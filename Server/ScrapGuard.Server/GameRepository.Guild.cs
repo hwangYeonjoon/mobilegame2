@@ -114,6 +114,8 @@ public sealed partial class GameRepository
         var target=Load(db,tx,id,true);
         if(hero<0 || hero>2 || !target.State.heroes[hero].unlocked)throw new ApiFault(400,"지원 등록이 해제된 대원이에요.");
         a.State.dailySupportStarts++;
-        return new SupportSnapshot {owner=id,name=target.State.displayName,hero=hero,skin=target.State.selectedSkin,power=SupportPower(target.State,hero)};
+        bool show=target.State.publicProfile;
+        return new SupportSnapshot {owner=id,name=show?target.State.displayName:"길드 지원 대원",hero=hero,skin=show?target.State.selectedSkin:0,power=SupportPower(target.State,hero),
+            showIdentity=show,title=show?target.State.showcaseTitle:0,frame=show?target.State.showcaseFrame:0,trophy=show?Endgame.Trophy(target.State):-1};
     }
 }

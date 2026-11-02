@@ -21,12 +21,12 @@ namespace ScrapGuard.Core
     public static class Social
     {
         public static readonly string[] Titles = { "새내기 정비사", "첫 구역의 수호자", "꾸준한 발걸음", "천 대의 증인", "코어 정복자", "균열의 개척자" };
-        public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "5개 구역 모두 클리어", "코어 파편 12개 교환" };
+        public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "작전 5개 클리어", "코어 파편 12개 교환" };
         public static readonly string[] Frames = { "작업대", "첫 승리", "푸른 궤적", "태양의 테두리", "코어 궤도" };
-        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색" };
+        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛" };
         public static void Normalize(GameState s)
         {
-            Endgame.Normalize(s);
+            Campaign.Normalize(s); Endgame.Normalize(s); Workshop.Normalize(s);
             if (string.IsNullOrWhiteSpace(s.displayName)) s.displayName = "새내기 정비사";
             if (s.ownedCosmetics == null) s.ownedCosmetics = new List<string>();
             if (s.showcaseItems == null) s.showcaseItems = new List<string>();
@@ -52,7 +52,7 @@ namespace ScrapGuard.Core
         }
         public static bool HasSkin(GameState s, int id)
         {
-            return id == 0 || id == 1 && s.ownedCosmetics != null && s.ownedCosmetics.Contains("skin_amber") || id == 2 && s.totalKills >= 1000;
+            return id == 0 || id == 1 && s.ownedCosmetics != null && s.ownedCosmetics.Contains("skin_amber") || id == 2 && s.totalKills >= 1000 || id>=3 && id<Skins.Length && s.ownedCosmetics!=null && s.ownedCosmetics.Contains(Workshop.SkinKey(id-3));
         }
         public static CommandResult Rename(GameState s, string name)
         {

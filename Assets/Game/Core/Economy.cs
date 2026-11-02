@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
     {
         public GameState State { get; private set; }
         readonly Func<DateTimeOffset> clock;
-        public Economy(GameState state, Func<DateTimeOffset> clock, bool refresh = true) { State = state; Endgame.Normalize(state); this.clock = clock; if (refresh) RefreshDay(); }
+        public Economy(GameState state, Func<DateTimeOffset> clock, bool refresh = true) { State = state; Campaign.Normalize(state); Endgame.Normalize(state); Workshop.Normalize(state); this.clock = clock; if (refresh) RefreshDay(); }
         public void RefreshDay()
         {
             string today = Catalog.ServiceDate(clock());
@@ -148,7 +148,7 @@ namespace ScrapGuard.Core
         public CommandResult BeginRun(string id, int stage)
         {
             RefreshDay();
-            if (string.IsNullOrEmpty(id) || stage < 0 || stage > State.unlockedStage || stage >= 5) return CommandResult.Fail("아직 갈 수 없는 구역이에요.");
+            if (string.IsNullOrEmpty(id) || stage < 0 || stage > State.unlockedStage || stage >= Campaign.Count) return CommandResult.Fail("아직 갈 수 없는 구역이에요.");
             if (State.receipts.Exists(r => r.id == id) || !string.IsNullOrEmpty(State.activeRun)) return CommandResult.Fail("진행 중인 전투가 있어요.");
             State.activeMode = State.activeWeek = "";
             State.activeRun = id; State.activeStage = stage; return CommandResult.Ok("출격!");
@@ -158,15 +158,16 @@ namespace ScrapGuard.Core
             RefreshDay();
             if (State.activeMode != "") return CommandResult.Fail("도전 전용 정산이 필요해요.");
             if (State.receipts.Exists(r => r.id == id)) return CommandResult.Fail("이미 받은 전투 보상이에요.");
-            if (State.activeRun != id || string.IsNullOrEmpty(id) || stage != State.activeStage || stage < 0 || stage >= 5 || kills < 0 || seconds < 0 || float.IsNaN(seconds) || float.IsInfinity(seconds))
+            if (State.activeRun != id || string.IsNullOrEmpty(id) || stage != State.activeStage || stage < 0 || stage >= Campaign.Count || kills < 0 || seconds < 0 || float.IsNaN(seconds) || float.IsInfinity(seconds))
                 return CommandResult.Fail("유효하지 않은 전투 결과예요.");
-            int gold = won ? 1500 + stage * 250 : Math.Min(1000, (int)Math.Min(seconds, 300) * 4);
-            int parts = won ? 10 + stage * 2 : Math.Min(8, (int)seconds / 30);
+            var definition = Campaign.Get(stage);
+            int gold = won ? definition.Gold : Math.Min(1000, (int)Math.Min(seconds, 300) * 4);
+            int parts = won ? definition.Parts : Math.Min(8, (int)seconds / 30);
             int gems = 0;
             if (won && !State.clearedStages.Contains(stage))
             {
-                gems = 50; State.clearedStages.Add(stage); State.unlockedStage = Math.Min(4, Math.Max(State.unlockedStage, stage + 1));
-                if (State.items.Count < 80) AddItem(stage == 0 ? 1 : stage == 1 ? 7 : stage == 2 ? 10 : stage == 3 ? 2 : 5, stage < 2 ? 1 : 2);
+                gems = 50; State.clearedStages.Add(stage); State.unlockedStage = Math.Min(Campaign.Count - 1, Math.Max(State.unlockedStage, stage + 1));
+                if (State.items.Count < 80) AddItem(definition.FirstItem, definition.FirstRarity);
                 else parts += 30;
             }
             State.gold += gold; State.parts += parts; State.gems += gems;

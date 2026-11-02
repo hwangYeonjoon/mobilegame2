@@ -52,7 +52,7 @@ namespace ScrapGuard
                 Ui.Label(card, Catalog.Items[item.definition].Name, ix + 19, 370, 114, 28, 15, rarity);
                 Ui.Label(card, new[] { "일반", "고급", "희귀" }[item.rarity] + "  +" + (item.level - 1), ix + 19, 398, 111, 25, 13, Ui.Muted);
             }
-            Ui.Label(card, "정복 " + p.stages + "/5     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 445, 428, 30, 15, Ui.Ink, TextAnchor.MiddleCenter);
+            Ui.Label(card, "정복 " + p.stages + "/" + Campaign.Count + "     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 445, 428, 30, 15, Ui.Ink, TextAnchor.MiddleCenter);
             string status = p.local ? "LOCAL PLAY · 로컬 체험 기록" : "SERVER PLAY · ID " + p.id;
             Ui.Label(card, status, 32, 483, 428, 22, 11, Ui.Muted, TextAnchor.MiddleCenter);
             return card;
@@ -61,7 +61,7 @@ namespace ScrapGuard
         {
             Social.Normalize(State);
             var card = Dialog("나를 보여 주는 전시실", "업적은 플레이로, 도색과 프레임은 취향대로.\n꾸미기는 전투 능력치를 바꾸지 않아요.", 870);
-            var content = Ui.Scroll(card, 24, 137, 444, 699, 1702);
+            var content = Ui.Scroll(card, 24, 137, 444, 699, 1987);
             Ui.Label(content, "닉네임", 0, 0, 444, 30, 17, Ui.Mint);
             var name = Ui.Input(content, State.displayName, "닉네임 2~12자", 0, 38, 300, 12);
             Ui.Button(content, "저장", 314, 38, 130, 52, () => Change(new GameCommand("rename") { value = name.text }, CustomizeProfile), Ui.Raised, true, 16);
@@ -96,15 +96,15 @@ namespace ScrapGuard
             {
                 int skin = i; bool owned = Social.HasSkin(State, i);
                 Ui.Button(content, Social.Skins[i] + (State.selectedSkin == i ? " ✓" : ""), 0, 1139 + i * 57, 226, 47,
-                    () => { if (owned) Customize(skin: skin); else Wardrobe(skin); }, State.selectedSkin == i ? Ui.Mint : Ui.Raised, owned || i == 1, 15);
-                Ui.Label(content, skinGoals[i], 240, 1139 + i * 57, 204, 47, 13, Ui.Muted);
+                    () => { if (owned) Customize(skin: skin); else Wardrobe(skin); }, State.selectedSkin == i ? Ui.Mint : Ui.Raised, owned || i == 1 || i>=3, 15);
+                Ui.Label(content, (i<3?skinGoals[i]:Campaign.Regions[i-3]+" 설계도 8개"), 240, 1139 + i * 57, 204, 47, 13, Ui.Muted);
             }
-            Ui.Label(content, "프로필 공개", 0, 1332, 444, 33, 17, Ui.Mint);
-            Ui.Label(content, Online ? "공개하면 닉네임·대원·장비·성장 기록을\n이 서버의 다른 플레이어가 보고 응원할 수 있어요." : "로컬 카드는 이미지로 공유할 수 있어요.\n전시 광장 공개는 서버 계정에서 가능합니다.", 0, 1374, 444, 65, 15, Ui.Muted);
-            Ui.Button(content, !Online ? "서버 계정 연결하기" : State.publicProfile ? "비공개로 바꾸기" : "프로필 공개하기", 0, 1458, 444, 54,
+            Ui.Label(content, "프로필 공개", 0, 1617, 444, 33, 17, Ui.Mint);
+            Ui.Label(content, Online ? "공개하면 닉네임·대원·장비·성장 기록을\n이 서버의 다른 플레이어가 보고 응원할 수 있어요." : "로컬 카드는 이미지로 공유할 수 있어요.\n전시 광장 공개는 서버 계정에서 가능합니다.", 0, 1659, 444, 65, 15, Ui.Muted);
+            Ui.Button(content, !Online ? "서버 계정 연결하기" : State.publicProfile ? "비공개로 바꾸기" : "프로필 공개하기", 0, 1743, 444, 54,
                 () => { if (!Online) AccountPanel(); else if (State.publicProfile) Change(new GameCommand("visibility") { enabled = false }, CustomizeProfile); else ConfirmPublish(); }, Ui.Raised, true, 17);
-            Ui.Label(content, "응원 수에 재화나 전투 보상은 연결되지 않습니다.\n획득 조건과 가격은 프로토타입 밸런스입니다.", 0, 1534, 444, 66, 14, Ui.Muted);
-            Ui.Button(content, "전시실로 돌아가기", 0, 1624, 444, 54, () => Show("showcase"));
+            Ui.Label(content, "응원 수에 재화나 전투 보상은 연결되지 않습니다.\n획득 조건과 가격은 프로토타입 밸런스입니다.", 0, 1819, 444, 66, 14, Ui.Muted);
+            Ui.Button(content, "전시실로 돌아가기", 0, 1909, 444, 54, () => Show("showcase"));
         }
         void Customize(int hero = -1, int title = -1, int frame = -1, int skin = -1)
         {
@@ -150,7 +150,7 @@ namespace ScrapGuard
                 var p = list.profiles[i]; var row = Ui.Box(content, 0, i * 113, 444, 101, Ui.Raised).transform;
                 Ui.Robot(row, 15, 11, .7f, p.hero, skin:p.skin);
                 Ui.Label(row, p.name, 88, 10, 223, 34, 21);
-                Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/5 · 응원 " + p.likes, 88, 45, 223, 46, 13, FrameColor(p.frame));
+                Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/" + Campaign.Count + " · 응원 " + p.likes, 88, 45, 223, 46, 13, FrameColor(p.frame));
                 Ui.Button(row, "보기", 337, 25, 93, 52, () => StartCoroutine(LoadPublic(p.id)), null, true, 16);
             }
             Ui.Button(card, "처음부터", 24, 769, 138, 57, () => StartCoroutine(LoadGallery("")), Ui.Raised, true, 17);

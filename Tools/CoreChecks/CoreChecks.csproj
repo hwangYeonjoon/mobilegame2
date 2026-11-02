@@ -7,6 +7,7 @@
   <ItemGroup>
     <Compile Include="../../Assets/Game/Core/*.cs" />
     <Compile Include="../../Assets/Tests/EditMode/CoreSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/WorkshopSpecification.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>

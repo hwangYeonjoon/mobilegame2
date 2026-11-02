@@ -120,6 +120,8 @@ try
         Check((long)query.ExecuteScalar() == 0,"account deletion cascades social and economy rows");
     }
     EndgameChecks.Run(folder,Check);
+    CampaignChecks.Run(folder,Check);
+    WorkshopChecks.Run(folder,Check);
     Console.WriteLine(count + " checks passed");
 }
 finally { SqliteConnection.ClearAllPools(); if (Directory.Exists(folder)) Directory.Delete(folder,true); }

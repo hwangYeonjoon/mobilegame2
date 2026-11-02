@@ -133,7 +133,8 @@ namespace ScrapGuard
         void Home()
         {
             var heroPanel = Ui.Box(screen, 24, 178, 492, 303, Ui.Panel).transform;
-            Ui.Label(heroPanel, "READY FOR THE NEXT RUN", 20, 16, 450, 24, 12, Ui.Muted);
+            Ui.Label(heroPanel, "READY FOR THE NEXT RUN", 20, 16, 280, 24, 12, Ui.Muted);
+            Ui.Button(heroPanel,"개조 · 수집",308,10,164,38,()=>RegionCollection(Campaign.Get(selectedStage).Region),Ui.Raised,true,15);
             for (int i = 0; i < 6; i++) Ui.Box(heroPanel, 20, 66 + i * 32, 452, 1, new Color(.3f, .45f, .5f, .13f), false);
             Ui.Disc(heroPanel, 150, 57, 196, new Color(.2f, .9f, .7f, .05f));
             Ui.Robot(heroPanel, 180, 65, 1.7f, State.selectedHero, skin: State.selectedSkin);
@@ -141,10 +142,11 @@ namespace ScrapGuard
             Ui.Label(heroPanel, "Lv." + State.heroes[State.selectedHero].level + "    공격 " + Catalog.Attack(State) + "    체력 " + Catalog.Health(State), 20, 262, 450, 25, 15, Ui.Muted, TextAnchor.MiddleCenter);
             Ui.Button(screen, "출석  " + (Store.Economy.CanAttend ? "받기" : "완료"), 24, 497, 236, 53, Attendance, Ui.Raised, true, 18);
             Ui.Button(screen, "오늘의 임무  " + Math.Min(3, State.dailyRuns) + "/3", 276, 497, 240, 53, Missions, Ui.Raised, true, 18);
-            Ui.Label(screen, "작전 구역", 24, 565, 250, 28, 17, Ui.Muted);
+            Ui.Label(screen, Campaign.Regions[Campaign.Get(selectedStage).Region]+" · "+State.clearedStages.Count+"/"+Campaign.Count, 24, 565, 300, 28, 17, Ui.Muted);
+            Ui.Button(screen,"전체 지도",374,558,142,38,()=>CampaignMap(),Ui.Raised,true,15);
             var stage = Ui.Box(screen, 24, 602, 492, 114, Ui.Panel).transform;
             Ui.Button(stage, "‹", 12, 29, 45, 53, () => { selectedStage = Math.Max(0, selectedStage - 1); Show("home"); }, Ui.Raised, selectedStage > 0, 26);
-            Ui.Label(stage, "0" + (selectedStage + 1) + "   " + Catalog.StageNames[selectedStage], 68, 18, 357, 40, 22);
+            Ui.Label(stage, (selectedStage + 1).ToString("D2") + "   " + Catalog.StageNames[selectedStage], 68, 18, 357, 40, 22);
             Ui.Label(stage, Catalog.StageDescriptions[selectedStage], 68, 62, 357, 30, 14, Ui.Muted);
             Ui.Button(stage, "›", 435, 29, 45, 53, () => { selectedStage = Math.Min(State.unlockedStage, selectedStage + 1); Show("home"); }, Ui.Raised, selectedStage < State.unlockedStage, 26);
             Ui.Button(screen, "출격하기  →", 24, 736, 492, 59, CampaignLaunch, null, true, 23);
@@ -196,7 +198,7 @@ namespace ScrapGuard
             Ui.Button(card, "계정 · 서버 연결", 24, 270, 444, 53, AccountPanel, Ui.Raised);
             Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online);
             Ui.Label(card, "이동: 화면 드래그 또는 WASD / 방향키\n공격은 자동 · 레벨업하면 스킬 선택\n일시정지: 전투 상단 버튼 또는 ESC", 24, 407, 444, 98, 16, Ui.Muted);
-            Ui.Label(card, "SCRAP GUARD  0.4.0\nUnity Android · collector prototype", 24, 527, 444, 64, 13, Ui.Muted);
+            Ui.Label(card, "SCRAP GUARD  " + Application.version + "\nUnity Android · collector prototype", 24, 527, 444, 64, 13, Ui.Muted);
         }
         void Info(string title, string text)
         {

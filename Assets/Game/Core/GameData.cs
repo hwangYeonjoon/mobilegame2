@@ -12,7 +12,7 @@ namespace ScrapGuard.Core
         public bool locked;
     }
     [Serializable] public class HeroProgress { public int id; public int level = 1; public bool unlocked; }
-    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems; public bool won; public int kills; public float seconds; public int score; public string week; }
+    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems; public bool won; public int kills; public float seconds; public int score; public string week; public int blueprints; public BattleReport report; }
     [Serializable] public class GameState
     {
         public int version = 1;
@@ -20,6 +20,8 @@ namespace ScrapGuard.Core
         public int parts = 30;
         public int gems;
         public int coreShards;
+        public int collectionVersion, enemyDiscoveries, bossDiscoveries;
+        public List<RegionProgress> regions = new List<RegionProgress>();
         public int selectedHero;
         public int unlockedStage;
         public int attendanceCount;
@@ -85,8 +87,8 @@ namespace ScrapGuard.Core
     {
         public static readonly string[] HeroNames = { "정비사 루크", "돌격수 레이", "수호자 볼트" };
         public static readonly string[] HeroRoles = { "드론 피해 +15%", "치명타 +5% · 빠른 이동", "20초마다 보호막 생성" };
-        public static readonly string[] StageNames = { "버려진 정비소", "철길의 불청객", "폐기물 처리장", "멈춰버린 공장", "중앙 제어 코어" };
-        public static readonly string[] StageDescriptions = { "작은 고철에도, 새로운 시작이.", "철길을 따라 몰려오는 폭주 로봇", "고철 더미 뒤에 숨은 위험", "다시 켜진 공장의 붉은 경고등", "폭주의 근원을 멈춰라" };
+        public static readonly string[] StageNames = Array.ConvertAll(Campaign.Stages, s => s.Name);
+        public static readonly string[] StageDescriptions = Array.ConvertAll(Campaign.Stages, s => s.Description);
         public static readonly string[] RarityNames = { "일반", "고급", "희귀" };
         public static readonly string[] SkillNames = { "리벳 탄막", "회전 톱날", "충격 코일", "지원 드론", "고밀도 탄환", "신속 장전", "응급 수리", "자력 수집" };
         public static readonly string[] SkillDescriptions = { "탄환 추가 · 정면을 꿰뚫는 화력", "주위를 도는 톱날로 근접 적 공격", "주기적인 전기 충격으로 주변 정리", "드론이 추적탄으로 적을 공격", "모든 공격 피해 20% 증가", "기본 공격 간격 12% 감소", "최대 체력 15% 증가 · 체력 회복", "경험치 수집 반경 증가" };

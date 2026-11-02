@@ -10,7 +10,8 @@ namespace ScrapGuard
         static readonly Sprite[,] sprites = new Sprite[3,3];
         public static Sprite Get(int hero, int skin)
         {
-            if (hero < 0 || hero > 2 || skin < 0 || skin > 2) return null;
+            if (hero < 0 || hero > 2 || skin < 0 || skin >= ScrapGuard.Core.Social.Skins.Length) return null;
+            if(skin>=3)skin=0;
             if (!loaded) { atlas = Resources.Load<Texture2D>("Art/Guardians-v1"); loaded = true; }
             if (atlas == null) return null;
             if (sprites[hero,skin] != null) return sprites[hero,skin];
@@ -24,10 +25,15 @@ namespace ScrapGuard
             sprites[hero,skin].name = "Guardian-" + hero + "-" + skin;
             return sprites[hero,skin];
         }
+        public static Color Tint(int skin)
+        {
+            if(skin<3 || skin>7)return Color.white;
+            return new[]{Ui.Hex("FFD1A4"),Ui.Hex("FFBA83"),Ui.Hex("A8F7B4"),Ui.Hex("B8E6FF"),Ui.Hex("E9B4FF")}[skin-3];
+        }
         public static Image Draw(Transform parent, float x, float y, float width, float height, int hero, int skin)
         {
             var image = Ui.Rect(parent,"GuardianArt",x,y,width,height).gameObject.AddComponent<Image>();
-            image.sprite = Get(hero,skin); image.preserveAspect = true; image.raycastTarget = false;
+            image.sprite = Get(hero,skin); image.color=Tint(skin); image.preserveAspect = true; image.raycastTarget = false;
             return image;
         }
     }

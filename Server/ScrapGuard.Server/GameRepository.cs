@@ -123,6 +123,7 @@ public sealed partial class GameRepository
             }
             if (a.Revision != command.revision) throw new ApiFault(409, "다른 기기에서 진행이 변경됐어요. 최신 상태에서 다시 시도해 주세요.", Reply(a, "진행 상태가 변경됐어요. 다시 시도해 주세요.", false));
             int gold = a.State.gold, gems = a.State.gems, parts = a.State.parts, shards=a.State.coreShards;
+            var blueprintBalances=Enumerable.Range(0,Campaign.Regions.Length).Select(i=>Workshop.Region(a.State,i).blueprints).ToArray();
             var e = new Economy(a.State, clock); CommandResult result;
             if (command.type == "battle_start")
             {
@@ -153,7 +154,7 @@ public sealed partial class GameRepository
                 try { simulation = ReplayRecorder.Verify(Decode<GameState>(a.RunSnapshot), a.State.activeStage, command.id, a.RunSeed, command.replay, (clock() - DateTimeOffset.Parse(a.RunStarted)).TotalSeconds, a.State.activeMode, a.RunSupport==null?null:Decode<SupportSnapshot>(a.RunSupport)); }
                 catch (ArgumentException ex) { throw new ApiFault(400, ex.Message); }
                 RecordWeekly(db,tx,a,simulation);
-                result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishRun(command.id, a.State.activeStage, simulation.Won, simulation.Kills, simulation.Elapsed);
+                result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
                 a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }
             else
@@ -170,6 +171,12 @@ public sealed partial class GameRepository
             foreach (var value in new[] { ("gold", a.State.gold-gold, a.State.gold), ("gems", a.State.gems-gems, a.State.gems), ("parts", a.State.parts-parts, a.State.parts), ("core_shards",a.State.coreShards-shards,a.State.coreShards) })
                 if (value.Item2 != 0) Execute(db, tx, "INSERT INTO ledger VALUES($owner,$id,$currency,$delta,$balance,$type,$time)",
                     ("$owner",a.Id), ("$id",command.requestId), ("$currency",value.Item1), ("$delta",value.Item2), ("$balance",value.Item3), ("$type",command.type), ("$time",clock().ToString("O")));
+            for(int region=0;region<Campaign.Regions.Length;region++)
+            {
+                int balance=Workshop.Region(a.State,region).blueprints,delta=balance-blueprintBalances[region];
+                if(delta!=0)Execute(db,tx,"INSERT INTO ledger VALUES($owner,$id,$currency,$delta,$balance,$type,$time)",
+                    ("$owner",a.Id),("$id",command.requestId),("$currency","blueprints:"+region),("$delta",delta),("$balance",balance),("$type",command.type),("$time",clock().ToString("O")));
+            }
             tx.Commit(); return Reply(a, result.Message);
         }
     }

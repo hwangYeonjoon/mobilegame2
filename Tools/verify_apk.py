@@ -21,7 +21,7 @@ def run(args):
     return result.stdout
 
 badging = run([bin_dir / 'aapt', 'dump', 'badging', apk])
-assert "versionName='0.4.0'" in badging and "versionCode='4'" in badging
+assert "versionName='0.6.0'" in badging and "versionCode='6'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'36'" in badging
 assert "native-code: 'arm64-v8a'" in badging
 manifest = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'AndroidManifest.xml'])
@@ -57,10 +57,10 @@ with zipfile.ZipFile(apk) as archive:
         libraries.append({'name': name, 'load_alignments': load_alignments})
 assert libraries
 report = {'apk': str(apk), 'bytes': apk.stat().st_size, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
-          'version': '0.4.0', 'versionCode': 4, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
+          'version': '0.6.0', 'versionCode': 6, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
           'v2_signature': True, 'zip_16kb': True, 'file_provider': True, 'backup_disabled': True,
           'libraries': libraries, 'device_execution': 'not tested'}
-(result_dir / 'apk-04-verification.json').write_text(json.dumps(report, indent=2) + '\n')
-(result_dir / 'apk-04-manifest.txt').write_text(manifest + '\n' + paths)
+(result_dir / 'apk-06-verification.json').write_text(json.dumps(report, indent=2) + '\n')
+(result_dir / 'apk-06-manifest.txt').write_text(manifest + '\n' + paths)
 print(json.dumps({key:value for key,value in report.items() if key != 'libraries'}, indent=2))
 print('ELF libraries checked:', len(libraries))

@@ -24,7 +24,7 @@ namespace ScrapGuard
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-smokeOutput") smokeOutput = args[i + 1];
             Directory.CreateDirectory(smokeOutput);
             Application.logMessageReceived += (message, stack, type) => { if (type == LogType.Exception || type == LogType.Error || type == LogType.Assert) smokeErrors.Add(message); };
-            StartCoroutine(Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
+            StartCoroutine(Array.IndexOf(args,"-workshopSmoke")>=0 ? WorkshopSmokeRoutine() : Array.IndexOf(args,"-campaignSmoke")>=0 ? CampaignSmokeRoutine() : Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
         }
         void UpdateSmoke() { }
         V2 SmokeMovement()

@@ -3,13 +3,81 @@ using ScrapGuard.Core;
 
 namespace ScrapGuard.Tests
 {
-    public static class CoreSpecification
+    public static partial class CoreSpecification
     {
-        public static readonly string[] Names = { "AttendanceBoundary", "AttendanceCannotRepeat", "AttendanceSkipAndCycle", "ClockBackwards", "InsufficientFunds", "ShopLimitsAndReset", "RareLifetimeLimit", "SellGuards", "TransferConservesLevels", "HeroUnlock", "DuplicateBattle", "WrongStage", "FirstClearOnlyOnce", "AbandonNoDailyCredit", "RewardCaps", "RewardReplay", "OldResultCannotFarm", "MissionClaimOnce", "CombatPausesForChoices", "InvalidSkillRejected", "CharacterStats", "CombatDeath", "BossVictory", "SpawnBudget", "ShowcaseMigration", "CosmeticsDoNotAffectStats", "ShowcaseOwnership", "NicknameValidation", "ShowcaseSoldItem", "ReplayRoundTrip", "ReplayRejectsInvalidInput", "UltimateRules", "UltimateHeroGeometry", "UltimateReplay", "UltimateRejectsForgery", "WeeklyBoundary", "ChallengeReplay", "WeeklyRewardRules", "CoreExchangeRules", "SupportReplay", "SupportGuards" };
+        public static readonly string[] Names = { "AttendanceBoundary", "AttendanceCannotRepeat", "AttendanceSkipAndCycle", "ClockBackwards", "InsufficientFunds", "ShopLimitsAndReset", "RareLifetimeLimit", "SellGuards", "TransferConservesLevels", "HeroUnlock", "DuplicateBattle", "WrongStage", "FirstClearOnlyOnce", "AbandonNoDailyCredit", "RewardCaps", "RewardReplay", "OldResultCannotFarm", "MissionClaimOnce", "CombatPausesForChoices", "InvalidSkillRejected", "CharacterStats", "CombatDeath", "BossVictory", "SpawnBudget", "ShowcaseMigration", "CosmeticsDoNotAffectStats", "ShowcaseOwnership", "NicknameValidation", "ShowcaseSoldItem", "ReplayRoundTrip", "ReplayRejectsInvalidInput", "UltimateRules", "UltimateHeroGeometry", "UltimateReplay", "UltimateRejectsForgery", "WeeklyBoundary", "ChallengeReplay", "WeeklyRewardRules", "CoreExchangeRules", "SupportReplay", "SupportGuards", "CampaignProgression", "CampaignMigration", "CampaignReplay", "CampaignTerrain", "CampaignEnemyRoles", "ModGeometry", "ModReplay", "BattleDamageReport", "CollectionMigration", "RegionRewardsAndCraft" };
         public static void Run(string name) { typeof(CoreSpecification).GetMethod(name).Invoke(null, null); }
         static DateTimeOffset Now = new DateTimeOffset(2026, 11, 2, 0, 0, 0, TimeSpan.Zero);
         static Economy New() { return new Economy(GameState.New(), () => Now); }
         static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+        public static void CampaignProgression()
+        {
+            var e=New();Check(Campaign.Count==30,"30 operations");
+            Check(!e.BeginRun("locked",1).Success,"sequential unlock");
+            for(int stage=0;stage<Campaign.Count;stage++)
+            {
+                var d=Campaign.Get(stage);Check(d.Id==stage && d.Duration<500,"stable IDs and replay duration budget");
+                Check(e.BeginRun("clear"+stage,stage).Success,"operation starts");
+                Check(e.FinishRun("clear"+stage,stage,true,20,d.Duration).Success,"operation settles");
+            }
+            Check(e.State.clearedStages.Count==30 && e.State.gems==1500 && e.State.unlockedStage==29,"all rewards and final bound");
+            int gems=e.State.gems,count=e.State.items.Count;
+            e.BeginRun("repeat",29);e.FinishRun("repeat",29,true,20,270);
+            Check(e.State.gems==gems && e.State.items.Count==count,"repeat cannot duplicate first rewards");
+            Check(!e.BeginRun("overflow",30).Success && !e.BeginRun("negative",-1).Success,"stage bounds");
+        }
+        public static void CampaignMigration()
+        {
+            var state=GameState.New();state.unlockedStage=4;state.clearedStages.AddRange(new[]{0,1,2,3,4});state.gems=250;
+            var e=new Economy(state,()=>Now);Check(state.unlockedStage==5 && state.gems==250 && state.clearedStages.Count==5,"old clears preserved without reward replay");
+            Campaign.Normalize(state);Check(state.unlockedStage==5 && Endgame.Unlocked(state) && Social.HasTitle(state,4),"idempotent migration and earned rights retained");
+            Check(e.BeginRun("six",5).Success,"legacy account continues");
+        }
+        public static void CampaignReplay()
+        {
+            for(int stage=0;stage<Campaign.Count;stage++)
+            {
+                var state=GameState.New();state.heroes[0].level=30;foreach(var item in state.items)item.level=20;
+                var combat=new Combat(state,stage,"campaign",913);var recorder=new ReplayRecorder();
+                for(int i=0;i<1200 && !combat.Ended;i++)
+                {
+                    if(combat.Choosing){recorder.Choose(combat.Choices[0]);combat.Choose(combat.Choices[0]);}
+                    if(combat.CanUltimate){recorder.Ultimate();combat.UseUltimate();}
+                    combat.Tick(ReplayRecorder.Step,recorder.Move(new V2((float)Math.Sin(i*.02),(float)Math.Cos(i*.02))));
+                }
+                if(!combat.Ended)combat.Abandon();
+                var replay=ReplayRecorder.Verify(state,stage,"campaign",913,recorder.Steps,50);
+                Check(replay.Hp==combat.Hp && replay.Kills==combat.Kills && replay.Position.x==combat.Position.x && replay.Position.y==combat.Position.y,"deterministic region replay "+stage);
+            }
+        }
+        public static void CampaignTerrain()
+        {
+            var s=GameState.New();
+            for(int stage=0;stage<Campaign.Count;stage++)
+            {
+                var c=new Combat(s,stage,"bounds");Check(!c.IsBlocked(c.Position),"safe spawn");
+                var block=c.Blocks[0];c.Position=new V2(block.X+block.W+15,block.Y+block.H/2);c.Tick(.05f,new V2(-1,0));Check(!c.IsBlocked(c.Position),"solid collision");
+            }
+            var toxic=new Combat(s,12,"toxic");toxic.Position=toxic.Zones[0].Center;float hp=toxic.Hp;toxic.Tick(.05f,new V2());Check(toxic.Hp<hp,"poison zone damages");
+            var ice=new Combat(s,18,"ice");ice.Tick(.05f,new V2(1,0));float x=ice.Position.x;ice.Tick(.05f,new V2());Check(ice.Position.x>x,"ice carries momentum");
+            var belt=new Combat(s,24,"belt");belt.Position=belt.Zones[0].Center;float y=belt.Position.y;belt.Tick(.05f,new V2());Check(belt.Position.y<y,"conveyor displacement");
+            var rail=new Combat(s,6,"rail");rail.Elapsed=5;for(int i=0;i<102;i++){rail.Enemies.Clear();rail.Tick(.05f,new V2());}
+            Check(rail.Hazards.Exists(h=>h.width>0 && h.delay>0),"rail has warning before damage");
+            var survival=new Combat(s,2,"survival");survival.Elapsed=survival.Duration-.01f;survival.Tick(.05f,new V2());Check(survival.Ended && survival.Won,"survival mission clears without boss");
+            var rift=new Combat(s,4,"rift",1,false,Endgame.PracticeMode);Check(rift.Blocks.Length==0 && rift.Zones.Length==0,"rift isolated from campaign terrain");
+        }
+        public static void CampaignEnemyRoles()
+        {
+            foreach(EnemyRole role in Enum.GetValues(typeof(EnemyRole)))
+            {
+                var c=new Combat(GameState.New(),24,"role");c.Enemies.Clear();
+                var enemy=new Enemy {id=900,kind=0,role=role,position=c.Position+new V2(70,0),hp=100000,maxHp=100000,speed=30,cooldown=0};c.Enemies.Add(enemy);
+                c.Tick(.05f,new V2());
+                if(role==EnemyRole.Charger)Check(enemy.windup>0,"charge telegraphs");
+                if(role==EnemyRole.Artillery || role==EnemyRole.Bomber)Check(c.Hazards.Count>0,"attack warning exists");
+                if(role==EnemyRole.Summoner)Check(c.Enemies.Count>=2,"summoner produces unit");
+            }
+        }
         public static void ShowcaseMigration()
         {
             var s = GameState.New(); s.displayName = null; s.ownedCosmetics = null; s.showcaseItems = null; s.showcaseHero = 99;

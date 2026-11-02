@@ -52,6 +52,7 @@ namespace ScrapGuard.Core
                 case "showcase_equipment": e.State.showcaseItems = new List<string>(e.State.equipped); return CommandResult.Ok("현재 장비를 전시했어요.");
                 case "visibility": e.State.publicProfile = c.enabled; return CommandResult.Ok(c.enabled ? "프로필을 공개했어요." : "프로필을 비공개로 바꿨어요.");
                 case "sound": e.State.sound = c.enabled; return CommandResult.Ok("효과음 설정 저장");
+                case "region_craft": return e.CraftRegionSkin(c.stage);
                 case "core_exchange": return e.ExchangeCore(c.value);
                 case "weekly_claim": return e.ClaimWeekly(c.value,c.stage);
                 case "battle_cancel": e.State.activeRun = e.State.activeMode = e.State.activeWeek = ""; return CommandResult.Ok("중단된 작전을 종료했어요.");

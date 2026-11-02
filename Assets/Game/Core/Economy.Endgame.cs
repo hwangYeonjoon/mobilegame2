@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if(!Endgame.IsChallenge(mode))return CommandResult.Fail("없는 도전이에요.");
-            if(mode==Endgame.WeeklyMode && !Endgame.Unlocked(State))return CommandResult.Fail("5구역을 클리어하면 정식 도전이 열려요.");
+            if(mode==Endgame.WeeklyMode && !Endgame.Unlocked(State))return CommandResult.Fail("작전 05을 클리어하면 정식 도전이 열려요.");
             if(string.IsNullOrEmpty(id) || !string.IsNullOrEmpty(State.activeRun) || State.receipts.Exists(r=>r.id==id))return CommandResult.Fail("진행 중이거나 정산된 전투예요.");
             State.activeRun=id;State.activeStage=4;State.activeMode=mode;State.activeWeek=Endgame.Week(clock());
             return CommandResult.Ok(mode==Endgame.PracticeMode ? "보상 없는 도전 연습을 시작해요." : "이번 주 코어에 도전하세요!");
@@ -26,7 +26,7 @@ namespace ScrapGuard.Core
                 progress.attempts++;progress.bestScore=Math.Max(progress.bestScore,combat.CoreScore);
                 State.totalRuns++;State.totalKills+=combat.Kills;State.dailyRuns++;State.dailyKills+=combat.Kills;
             }
-            State.receipts.Add(new Receipt {id=combat.RunId,kind=State.activeMode,score=combat.CoreScore,week=week,seconds=combat.Elapsed,kills=combat.Kills,won=combat.Won});
+            State.receipts.Add(new Receipt {id=combat.RunId,kind=State.activeMode,score=combat.CoreScore,week=week,seconds=combat.Elapsed,kills=combat.Kills,won=combat.Won,report=combat.Report()});
             State.activeRun=State.activeMode=State.activeWeek="";
             State.lastResultGold=0;State.lastResultBonus=true;
             return CommandResult.Ok(eligible ? "주간 기록 저장 · 달성 보상을 확인하세요." : "연습 또는 30초 미만 기록은 보상·순위에 반영되지 않아요.");

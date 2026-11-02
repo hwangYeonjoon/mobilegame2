@@ -74,7 +74,7 @@ namespace ScrapGuard
         }
         void SupportRegistration()
         {
-            var card=Dialog("내 대원 지원 등록","등록한 대원을 길드 동료가 빌려 쓸 수 있어요.",650);
+            var card=Dialog("내 대원 지원 등록","프로필 공개 시 지원에 도색·이름·칭호가 표시돼요.",650);
             for(int i=0;i<3;i++)
             {
                 int hero=i;float y=144+i*118;CharacterArt.Draw(card,24,y,80,96,i,State.selectedSkin);
@@ -110,7 +110,7 @@ namespace ScrapGuard
         void TriggerSupport()
         {
             if(combat==null || battlePaused || networkBusy || !combat.UseSupport())return;
-            recorder.Support();dragging=false;
+            recorder.Support();dragging=false;SupportArrivalCard();
             var label=Ui.Label(effectLayer,SupportNames[combat.Support.hero]+"!",80,290,380,44,26,Ui.Blue,TextAnchor.MiddleCenter);
             label.gameObject.AddComponent<CombatBurst>().Configure(1.3f,1,1);RenderBattle();
         }

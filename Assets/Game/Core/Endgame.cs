@@ -37,6 +37,8 @@ namespace ScrapGuard.Core
     {
         public string owner, name;
         public int hero, skin, power;
+        public bool showIdentity;
+        public int title, frame, trophy;
     }
     public static class Endgame
     {

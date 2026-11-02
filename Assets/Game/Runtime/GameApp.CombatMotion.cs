@@ -36,7 +36,7 @@ namespace ScrapGuard
             player.localScale = new Vector3(.48f*(1+stride*.035f),.48f*(1-stride*.035f),1);
             player.localEulerAngles = new Vector3(0,0,-combat.LastMovement.x*5+stride*2-recoil*3);
             playerArt.rectTransform.localScale = new Vector3(Mathf.Cos(combat.Facing)<-.05f ? -1 : 1,1,1);
-            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : Color.white;
+            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : CharacterArt.Tint(State.selectedSkin);
             playerShadow.anchoredPosition = new Vector2(combat.Position.x-20,-combat.Position.y-12);
             shieldRing.gameObject.SetActive(combat.Shield>0);
             shieldRing.anchoredPosition = new Vector2(combat.Position.x,-combat.Position.y);

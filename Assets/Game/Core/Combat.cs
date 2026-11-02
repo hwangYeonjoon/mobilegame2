@@ -22,6 +22,9 @@ namespace ScrapGuard.Core
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
         public bool finalBoss, core;
+        public EnemyRole role;
+        public V2 direction;
+        public float windup, dash, attackFlash;
         public float Radius { get { return kind == 3 ? 35 : kind == 2 ? 23 : 15; } }
     }
     public class Bullet
@@ -30,14 +33,14 @@ namespace ScrapGuard.Core
         public V2 position, velocity;
         public float damage, life;
         public int pierce, lastHit = -1;
-        public bool blast, drone;
+        public bool blast, drone, mod;
     }
     public class Pickup { public int id, xp; public V2 position; public bool heal; }
-    public class Hazard { public int id; public V2 position; public float delay, radius; }
-    public class BattleEffect { public V2 position; public string text; public int kind; public float radius; }
-    public sealed class Combat
+    public class Hazard { public int id; public V2 position; public float delay, radius, width, height, damage; public DamageCause cause; }
+    public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
+    public sealed partial class Combat
     {
-        public const int RulesVersion = 4;
+        public const int RulesVersion = 6;
         public static readonly string[] UltimateNames = { "고철 폭풍", "광자 관통", "요새 강하" };
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -89,13 +92,16 @@ namespace ScrapGuard.Core
             if(Mode!="" && !Endgame.IsChallenge(Mode))throw new ArgumentException("Unknown combat mode");
             if(support!=null && (Challenge || support.hero<0 || support.hero>2 || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
             Support=support;
+            Definition=Campaign.Get(stage);
+            Blocks=Challenge?new MapRect[0]:Campaign.Blocks(Definition);
+            Zones=Challenge?new MapRect[0]:Campaign.Zones(Definition);
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
             module = state.items.Find(i => i.id == state.equipped[2]).definition;
             baseDamage = Catalog.Attack(state); MaxHp = Hp = Catalog.Health(state);
             baseSpeed = new[] { 160f, 174f, 150f }[hero] * (armor == 8 ? 1.08f : 1);
-            Duration = Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : 300 + stage * 15;
+            Duration = Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
             Skills[0] = 1;
             if(Challenge)
             {
@@ -116,7 +122,7 @@ namespace ScrapGuard.Core
             ShotFlash = Math.Max(0,ShotFlash-dt); HurtFlash = Math.Max(0,HurtFlash-dt);
             if (ultimateGuard > 0 && ultimateGuard <= dt) Shield = 0;
             ultimateGuard = Math.Max(0,ultimateGuard-dt);
-            Position += (movement.Length > 1 ? movement.Normal : movement) * (baseSpeed * dt);
+            MovePlayer(dt,movement);
             Position.x = Math.Max(26, Math.Min(514, Position.x)); Position.y = Math.Max(190, Math.Min(790, Position.y));
             if (movement.Length > .1f) Facing = (float)Math.Atan2(movement.y, movement.x);
             contactTimer -= dt;
@@ -129,12 +135,12 @@ namespace ScrapGuard.Core
             spawnTimer -= dt;
             if (spawnTimer <= 0)
             {
-                spawnTimer = Math.Max(.18f, .85f - Elapsed / Duration * .58f);
-                if (Enemies.Count < 150) Spawn(random.NextDouble() < .2 + Stage * .04 ? 1 : 0, false);
+                spawnTimer = Math.Max(.25f, (Challenge?.85f:Definition.SpawnInterval) - Elapsed / Duration * (Challenge?.58f:.48f));
+                if (Enemies.Count < 150) Spawn(random.NextDouble() < (Challenge?.36:.25 + Definition.Region * .07) ? 1 : 0, false);
             }
             if (!eliteSpawned && Elapsed > Duration * .46f) { eliteSpawned = true; Spawn(2, false); }
-            if (!bossSpawned && Elapsed >= Duration - 30) { bossSpawned = true; Spawn(3, true); }
-            if (Elapsed > Duration + 60) { Ended = true; Won = false; return; }
+            if (!bossSpawned && (Challenge || Definition.Mission==Mission.Eliminate) && Elapsed >= Duration - 30) { bossSpawned = true; Spawn(3, true); }
+            if (Elapsed > Duration + 60) { Ended = true; Won = false; endCause=DamageCause.Timeout; return; }
             if (bossSpawned)
             {
                 bossTimer -= dt;
@@ -144,10 +150,13 @@ namespace ScrapGuard.Core
                     Hazards.Add(new Hazard { id = nextId++, position = Position, radius = 65, delay = 1.4f });
                 }
             }
+            if(!Challenge && Definition.Mission==Mission.Survive && Elapsed>=Duration) { Ended=true;Won=Hp>0;return; }
+            UpdateTerrain(dt);
             UpdateHazards(dt);
             if (Ended) return;
             UpdateEnemies(dt);
             if (Ended) return;
+            UpdateMods(dt);
             UpdateWeapons(dt);
             UpdateSupport(dt);
             UpdateBullets(dt);
@@ -159,11 +168,14 @@ namespace ScrapGuard.Core
             V2 p = side == 0 ? new V2(15, 200 + random.Next(570)) : side == 1 ? new V2(525, 200 + random.Next(570)) :
                 side == 2 ? new V2(30 + random.Next(480), 175) : new V2(30 + random.Next(480), 810);
             if (V2.Distance(p, Position) < 95) p = new V2(540 - p.x, 980 - p.y);
-            float difficulty = 1 + Stage * .28f + Elapsed / Duration * .55f;
+            float difficulty = (Challenge?2.12f:Definition.Difficulty) + Elapsed / Duration * .55f;
             float hp = (kind == 3 ? 7000 : kind == 2 ? 1800 : kind == 1 ? 110 : 150) * difficulty;
-            Enemies.Add(new Enemy { id = nextId++, kind = kind, finalBoss = final, position = p, hp = hp, maxHp = hp,
+            var role=Challenge?EnemyRole.Pursuer:Definition.Enemies[random.Next(Definition.Enemies.Length)];
+            if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
+            if(final)role=BossRole();
+            Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
                 speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
-            if (kind >= 2) Effects.Add(new BattleEffect { position = new V2(270, 300), text = kind == 3 ? "폭주 코어 출현!" : "강화 로봇 접근", kind = 3 });
+            if (kind >= 2) Effects.Add(new BattleEffect { position = new V2(270, 300), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
         }
         void UpdateHazards(float dt)
         {
@@ -172,7 +184,8 @@ namespace ScrapGuard.Core
                 var h = Hazards[i]; h.delay -= dt;
                 if (h.delay > 0) continue;
                 Effects.Add(new BattleEffect { position = h.position, kind = 2, radius = h.radius });
-                if (V2.Distance(Position, h.position) < h.radius) Hurt(200 + Stage * 40);
+                bool hit=h.width>0 ? Math.Abs(Position.x-h.position.x)<h.width/2+12 && Math.Abs(Position.y-h.position.y)<h.height/2+12 : V2.Distance(Position, h.position)<h.radius+12;
+                if (hit) Hurt(h.damage>0?h.damage:200 + (Challenge?4:Definition.Region) * 40,h.cause==DamageCause.None?DamageCause.Boss:h.cause);
                 Hazards.RemoveAt(i);
             }
         }
@@ -182,23 +195,27 @@ namespace ScrapGuard.Core
             {
                 var e = Enemies[i];
                 if (e.hp <= 0) { Kill(i); continue; }
-                e.flash = Math.Max(0, e.flash - dt);
-                e.position += (Position - e.position).Normal * (e.speed * dt);
+                e.flash = Math.Max(0, e.flash - dt);e.attackFlash=Math.Max(0,e.attackFlash-dt);
+                UpdateEnemyRole(e,dt);
+                if(e.hp<=0) { Kill(i);continue; }
                 if (V2.Distance(Position, e.position) < 15 + e.Radius && contactTimer <= 0)
                 {
-                    Hurt(e.kind == 3 ? 170 : e.kind == 2 ? 110 : 70); contactTimer = .65f;
-                    if(!e.core)e.position += (e.position - Position).Normal * 22;
+                    Hurt(e.kind == 3 ? 170 : e.kind == 2 ? 110 : 70,e.dash>0?DamageCause.Charge:DamageCause.Contact);e.attackFlash=.25f; contactTimer = .65f;
+                    if(!e.core)e.position=Slide(e.position,(e.position - Position).Normal * 22,Math.Min(e.Radius,20));
                 }
             }
         }
-        void Hurt(float damage)
+        void Hurt(float damage,DamageCause cause=DamageCause.Contact)
         {
             if (Ended || UltimateFlash > .15f) return;
             HurtFlash = .22f;
             if (armor == 7) damage *= .9f;
-            float absorbed = Math.Min(Shield, damage); Shield -= absorbed; Hp -= damage - absorbed;
+            float absorbed = Math.Min(Shield, damage); Shield -= absorbed;
+            float actual=Math.Min(Hp,Math.Max(0,damage-absorbed));
+            if((int)cause>0 && (int)cause<damageTaken.Length)damageTaken[(int)cause]+=actual;
+            Hp -= damage - absorbed;
             Effects.Add(new BattleEffect { position = Position, text = "-" + (int)(damage - absorbed), kind = 1 });
-            if (Hp <= 0) { Hp = 0; Ended = true; Won = false; }
+            if (Hp <= 0) { Hp = 0; Ended = true; Won = false; endCause=cause; }
         }
         Enemy Nearest(V2 origin)
         {
@@ -237,8 +254,12 @@ namespace ScrapGuard.Core
             {
                 coilTimer = 2.7f - Skills[2] * .18f;
                 float radius = 90 + Skills[2] * 13;
-                Effects.Add(new BattleEffect { position = Position, kind = 4, radius = radius });
-                foreach (var e in Enemies) if (e.hp > 0 && V2.Distance(e.position, Position) < radius) Hit(e, Damage * (1 + Skills[2] * .2f));
+                if(HasMod(1))ChainLightning();
+                else
+                {
+                    Effects.Add(new BattleEffect { position = Position, kind = 4, radius = radius });
+                    foreach (var e in Enemies) if (e.hp > 0 && V2.Distance(e.position, Position) < radius) Hit(e, Damage * (1 + Skills[2] * .2f));
+                }
             }
             if (Skills[3] > 0 && droneTimer <= 0 && target != null)
             {
@@ -285,13 +306,14 @@ namespace ScrapGuard.Core
                 damage=(float)Math.Round(damage,MidpointRounding.AwayFromZero);
                 CoreScore+=Math.Max(0,(int)Math.Min(Math.Max(0,e.hp),damage));
             }
+            if(e.role==EnemyRole.Shield && !e.core && V2.Distance(Position,e.position)>125)damage*=.45f;
             e.hp -= damage; e.flash = .08f;
             if (e.kind >= 2 || random.NextDouble() < .15)
                 Effects.Add(new BattleEffect { position = e.position, text = ((int)damage).ToString(), kind = 0 });
         }
         void Kill(int index)
         {
-            var e = Enemies[index]; Kills++; UltimateCharge = Math.Min(100,UltimateCharge + 2);
+            var e = Enemies[index]; DefeatedRoles|=1<<(int)e.role; Kills++; UltimateCharge = Math.Min(100,UltimateCharge + 2);
             int xp = e.kind >= 2 ? 20 : 2;
             if (Pickups.Count < 220) Pickups.Add(new Pickup { id = nextId++, position = e.position, xp = xp });
             else Pickups[random.Next(Pickups.Count)].xp += xp;
@@ -345,7 +367,7 @@ namespace ScrapGuard.Core
                 bool hit = hero == 1 ? forward >= -e.Radius && forward <= 560 && side <= 38+e.Radius : offset.Length <= (hero == 2 ? 180 : 245)+e.Radius;
                 if (!hit) continue;
                 Hit(e,Damage*(hero == 1 ? 12 : hero == 2 ? 7 : 5));
-                if(!e.core)e.position += offset.Normal*(hero == 1 ? 28 : 56);
+                if(!e.core)e.position=Slide(e.position,offset.Normal*(hero == 1 ? 28 : 56),Math.Min(e.Radius,20));
                 if (e.hp <= 0) Kill(i);
             }
             return true;
@@ -369,6 +391,6 @@ namespace ScrapGuard.Core
             Bullets.Add(new Bullet {id=nextId++,position=origin,velocity=(target.position-origin).Normal*460,
                 damage=Support.power*(Support.hero==1 ? .8f : .65f),life=1.7f,pierce=Support.hero==1 ? 1 : 0,drone=true});
         }
-        public void Abandon() { Ended = true; Won = false; }
+        public void Abandon() { if(Ended)return; Ended = true; Won = false; endCause=DamageCause.Abandoned; }
     }
 }

@@ -36,6 +36,7 @@ namespace ScrapGuard
         }
         void Wardrobe(int skin, int hero = -1)
         {
+            if(skin>=3){RegionCollection(skin-3);return;}
             if (hero < 0) hero = State.showcaseHero;
             int previewHero = hero;
             var card = Dialog("스타일 피팅룸", "미리보기는 재화와 보유 상태를 바꾸지 않아요.", 880);

@@ -32,7 +32,7 @@ def request(path, data=None, token=None):
 def command(*args):
     return subprocess.run(COMPOSE + list(args), cwd=ROOT, check=True, capture_output=True, text=True).stdout
 
-check(request('/health')[1]['version'] == '0.4.0', 'container health version')
+check(request('/health')[1]['version'] == '0.6.0', 'container health version')
 check(request('/health/ready')[0] == 200, 'database readiness')
 check(request('/v1/auth/guest', {'secret': secret})[0] == 403, 'HTTP invitation guard')
 status, initial = request('/v1/auth/guest', {'secret': secret, 'inviteCode': 'local-integration-test-invite-03'})
@@ -60,5 +60,5 @@ for attempt in range(30):
     time.sleep(.3)
 restored = request('/v1/bootstrap', token=secret)[1]
 check(restored['playerId'] == initial['playerId'] and restored['state']['gold'] == state['state']['gold'], 'container restart retains volume and account')
-(ROOT/'TestResults/deploy-04-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
+(ROOT/'TestResults/deploy-06-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
 print(len(checks), 'deployment checks passed')
