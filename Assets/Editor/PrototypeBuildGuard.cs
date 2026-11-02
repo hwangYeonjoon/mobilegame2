@@ -1,0 +1,17 @@
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Build.Reporting;
+
+namespace ScrapGuard.Editor
+{
+    // The prototype economy and development grants must never be mistaken for a store-ready app.
+    public sealed class PrototypeBuildGuard : IPreprocessBuildWithReport
+    {
+        public int callbackOrder { get { return 0; } }
+        public void OnPreprocessBuild(BuildReport report)
+        {
+            if ((report.summary.options & BuildOptions.Development) == 0)
+                throw new BuildFailedException("This prototype only supports Development builds. Complete production authentication, live billing verification and ad reward verification before preparing a production build.");
+        }
+    }
+}

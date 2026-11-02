@@ -1,0 +1,64 @@
+name: scrapguard-beta
+services:
+  api:
+    image: scrapguard-api:${RELEASE_TAG:-0.4.0}
+    build:
+      context: ../..
+      dockerfile: Server/Deploy/Dockerfile
+    restart: unless-stopped
+    environment:
+      SERVER_URLS: http://+:8080
+      GAME_DB: /data/scrapguard.db
+      TRUSTED_PROXY_IPS: 172.31.248.2
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      BETA_INVITE_CODE: ${BETA_INVITE_CODE:?Set a private beta invite code}
+      MAINTENANCE_MODE: ${MAINTENANCE_MODE:-false}
+      Logging__LogLevel__Microsoft.AspNetCore: Warning
+    volumes:
+      - game_data:/data
+      - game_backups:/backups
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    pids_limit: 128
+    stop_grace_period: 30s
+    networks:
+      backend:
+        ipv4_address: 172.31.248.3
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2-alpine}
+    restart: unless-stopped
+    depends_on: [api]
+    environment:
+      GAME_DOMAIN: ${GAME_DOMAIN:?Set the game API domain}
+      ACME_EMAIL: ${ACME_EMAIL:?Set a certificate contact email}
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      backend:
+        ipv4_address: 172.31.248.2
+    logging:
+      driver: json-file
+      options: { max-size: 10m, max-file: '3' }
+volumes:
+  game_data:
+  game_backups:
+  caddy_data:
+  caddy_config:
+networks:
+  backend:
+    ipam:
+      config:
+        - subnet: 172.31.248.0/29

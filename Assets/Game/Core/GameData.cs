@@ -1,0 +1,132 @@
+using System;
+using System.Collections.Generic;
+
+namespace ScrapGuard.Core
+{
+    [Serializable] public class Item
+    {
+        public string id;
+        public int definition;
+        public int rarity;
+        public int level = 1;
+        public bool locked;
+    }
+    [Serializable] public class HeroProgress { public int id; public int level = 1; public bool unlocked; }
+    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems; public bool won; public int kills; public float seconds; public int score; public string week; }
+    [Serializable] public class GameState
+    {
+        public int version = 1;
+        public int gold = 1800;
+        public int parts = 30;
+        public int gems;
+        public int coreShards;
+        public int selectedHero;
+        public int unlockedStage;
+        public int attendanceCount;
+        public string attendanceDate = "";
+        public string serviceDate = "";
+        public int dailyRuns;
+        public int dailyKills;
+        public bool missionClaimed;
+        public int dailyItemPurchases;
+        public int dailyPartsPurchases;
+        public int dailyGemPartsPurchases;
+        public int dailyRewardGold;
+        public int dailyRewardParts;
+        public bool demoAdSkip;
+        public bool sound = true;
+        public bool tutorialCompleted;
+        public string activeMode = "", activeWeek = "";
+        public int dailySupportStarts;
+        public List<WeeklyProgress> weekly = new List<WeeklyProgress>();
+        public string activeRun = "";
+        public int activeStage;
+        public string lastResultId = "";
+        public int lastResultGold;
+        public string lastResultDate = "";
+        public bool lastResultBonus;
+        public int totalRuns;
+        public int totalKills;
+        public string displayName = "새내기 정비사";
+        public int showcaseHero;
+        public int showcaseTitle;
+        public int showcaseFrame;
+        public int selectedSkin;
+        public bool publicProfile;
+        public bool testProgress;
+        public List<string> showcaseItems = new List<string>();
+        public List<string> ownedCosmetics = new List<string>();
+        public List<int> clearedStages = new List<int>();
+        public List<int> purchasedRare = new List<int>();
+        public List<Item> items = new List<Item>();
+        public List<string> equipped = new List<string>();
+        public List<HeroProgress> heroes = new List<HeroProgress>();
+        public List<Receipt> receipts = new List<Receipt>();
+        public static GameState New()
+        {
+            var state = new GameState();
+            for (int i = 0; i < 3; i++)
+            {
+                var item = new Item { id = Guid.NewGuid().ToString("N"), definition = i == 0 ? 0 : i == 1 ? 6 : 9 };
+                state.items.Add(item); state.equipped.Add(item.id);
+                state.heroes.Add(new HeroProgress { id = i, unlocked = i == 0 });
+            }
+            return state;
+        }
+    }
+    public class ItemDefinition
+    {
+        public int Id, Slot;
+        public string Name, Description, Icon;
+        public ItemDefinition(int id, int slot, string name, string description, string icon)
+        { Id = id; Slot = slot; Name = name; Description = description; Icon = icon; }
+    }
+    public static class Catalog
+    {
+        public static readonly string[] HeroNames = { "정비사 루크", "돌격수 레이", "수호자 볼트" };
+        public static readonly string[] HeroRoles = { "드론 피해 +15%", "치명타 +5% · 빠른 이동", "20초마다 보호막 생성" };
+        public static readonly string[] StageNames = { "버려진 정비소", "철길의 불청객", "폐기물 처리장", "멈춰버린 공장", "중앙 제어 코어" };
+        public static readonly string[] StageDescriptions = { "작은 고철에도, 새로운 시작이.", "철길을 따라 몰려오는 폭주 로봇", "고철 더미 뒤에 숨은 위험", "다시 켜진 공장의 붉은 경고등", "폭주의 근원을 멈춰라" };
+        public static readonly string[] RarityNames = { "일반", "고급", "희귀" };
+        public static readonly string[] SkillNames = { "리벳 탄막", "회전 톱날", "충격 코일", "지원 드론", "고밀도 탄환", "신속 장전", "응급 수리", "자력 수집" };
+        public static readonly string[] SkillDescriptions = { "탄환 추가 · 정면을 꿰뚫는 화력", "주위를 도는 톱날로 근접 적 공격", "주기적인 전기 충격으로 주변 정리", "드론이 추적탄으로 적을 공격", "모든 공격 피해 20% 증가", "기본 공격 간격 12% 감소", "최대 체력 15% 증가 · 체력 회복", "경험치 수집 반경 증가" };
+        public static readonly ItemDefinition[] Items = {
+            new ItemDefinition(0, 0, "리벳건", "빠르고 정확한 단일 사격", "R"),
+            new ItemDefinition(1, 0, "회전 절단기", "가까운 적을 향한 산탄 사격", "S"),
+            new ItemDefinition(2, 0, "충격 발사기", "관통하는 고전압 탄환", "E"),
+            new ItemDefinition(3, 0, "화염 분사기", "짧은 거리의 빠른 연속 사격", "F"),
+            new ItemDefinition(4, 0, "드론 런처", "먼 거리에서 강력한 탄환 발사", "D"),
+            new ItemDefinition(5, 0, "자력 폭탄", "느리지만 강력한 폭발 공격", "B"),
+            new ItemDefinition(6, 1, "작업 조끼", "기본 체력 증가", "V"),
+            new ItemDefinition(7, 1, "강철 외골격", "체력과 접촉 피해 저항", "A"),
+            new ItemDefinition(8, 1, "경량 보호복", "체력과 이동속도 증가", "L"),
+            new ItemDefinition(9, 2, "수집 모듈", "경험치 수집 반경 증가", "M"),
+            new ItemDefinition(10, 2, "드론 모듈", "지원 드론 공격력 증가", "D"),
+            new ItemDefinition(11, 2, "조준 모듈", "치명타 확률 증가", "C")
+        };
+        public static int Attack(GameState s)
+        {
+            float baseValue = new[] { 100, 110, 90 }[s.selectedHero];
+            baseValue *= 1 + .03f * (s.heroes[s.selectedHero].level - 1);
+            var weapon = s.items.Find(i => i.id == s.equipped[0]);
+            if (weapon != null) baseValue += 30 * Multiplier(weapon);
+            return (int)baseValue;
+        }
+        public static int Health(GameState s)
+        {
+            float hp = new[] { 1000, 850, 1200 }[s.selectedHero] * (1 + .03f * (s.heroes[s.selectedHero].level - 1));
+            var armor = s.items.Find(i => i.id == s.equipped[1]);
+            return (int)(hp + (armor == null ? 0 : 180 * Multiplier(armor)));
+        }
+        public static float Multiplier(Item item) { return new[] { 1f, 1.15f, 1.35f }[item.rarity] * (1 + .05f * (item.level - 1)); }
+        public static string ServiceDate(DateTimeOffset utc) { return utc.ToOffset(TimeSpan.FromHours(9)).AddHours(-5).ToString("yyyy-MM-dd"); }
+    }
+    public struct CommandResult
+    {
+        public bool Success;
+        public string Message;
+        public CommandResult(bool success, string message) { Success = success; Message = message; }
+        public static CommandResult Ok(string text) { return new CommandResult(true, text); }
+        public static CommandResult Fail(string text) { return new CommandResult(false, text); }
+    }
+}

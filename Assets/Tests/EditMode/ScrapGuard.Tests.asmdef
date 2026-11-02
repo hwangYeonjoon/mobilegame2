@@ -1,0 +1,1 @@
+{"name":"ScrapGuard.Tests","rootNamespace":"ScrapGuard.Tests","references":["ScrapGuard.Core","ScrapGuard.Runtime","UnityEngine.UI"],"includePlatforms":["Editor"],"optionalUnityReferences":["TestAssemblies"]}

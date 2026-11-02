@@ -1,0 +1,1 @@
+{"name":"ScrapGuard.Runtime","rootNamespace":"ScrapGuard","references":["ScrapGuard.Core","Unity.InputSystem","UnityEngine.UI"]}

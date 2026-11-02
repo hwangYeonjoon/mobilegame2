@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+**/data/
+*.db
+*.db-shm
+*.db-wal
+Deploy/.env
+Deploy/backups/
+Deploy/secrets/

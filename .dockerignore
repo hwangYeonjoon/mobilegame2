@@ -1,0 +1,14 @@
+**
+!Server/
+!Server/**
+!Assets/
+!Assets/Game/
+!Assets/Game/Core/
+!Assets/Game/Core/**
+Server/**/bin/
+Server/**/obj/
+Server/**/data/
+Server/**/*.db*
+Server/Deploy/.env
+Server/Deploy/backups/
+Server/Deploy/secrets/

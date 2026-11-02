@@ -1,0 +1,21 @@
+# Isolated loopback test stack. No public TLS ports or production volumes.
+name: scrapguard-local-check
+services:
+  api:
+    image: scrapguard-api:0.4.0-check
+    build:
+      context: ../..
+      dockerfile: Server/Deploy/Dockerfile
+    ports: ['127.0.0.1:5190:8080']
+    environment:
+      BETA_INVITE_CODE: local-integration-test-invite-03
+      GAME_DB: /data/scrapguard.db
+      Logging__LogLevel__Microsoft.AspNetCore: Warning
+    volumes: [check_data:/data, check_backups:/backups]
+    read_only: true
+    tmpfs: ['/tmp:size=64m,mode=1777']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+volumes:
+  check_data:
+  check_backups:

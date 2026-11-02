@@ -1,0 +1,1 @@
+{"name":"ScrapGuard.Editor","rootNamespace":"ScrapGuard.Editor","references":["ScrapGuard.Core","ScrapGuard.Runtime","UnityEngine.UI"],"includePlatforms":["Editor"]}
