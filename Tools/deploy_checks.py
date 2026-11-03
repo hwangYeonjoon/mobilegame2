@@ -18,7 +18,7 @@ def check(value, name):
     checks.append(name)
     print('PASS', name, flush=True)
 
-def request(path, data=None, token=None, build="14", rules="11"):
+def request(path, data=None, token=None, build="15", rules="11"):
     headers = {'Content-Type': 'application/json'}
     if build is not None:
         headers['X-Scrap-Build'] = build
@@ -36,10 +36,10 @@ def request(path, data=None, token=None, build="14", rules="11"):
 def command(*args):
     return subprocess.run(COMPOSE + list(args), cwd=ROOT, check=True, capture_output=True, text=True).stdout
 
-check(request('/health')[1]['version'] == '0.14.0', 'container health version')
+check(request('/health')[1]['version'] == '0.15.0', 'container health version')
 check(request('/health/ready')[0] == 200, 'database readiness')
 status, release = request('/v1/release', build=None, rules=None)
-check(status == 200 and release['minimumBuild'] == 14 and release['latestBuild'] == 14 and not release['playAvailable'], 'public release policy is reachable without client headers')
+check(status == 200 and release['minimumBuild'] == 14 and release['latestBuild'] == 15 and not release['playAvailable'], 'public release policy is reachable without client headers')
 for build in [None, '13', '-1', '14,15']:
     status, reply = request('/v1/bootstrap', build=build)
     check(status == 426 and reply['code'] == 'client_update_required' and reply['release']['minimumBuild'] == 14, 'unsupported client receives structured update policy ' + str(build))
@@ -78,5 +78,5 @@ for attempt in range(30):
     time.sleep(.3)
 restored = request('/v1/bootstrap', token=secret)[1]
 check(restored['playerId'] == initial['playerId'] and restored['state']['gold'] == state['state']['gold'], 'container restart retains volume and account')
-(ROOT/'TestResults/deploy-014-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
+(ROOT/'TestResults/deploy-015-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
 print(len(checks), 'deployment checks passed')

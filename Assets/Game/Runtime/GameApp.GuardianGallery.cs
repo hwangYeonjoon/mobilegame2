@@ -16,15 +16,18 @@ namespace ScrapGuard
             var floor=Ui.Box(stage,0,0,444,448,Color.white,false);floor.sprite=ArenaArt.Floor(Mathf.Clamp(profile.skin-3,0,6));
             Ui.Box(stage,0,0,444,448,new Color(.02f,.04f,.07f,.42f),false);
             Ui.Label(stage,profile.name,18,12,408,37,26,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(stage,profile.outfit>0?Outfits.Label(profile.outfit):Social.Skins[Mathf.Clamp(profile.skin,0,Social.Skins.Length-1)],18,54,408,30,17,Ui.Gold,TextAnchor.MiddleCenter);
+            var lookLabel=Ui.Label(stage,StylePresentation.Look(profile.outfit,profile.skin),18,54,408,30,17,Ui.Gold,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<GuardianPosePreview>();preview.Initialize(profile.hero,profile.skin,profile.outfit);
             Ui.Label(stage,"Lv."+profile.heroLevel+" · "+Catalog.HeroNames[profile.hero],18,365,408,30,19,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(stage,caption??("정복 "+profile.stages+" / "+Campaign.Count+" · "+Social.Titles[Mathf.Clamp(profile.title,0,Social.Titles.Length-1)]),18,401,408,34,13,Ui.Mint,TextAnchor.MiddleCenter);
-            string[] poses={"대기","이동","사격","필살기"};
-            for(int i=0;i<4;i++){int pose=i;Ui.Button(card,poses[i],24+i*114,605,102,49,()=>preview.SetPose(pose),i==3?Ui.Gold:Ui.Raised,true,16);}
-            Ui.Button(card,"방향 바꾸기",24,672,214,48,preview.Flip,Ui.Raised,true,15);
+            string[] poses={"대기","이동","사격","필살기","지원"};
+            for(int i=0;i<5;i++){int pose=i;Ui.Button(card,poses[i],24+i*90,605,84,49,()=>preview.SetPose(pose),i==3?Ui.Gold:Ui.Raised,true,15);}
+            Ui.Button(card,profile.outfit>0?"이 의상 체험":"방향 바꾸기",24,672,214,48,()=>{if(profile.outfit>0)OutfitRoom(profile.outfit);else preview.Flip();},Ui.Raised,true,15);
             Ui.Button(card,"사진 카드 공유",254,672,214,48,()=>{if(!exportingCard)StartCoroutine(ExportCard(stage));},Ui.Mint,share,15);
-            Ui.Label(card,share?"현재 외형·이름·선택한 동작이 카드에 담깁니다.":"길드 내부 감상 · 공개 프로필에서 사진을 공유할 수 있어요.",24,735,444,46,13,Ui.Muted,TextAnchor.MiddleCenter);
+            Button compare=null,size=null;
+            compare=Ui.Button(card,"기본 외형과 비교",24,734,214,42,()=>{preview.Compare();lookLabel.text=preview.BaseLook?"기본 외형 · 비교 중":StylePresentation.Look(profile.outfit,profile.skin);compare.GetComponentInChildren<Text>().text=preview.BaseLook?"장착 모습으로 돌아가기":"기본 외형과 비교";},Ui.Raised,true,14);
+            size=Ui.Button(card,"전투 크기로 보기",254,734,214,42,()=>{preview.ToggleSize();size.GetComponentInChildren<Text>().text=preview.BattleSize?"크게 보기":"전투 크기로 보기";},Ui.Raised,true,14);
+            Ui.Label(card,share?"미리보기는 장착·재화·능력치를 바꾸지 않아요.":"길드 내부 감상 · 사진 공유는 공개 프로필에서 가능해요.",24,781,444,19,11,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,"돌아가기",24,803,444,51,back,Ui.Raised,true,17);
         }
         void GuildPortrait(GuildMember member,GuildView guild)
@@ -69,22 +72,28 @@ namespace ScrapGuard
 
     public sealed class GuardianPosePreview : MonoBehaviour
     {
-        Image actor;int hero,skin,outfit,pose;bool flipped;float nextShot;
+        Image actor,shadow;int hero,skin,outfit,pose;bool flipped;float nextShot;
         public int Pose { get { return pose; } }
+        public bool BaseLook { get; private set; }
+        public bool BattleSize { get; private set; }
+        public void Compare(){BaseLook=!BaseLook;SetPose(0);}
+        public void ToggleSize(){BattleSize=!BattleSize;}
         public void Initialize(int h,int s,int o)
         {
             hero=h;skin=s;outfit=o;
-            var shadow=Ui.Disc(transform,127,320,190,new Color(0,0,0,.35f));shadow.rectTransform.sizeDelta=new Vector2(190,30);
+            shadow=Ui.Disc(transform,127,320,190,new Color(0,0,0,.35f));shadow.rectTransform.sizeDelta=new Vector2(190,30);
             actor=CharacterArt.Draw(transform,82,96,280,260,hero,skin,outfit);
             actor.rectTransform.pivot=new Vector2(.5f,.5f);actor.rectTransform.anchoredPosition=new Vector2(222,-226);
         }
         public void Flip(){flipped=!flipped;}
         public void SetPose(int value)
         {
-            pose=Mathf.Clamp(value,0,3);nextShot=0;
+            pose=Mathf.Clamp(value,0,4);nextShot=0;
+            int shown=BaseLook?0:outfit;
+            if(pose==4)StylePresentation.Arrival(transform,15,88,"지원 등장 미리보기",hero,BaseLook?0:skin,shown,"동료에게 보이는 장착 모습");
             if(pose==3)
             {
-                if(outfit>0)OutfitVisuals.Special(transform,new Vector2(222,-246),150,outfit);
+                if(shown>0)OutfitVisuals.Special(transform,new Vector2(222,-246),150,shown);
                 else {var ring=CombatRing.Create(transform,360,hero==3?Ui.Gold:Ui.Blue,.025f);ring.anchoredPosition=new Vector2(222,-246);ring.gameObject.AddComponent<CombatBurst>().Configure(.8f,.25f,1);}
             }
         }
@@ -92,13 +101,14 @@ namespace ScrapGuard
         {
             if(actor==null)return;
             float t=Time.unscaledTime;float stride=pose==1?Mathf.Sin(t*12):Mathf.Sin(t*2)*.2f;
-            actor.sprite=CharacterArt.Get(hero,skin,outfit,pose==1?(stride>0?1:0):pose);
+            StylePresentation.SetLook(actor,hero,BaseLook?0:skin,BaseLook?0:outfit,pose==1?(stride>0?1:0):Mathf.Min(pose,3));
             actor.rectTransform.anchoredPosition=new Vector2(222+(pose==2?Mathf.Sin(t*20)*2:0),-226+Mathf.Abs(stride)*4);
+            actor.rectTransform.sizeDelta=BattleSize?new Vector2(96,100)*StylePresentation.PlayerScale:new Vector2(280,260);
             actor.rectTransform.localScale=new Vector3((flipped?-1:1)*(1+stride*.018f),1-stride*.018f,1);
+            shadow.gameObject.SetActive(!BattleSize);
             if(pose==2 && t>=nextShot)
             {
-                nextShot=t+.45f;var shot=Ui.Box(transform,flipped?293:76,216,75,6,outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold,false);
-                shot.gameObject.AddComponent<CombatBurst>().Configure(.25f,.4f,1);
+                nextShot=t+.45f;StylePresentation.Shot(transform,new Vector2(222+(flipped?1:-1)*(BattleSize?24:80),-216),BaseLook?0:outfit,!flipped);
             }
         }
     }

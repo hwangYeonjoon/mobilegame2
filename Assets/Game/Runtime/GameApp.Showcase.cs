@@ -41,21 +41,22 @@ namespace ScrapGuard
                 var orbit=CombatRing.Create(card,166,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(246,-216);
                 for(int n=0;n<6;n++)Ui.Disc(card,240+Mathf.Cos(n*Mathf.PI/3)*83,210+Mathf.Sin(n*Mathf.PI/3)*83,12,Ui.Hex("C89BFF"));
             }
-            Ui.Robot(card, 185, 143, 1.48f, p.hero, skin: p.skin, outfit: p.outfit);
-            Ui.Label(card, "Lv." + p.heroLevel + "  " + Catalog.HeroNames[p.hero], 32, 293, 428, 31, 21, Ui.Ink, TextAnchor.MiddleCenter);
-            Ui.Label(card, "공격 " + p.attack + "   ·   체력 " + p.health, 32, 327, 428, 24, 14, Ui.Muted, TextAnchor.MiddleCenter);
+            CharacterArt.Draw(card,140,130,212,180,p.hero,p.skin,p.outfit);
+            Ui.Label(card,StylePresentation.Look(p.outfit,p.skin),32,306,428,27,19,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
+            Ui.Label(card, "Lv." + p.heroLevel + "  " + Catalog.HeroNames[p.hero], 32, 337, 428, 28, 19, Ui.Ink, TextAnchor.MiddleCenter);
+            Ui.Label(card, "공격 " + p.attack + "   ·   체력 " + p.health, 32, 367, 428, 23, 14, Ui.Muted, TextAnchor.MiddleCenter);
             for (int i = 0; i < p.items.Count && i < 3; i++)
             {
                 var item = p.items[i]; Color rarity = item.rarity == 2 ? Ui.Gold : item.rarity == 1 ? Ui.Blue : Ui.Muted;
                 float ix = 32 + i * 145;
-                Ui.Box(card, ix, 362, 138, 72, Ui.Raised);
-                Ui.Box(card, ix + 9, 373, 3, 46, rarity, false);
-                Ui.Label(card, Catalog.Items[item.definition].Name, ix + 19, 370, 114, 28, 15, rarity);
-                Ui.Label(card, new[] { "일반", "고급", "희귀" }[item.rarity] + "  +" + (item.level - 1), ix + 19, 398, 111, 25, 13, Ui.Muted);
+                Ui.Box(card, ix, 399, 138, 64, Ui.Raised);
+                Ui.Box(card, ix + 9, 408, 3, 46, rarity, false);
+                Ui.Label(card, Catalog.Items[item.definition].Name, ix + 19, 402, 114, 28, 15, rarity);
+                Ui.Label(card, new[] { "일반", "고급", "희귀" }[item.rarity] + "  +" + (item.level - 1), ix + 19, 432, 111, 25, 13, Ui.Muted);
             }
-            Ui.Label(card, "정복 " + p.stages + "/" + Campaign.Count + "     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 445, 428, 30, 15, Ui.Ink, TextAnchor.MiddleCenter);
+            Ui.Label(card, "정복 " + p.stages + "/" + Campaign.Count + "     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 468, 428, 28, 14, Ui.Ink, TextAnchor.MiddleCenter);
             string status = p.local ? "로컬 체험 기록" : (p.test?"테스트 진행 · 공개 ID ":"서버 기록 · 공개 ID ") + p.id;
-            Ui.Label(card, status, 32, 483, 428, 22, 11, Ui.Muted, TextAnchor.MiddleCenter);
+            Ui.Label(card, status, 32, 499, 428, 22, 11, Ui.Muted, TextAnchor.MiddleCenter);
             return card;
         }
         void CustomizeProfile()
@@ -154,15 +155,16 @@ namespace ScrapGuard
                 Ui.Label(pick,"이 목록에서 주간 선정 · 구매 여부와 무관",113,43,312,28,12,Ui.Muted);
                 Ui.Button(pick,"전시실 방문",113,79,312,38,()=>StartCoroutine(LoadPublic(featured.id)),Ui.Mint,true,16);
             }
-            var content = Ui.Scroll(card, 24, featured==null?212:347, 444, featured==null?532:397, Math.Max(532, list.profiles.Count * 113));
+            var content = Ui.Scroll(card, 24, featured==null?212:347, 444, featured==null?532:397, Math.Max(532, list.profiles.Count * 145));
             if (list.profiles.Count == 0) Ui.Label(content, "아직 볼 수 있는 프로필이 없어요.\n내 프로필을 공개하고 친구에게 ID를 알려 주세요.", 8, 165, 428, 110, 17, Ui.Muted, TextAnchor.MiddleCenter);
             for (int i = 0; i < list.profiles.Count; i++)
             {
-                var p = list.profiles[i]; var row = Ui.Box(content, 0, i * 113, 444, 101, Ui.Raised).transform;
-                Ui.Robot(row, 15, 11, .7f, p.hero, skin:p.skin,outfit:p.outfit);
-                Ui.Label(row, p.name, 88, 10, 223, 34, 21);
-                Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/" + Campaign.Count + " · 응원 " + p.likes, 88, 45, 223, 46, 13, FrameColor(p.frame));
-                Ui.Button(row, "보기", 337, 25, 93, 52, () => StartCoroutine(LoadPublic(p.id)), null, true, 16);
+                var p = list.profiles[i]; var row = Ui.Box(content, 0, i * 145, 444, 133, Ui.Raised).transform;
+                CharacterArt.Draw(row,4,7,104,118,p.hero,p.skin,p.outfit);
+                Ui.Label(row, p.name, 115, 8, 215, 30, 20);
+                Ui.Label(row,StylePresentation.Look(p.outfit,p.skin),115,42,215,27,15,p.outfit>0?OutfitVisuals.Accent(p.outfit):Ui.Muted);
+                Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/" + Campaign.Count + " · 응원 " + p.likes, 115, 77, 215, 44, 12, FrameColor(p.frame));
+                Ui.Button(row, "보기", 337, 40, 93, 52, () => StartCoroutine(LoadPublic(p.id)), null, true, 16);
             }
             Ui.Button(card, "처음부터", 24, 769, 138, 57, () => StartCoroutine(LoadGallery("")), Ui.Raised, true, 17);
             Ui.Button(card, "다음 목록", 177, 769, 138, 57, () => StartCoroutine(LoadGallery(list.next)), null, !string.IsNullOrEmpty(list.next), 17);

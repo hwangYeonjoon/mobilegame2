@@ -109,14 +109,14 @@ namespace ScrapGuard
             supportButton=null;supportArt=null;
             if(combat.Support==null)return;
             supportButton=Ui.Button(screen,"",183,876,146,66,TriggerSupport,Ui.Blue,true,15);supportText=supportButton.GetComponentInChildren<Text>();
-            supportArt=CharacterArt.Draw(effectLayer,0,0,44,52,combat.Support.hero,combat.Support.skin,combat.Support.outfit).rectTransform;
+            var support=combat.Support;
+            supportArt=CharacterArt.Draw(effectLayer,0,0,72,80,support.hero,support.showIdentity?support.skin:0,support.showIdentity?support.outfit:0).rectTransform;
         }
         void TriggerSupport()
         {
             if(combat==null || battlePaused || networkBusy || !combat.UseSupport())return;
             recorder.Support();dragging=false;SupportArrivalCard();
-            var label=Ui.Label(effectLayer,SupportNames[combat.Support.hero]+"!",80,363,380,44,26,Ui.Blue,TextAnchor.MiddleCenter);
-            label.gameObject.AddComponent<CombatBurst>().Configure(1.3f,1,1);RenderBattle();
+            RenderBattle();
         }
         void RenderSupport()
         {
@@ -124,7 +124,7 @@ namespace ScrapGuard
             supportButton.interactable=combat.CanSupport;
             supportText.text=combat.SupportUsed?"지원 완료":combat.Elapsed<8?"지원 준비\n"+Mathf.CeilToInt(8-combat.Elapsed)+"초":SupportNames[combat.Support.hero]+"\n호출 · Q";
             supportArt.gameObject.SetActive(combat.SupportTime>0);
-            supportArt.anchoredPosition=new Vector2(combat.Position.x-54,-combat.Position.y+76+Mathf.Sin(combat.Elapsed*9)*2);
+            supportArt.anchoredPosition=new Vector2(Mathf.Clamp(combat.Position.x-86,0,468),-Mathf.Clamp(combat.Position.y-96,180,730)+Mathf.Sin(combat.Elapsed*9)*2);
         }
     }
 }

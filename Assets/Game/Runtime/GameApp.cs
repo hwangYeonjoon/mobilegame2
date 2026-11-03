@@ -102,7 +102,7 @@ namespace ScrapGuard
             toastLabel.text = text; toastRoot.gameObject.SetActive(true); toastRoot.SetAsLastSibling(); toastTime = 3.2f;
             if (State.sound && audioSource != null) audioSource.PlayOneShot(clickClip);
         }
-        void Change(GameCommand command, Action after = null, bool redraw = true)
+        void Change(GameCommand command, Action after = null, bool redraw = true, Action confirmed = null)
         {
             if(UpdateBlocksPlay){ShowUpdatePanel();return;}
             if(command.type!=null&&command.type.StartsWith("demo_",StringComparison.Ordinal)&&!Debug.isDebugBuild&&!Application.isEditor){Toast("개발 빌드 전용 기능이에요.");return;}
@@ -114,6 +114,7 @@ namespace ScrapGuard
                 Toast(result.Message);
                 if (redraw && combat == null) Show(page); else RefreshWallet();
                 after?.Invoke();
+                if(result.Success)confirmed?.Invoke();
             };
             if (!Online) { complete(Store.Change(e => CommandDispatcher.Apply(e, command, true))); return; }
             StartCoroutine(SubmitCloud(command, reply => complete(new CommandResult(reply.success, reply.message))));

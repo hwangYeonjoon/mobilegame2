@@ -69,10 +69,11 @@ namespace ScrapGuard
             bulletLayer = Ui.Rect(arena, "Projectiles", 0, 0, 540, 960);
             playerShadow = Ui.Disc(arena,0,0,40,new Color(0,0,0,.32f)).rectTransform;
             playerShadow.sizeDelta = new Vector2(40,13);
-            player = Ui.Robot(arena, 0, 0, .64f, combat.Hero, skin: State.selectedSkin, outfit: Outfits.Active(State,combat.Hero));
+            player = Ui.Robot(arena, 0, 0, StylePresentation.PlayerScale, combat.Hero, skin: State.selectedSkin, outfit: Outfits.Active(State,combat.Hero));
             playerArt = player.GetComponentInChildren<Image>();
             playerArt.rectTransform.pivot = new Vector2(.5f,.5f);
             playerArt.rectTransform.anchoredPosition = new Vector2(40,-50);
+            var outline=playerArt.gameObject.AddComponent<Outline>();outline.effectColor=new Color(.025f,.045f,.07f,.9f);outline.effectDistance=new Vector2(1.5f,-1.5f);
             drone = Ui.Robot(arena, 0, 0, .24f, 0);
             for (int i = 0; i < 6; i++)
             {

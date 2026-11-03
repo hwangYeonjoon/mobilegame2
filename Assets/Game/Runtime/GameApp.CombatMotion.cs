@@ -31,9 +31,10 @@ namespace ScrapGuard
             float moving = Mathf.Clamp01(combat.LastMovement.Length);
             float stride = Mathf.Sin(combat.Elapsed*17)*moving;
             float recoil = combat.ShotFlash/.11f;
-            player.anchoredPosition = new Vector2(combat.Position.x-25.6f-Mathf.Cos(combat.Facing)*recoil*2,
-                -combat.Position.y+32+Mathf.Abs(stride)*2.5f);
-            player.localScale = new Vector3(.64f*(1+stride*.035f),.64f*(1-stride*.035f),1);
+            float scale=StylePresentation.PlayerScale;
+            player.anchoredPosition = new Vector2(combat.Position.x-40*scale-Mathf.Cos(combat.Facing)*recoil*2,
+                -combat.Position.y+50*scale+Mathf.Abs(stride)*2.5f);
+            player.localScale = new Vector3(scale*(1+stride*.035f),scale*(1-stride*.035f),1);
             player.localEulerAngles = new Vector3(0,0,-combat.LastMovement.x*5+stride*2-recoil*3);
             playerArt.rectTransform.localScale = new Vector3(Mathf.Cos(combat.Facing)<-.05f ? -1 : 1,1,1);
             int outfit=Outfits.Active(State,combat.Hero);

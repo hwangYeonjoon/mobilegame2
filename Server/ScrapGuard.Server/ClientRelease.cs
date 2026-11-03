@@ -8,7 +8,7 @@ public sealed class ClientRelease
     {
         Policy=new ReleasePolicy{
             latestBuild=config.GetValue("CLIENT_LATEST_BUILD",AppRelease.Build),
-            minimumBuild=config.GetValue("CLIENT_MIN_BUILD",AppRelease.Build),
+            minimumBuild=config.GetValue("CLIENT_MIN_BUILD",AppRelease.MinimumBuild),
             latestVersion=config["CLIENT_LATEST_VERSION"]??AppRelease.Version,
             combatRules=Combat.RulesVersion,packageName=AppRelease.Package,
             playAvailable=config.GetValue("PLAY_UPDATE_AVAILABLE",false),

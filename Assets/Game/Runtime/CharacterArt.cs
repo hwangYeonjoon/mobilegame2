@@ -55,6 +55,7 @@ namespace ScrapGuard
         {
             var image = Ui.Rect(parent,"GuardianArt",x,y,width,height).gameObject.AddComponent<Image>();
             image.sprite = Get(hero,skin,outfit); image.color=outfit>0 ? Color.white : Tint(skin); image.preserveAspect = true; image.raycastTarget = false;
+            if(ScrapGuard.Core.Outfits.Valid(outfit) && ScrapGuard.Core.Outfits.Hero(outfit)==hero)OutfitMark.Attach(image,outfit);
             return image;
         }
     }

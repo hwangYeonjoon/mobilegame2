@@ -73,18 +73,25 @@ namespace ScrapGuard
 
     public sealed class BulletVisual : MonoBehaviour
     {
-        Image trail,core,head;
+        Image trail,core,head;OutfitMark signature;
+        public int Signature { get { return signature.enabled?signature.Outfit:0; } }
         public static RectTransform Create(Transform parent)
         {
             var root=Ui.Rect(parent,"Projectile",0,0,0,0);
             var v=root.gameObject.AddComponent<BulletVisual>();
             v.trail=Ui.Box(root,-28,-3,28,6,Color.white,false);
             v.head=Ui.Disc(root,-6,-4,8,Color.white);
-            v.core=Ui.Box(root,-9,-1,10,2,Color.white,false);return root;
+            v.core=Ui.Box(root,-9,-1,10,2,Color.white,false);
+            var shape=Ui.Rect(root,"Outfit projectile",-34,-7,38,14);
+            v.signature=shape.gameObject.AddComponent<OutfitMark>();v.signature.raycastTarget=false;return root;
         }
         public void Render(Bullet bullet,int level,int outfit,float time)
         {
             var root=(RectTransform)transform;
+            bool styled=Outfits.Valid(outfit)&&!bullet.mod&&!bullet.drone;
+            signature.Configure(styled?outfit:0,true);
+            signature.color=bullet.chilling?Ui.Hex("91EAFF"):OutfitVisuals.Accent(outfit);
+            trail.enabled=core.enabled=head.enabled=!styled;
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
             var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;

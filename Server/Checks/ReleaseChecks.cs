@@ -6,7 +6,7 @@ static class ReleaseChecks
     public static void Run(Action<bool,string> check)
     {
         ClientRelease Make(params (string,string)[] values)=>new(new ConfigurationBuilder().AddInMemoryCollection(values.Select(v=>new KeyValuePair<string,string?>(v.Item1,v.Item2))).Build());
-        var release=Make();check(release.Policy.latestBuild==AppRelease.Build && release.Policy.minimumBuild==AppRelease.Build && !release.Policy.playAvailable,"release defaults match packaged app and unpublished Play state");
+        var release=Make();check(release.Policy.latestBuild==AppRelease.Build && release.Policy.minimumBuild==AppRelease.MinimumBuild && !release.Policy.playAvailable,"release defaults match packaged app and unpublished Play state");
         check(release.Accepts(AppRelease.Build.ToString(),Combat.RulesVersion.ToString()),"matching build and rules accepted");
         foreach(string build in new[]{"", "-1", "0", "13", "14,15", "2147483648"})check(!release.Accepts(build,Combat.RulesVersion.ToString()),"legacy or invalid build header rejected "+build);
         check(!release.Accepts("14","10"),"incompatible rules rejected before account mutation");

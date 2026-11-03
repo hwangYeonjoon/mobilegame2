@@ -14,6 +14,7 @@ namespace ScrapGuard
             var stage=Ui.Box(card,24,144,444,361,Ui.Background);stage.raycastTarget=true;stage.gameObject.AddComponent<RectMask2D>();
             Ui.Label(stage.transform,"외형 체험 · 드래그로 이동",14,8,416,28,14,Ui.Muted,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<OutfitPreview>();preview.Initialize(id);
+            Button size=null;size=Ui.Button(stage.transform,"전투 크기로 보기",121,311,202,36,()=>{preview.ToggleSize();size.GetComponentInChildren<Text>().text=preview.BattleSize?"크게 보기":"전투 크기로 보기";},Ui.Raised,true,14);
             Ui.Button(card,"사격",24,519,140,45,preview.Fire,Ui.Raised,true,17);
             Ui.Button(card,"필살기",176,519,140,45,preview.Ultimate,Ui.Gold,true,17);
             Ui.Button(card,"지원 등장",328,519,140,45,preview.Support,Ui.Raised,true,17);
@@ -32,7 +33,7 @@ namespace ScrapGuard
         {
             var card=Dialog("의상을 구매할까요?",Outfits.Label(id)+" 1종 · "+Outfits.HeroName(id)+" 전용 · 대원 별도",490);
             Ui.Label(card,"보석 600개 차감\n이동·사격·필살기 자세와 전용 연출 포함\n능력치 보너스 없음 · 구매 후 별도 장착",24,128,444,104,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Button(card,"보석 600개로 구매",24,255,444,55,()=>Change(new GameCommand("cosmetic_buy"){value=Outfits.Product(id)},()=>OutfitRoom(id)),Ui.Gold,State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
+            Ui.Button(card,"보석 600개로 구매",24,255,444,55,()=>PurchaseOutfit(id),Ui.Gold,State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
             Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,323,444,43,()=>GemSources(Outfits.Price,()=>OutfitPurchase(id)),Ui.Raised,true,16);
             Ui.Button(card,"체험으로 돌아가기",24,393,444,43,()=>OutfitRoom(id),Ui.Raised,true,16);
         }
@@ -43,7 +44,9 @@ namespace ScrapGuard
         Image actor;RectTransform area;Vector2 position=new Vector2(222,209),target;
         bool moving;float poseUntil;int pose,outfit=1,hero;
         public bool BaseLook { get; private set; }
+        public bool BattleSize { get; private set; }
         public void Compare(){BaseLook=!BaseLook;}
+        public void ToggleSize(){BattleSize=!BattleSize;}
         public void Initialize(int id=1)
         {
             outfit=id;hero=Outfits.Hero(id);area=(RectTransform)transform;
@@ -61,17 +64,14 @@ namespace ScrapGuard
         public void Fire()
         {
             pose=2;poseUntil=Time.unscaledTime+.5f;
-            var shot=Ui.Box(transform,position.x-135,position.y-20,70,8,BaseLook?Ui.Gold:OutfitVisuals.Accent(outfit),false);
-            shot.gameObject.AddComponent<CombatBurst>().Configure(.45f,.4f,1.3f);
+            StylePresentation.Shot(transform,new Vector2(position.x-(BattleSize?22:65),-position.y+10),BaseLook?0:outfit,true);
         }
         public void Ultimate(){pose=3;poseUntil=Time.unscaledTime+1;
             if(!BaseLook)OutfitVisuals.Special(transform,new Vector2(position.x,-position.y),135,outfit);
             else {var ring=CombatRing.Create(transform,270,Ui.Mint,.025f);ring.anchoredPosition=new Vector2(position.x,-position.y);ring.gameObject.AddComponent<CombatBurst>().Configure(.9f,.25f,1);}}
         public void Support()
         {
-            var helper=CharacterArt.Draw(transform,310,48,100,115,hero,0,BaseLook?0:outfit);
-            helper.gameObject.AddComponent<CombatBurst>().Configure(2,1,1);
-            if(!BaseLook)OutfitVisuals.Special(transform,new Vector2(360,-107),65,outfit);
+            StylePresentation.Arrival(transform,15,42,"지원 등장 미리보기",hero,0,BaseLook?0:outfit,"실제 지원 도착과 같은 연출");
         }
         void Update()
         {
@@ -79,7 +79,9 @@ namespace ScrapGuard
             if(moving)position=Vector2.MoveTowards(position,target,170*Time.unscaledDeltaTime);
             actor.rectTransform.anchoredPosition=new Vector2(position.x-120,-position.y+125);
             int frame=Time.unscaledTime<poseUntil?pose:moving && Vector2.Distance(position,target)>1 && Mathf.Sin(Time.unscaledTime*11)>0?1:0;
-            actor.sprite=CharacterArt.Get(hero,0,BaseLook?0:outfit,frame);
+            StylePresentation.SetLook(actor,hero,0,BaseLook?0:outfit,frame);
+            actor.rectTransform.pivot=new Vector2(.5f,.5f);actor.rectTransform.anchoredPosition=new Vector2(position.x,-position.y);
+            actor.rectTransform.localScale=Vector3.one*(BattleSize?100*StylePresentation.PlayerScale/250:1);
         }
     }
     public static class OutfitVisuals

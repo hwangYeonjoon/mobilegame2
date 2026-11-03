@@ -16,7 +16,7 @@ namespace ScrapGuard.Tests
             {
                 var cloud=new CloudClient(folder);cloud.Session.endpoint="https://game.example.com";cloud.Session.secret=CloudClient.NewSecret();cloud.Session.enabled=true;cloud.SaveSession();
                 var pending=new GameCommand("attendance");string json=JsonUtility.ToJson(pending);File.WriteAllText(Path.Combine(folder,"cloud-pending.json"),json);
-                var p=new ReleasePolicy{latestBuild=15,minimumBuild=15,latestVersion="0.15.0",combatRules=Combat.RulesVersion,packageName=AppRelease.Package};
+                var p=new ReleasePolicy{latestBuild=AppRelease.Build+1,minimumBuild=AppRelease.Build+1,latestVersion="0.16.0",combatRules=Combat.RulesVersion,packageName=AppRelease.Package};
                 Assert.That(cloud.ObserveRelease(cloud.Session.endpoint,p),Is.True);
                 var restored=new CloudClient(folder);Assert.That(restored.UpdateBlocked,Is.True);Assert.That(restored.Pending.requestId,Is.EqualTo(pending.requestId));Assert.That(restored.Session.secret,Is.EqualTo(cloud.Session.secret));
                 Assert.That(File.ReadAllText(Path.Combine(folder,"cloud-pending.json")),Is.EqualTo(json));
@@ -30,7 +30,7 @@ namespace ScrapGuard.Tests
         [Test]
         public void ReleaseWireRoundTrip()
         {
-            var reply=new ServerReply{code="client_update_required",release=new ReleasePolicy{latestBuild=15,minimumBuild=15,latestVersion="0.15.0",packageName=AppRelease.Package,combatRules=Combat.RulesVersion,playAvailable=true}};
+            var reply=new ServerReply{code="client_update_required",release=new ReleasePolicy{latestBuild=AppRelease.Build+1,minimumBuild=AppRelease.Build+1,latestVersion="0.16.0",packageName=AppRelease.Package,combatRules=Combat.RulesVersion,playAvailable=true}};
             var copy=JsonUtility.FromJson<ServerReply>(JsonUtility.ToJson(reply));Assert.That(ReleaseRules.Evaluate(copy.release,14,Combat.RulesVersion),Is.EqualTo(UpdateRequirement.Required));
             Assert.That(copy.code,Is.EqualTo("client_update_required"));
         }

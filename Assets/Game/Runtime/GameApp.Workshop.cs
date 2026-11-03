@@ -139,15 +139,10 @@ namespace ScrapGuard
         void SupportArrivalCard()
         {
             var support=combat.Support;bool show=support.showIdentity;
-            Color accent=show?FrameColor(support.frame):Ui.Blue;
             if(show && support.outfit>0)OutfitVisuals.Special(effectLayer,new Vector2(combat.Position.x,-combat.Position.y),90,support.outfit);
-            var card=Ui.Box(effectLayer,18,244,306,111,Ui.Panel).rectTransform;
-            Ui.Box(card,0,0,4,111,accent,false);
-            CharacterArt.Draw(card,12,9,80,90,support.hero,show?support.skin:0,show?support.outfit:0);
-            Ui.Label(card,show?support.name:"길드 지원 도착",104,11,190,30,19,accent);
-            Ui.Label(card,show?Social.Titles[Mathf.Clamp(support.title,0,Social.Titles.Length-1)]:"비공개 대원",104,47,190,25,13,Ui.Muted);
-            Ui.Label(card,show?(support.outfit>0?Outfits.Label(support.outfit):Social.Skins[Mathf.Clamp(support.skin,0,Social.Skins.Length-1)]):SupportNames[support.hero],104,77,190,25,13,Ui.Ink);
-            card.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(3,1,1);
+            // HUD-only entrance: never cover the arena's attack warnings or consume touches.
+            StylePresentation.Arrival(screen,18,16,show?support.name+" · 지원 도착":"길드 지원 도착",support.hero,show?support.skin:0,show?support.outfit:0,
+                show?Social.Titles[Mathf.Clamp(support.title,0,Social.Titles.Length-1)]+" · "+SupportNames[support.hero]:"비공개 대원 · "+SupportNames[support.hero],combat);
         }
     }
 }

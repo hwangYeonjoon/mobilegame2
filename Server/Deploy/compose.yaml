@@ -1,7 +1,7 @@
 name: scrapguard-beta
 services:
   api:
-    image: scrapguard-api:${RELEASE_TAG:-0.14.0}
+    image: scrapguard-api:${RELEASE_TAG:-0.15.0}
     build:
       context: ../..
       dockerfile: Server/Deploy/Dockerfile
@@ -9,9 +9,9 @@ services:
     environment:
       SERVER_URLS: http://+:8080
       GAME_DB: /data/scrapguard.db
-      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-14}
+      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-15}
       CLIENT_MIN_BUILD: ${CLIENT_MIN_BUILD:-14}
-      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.14.0}
+      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.15.0}
       PLAY_UPDATE_AVAILABLE: ${PLAY_UPDATE_AVAILABLE:-false}
       CLIENT_UPDATE_NOTES: ${CLIENT_UPDATE_NOTES:-새로운 수호대 콘텐츠와 안정성 개선을 확인하세요.}
       COMMERCE_MODE: ${COMMERCE_MODE:-disabled}

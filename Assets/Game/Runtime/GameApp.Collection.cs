@@ -37,18 +37,18 @@ namespace ScrapGuard
                 Ui.Button(row, "관리", 395, 23, 82, 51, () => ItemDetail(id), Ui.Raised, true, 16);
             }
         }
-        void ItemDetail(string id)
+        void ItemDetail(string id,string feedback=null)
         {
             var item = State.items.Find(i => i.id == id); if (item == null) { CloseModal(); return; }
             var definition = Catalog.Items[item.definition];
-            var card = Dialog(definition.Name, Catalog.RarityNames[item.rarity] + " · " + definition.Description, 624);
+            var card = Dialog(definition.Name, feedback??(Catalog.RarityNames[item.rarity] + " · " + definition.Description), 624);
             ItemIcon(card, item, 24, 137, 84);
             Ui.Label(card, "강화 Lv." + item.level + " / 20", 130, 136, 333, 39, 24);
             Ui.Label(card, "기본 능력치 ×" + Catalog.Multiplier(item).ToString("0.00"), 130, 181, 333, 35, 16, Rarity(item.rarity));
             Ui.Button(card, State.equipped.Contains(id) ? "장착 중" : "장착하기", 24, 243, 214, 53, () => Change(new GameCommand("equip", id), () => ItemDetail(id)), null, !State.equipped.Contains(id));
             Ui.Button(card, item.locked ? "잠금 해제" : "판매 잠금", 254, 243, 214, 53, () => Change(new GameCommand("lock", id), () => ItemDetail(id)), Ui.Raised);
             Ui.Label(card, "강화 비용  골드 " + (item.level * 300).ToString("N0") + " · 부품 " + item.level * 2, 24, 317, 444, 32, 16, Ui.Gold);
-            Ui.Button(card, item.level >= 20 ? "최대 강화" : "장비 강화  +1", 24, 362, 444, 56, () => Change(new GameCommand("upgrade", id), () => ItemDetail(id)), null, item.level < 20);
+            Ui.Button(card, item.level >= 20 ? "최대 강화" : "장비 강화  +1", 24, 362, 444, 56, () => UpgradeItemWithFeedback(id), null, item.level < 20);
             Ui.Button(card, "강화 이전", 24, 438, 214, 50, () => TransferTargets(id), Ui.Raised, item.level > 1, 16);
             Ui.Button(card, "판매  +" + new[] { 300, 600, 1200 }[item.rarity], 254, 438, 214, 50, () => ConfirmSale(id), Ui.Raised,
                 !State.equipped.Contains(id) && !item.locked && item.level == 1, 16);
@@ -103,12 +103,16 @@ namespace ScrapGuard
             }
         }
         void HeroUpgrade()
+        {HeroUpgrade(null);}
+        void HeroUpgrade(string feedback)
         {
             var hero = State.heroes[State.selectedHero];
-            var card = Dialog("대원 레벨업", Catalog.HeroNames[State.selectedHero] + " · 기본 공격과 체력이 증가해요.", 365);
+            var card = Dialog("대원 레벨업", feedback??(Catalog.HeroNames[State.selectedHero] + " · 기본 공격과 체력이 증가해요."), 440);
             Ui.Label(card, "Lv." + hero.level + " → Lv." + Math.Min(30, hero.level + 1), 24, 139, 444, 52, 29, Ui.Mint, TextAnchor.MiddleCenter);
-            Ui.Label(card, "골드 " + (hero.level * 500).ToString("N0") + " · 부품 " + hero.level * 3, 24, 202, 444, 40, 18, Ui.Gold, TextAnchor.MiddleCenter);
-            Ui.Button(card, hero.level == 30 ? "최대 레벨" : "레벨업", 24, 279, 444, 59, () => Change(new GameCommand("hero_upgrade"), HeroUpgrade), null, hero.level < 30);
+            var weapon=State.items.Find(i=>i.id==State.equipped[0]);var armor=State.items.Find(i=>i.id==State.equipped[1]);int next=Mathf.Min(30,hero.level+1);
+            Ui.Label(card,"공격 "+Catalog.Attack(State)+" → "+Catalog.AttackFor(State.selectedHero,next,weapon)+"   체력 "+Catalog.Health(State)+" → "+Catalog.HealthFor(State.selectedHero,next,armor),24,204,444,37,16,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card, "골드 " + (hero.level * 500).ToString("N0") + " · 부품 " + hero.level * 3, 24, 255, 444, 40, 18, Ui.Gold,TextAnchor.MiddleCenter);
+            Ui.Button(card, hero.level == 30 ? "최대 레벨" : "레벨업", 24, 343, 444, 59, UpgradeHeroWithFeedback, null, hero.level < 30);
         }
         bool shopSupplies;
         void Shop()
@@ -156,7 +160,7 @@ namespace ScrapGuard
             Ui.Label(card, name, 24, 128, 444, 45, 25, Ui.Ink, TextAnchor.MiddleCenter);
             Ui.Label(card, price, 24, 182, 444, 40, 21, Ui.Gold, TextAnchor.MiddleCenter);
             int gems=offer=="hero"?1200:offer=="parts_gems"?100:offer.StartsWith("rare:")?600:0;
-            Ui.Button(card, "구매하기", 24, 269, 444, 62, () => Change(new GameCommand("buy") { value = offer }),null,gems==0 || State.gems>=gems && State.gemDebt==0);
+            Ui.Button(card, "구매하기", 24, 269, 444, 62, () => PurchaseSupply(offer,name),null,gems==0 || State.gems>=gems && State.gemDebt==0);
             if(gems>0)Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,365,444,51,()=>GemSources(gems,()=>ConfirmBuy(offer,name,price)),Ui.Raised,true,16);
         }
     }
