@@ -130,6 +130,7 @@ try
     RestorationChecks.Run(folder,Check);
     WardrobeChecks.Run(folder,Check);
     ReleaseChecks.Run(Check);
+    ServicePreparationChecks.Run(folder,Check);
     Console.WriteLine(count + " checks passed");
 }
 finally { SqliteConnection.ClearAllPools(); if (Directory.Exists(folder)) Directory.Delete(folder,true); }

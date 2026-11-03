@@ -18,5 +18,5 @@ namespace ScrapGuard.Core
         }
     }
     [Serializable] public class PurchaseRequest {public string productId,purchaseToken;}
-    [Serializable] public class CommerceStatus {public bool licenseTest;public string accountBinding;}
+    [Serializable] public class CommerceStatus {public bool licenseTest, enabled, salesEnabled;public string accountBinding;public string[] saleProducts;}
 }

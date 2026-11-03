@@ -21,13 +21,15 @@ def run(args):
     return result.stdout
 
 badging = run([bin_dir / 'aapt', 'dump', 'badging', apk])
-assert "versionName='0.15.0'" in badging and "versionCode='15'" in badging
+assert "versionName='0.16.0'" in badging and "versionCode='16'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'36'" in badging
 assert "native-code: 'arm64-v8a'" in badging
 manifest = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'AndroidManifest.xml'])
 assert 'androidx.core.content.FileProvider' in manifest
 assert 'com.scrapguard.mobilegame2.prototype.showcase' in manifest
 assert 'android.permission.INTERNET' in manifest
+assert 'com.google.android.gms.ads.APPLICATION_ID' in manifest
+assert 'ca-app-pub-3940256099942544~3347511713' in manifest
 assert 'android.permission.WRITE_EXTERNAL_STORAGE' not in manifest
 assert re.search(r'allowBackup[^\n]*0x0', manifest)
 paths = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'res/xml/showcase_paths.xml'])
@@ -57,10 +59,10 @@ with zipfile.ZipFile(apk) as archive:
         libraries.append({'name': name, 'load_alignments': load_alignments})
 assert libraries
 report = {'apk': str(apk), 'bytes': apk.stat().st_size, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
-          'version': '0.15.0', 'versionCode': 15, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
+          'version': '0.16.0', 'versionCode': 16, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
           'v2_signature': True, 'zip_16kb': True, 'file_provider': True, 'backup_disabled': True,
           'libraries': libraries, 'device_execution': 'not tested'}
-(result_dir / 'apk-015-verification.json').write_text(json.dumps(report, indent=2) + '\n')
-(result_dir / 'apk-015-manifest.txt').write_text(manifest + '\n' + paths)
+(result_dir / 'apk-016-verification.json').write_text(json.dumps(report, indent=2) + '\n')
+(result_dir / 'apk-016-manifest.txt').write_text(manifest + '\n' + paths)
 print(json.dumps({key:value for key,value in report.items() if key != 'libraries'}, indent=2))
 print('ELF libraries checked:', len(libraries))

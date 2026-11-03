@@ -1,5 +1,64 @@
 # 서버와 안드로이드 출시 계획
 
+## 0.16 외부 연결 전 서비스 준비
+
+앱 0.16/code 16, 최소 호환 code 14, 전투 규칙 11이다. 일반 구매 코드와 광고 SDK를 추가했지만 실제 Google 계정·공개 서버·광고·판매는 연결하지 않았다. 아래 내용이 과거 버전의 미구현 설명을 대체한다.
+
+### 결제 설정
+
+- `COMMERCE_MODE=disabled|license_test|production`. production은 `COMMERCE_RELEASE_READY=true`가 별도로 필요하다. 잘못된 설정은 시작 시 거절한다.
+- `COMMERCE_SALES_ENABLED`는 신규 구매 버튼을 제어한다. 판매 중지 중에도 이미 청구된 구매 검증·복원은 허용한다. Play Console 상품 판매 상태도 함께 관리한다.
+- `COMMERCE_DISABLED_PRODUCTS`는 판매에서 제외할 상품 ID 목록이다. 기본 배포에서는 광고 검증 전까지 `ad_skip_lifetime`을 제외한다.
+- 테스트/일반 영수증을 상호 거절하며, 테스트 진행 계정은 일반 구매를 사용할 수 없다. 기존 유료/무료 원장·환불·부채 조정은 유지한다.
+- `/health/services`는 결제/광고 모드와 환불 조회의 마지막 성공·실패, 연속 실패, 주의 필요 여부를 제공한다. 환불은 시간 단위 폴러다. RTDN 푸시와 장기 중단 복구는 별도 작업이다.
+
+### 광고 설정과 보상 처리
+
+기존 AdMob 계정에 **이 게임을 별도 앱으로 추가하고 새 App ID·보상형 광고 단위를 생성**한다. 다른 앱의 광고 ID는 재사용하지 않는다. [공식 앱 추가](https://support.google.com/admob/answer/9989980?hl=ko).
+
+- SDK는 Google Mobile Ads Unity 11.6.0, Android Ads 25.5.0, UMP 4.0.0으로 고정했다. 설정이 활성화된 Android에서만 앱 시작 시 동의 정보를 갱신하고 `CanRequestAds()` 확인 후 요청한다. 필요한 경우 개인정보 선택 변경 버튼을 제공한다.
+- `Assets/Resources/ServiceSettings.json`은 `adsEnabled=false`, `productionAds=false`와 공식 샘플 ID가 기본이다. 실제 App ID·단위 ID·테스트 기기 ID·개인정보/문의/삭제 URL을 설정한다. 빌드 시 App ID를 SDK 설정에 복사한다.
+- 서버 `ADS_MODE=disabled|test|production`, `ADMOB_REWARDED_UNIT_ID`. production은 `ADS_RELEASE_READY=true`와 게임 전용 단위를 요구한다. 앱/서버 단위와 모드가 일치해야 표시한다. test 모드의 게임 광고 단위에는 테스트 기기 ID가 필요하다. 샘플 광고 ID로 게임의 SSV를 설정할 수 없으므로 전체 검증은 게임 단위와 등록된 테스트 기기를 사용한다.
+- AdMob 콘솔 보상은 **reward / 1**, SSV URL은 `https://운영도메인/v1/ads/ssv`로 설정한다. custom_data는 서버 claim ID, user_id는 공개 계정 ID다. 복구 코드를 보내지 않는다. 실제 골드·부품 지급량은 서버 예약 값으로 결정한다.
+- 서버 예약은 동일 계정·보상 종류의 동시 요청을 막는다. 20분 또는 서비스 일자 종료 시 만료한다. 표시 실패·취소는 지급 횟수를 소비하지 않는다. 로컬 시청 완료 콜백은 재화를 지급하지 않는다.
+- SSV는 원본 쿼리 ECDSA/SHA256 DER 서명, Google 키(12시간 캐시), 광고 단위·계정·요청·보상·시각·중복 거래를 검증한다. 지급·원장은 단일 DB 트랜잭션이다. 재시작 후 내역으로 확인하며 취소·만료된 요청은 늦은 콜백으로 되살리지 않는다.
+- 영구 스킵은 동일 예약·지급·하루 한도를 사용하고 광고를 표시하거나 노출 이벤트를 보내지 않는다. 이전 앱의 스킵 명령도 대기 중인 예약과 충돌하면 거절한다.
+- [SDK 설치](https://developers.google.com/admob/unity/quick-start), [SSV](https://developers.google.com/admob/unity/ssv), [UMP](https://developers.google.com/admob/unity/privacy). 대상 연령·국가와 콘솔 메시지는 연결 단계에서 확정한다.
+
+### 운영자 CLI
+
+서버 파일 접근 권한이 있는 운영자가 컨테이너 내부에서 실행한다. 외부 관리자 API는 제공하지 않는다. 예시의 공개 ID·운영자·요청 ID는 실제 값으로 바꾼다.
+
+```sh
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops summary
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops reports
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops account --account PUBLIC_ID
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops audit
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops hide --account PUBLIC_ID --operator OPERATOR --request-id 0123456789abcdef0123456789abcdef --reason "신고 검토 후 공개 제한"
+docker compose exec -T api dotnet ScrapGuard.Server.dll --ops compensate --account PUBLIC_ID --operator OPERATOR --request-id 1123456789abcdef0123456789abcdef --reason "장애 보상 접수번호" --gold 1000 --parts 10
+```
+
+`hide`는 이름 초기화·공개 제한·신고 종결을 처리하고 해제 전 이름 변경과 재공개를 막는다. `unhide`는 제한만 해제하며 공개 동의는 켜지 않는다. `resolve`는 대상의 신고를 종결한다. 감사 기록은 운영자·사유·대상·요청 ID를 남기며 계정 삭제 시 계정 연결을 제거한다. 사유에 개인정보나 토큰을 넣지 않는다.
+
+보상은 1회 최대 골드 10,000·부품 100이다. 같은 요청 ID 재실행은 중복 지급하지 않고 내용 변경은 거절한다. 임의 유료 보석 지급은 제공하지 않는다. 구매 미지급은 정상 복원으로 재검증한다. 운영 조회는 최근 구매·원장·광고 내역을 제공하며 인증/구매 토큰을 제외한다.
+
+### 연결 전 점검
+
+```sh
+python3 Tools/release_preflight.py --env-file Server/Deploy/.env.example
+python3 Tools/service_health.py --url http://127.0.0.1:5190
+python3 Tools/service_health.py --url https://운영도메인 --backup-dir Server/Deploy/backups
+dotnet run --project Tools/EconomyForecast
+python3 Tools/local_load_check.py
+```
+
+preflight는 외부에 접속하지 않고 비밀값을 출력하지 않는다. 현재 미설정 항목 때문에 종료 코드 2가 정상이다. configuration_ready는 거래 검증이나 출시 승인이 아니다. 서명 변수 확인은 `--signing`으로 추가한다. 서비스 계정 파일은 검사 환경에서도 읽을 수 있어야 한다. health 도구는 JSON·종료 코드를 제공하고 알림 수신처 연결은 별도다.
+
+local_load_check는 격리된 127.0.0.1:5190 서버에 인증된 읽기 40회(동시 4개)를 실행한다. 운영 서버 수용량이나 장시간 전투 부하 결과로 해석하지 않는다.
+
+개인정보·고객지원·웹 삭제 안내 버튼과 URL 설정은 준비했지만 실제 페이지는 게시하지 않았다. 운영자 정보·도메인·서버·서명 키·상품 등록·실기기와 외부 백업 보관·복구 훈련은 외부 준비 작업이다.
+
+
 ## 0.15 표현·구매 결과 화면
 
 - 앱 0.15.0 / code 15 / 전투 규칙 11. 표현과 UI 변경이며 피해·충돌·보상·입력 리플레이 규칙은 바꾸지 않는다. 기본 최신 코드는 15, 호환 최소 코드는 14를 유지하여 0.14에는 권장 업데이트를 안내한다. Play 배포 가능은 여전히 false다.

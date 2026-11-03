@@ -11,6 +11,7 @@ namespace ScrapGuard
     {
         StoreController playStore;
         string billingAccount;
+        CommerceStatus billingStatus;
         bool billingConnecting,billingVerifying;
         readonly Queue<Order> purchaseQueue=new Queue<Order>();
         void ConnectPlayBilling()
@@ -24,9 +25,9 @@ namespace ScrapGuard
         {
             SetNetworkBusy(true);CommerceStatus status=null;
             yield return cloud.Get("/v1/commerce",(body,code)=>{if(code==200)status=JsonUtility.FromJson<CommerceStatus>(body);});SetNetworkBusy(false);
-            if(status==null||!status.licenseTest){Toast("서버의 Play 라이선스 테스트 설정이 필요해요.");yield break;}
+            if(status==null||!(status.enabled||status.licenseTest)){Toast("현재 Play 결제를 이용할 수 없어요.");yield break;}
             if(playStore!=null&&billingAccount!=status.accountBinding){Toast("계정을 바꾼 경우 앱을 다시 시작해 주세요.");yield break;}
-            billingAccount=status.accountBinding;
+            billingAccount=status.accountBinding;billingStatus=status;
             if(playStore!=null){playStore.FetchPurchases();PlayStorePanel();yield break;}
             InitializePlayStore();
         }
@@ -52,8 +53,8 @@ namespace ScrapGuard
         void PlayStorePanel()
         {
             if(playStore==null)return;
-            var card=Dialog("Play 라이선스 테스트","등록된 테스트 계정 전용 · 일반 판매는 비활성화 상태",860);
-            Ui.Label(card,"Google 테스트 결제 수단인지 확인해 주세요.\n실제 청구 수단이 보이면 구매를 취소하세요.",24,135,444,64,16,Ui.Gold);
+            var card=Dialog(billingStatus.licenseTest?"Play 라이선스 테스트":"보석 충전 · 구매 복원",billingStatus.licenseTest?"등록된 테스트 계정 전용":"Google Play 가격 확인 후 구매할 수 있어요.",860);
+            Ui.Label(card,billingStatus.licenseTest?"Google 테스트 결제 수단인지 확인해 주세요.\n실제 청구 수단이 보이면 구매를 취소하세요.":"구매 내역은 서버 계정에 보관됩니다.\n판매가 중지되어도 기존 구매 복원은 가능합니다.",24,135,444,64,16,Ui.Gold);
             var products=playStore.GetProducts();
             for(int i=0;i<CommerceCatalog.Offers.Length;i++)
             {
@@ -62,7 +63,7 @@ namespace ScrapGuard
                 Ui.Button(card,offer.Name+" · "+price,24,225+i*90,444,65,()=>{
                     if(!Online||!cloudReady||networkBusy||combat!=null||billingVerifying||cloud.Pending!=null){Toast("진행 중인 작전과 동기화를 먼저 마쳐 주세요.");return;}
                     StartCoroutine(ConfirmBillingAccount(product));
-                },Ui.Raised,product!=null&&product.availableToPurchase,17);
+                },Ui.Raised,product!=null&&product.availableToPurchase&&billingStatus.salesEnabled&&billingStatus.saleProducts!=null&&Array.IndexOf(billingStatus.saleProducts,offer.Id)>=0,17);
             }
             Ui.Label(card,"지급은 서버 검증 후 확정됩니다.\n보류·실패에는 지급하지 않으며 복원 시 중복 지급하지 않아요.",24,716,444,67,14,Ui.Muted);
         }
@@ -70,7 +71,7 @@ namespace ScrapGuard
         {
             SetNetworkBusy(true);CommerceStatus status=null;
             yield return cloud.Get("/v1/commerce",(body,code)=>{if(code==200)status=JsonUtility.FromJson<CommerceStatus>(body);});SetNetworkBusy(false);
-            if(status==null||!status.licenseTest||status.accountBinding!=billingAccount){Toast("결제 계정이 달라졌거나 테스트가 종료됐어요.");yield break;}
+            if(status==null||!(status.enabled||status.licenseTest)||status.accountBinding!=billingAccount||!status.salesEnabled||status.saleProducts==null||Array.IndexOf(status.saleProducts,product.definition.id)<0){Toast("계정 또는 판매 상태가 변경됐어요. 상점을 다시 열어 주세요.");yield break;}
             playStore.PurchaseProduct(product);
         }
         void QueuePurchase(Order order)

@@ -14,14 +14,21 @@ public sealed partial class GameRepository
         CREATE INDEX IF NOT EXISTS purchase_owner ON purchases(owner,created);
         """);
     }
+    public CommerceStatus Commerce(string token,CommercePolicy policy)
+    {
+        var status=Commerce(token,policy.LicenseTest);
+        status.enabled=policy.Enabled;status.salesEnabled=policy.SalesEnabled;status.saleProducts=policy.SaleProducts;
+        if(!policy.LicenseTest && Bootstrap(token).state.testProgress){status.salesEnabled=false;status.saleProducts=[];}
+        return status;
+    }
     public CommerceStatus Commerce(string token,bool enabled)
-    {using var db=Open();var a=Load(db,null,token);return new CommerceStatus{licenseTest=enabled,accountBinding=Hash("play:"+a.Id).ToLowerInvariant()};}
+    {using var db=Open();var a=Load(db,null,token);return new CommerceStatus{licenseTest=enabled,enabled=enabled,accountBinding=Hash("play:"+a.Id).ToLowerInvariant()};}
     public async Task<ServerReply> VerifyPurchase(string token,PurchaseRequest request,IPlayPurchases verifier,CancellationToken ct=default)
     {
         if(!verifier.Enabled)throw new ApiFault(503,"현재 결제를 사용할 수 없어요.");
         var status=Commerce(token,true);var purchase=await verifier.Verify(request,ct);
-        if(purchase.Product!=request.productId||purchase.Token!=request.purchaseToken||purchase.Binding!=status.accountBinding||!purchase.Test||purchase.Quantity!=1)
-            throw new ApiFault(400,"이 계정의 단일 테스트 구매만 처리할 수 있어요.");
+        if(purchase.Product!=request.productId||purchase.Token!=request.purchaseToken||purchase.Binding!=status.accountBinding||purchase.Test!=verifier.LicenseTest||purchase.Quantity!=1)
+            throw new ApiFault(400,"계정 또는 결제 환경이 일치하지 않아요.");
         if(purchase.Canceled){RevokePurchase(purchase.Token);throw new ApiFault(400,"취소된 구매입니다. 계정을 동기화해 주세요.");}
         if(!purchase.Purchased)throw new ApiFault(409,"결제가 보류 중이에요. 완료 후 다시 확인합니다.");
         lock(gate)
@@ -35,13 +42,14 @@ public sealed partial class GameRepository
                 return Reply(a,"구매 확인 완료 · 중복 지급 없음");
             }
             using(var voided=Sql(db,tx,"SELECT COUNT(*) FROM voided_tokens WHERE token_hash=$key",("$key",key)))if((long)voided.ExecuteScalar()>0)throw new ApiFault(409,"회수된 구매예요.");
-            a.State.testProgress=true;
+            if(!purchase.Test && a.State.testProgress)throw new ApiFault(409,"테스트 진행 계정은 일반 결제를 사용할 수 없어요.");
+            if(purchase.Test)a.State.testProgress=true;
             var offer=CommerceCatalog.Find(purchase.Product);if(offer==null)throw new ApiFault(400,"지원하지 않는 상품이에요.");
             int granted=offer.Gems>0?PremiumWallet.Grant(a.State,offer.Gems):0;
             if(!offer.Consumable)a.State.adSkip=true;
             Execute(db,tx,"INSERT INTO purchases(token_hash,owner,product,granted,remaining,created) VALUES($key,$owner,$product,$granted,$remaining,$time)",("$key",key),("$owner",a.Id),("$product",offer.Id),("$granted",offer.Gems),("$remaining",granted),("$time",clock().ToString("O")));
             // Amount applied to prior refund debt is already spent and must be restored if this grant is refunded.
-            SaveCommerce(db,tx,a,key,"play_purchase",granted);tx.Commit();return Reply(a,"Play 테스트 구매 지급 완료");
+            SaveCommerce(db,tx,a,key,"play_purchase",granted);tx.Commit();return Reply(a,purchase.Test?"Play 테스트 구매 지급 완료":"구매한 상품을 지급했어요.");
         }
     }
     void SaveCommerce(SqliteConnection db,SqliteTransaction tx,Account a,string key,string kind,int delta)

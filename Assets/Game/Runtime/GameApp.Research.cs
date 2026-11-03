@@ -39,17 +39,18 @@ namespace ScrapGuard
         {
             var card=Dialog("보석 잔액","무료 보석부터 사용하며 구매 효력은 같아요.",460);
             Ui.Label(card,"총 보석 "+State.gems.ToString("N0")+"개\n무료 "+(State.gems-State.paidGems).ToString("N0")+" · 유료 "+State.paidGems.ToString("N0"),24,141,444,101,25,Ui.Gold,TextAnchor.MiddleCenter);
-            Ui.Label(card,State.gemDebt>0?"환불 조정 "+State.gemDebt+"보석\n일반 플레이는 가능해요. 보석 소비는 조정 후 이용할 수 있어요.":"환불 조정 내역 없음\n현재 Play 구매는 라이선스 테스트 전용입니다.",24,277,444,105,16,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,State.gemDebt>0?"환불 조정 "+State.gemDebt+"보석\n일반 플레이는 가능해요. 보석 소비는 조정 후 이용할 수 있어요.":"환불 조정 내역 없음\n구매 가능 여부는 Play 상점에서 확인해 주세요.",24,277,444,105,16,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void StoreOfferPanel(StoreOffer offer)
         {
             Track("offer_view",offer.Id);
-            var card=Dialog(offer.Name,"출시 제안가 · 이 화면에서는 결제되지 않아요.",580);
+            var card=Dialog(offer.Name,"구성 안내 · 실제 가격은 Play 상점에서 확인해요.",650);
             Ui.Label(card,offer.ProposedWon.ToString("N0")+"원",24,140,444,62,36,Ui.Gold,TextAnchor.MiddleCenter);
             string benefit=offer.Gems>0?"보석 "+offer.Gems.ToString("N0")+"개 확정 지급\n무료 보석과 사용 효력이 같아요.\n캐릭터·의상·장비·부품을 선택해 구매해요.":"광고 연결 후 제공할 영구 권리 · 계정 복원 지원\n결과 추가 골드 하루 3회 + 부품 하루 2회\n보상 횟수를 늘리지 않고 광고 시청만 생략해요.";
             Ui.Label(card,benefit,24,227,444,120,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(card,"정식 판매 시 Google Play가 제공하는 가격을\n확인한 뒤 결제합니다. 지금은 예약·청구하지 않아요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
-            Ui.Button(card,"관심 표시 · 결제 아님",24,477,444,54,()=>{Track("offer_interest",offer.Id);Toast(research.Data.consent?"이 기기의 테스트 기록에 남겼어요.":"관심도 기록은 설정에서 동의한 경우에만 저장돼요.");},Ui.Mint,true,17);
+            Ui.Label(card,"표시 금액은 제안가이며 청구 금액이 아닙니다.\n실제 결제 전 Google Play 가격을 확인해 주세요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,"Play 상점 · 가격 확인",24,460,444,54,ConnectPlayBilling,Ui.Mint,Online,17);
+            Ui.Button(card,"관심 표시 · 결제 아님",24,532,444,54,()=>{Track("offer_interest",offer.Id);Toast(research.Data.consent?"이 기기의 테스트 기록에 남겼어요.":"관심도 기록은 설정에서 동의한 경우에만 저장돼요.");},Ui.Mint,true,17);
         }
         void ConceptRoom(){OutfitCollection();}
         void SkillTrialHub()

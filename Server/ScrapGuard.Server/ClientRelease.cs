@@ -23,6 +23,6 @@ public sealed class ClientRelease
             int.TryParse(rulesHeader,NumberStyles.None,CultureInfo.InvariantCulture,out var rules) && rules==Policy.combatRules;
     }
     public static bool Exempt(string path,string method)
-    {return !path.StartsWith("/v1/",StringComparison.OrdinalIgnoreCase) || path.Equals("/v1/release",StringComparison.OrdinalIgnoreCase) || method=="DELETE"&&path.Equals("/v1/account",StringComparison.OrdinalIgnoreCase);}
+    {return !path.StartsWith("/v1/",StringComparison.OrdinalIgnoreCase) || path.Equals("/v1/release",StringComparison.OrdinalIgnoreCase) || path=="/v1/ads/ssv" || method=="DELETE"&&path.Equals("/v1/account",StringComparison.OrdinalIgnoreCase);}
     public ServerReply Rejection()=>new ServerReply{success=false,code="client_update_required",message=Policy.playAvailable?"새 버전으로 업데이트한 뒤 다시 연결해 주세요.":"호환되는 앱이 필요해요. 배포 상태를 확인한 뒤 다시 연결해 주세요.",release=Policy};
 }

@@ -1,7 +1,7 @@
 name: scrapguard-beta
 services:
   api:
-    image: scrapguard-api:${RELEASE_TAG:-0.15.0}
+    image: scrapguard-api:${RELEASE_TAG:-0.16.0}
     build:
       context: ../..
       dockerfile: Server/Deploy/Dockerfile
@@ -9,12 +9,18 @@ services:
     environment:
       SERVER_URLS: http://+:8080
       GAME_DB: /data/scrapguard.db
-      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-15}
+      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-16}
       CLIENT_MIN_BUILD: ${CLIENT_MIN_BUILD:-14}
-      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.15.0}
+      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.16.0}
       PLAY_UPDATE_AVAILABLE: ${PLAY_UPDATE_AVAILABLE:-false}
       CLIENT_UPDATE_NOTES: ${CLIENT_UPDATE_NOTES:-새로운 수호대 콘텐츠와 안정성 개선을 확인하세요.}
       COMMERCE_MODE: ${COMMERCE_MODE:-disabled}
+      COMMERCE_SALES_ENABLED: ${COMMERCE_SALES_ENABLED:-false}
+      COMMERCE_RELEASE_READY: ${COMMERCE_RELEASE_READY:-false}
+      COMMERCE_DISABLED_PRODUCTS: ${COMMERCE_DISABLED_PRODUCTS:-ad_skip_lifetime}
+      ADS_MODE: ${ADS_MODE:-disabled}
+      ADS_RELEASE_READY: ${ADS_RELEASE_READY:-false}
+      ADMOB_REWARDED_UNIT_ID: ${ADMOB_REWARDED_UNIT_ID:-}
       PLAY_PACKAGE_NAME: ${PLAY_PACKAGE_NAME:-com.scrapguard.mobilegame2.prototype}
       GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       TRUSTED_PROXY_IPS: 172.31.248.2

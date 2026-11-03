@@ -53,6 +53,7 @@ namespace ScrapGuard.Editor
             }
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             Branding.Apply();
+            ServiceBuildSettings.Apply();
             AssetDatabase.SaveAssets();
             Debug.Log("SCRAP_GUARD_CONFIGURED");
         }

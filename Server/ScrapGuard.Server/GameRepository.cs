@@ -54,6 +54,8 @@ public sealed partial class GameRepository
         if (!hasRules) Execute(db,null,"ALTER TABLE accounts ADD COLUMN run_rules INTEGER NOT NULL DEFAULT 2");
         InitializeEndgame(db);
         InitializeCommerce(db);
+        InitializeAds(db);
+        InitializeOperations(db);
     }
     SqliteConnection Open() { var db = new SqliteConnection(connectionString); db.Open(); return db; }
     static SqliteCommand Sql(SqliteConnection db, SqliteTransaction tx, string text, params (string, object)[] args)
@@ -123,6 +125,8 @@ public sealed partial class GameRepository
                 }
             }
             if (a.Revision != command.revision) throw new ApiFault(409, "다른 기기에서 진행이 변경됐어요. 최신 상태에서 다시 시도해 주세요.", Reply(a, "진행 상태가 변경됐어요. 다시 시도해 주세요.", false));
+            if(command.type=="ad_skip_reward"&&HasAdReservation(db,tx,a.Id,command.value))throw new ApiFault(409,"확인 중인 광고 보상을 먼저 처리해 주세요.");
+            if(Moderated(db,tx,a.Id)&&(command.type=="rename"||command.type=="visibility"&&command.enabled))throw new ApiFault(403,"프로필 공개가 제한되어 있어요. 고객지원으로 문의해 주세요.");
             int paidBefore=a.State.paidGems;
             int gold = a.State.gold, gems = a.State.gems, parts = a.State.parts, shards=a.State.coreShards;
             var blueprintBalances=Enumerable.Range(0,Campaign.Regions.Length).Select(i=>Workshop.Region(a.State,i).blueprints).ToArray();
@@ -193,7 +197,7 @@ public sealed partial class GameRepository
     }
     PublicProfile Public(SqliteConnection db, SqliteTransaction tx, Account viewer, Account target)
     {
-        if (viewer.Id != target.Id && (!target.State.publicProfile || Blocked(db, tx, viewer.Id, target.Id))) throw new ApiFault(404, "공개된 프로필을 찾을 수 없어요.");
+        if (viewer.Id != target.Id && (!target.State.publicProfile || Moderated(db,tx,target.Id) || Blocked(db, tx, viewer.Id, target.Id))) throw new ApiFault(404, "공개된 프로필을 찾을 수 없어요.");
         var profile = Social.Build(target.State, target.Id, false);
         using var likes = Sql(db, tx, "SELECT COUNT(*),COALESCE(SUM(CASE WHEN viewer=$viewer THEN 1 ELSE 0 END),0) FROM likes WHERE target=$target", ("$viewer",viewer.Id), ("$target",target.Id));
         using var r = likes.ExecuteReader(); r.Read(); profile.likes = r.GetInt32(0); profile.liked = r.GetInt64(1) > 0; return profile;

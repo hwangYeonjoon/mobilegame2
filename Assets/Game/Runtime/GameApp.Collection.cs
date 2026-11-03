@@ -124,7 +124,7 @@ namespace ScrapGuard
             Ui.Label(list, "보급품", 0, 0, 492, 32, 22);
             ShopRow(list, 45, "공용 부품 ×20", "매일 1회 · 골드로 성장 재료 보충", "2,000 골드", () => ConfirmBuy("parts_gold", "부품 20개", "골드 2,000"), State.dailyPartsPurchases < 1);
             ShopRow(list, 154, "공용 부품 ×100", "매일 1회 · 확정 수량", "◆ 100", () => ConfirmBuy("parts_gems", "부품 100개", "보석 100"), State.dailyGemPartsPurchases < 1);
-            ShopRow(list, 263, "추가 보급 부품 ×10", "선택 보상 · 오늘 " + State.dailyRewardParts + "/2회", State.demoAdSkip || State.adSkip ? "스킵 수령" : "체험 안내", () => RequestReward("parts"), State.dailyRewardParts < 2);
+            ShopRow(list, 263, "추가 보급 부품 ×10", "선택 보상 · 오늘 " + State.dailyRewardParts + "/2회", State.demoAdSkip || State.adSkip ? "스킵 수령" : Online ? "광고 보상" : "체험 안내", () => RequestReward("parts"), State.dailyRewardParts < 2);
             Ui.Label(list, "확정 장비 · 일반", 0, 391, 492, 36, 22);
             Ui.Label(list, "하루 총 2개 · 구매 " + State.dailyItemPurchases + "/2", 0, 427, 492, 27, 14, Ui.Muted);
             int[] sale = { 1, 2, 3, 4, 5, 7, 8, 10, 11 };
@@ -138,7 +138,7 @@ namespace ScrapGuard
             ShopRow(list, 1508, "희귀 충격 발사기", "능력치 ×1.35 · 장비별 영구 1회", "◆ 600", () => ConfirmBuy("rare:2", "희귀 충격 발사기", "보석 600"), !State.purchasedRare.Contains(2) && !State.items.Exists(i => i.definition == 2 && i.rarity == 2));
             Ui.Label(list, "Google Play 상품 미리보기", 0, 1636, 330, 38, 22);
             Ui.Button(list,"보석 내역",356,1635,136,38,GemWalletPanel,Ui.Raised,true,14);
-            Ui.Label(list, "일반 판매 준비 중 · 이곳에서는 구성과 제안가만 확인해요.", 0, 1677, 492, 38, 13, Ui.Muted);
+            Ui.Label(list, "상품 구성 · 실제 구매 가능 여부와 가격은 Play 상점에서 확인해요.", 0, 1677, 492, 38, 13, Ui.Muted);
             for(int i=0;i<CommerceCatalog.Offers.Length;i++)
             {
                 var offer=CommerceCatalog.Offers[i];

@@ -126,6 +126,20 @@ namespace ScrapGuard
             if(Pending!=null){done(new ServerReply{message="미확인 게임 거래를 먼저 동기화해 주세요."});yield break;}
             yield return Request("/v1/commerce/verify","POST",JsonUtility.ToJson(purchase),(body,status)=>{var reply=Parse(body,status);if(reply.state!=null)Persist(()=>Accept(reply));done(reply);});
         }
+        public bool AcceptAd(AdClaim claim)
+        {
+            return claim!=null&&claim.reply!=null&&claim.reply.state!=null&&claim.reply.playerId==Session.playerId&&claim.reply.revision>=Session.revision&&Persist(()=>Accept(claim.reply));
+        }
+        public IEnumerator AdRequest(string path,string method,GameCommand body,Action<AdClaim> done)
+        {
+            if(Pending!=null){done(null);yield break;}
+            yield return Request(path,method,body==null?null:JsonUtility.ToJson(body),(text,status)=>{
+                AdClaim claim=null;
+                if(status==200){try{claim=JsonUtility.FromJson<AdClaim>(text);}catch(ArgumentException){}}
+                if(claim!=null&&!AcceptAd(claim))claim=null;
+                done(claim);
+            });
+        }
         public IEnumerator Get(string path, Action<string,long> done) { yield return Request(path, "GET", null, done); }
         public IEnumerator Send(string path, string method, GameCommand body, Action<string,long> done)
         { yield return Request(path, method, body == null ? null : JsonUtility.ToJson(body), done); }

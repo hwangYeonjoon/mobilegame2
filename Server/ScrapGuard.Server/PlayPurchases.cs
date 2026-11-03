@@ -8,23 +8,26 @@ public sealed record VerifiedPurchase(string Token,string Product,string Binding
 public interface IPlayPurchases
 {
     bool Enabled {get;}
+    bool LicenseTest => true;
     Task<VerifiedPurchase> Verify(PurchaseRequest request,CancellationToken ct);
 }
-// Deliberately license-test only until production identity, ads and release gates are validated.
+// Server configuration separates real purchases from isolated license-test progress.
 public sealed class GooglePlayPurchases : IPlayPurchases
 {
     readonly HttpClient http=new(){Timeout=TimeSpan.FromSeconds(20)};
     readonly string package;
     GoogleCredential credential;
-    public bool Enabled {get;}
+    public CommercePolicy Policy {get;}
+    public bool Enabled => Policy.Enabled;
+    public bool LicenseTest => Policy.LicenseTest;
     public GooglePlayPurchases(IConfiguration c)
     {
         package=c["PLAY_PACKAGE_NAME"];
-        Enabled=c["COMMERCE_MODE"]=="license_test"&&!string.IsNullOrWhiteSpace(package);
+        Policy=new CommercePolicy(c);
     }
     async Task<JsonDocument> Get(string path,CancellationToken ct)
     {
-        if(!Enabled)throw new ApiFault(503,"Play 테스트 결제가 설정되지 않았어요.");
+        if(!Enabled)throw new ApiFault(503,"Play 결제가 설정되지 않았어요.");
         credential??=(await GoogleCredential.GetApplicationDefaultAsync(ct)).CreateScoped("https://www.googleapis.com/auth/androidpublisher");
         string token=await credential.UnderlyingCredential.GetAccessTokenForRequestAsync(null,ct);
         using var req=new HttpRequestMessage(HttpMethod.Get,"https://androidpublisher.googleapis.com/androidpublisher/v3/applications/"+Uri.EscapeDataString(package)+"/"+path);
@@ -52,16 +55,16 @@ public sealed class GooglePlayPurchases : IPlayPurchases
         }while(!string.IsNullOrEmpty(page));return result;
     }
 }
-public sealed class PurchaseReconciler(GooglePlayPurchases play,GameRepository repo,ILogger<PurchaseReconciler> logger) : BackgroundService
+public sealed class PurchaseReconciler(GooglePlayPurchases play,GameRepository repo,ILogger<PurchaseReconciler> logger,ServiceMonitor monitor) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken ct)
     {
         if(!play.Enabled)return;
         while(!ct.IsCancellationRequested)
         {
-            try{foreach(string token in await play.Voided(ct))repo.RevokePurchase(token);logger.LogInformation("Play refund reconciliation completed");}
+            try{foreach(string token in await play.Voided(ct))repo.RevokePurchase(token);monitor.RefundResult(true);logger.LogInformation("Play refund reconciliation completed");}
             catch(OperationCanceledException)when(ct.IsCancellationRequested){break;}
-            catch(Exception ex){logger.LogWarning("Play refund reconciliation failed ({Type}); retry scheduled",ex.GetType().Name);}
+            catch(Exception ex){monitor.RefundResult(false);logger.LogWarning("Play refund reconciliation failed ({Type}); retry scheduled",ex.GetType().Name);}
             await Task.Delay(TimeSpan.FromHours(1),ct);
         }
     }

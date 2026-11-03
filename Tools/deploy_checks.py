@@ -18,7 +18,7 @@ def check(value, name):
     checks.append(name)
     print('PASS', name, flush=True)
 
-def request(path, data=None, token=None, build="15", rules="11"):
+def request(path, data=None, token=None, build="16", rules="11"):
     headers = {'Content-Type': 'application/json'}
     if build is not None:
         headers['X-Scrap-Build'] = build
@@ -36,10 +36,11 @@ def request(path, data=None, token=None, build="15", rules="11"):
 def command(*args):
     return subprocess.run(COMPOSE + list(args), cwd=ROOT, check=True, capture_output=True, text=True).stdout
 
-check(request('/health')[1]['version'] == '0.15.0', 'container health version')
+check(request('/health')[1]['version'] == '0.16.0', 'container health version')
 check(request('/health/ready')[0] == 200, 'database readiness')
+check(request('/health/services')[1]['refunds']['status'] == 'disabled', 'service monitor distinguishes disabled commerce')
 status, release = request('/v1/release', build=None, rules=None)
-check(status == 200 and release['minimumBuild'] == 14 and release['latestBuild'] == 15 and not release['playAvailable'], 'public release policy is reachable without client headers')
+check(status == 200 and release['minimumBuild'] == 14 and release['latestBuild'] == 16 and not release['playAvailable'], 'public release policy is reachable without client headers')
 for build in [None, '13', '-1', '14,15']:
     status, reply = request('/v1/bootstrap', build=build)
     check(status == 426 and reply['code'] == 'client_update_required' and reply['release']['minimumBuild'] == 14, 'unsupported client receives structured update policy ' + str(build))
@@ -50,7 +51,14 @@ status, initial = request('/v1/auth/guest', {'secret': secret, 'inviteCode': 'lo
 check(status == 200 and initial['success'], 'invited account registration')
 check(request('/v1/commerce', token=secret)[1]['licenseTest'] is False, 'live checkout disabled by default')
 check(request('/v1/commerce/verify', {'productId':'gems_600','purchaseToken':'fake'}, secret)[0] == 503, 'disabled purchase endpoint cannot credit')
-check(request('/v1/auth/google/challenge', {'link':True}, secret)[0] == 503, 'missing Google configuration fails closed')
+check(request('/v1/ads')[1]['enabled'] is False, 'advertising disabled by default')
+check(request('/v1/ads/claims', {'type':'ad_request','value':'parts','requestId':secrets.token_hex(16)},secret)[0] == 503, 'disabled ad reservation cannot grant')
+check(request('/v1/ads/ssv', build=None, rules=None)[0] == 503, 'disabled provider callback cannot contact verifier or grant')
+summary = json.loads(command('exec','-T','api','dotnet','ScrapGuard.Server.dll','--ops','summary'))
+check('accounts' in summary and 'economy' in summary, 'local operations summary available')
+account = json.loads(command('exec','-T','api','dotnet','ScrapGuard.Server.dll','--ops','account','--account',initial['playerId']))
+check('ledger' in account and 'token' not in json.dumps(account), 'support account lookup excludes credentials')
+check(request('/v1/auth/google/challenge' , {'link':True}, secret)[0] == 503, 'missing Google configuration fails closed')
 check(request('/v1/skill', token=secret)[1]['entries'] == [], 'new skill board starts empty')
 attend = {'type':'attendance', 'requestId':secrets.token_hex(16), 'revision':initial['revision'], 'rulesVersion':4}
 
@@ -78,5 +86,5 @@ for attempt in range(30):
     time.sleep(.3)
 restored = request('/v1/bootstrap', token=secret)[1]
 check(restored['playerId'] == initial['playerId'] and restored['state']['gold'] == state['state']['gold'], 'container restart retains volume and account')
-(ROOT/'TestResults/deploy-015-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
+(ROOT/'TestResults/deploy-016-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
 print(len(checks), 'deployment checks passed')

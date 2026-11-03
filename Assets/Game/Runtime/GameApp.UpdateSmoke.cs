@@ -10,7 +10,7 @@ namespace ScrapGuard
         {
             DismissTitleScreen();CloseModal();Show("home");
             string before=JsonUtility.ToJson(State), endpoint="http://127.0.0.1:1";
-            var policy=new ReleasePolicy{latestBuild=AppRelease.Build+1,minimumBuild=AppRelease.Build,latestVersion="0.16.0",combatRules=Combat.RulesVersion,packageName=AppRelease.Package,playAvailable=true,notes="화면 검증용 업데이트 안내 · 새 콘텐츠와 안정성 개선"};
+            var policy=new ReleasePolicy{latestBuild=AppRelease.Build+1,minimumBuild=AppRelease.Build,latestVersion="0.17.0",combatRules=Combat.RulesVersion,packageName=AppRelease.Package,playAvailable=true,notes="화면 검증용 업데이트 안내 · 새 콘텐츠와 안정성 개선"};
             cloud.ObserveRelease(endpoint,policy);PollUpdateNotice();yield return Capture("01-recommended");
             ClickVisibleButton("나중에 하기");if(updateOverlay!=null)smokeErrors.Add("Recommended update could not be deferred");
             policy.notes=new string('가',480);cloud.ObserveRelease(endpoint,policy);cloud.ReleaseNotice=false;ShowUpdatePanel();
@@ -35,7 +35,7 @@ namespace ScrapGuard
             if(before!=JsonUtility.ToJson(State))smokeErrors.Add("Update screens changed player data");
             // A mandatory gate pauses a live run; rollback restores its prior pause state.
             OpenBattle(0,"update-ui-fixture",0,false);battlePaused=false;
-            policy.minimumBuild=policy.latestBuild=AppRelease.Build+1;policy.latestVersion="0.16.0";cloud.ObserveRelease(endpoint,policy);PollUpdateNotice();
+            policy.minimumBuild=policy.latestBuild=AppRelease.Build+1;policy.latestVersion="0.17.0";cloud.ObserveRelease(endpoint,policy);PollUpdateNotice();
             if(!battlePaused)smokeErrors.Add("Mandatory update did not pause combat");
             yield return Capture("07-paused-battle");
             policy.minimumBuild=policy.latestBuild=AppRelease.Build;policy.latestVersion=AppRelease.Version;cloud.ObserveRelease(endpoint,policy);PollUpdateNotice();

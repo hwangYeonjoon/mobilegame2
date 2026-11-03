@@ -63,6 +63,7 @@ namespace ScrapGuard
         }
         void AccountPanel()
         {
+            if(adBusy){Toast("광고 보상 확인을 마친 뒤 계정을 변경해 주세요.");return;}
             var card = Dialog("계정과 저장", Online ? "서버 계정 · ID " + cloud.Session.playerId : "로컬 체험과 서버 계정은 별도로 성장합니다.", 770);
             if (!Online)
             {

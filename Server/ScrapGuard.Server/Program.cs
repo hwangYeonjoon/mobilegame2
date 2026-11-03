@@ -14,6 +14,7 @@ if (builder.Configuration["verify-backup"] is string verify)
 {
     DatabaseMaintenance.Verify(verify); Console.WriteLine("DATABASE_VERIFIED"); return;
 }
+if (builder.Configuration["ops"] != null) { OperationsCommand.Run(databasePath,builder.Configuration); return; }
 var operations = new ServerOperations(builder.Configuration);
 var clientRelease = new ClientRelease(builder.Configuration);
 builder.Services.Configure<ForwardedHeadersOptions>(o => ServerOperations.ConfigureProxy(o,builder.Configuration["TRUSTED_PROXY_IPS"]));
@@ -21,9 +22,12 @@ builder.WebHost.UseUrls(builder.Configuration["SERVER_URLS"] ?? "http://127.0.0.
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 2 * 1024 * 1024);
 builder.Services.ConfigureHttpJsonOptions(o => { o.SerializerOptions.IncludeFields = true; o.SerializerOptions.PropertyNameCaseInsensitive = true; });
 builder.Services.AddSingleton(new GameRepository(databasePath));
-builder.Services.AddSingleton<GooglePlayPurchases>();
+builder.Services.AddSingleton(new GooglePlayPurchases(builder.Configuration));
+builder.Services.AddSingleton(new AdPolicy(builder.Configuration));
+builder.Services.AddSingleton<AdMobVerifier>();
 builder.Services.AddSingleton<IGoogleIdentityToken,GoogleIdentityToken>();
 builder.Services.AddSingleton<GoogleIdentityFlow>();
+builder.Services.AddSingleton<ServiceMonitor>();
 builder.Services.AddHostedService<PurchaseReconciler>();
 builder.Services.AddRateLimiter(o =>
 {
@@ -51,7 +55,7 @@ app.Use(async (ctx, next) =>
         {
             ctx.Response.StatusCode=426;await ctx.Response.WriteAsJsonAsync(clientRelease.Rejection());return;
         }
-        if (operations.Maintenance && ctx.Request.Method != "GET")
+        if (operations.Maintenance && (ctx.Request.Method != "GET" || ctx.Request.Path=="/v1/ads/ssv"))
         {
             ctx.Response.Headers.RetryAfter = "60"; throw new ApiFault(503,"서버 점검 중이에요. 진행 기록을 보관했으니 잠시 뒤 동기화해 주세요.");
         }
@@ -67,15 +71,22 @@ string Token(HttpContext ctx)
     return header.Substring(7);
 }
 app.MapGet("/v1/release", () => clientRelease.Policy);
-app.MapGet("/health", () => new { status = "ok", version = AppRelease.Version, commerce = "disabled", maintenance = operations.Maintenance });
+app.MapGet("/health", () => new { status = "ok", version = AppRelease.Version, commerce = app.Services.GetRequiredService<GooglePlayPurchases>().Policy.Mode, maintenance = operations.Maintenance });
+app.MapGet("/health/services", (GooglePlayPurchases play,AdPolicy ads,ServiceMonitor monitor)=>new {commerce=play.Policy.Mode,newSales=play.Policy.SalesEnabled,ads=ads.Mode,refunds=monitor.Snapshot(play.Enabled)});
 app.MapGet("/health/ready", () => DatabaseMaintenance.Ready(databasePath) ? Results.Ok(new { status = "ready" }) : Results.Json(new { status = "unavailable" },statusCode:503));
 app.MapPost("/v1/auth/guest", (GuestRequest body, GameRepository repo) => { operations.CheckRegistration(body.inviteCode); return repo.Register(body.secret); }).RequireRateLimiting("register");
 app.MapPost("/v1/auth/google/challenge",(HttpContext ctx,GoogleChallengeRequest body,GoogleIdentityFlow flow)=>flow.Begin(body.link?Token(ctx):null,body)).RequireRateLimiting("register");
 app.MapPost("/v1/auth/google/finish",(HttpContext ctx,GoogleLoginRequest body,GoogleIdentityFlow flow)=>flow.Finish(body.link?Token(ctx):null,body)).RequireRateLimiting("register");
 app.MapGet("/v1/bootstrap", (HttpContext ctx, GameRepository repo) => repo.Bootstrap(Token(ctx)));
 app.MapPost("/v1/commands", (HttpContext ctx, GameCommand body, GameRepository repo) => repo.Apply(Token(ctx), body)).RequireRateLimiting("commands");
-app.MapGet("/v1/commerce", (HttpContext ctx, GameRepository repo,GooglePlayPurchases play) => repo.Commerce(Token(ctx),play.Enabled));
+app.MapGet("/v1/commerce", (HttpContext ctx, GameRepository repo,GooglePlayPurchases play) => repo.Commerce(Token(ctx),play.Policy));
 app.MapPost("/v1/commerce/verify", (HttpContext ctx,PurchaseRequest body,GameRepository repo,GooglePlayPurchases play) => repo.VerifyPurchase(Token(ctx),body,play,ctx.RequestAborted)).RequireRateLimiting("commands");
+app.MapGet("/v1/ads", (AdPolicy p) => new AdRewardStatus{enabled=p.Enabled,mode=p.Mode,unitId=p.UnitId});
+app.MapPost("/v1/ads/claims", (HttpContext ctx,GameCommand body,GameRepository repo,AdPolicy p)=>repo.CreateAdClaim(Token(ctx),body,p)).RequireRateLimiting("commands");
+app.MapGet("/v1/ads/claims", (HttpContext ctx,GameRepository repo)=>new { claims=repo.RecentAds(Token(ctx)) });
+app.MapGet("/v1/ads/claims/{id}", (HttpContext ctx,string id,GameRepository repo)=>repo.AdClaimStatus(Token(ctx),id));
+app.MapDelete("/v1/ads/claims/{id}", (HttpContext ctx,string id,GameRepository repo)=>repo.AdClaimStatus(Token(ctx),id,true));
+app.MapGet("/v1/ads/ssv",async(HttpContext ctx,GameRepository repo,AdPolicy p,AdMobVerifier verifier)=>{if(!p.Enabled)throw new ApiFault(503,"광고 확인이 중지되어 있어요.");repo.CompleteAd(await verifier.Verify(ctx.Request.QueryString.Value,ctx.RequestAborted),p);return Results.Ok();});
 app.MapGet("/v1/profiles", (HttpContext ctx, GameRepository repo, string after = "") => repo.Gallery(Token(ctx), after));
 app.MapGet("/v1/profiles/{id}", (HttpContext ctx, string id, GameRepository repo) => repo.GetProfile(Token(ctx), id));
 app.MapPost("/v1/profiles/{id}/like", (HttpContext ctx, string id, GameCommand body, GameRepository repo) => repo.Like(Token(ctx), id.ToUpperInvariant(), body.enabled));
