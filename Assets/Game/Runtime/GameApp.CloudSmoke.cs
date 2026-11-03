@@ -55,14 +55,19 @@ namespace ScrapGuard
             StartBattle(0,false,"",other.Session.playerId);
             while (networkBusy) yield return null;
             if (combat == null) { smokeErrors.Add("Server battle failed to start"); FinishCloudSmoke(); yield break; }
+            smokeRecover=true;
             float until = Time.realtimeSinceStartup + 65;
             while (!combat.Ended && combat.Elapsed < 40 && Time.realtimeSinceStartup < until)
             {
                 if (combat.Choosing) ChooseBattleSkill(combat.Choices[0]);
+                if(combat.CanChooseTask)SelectFieldChoice(1);
+                if(combat.CanAssemble)SelectFieldModule(1);
                 if (combat.CanUltimate) TriggerUltimate();
                 if (combat.CanSupport) TriggerSupport();
                 yield return null;
             }
+            smokeRecover=false;
+            if(combat.FieldModule!=1)smokeErrors.Add("Cloud field assembly was not exercised");
             if (!combat.SupportUsed) smokeErrors.Add("Guild support not exercised");
             if (combat.UltimateUses == 0) smokeErrors.Add("Cloud replay did not exercise ultimate");
             Debug.Log("CLOUD_ULTIMATE_USES="+combat.UltimateUses);
@@ -71,6 +76,7 @@ namespace ScrapGuard
             var receipt = State.receipts.Find(r => r.id == combat.RunId);
             if (receipt == null || receipt.kills != combat.Kills || Mathf.Abs(receipt.seconds-combat.Elapsed) > .05f) smokeErrors.Add("Unity/server replay mismatch or missing reward");
             yield return Capture("06-server-result");
+            if(combat.Support.showIdentity){ClickVisibleButton("지원해 준 동료의 전시실");while(networkBusy)yield return null;yield return Capture("06a-support-profile");ShowResult();}
             combat=null;Show("weekly");yield return Capture("09-cloud-rift-hub");
             StartBattle(4,false,Endgame.PracticeMode);while(networkBusy)yield return null;
             if(combat==null){smokeErrors.Add("Cloud practice failed to start");FinishCloudSmoke();yield break;}

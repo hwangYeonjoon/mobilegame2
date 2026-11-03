@@ -55,7 +55,7 @@ namespace ScrapGuard.Core
             {
                 if (State.heroes[1].unlocked) return CommandResult.Fail("이미 합류한 캐릭터예요.");
                 if (State.gems < 1200) return CommandResult.Fail("보석 1,200개가 필요해요.");
-                State.gems -= 1200; State.heroes[1].unlocked = true; return CommandResult.Ok("돌격수 레이 합류!");
+                if(!PremiumWallet.Spend(State,1200))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요."); State.heroes[1].unlocked = true; return CommandResult.Ok("돌격수 레이 합류!");
             }
             if (offer == "parts_gold")
             {
@@ -67,7 +67,7 @@ namespace ScrapGuard.Core
             {
                 if (State.dailyGemPartsPurchases >= 1) return CommandResult.Fail("오늘 구매 한도에 도달했어요.");
                 if (State.gems < 100) return CommandResult.Fail("보석 100개가 필요해요.");
-                State.gems -= 100; State.parts += 100; State.dailyGemPartsPurchases++; return CommandResult.Ok("부품 100개 획득");
+                if(!PremiumWallet.Spend(State,100))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요."); State.parts += 100; State.dailyGemPartsPurchases++; return CommandResult.Ok("부품 100개 획득");
             }
             string[] split = (offer ?? "").Split(':');
             int definition;
@@ -85,7 +85,7 @@ namespace ScrapGuard.Core
                 if (State.purchasedRare.Contains(definition) || State.items.Exists(i => i.definition == definition && i.rarity == 2))
                     return CommandResult.Fail("이미 보유했거나 구매한 희귀 장비예요.");
                 if (State.gems < 600) return CommandResult.Fail("보석 600개가 필요해요.");
-                State.gems -= 600; State.purchasedRare.Add(definition); AddItem(definition, 2);
+                if(!PremiumWallet.Spend(State,600))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요."); State.purchasedRare.Add(definition); AddItem(definition, 2);
             }
             else return CommandResult.Fail("등록되지 않은 상품이에요.");
             return CommandResult.Ok(Catalog.Items[definition].Name + " 획득");

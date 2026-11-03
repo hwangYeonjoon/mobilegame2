@@ -53,6 +53,7 @@ public sealed partial class GameRepository
         using (var reader = columns.ExecuteReader()) while (reader.Read()) if (reader.GetString(1) == "run_rules") hasRules = true;
         if (!hasRules) Execute(db,null,"ALTER TABLE accounts ADD COLUMN run_rules INTEGER NOT NULL DEFAULT 2");
         InitializeEndgame(db);
+        InitializeCommerce(db);
     }
     SqliteConnection Open() { var db = new SqliteConnection(connectionString); db.Open(); return db; }
     static SqliteCommand Sql(SqliteConnection db, SqliteTransaction tx, string text, params (string, object)[] args)
@@ -122,6 +123,7 @@ public sealed partial class GameRepository
                 }
             }
             if (a.Revision != command.revision) throw new ApiFault(409, "다른 기기에서 진행이 변경됐어요. 최신 상태에서 다시 시도해 주세요.", Reply(a, "진행 상태가 변경됐어요. 다시 시도해 주세요.", false));
+            int paidBefore=a.State.paidGems;
             int gold = a.State.gold, gems = a.State.gems, parts = a.State.parts, shards=a.State.coreShards;
             var blueprintBalances=Enumerable.Range(0,Campaign.Regions.Length).Select(i=>Workshop.Region(a.State,i).blueprints).ToArray();
             var e = new Economy(a.State, clock); CommandResult result;
@@ -144,6 +146,7 @@ public sealed partial class GameRepository
                     result=e.BeginRun(id,command.stage);
                     var support=ReserveSupport(db,tx,a,command.supportId);a.RunSupport=support==null?null:Encode(support);
                 }
+                a.State.activeGuild=GuildId(db,tx,a.Id)??"";
                 a.RunSnapshot = Encode(a.State); a.RunStarted = clock().ToString("O");
             }
             else if (command.type == "battle_finish")
@@ -155,6 +158,7 @@ public sealed partial class GameRepository
                 catch (ArgumentException ex) { throw new ApiFault(400, ex.Message); }
                 RecordWeekly(db,tx,a,simulation);
                 RecordSupport(db,tx,a,simulation);
+                RecordRestoration(db,tx,a,simulation);
                 result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
                 a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }
@@ -165,6 +169,7 @@ public sealed partial class GameRepository
                 if (command.type == "battle_cancel") a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }
             if (!result.Success) throw new ApiFault(400, result.Message);
+            AllocatePaidSpend(db,tx,a.Id,paidBefore-a.State.paidGems);
             Social.Normalize(a.State); a.Revision++;
             Execute(db, tx, "UPDATE accounts SET state=$state,revision=$revision,run_snapshot=$snapshot,run_seed=$seed,run_started=$started,run_rules=$rules,run_support=$support WHERE id=$id",
                 ("$state", Encode(a.State)), ("$revision", a.Revision), ("$snapshot", a.RunSnapshot), ("$seed", a.RunSeed), ("$started", a.RunStarted), ("$rules",a.RunRules), ("$support",a.RunSupport), ("$id", a.Id));
@@ -204,9 +209,14 @@ public sealed partial class GameRepository
         {
             list.next = id;
             try { list.profiles.Add(Public(db, null, viewer, Load(db, null, id, true))); } catch (ApiFault ex) when (ex.Status == 404) { }
-            if (list.profiles.Count == 20) return list;
+            if (list.profiles.Count == 20) return FeatureGallery(list);
         }
-        if (ids.Count < 100) list.next = ""; return list;
+        if (ids.Count < 100) list.next = ""; return FeatureGallery(list);
+    }
+    ProfileList FeatureGallery(ProfileList list)
+    {
+        list.featuredId=list.profiles.Where(p=>!p.test).OrderBy(p=>Hash(p.id+Endgame.Week(clock())),StringComparer.Ordinal).Select(p=>p.id).FirstOrDefault()??"";
+        return list;
     }
     public PublicProfile Like(string token, string id, bool enabled)
     {

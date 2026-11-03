@@ -125,6 +125,9 @@ try
     ExpansionChecks.Run(folder,Check);
     OutfitChecks.Run(folder,Check);
     ExperienceChecks.Run(folder,Check);
+    CommerceChecks.Run(folder,Check);
+    IdentityChecks.Run(folder,Check);
+    RestorationChecks.Run(folder,Check);
     Console.WriteLine(count + " checks passed");
 }
 finally { SqliteConnection.ClearAllPools(); if (Directory.Exists(folder)) Directory.Delete(folder,true); }

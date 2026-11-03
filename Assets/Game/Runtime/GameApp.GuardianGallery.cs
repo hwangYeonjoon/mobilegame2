@@ -10,12 +10,13 @@ namespace ScrapGuard
     {
         void GuardianGallery(PublicProfile profile,Action back,string caption=null,bool share=true)
         {
+            Track("preview","guardian");
             var card=Dialog("수호대원 확대 감상","외형과 동작을 가까이에서 보고 사진 카드로 남겨 보세요.",890);
             var stage=Ui.Box(card,24,138,444,448,Ui.Background).rectTransform;stage.gameObject.AddComponent<RectMask2D>();
             var floor=Ui.Box(stage,0,0,444,448,Color.white,false);floor.sprite=ArenaArt.Floor(Mathf.Clamp(profile.skin-3,0,6));
             Ui.Box(stage,0,0,444,448,new Color(.02f,.04f,.07f,.42f),false);
             Ui.Label(stage,profile.name,18,12,408,37,26,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(stage,profile.outfit==1?Outfits.Name:Social.Skins[Mathf.Clamp(profile.skin,0,Social.Skins.Length-1)],18,54,408,30,17,Ui.Gold,TextAnchor.MiddleCenter);
+            Ui.Label(stage,profile.outfit>0?Outfits.Label(profile.outfit):Social.Skins[Mathf.Clamp(profile.skin,0,Social.Skins.Length-1)],18,54,408,30,17,Ui.Gold,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<GuardianPosePreview>();preview.Initialize(profile.hero,profile.skin,profile.outfit);
             Ui.Label(stage,"Lv."+profile.heroLevel+" · "+Catalog.HeroNames[profile.hero],18,365,408,30,19,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(stage,caption??("정복 "+profile.stages+" / "+Campaign.Count+" · "+Social.Titles[Mathf.Clamp(profile.title,0,Social.Titles.Length-1)]),18,401,408,34,13,Ui.Mint,TextAnchor.MiddleCenter);
@@ -83,7 +84,7 @@ namespace ScrapGuard
             pose=Mathf.Clamp(value,0,3);nextShot=0;
             if(pose==3)
             {
-                if(outfit==1)OutfitVisuals.Gear(transform,new Vector2(222,-246),150);
+                if(outfit>0)OutfitVisuals.Special(transform,new Vector2(222,-246),150,outfit);
                 else {var ring=CombatRing.Create(transform,360,hero==3?Ui.Gold:Ui.Blue,.025f);ring.anchoredPosition=new Vector2(222,-246);ring.gameObject.AddComponent<CombatBurst>().Configure(.8f,.25f,1);}
             }
         }
@@ -96,7 +97,7 @@ namespace ScrapGuard
             actor.rectTransform.localScale=new Vector3((flipped?-1:1)*(1+stride*.018f),1-stride*.018f,1);
             if(pose==2 && t>=nextShot)
             {
-                nextShot=t+.45f;var shot=Ui.Box(transform,flipped?293:76,216,75,6,outfit==1?OutfitVisuals.Copper:Ui.Gold,false);
+                nextShot=t+.45f;var shot=Ui.Box(transform,flipped?293:76,216,75,6,outfit>0?OutfitVisuals.Copper:Ui.Gold,false);
                 shot.gameObject.AddComponent<CombatBurst>().Configure(.25f,.4f,1);
             }
         }

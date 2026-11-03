@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
     [Serializable] public sealed class BattleReport
     {
         public float[] damage = new float[13];
-        public int cause, mods, task, taskChoice;
+        public int cause, mods, task, taskChoice, fieldModule, hero;
         public bool taskCompleted;
         public int[] skills = new int[8];
         public float bossRemaining = -1;
@@ -79,6 +79,11 @@ namespace ScrapGuard.Core
                 if(combat.Definition.Mission==Mission.Eliminate)State.bossDiscoveries|=1<<combat.Definition.Region;
             }
             return result;
+        }
+        public CommandResult SetCollectionTarget(int region)
+        {
+            if(region < -1 || region>=Campaign.Regions.Length)return CommandResult.Fail("없는 지역이에요.");
+            State.collectionTarget=region;return CommandResult.Ok(region<0?"수집 목표를 해제했어요.":Campaign.Regions[region]+" 도색을 수집 목표로 정했어요.");
         }
         public CommandResult CraftRegionSkin(int region)
         {

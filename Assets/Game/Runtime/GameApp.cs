@@ -37,6 +37,7 @@ namespace ScrapGuard
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-profilePath") profile = args[i + 1];
             Store = new ProfileStore(profile);
             SetupCloud(profile);
+            SetupResearch(profile);
             if (FindFirstObjectByType<EventSystem>() == null)
             {
                 var system = new GameObject("Input", typeof(EventSystem));
@@ -72,6 +73,7 @@ namespace ScrapGuard
         void Update()
         {
             FitScreen();
+            MeasureFrame();
             if (titleScreen != null && titleScreen.gameObject.activeSelf)
             {
                 if (Keyboard.current != null && (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame)) DismissTitleScreen();
@@ -98,9 +100,12 @@ namespace ScrapGuard
         }
         void Change(GameCommand command, Action after = null, bool redraw = true)
         {
+            if(command.type!=null&&command.type.StartsWith("demo_",StringComparison.Ordinal)&&!Debug.isDebugBuild&&!Application.isEditor){Toast("개발 빌드 전용 기능이에요.");return;}
             if (networkBusy) { Toast("서버 요청을 처리 중이에요."); return; }
+            int previousGems=State.gems;
             Action<CommandResult> complete = result =>
             {
+                if(result.Success){Track("command",command.type);if(State.gems!=previousGems)Track("economy","gems",State.gems-previousGems,State.gems);if(command.type=="cosmetic_buy")Track("cosmetic_purchase",command.value);}
                 Toast(result.Message);
                 if (redraw && combat == null) Show(page); else RefreshWallet();
                 after?.Invoke();
@@ -110,6 +115,7 @@ namespace ScrapGuard
         }
         public void Show(string target)
         {
+            Track("screen",target);
             page = target; if (!Online) Store.Economy.RefreshDay(); Ui.Clear(screen); CloseModal();
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
             Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 380, 40, 30);
@@ -134,7 +140,7 @@ namespace ScrapGuard
         {
             var heroPanel = Ui.Box(screen, 24, 178, 492, 303, Ui.Panel).transform;
             Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",16,10,276,38,GuidePanel,Ui.Raised,true,15);
-            Ui.Button(heroPanel,"개조 · 수집",308,10,164,38,()=>RegionCollection(Campaign.Get(selectedStage).Region),Ui.Raised,true,15);
+            Ui.Button(heroPanel,State.collectionTarget<0?"개조 · 수집":"수집 목표 확인",308,10,164,38,()=>RegionCollection(State.collectionTarget<0?Campaign.Get(selectedStage).Region:State.collectionTarget),Ui.Raised,true,15);
             for (int i = 0; i < 6; i++) Ui.Box(heroPanel, 20, 66 + i * 32, 452, 1, new Color(.3f, .45f, .5f, .13f), false);
             Ui.Disc(heroPanel, 150, 57, 196, new Color(.2f, .9f, .7f, .05f));
             Ui.Robot(heroPanel, 180, 65, 1.7f, State.selectedHero, skin: State.selectedSkin, outfit: Outfits.Active(State,State.selectedHero));
@@ -192,13 +198,14 @@ namespace ScrapGuard
         }
         void Settings()
         {
-            var card = Dialog("설정", Online ? "진행 상황은 연결한 서버에 저장됩니다." : "진행 상황은 이 기기에 저장됩니다.", 638);
+            var card = Dialog("설정", Online ? "진행 상황은 연결한 서버에 저장됩니다." : "진행 상황은 이 기기에 저장됩니다.", 710);
             Ui.Button(card, State.sound ? "효과음 켜짐" : "효과음 꺼짐", 24, 134, 444, 53, () => Change(new GameCommand("sound") { enabled = !State.sound }, Settings), Ui.Raised);
-            Ui.Button(card, "구매 복원 안내", 24, 202, 444, 53, () => Info("구매 복원", "이 프로토타입에서는 실제 구매가 발생하지 않습니다.\n정식 구매 복원은 서버와 Play 연결 후 제공됩니다."), Ui.Raised);
+            Ui.Button(card,"Play 테스트 상점 · 구매 복원",24,202,444,53,ConnectPlayBilling,Ui.Raised,true,17);
             Ui.Button(card, "계정 · 서버 연결", 24, 270, 444, 53, AccountPanel, Ui.Raised);
-            Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online);
+            Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online && (Debug.isDebugBuild || Application.isEditor));
             Ui.Label(card, "이동: 화면 드래그 또는 WASD / 방향키\n공격은 자동 · 레벨업하면 스킬 선택\n일시정지: 전투 상단 버튼 또는 ESC", 24, 407, 444, 98, 16, Ui.Muted);
-            Ui.Label(card, "SCRAP GUARD  " + Application.version + "\nUnity Android · collector prototype", 24, 527, 444, 64, 13, Ui.Muted);
+            Ui.Button(card,"플레이 테스트 · 기록 설정",24,526,444,48,ResearchPanel,Ui.Raised,true,17);
+            Ui.Label(card, "SCRAP GUARD  " + Application.version + "\nUnity Android · collector prototype", 24, 600, 444, 64, 13, Ui.Muted);
         }
         void Info(string title, string text)
         {
@@ -217,6 +224,7 @@ namespace ScrapGuard
         void RequestReward(string placement)
         {
             if (demoRewardPending || networkBusy) return;
+            if(Online && State.adSkip){Change(new GameCommand("ad_skip_reward",Guid.NewGuid().ToString("N")){value=placement},()=>{if(combat!=null&&combat.Ended)ShowResult();},redraw:combat==null);return;}
             if (Online) { Info("광고 연결 준비 중", "서버 계정의 실제 광고 보상은 아직 연결되지 않았어요."); return; }
             string claim = Guid.NewGuid().ToString("N");
             if (State.demoAdSkip)

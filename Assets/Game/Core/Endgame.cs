@@ -23,13 +23,13 @@ namespace ScrapGuard.Core
     [Serializable] public class GuildMember
     {
         public string id, name;
-        public int hero = -1, level, skin, outfit, power, supportUses, supportWins, helpedMembers;
+        public int hero = -1, level, skin, outfit, power, supportUses, supportWins, helpedMembers, restorationPoints;
         public bool leader, self;
     }
     [Serializable] public class GuildView
     {
         public string id, name, code, week, featuredId;
-        public int remaining;
+        public int remaining, restorationPoints, restorationToday;
         public bool leader;
         public List<GuildMember> members = new List<GuildMember>();
     }
@@ -60,10 +60,11 @@ namespace ScrapGuard.Core
             return 40000+(int)(date-new DateTime(2026,1,1)).TotalDays;
         }
         public static bool Unlocked(GameState state) { return state.clearedStages.Contains(4); }
-        public static bool IsChallenge(string mode) { return mode==WeeklyMode || mode==PracticeMode; }
+        public static bool IsChallenge(string mode) { return mode==WeeklyMode || mode==PracticeMode || mode==SkillTrial.Mode; }
         public static void Normalize(GameState state)
         {
             if(state.weekly==null)state.weekly=new List<WeeklyProgress>();
+            if(state.skillWeekly==null)state.skillWeekly=new List<WeeklyProgress>();
             if(state.activeMode==null)state.activeMode="";
         }
         public static WeeklyProgress Find(GameState state,string week)

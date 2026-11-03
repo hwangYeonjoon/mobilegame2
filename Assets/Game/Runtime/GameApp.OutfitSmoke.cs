@@ -26,7 +26,7 @@ namespace ScrapGuard
             Store.Change(e=>{e.State.gems=900;e.State.testProgress=true;return CommandResult.Ok("Isolated outfit fixture");});
             OutfitRoom();ClickVisibleButton("구성 확인하고 구매 · ◆ 600");yield return Capture("06-confirm");ClickVisibleButton("보석 600개로 구매");
             if(!Outfits.Owned(State) || State.gems!=300)smokeErrors.Add("Purchase failed");
-            ClickVisibleButton("루크에 의상 장착");if(Outfits.Active(State,0)!=1)smokeErrors.Add("Equip failed");
+            ClickVisibleButton("전용 대원에 의상 장착");if(Outfits.Active(State,0)!=1)smokeErrors.Add("Equip failed");
             CloseModal();Show("home");yield return Capture("07-equipped-home");Show("showcase");yield return Capture("08-equipped-showcase");
             StartBattle(0);float until=Time.realtimeSinceStartup+60;bool ultimate=false;
             while(!combat.Ended && combat.Elapsed<35 && Time.realtimeSinceStartup<until)

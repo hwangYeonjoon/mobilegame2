@@ -32,11 +32,15 @@ def request(path, data=None, token=None):
 def command(*args):
     return subprocess.run(COMPOSE + list(args), cwd=ROOT, check=True, capture_output=True, text=True).stdout
 
-check(request('/health')[1]['version'] == '0.10.0', 'container health version')
+check(request('/health')[1]['version'] == '0.12.0', 'container health version')
 check(request('/health/ready')[0] == 200, 'database readiness')
 check(request('/v1/auth/guest', {'secret': secret})[0] == 403, 'HTTP invitation guard')
 status, initial = request('/v1/auth/guest', {'secret': secret, 'inviteCode': 'local-integration-test-invite-03'})
 check(status == 200 and initial['success'], 'invited account registration')
+check(request('/v1/commerce', token=secret)[1]['licenseTest'] is False, 'live checkout disabled by default')
+check(request('/v1/commerce/verify', {'productId':'gems_600','purchaseToken':'fake'}, secret)[0] == 503, 'disabled purchase endpoint cannot credit')
+check(request('/v1/auth/google/challenge', {'link':True}, secret)[0] == 503, 'missing Google configuration fails closed')
+check(request('/v1/skill', token=secret)[1]['entries'] == [], 'new skill board starts empty')
 attend = {'type':'attendance', 'requestId':secrets.token_hex(16), 'revision':initial['revision'], 'rulesVersion':4}
 status, state = request('/v1/commands', attend, secret)
 check(status == 200 and state['state']['attendanceCount'] == 1, 'HTTP economy transaction')
@@ -60,5 +64,5 @@ for attempt in range(30):
     time.sleep(.3)
 restored = request('/v1/bootstrap', token=secret)[1]
 check(restored['playerId'] == initial['playerId'] and restored['state']['gold'] == state['state']['gold'], 'container restart retains volume and account')
-(ROOT/'TestResults/deploy-010-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
+(ROOT/'TestResults/deploy-012-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
 print(len(checks), 'deployment checks passed')

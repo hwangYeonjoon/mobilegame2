@@ -14,12 +14,23 @@ public sealed partial class GameRepository
                 score INTEGER NOT NULL, achieved TEXT NOT NULL, hero INTEGER NOT NULL, skin INTEGER NOT NULL, rules INTEGER NOT NULL,
                 PRIMARY KEY(week,owner));
             CREATE INDEX IF NOT EXISTS weekly_score ON weekly_records(week,rules,score DESC,achieved,owner);
+            CREATE TABLE IF NOT EXISTS skill_records(
+                week TEXT NOT NULL, owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                score INTEGER NOT NULL, achieved TEXT NOT NULL, hero INTEGER NOT NULL, skin INTEGER NOT NULL, rules INTEGER NOT NULL, outfit INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY(week,owner));
+            CREATE INDEX IF NOT EXISTS skill_score ON skill_records(week,rules,score DESC,achieved,owner);
             CREATE TABLE IF NOT EXISTS guilds(
                 id TEXT PRIMARY KEY,name TEXT NOT NULL,code TEXT UNIQUE NOT NULL,leader TEXT REFERENCES accounts(id) ON DELETE SET NULL);
             CREATE TABLE IF NOT EXISTS guild_members(
                 owner TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
                 guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,hero INTEGER NOT NULL DEFAULT -1);
             CREATE INDEX IF NOT EXISTS guild_roster ON guild_members(guild,owner);
+            CREATE TABLE IF NOT EXISTS restoration_runs(
+                run TEXT PRIMARY KEY, week TEXT NOT NULL, day TEXT NOT NULL,
+                guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+                owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE);
+            CREATE INDEX IF NOT EXISTS restoration_week ON restoration_runs(guild,week);
+            CREATE INDEX IF NOT EXISTS restoration_daily ON restoration_runs(owner,day);
             CREATE TABLE IF NOT EXISTS support_runs(
                 run TEXT PRIMARY KEY, week TEXT NOT NULL, guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
                 owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
@@ -78,7 +89,24 @@ public sealed partial class GameRepository
             member.helpedMembers=helped.Count;
         }
         result.featuredId=result.members.Where(m=>m.hero>=0 && m.helpedMembers>0).OrderByDescending(m=>m.helpedMembers).ThenByDescending(m=>m.supportWins).ThenBy(m=>m.id,StringComparer.Ordinal).Select(m=>m.id).FirstOrDefault();
+        using(var q=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE guild=$guild AND week=$week",("$guild",guild),("$week",result.week)))result.restorationPoints=Convert.ToInt32(q.ExecuteScalar());
+        using(var q=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE owner=$owner AND day=$day",("$owner",viewer.Id),("$day",Catalog.ServiceDate(clock()))))result.restorationToday=Convert.ToInt32(q.ExecuteScalar());
+        foreach(var member in result.members)
+        {
+            using var q=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE guild=$guild AND week=$week AND owner=$owner",("$guild",guild),("$week",result.week),("$owner",member.id));
+            member.restorationPoints=Convert.ToInt32(q.ExecuteScalar());
+        }
         return result;
+    }
+    void RecordRestoration(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
+    {
+        if(combat.Challenge || !combat.Won || !combat.TaskCompleted || combat.Elapsed<30 || account.State.testProgress)return;
+        string guild=GuildId(db,tx,account.Id);
+        if(string.IsNullOrEmpty(guild) || guild!=combat.GuildAtStart)return;
+        string day=Catalog.ServiceDate(clock());
+        using var count=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE owner=$owner AND day=$day",("$owner",account.Id),("$day",day));
+        if(Convert.ToInt32(count.ExecuteScalar())>=GuildRestoration.DailyLimit)return;
+        Execute(db,tx,"INSERT OR IGNORE INTO restoration_runs(run,week,day,guild,owner) VALUES($run,$week,$day,$guild,$owner)",("$run",combat.RunId),("$week",Endgame.Week(clock())),("$day",day),("$guild",guild),("$owner",account.Id));
     }
     void RecordSupport(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
     {

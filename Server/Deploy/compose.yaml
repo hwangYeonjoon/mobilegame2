@@ -1,7 +1,7 @@
 name: scrapguard-beta
 services:
   api:
-    image: scrapguard-api:${RELEASE_TAG:-0.10.0}
+    image: scrapguard-api:${RELEASE_TAG:-0.12.0}
     build:
       context: ../..
       dockerfile: Server/Deploy/Dockerfile
@@ -9,6 +9,9 @@ services:
     environment:
       SERVER_URLS: http://+:8080
       GAME_DB: /data/scrapguard.db
+      COMMERCE_MODE: ${COMMERCE_MODE:-disabled}
+      PLAY_PACKAGE_NAME: ${PLAY_PACKAGE_NAME:-com.scrapguard.mobilegame2.prototype}
+      GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       TRUSTED_PROXY_IPS: 172.31.248.2
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
       BETA_INVITE_CODE: ${BETA_INVITE_CODE:?Set a private beta invite code}

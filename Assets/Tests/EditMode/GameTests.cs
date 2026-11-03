@@ -9,6 +9,32 @@ namespace ScrapGuard.Tests
     public class GameTests
     {
         [Test]
+        public void RailOutfitAtlasAndSaveRoundTrip()
+        {
+            var s=GameState.New();s.heroes[1].unlocked=true;s.gems=600;
+            Assert.That(ScrapGuard.Core.Social.Buy(s,Outfits.RailKey).Success,Is.True);Outfits.Equip(s,2);s.collectionTarget=6;
+            var copy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));ScrapGuard.Core.Social.Normalize(copy);
+            Assert.That(Outfits.Active(copy,1),Is.EqualTo(2));Assert.That(copy.collectionTarget,Is.EqualTo(6));
+            var cells=new System.Collections.Generic.HashSet<Rect>();
+            for(int pose=0;pose<4;pose++){var art=CharacterArt.Get(1,0,2,pose);Assert.That(art,Is.Not.Null);Assert.That(art.texture.name,Is.EqualTo("Ray-RailRanger-v1"));cells.Add(art.rect);}
+            Assert.That(cells.Count,Is.EqualTo(4));Assert.That(CharacterArt.Get(0,0,2),Is.SameAs(CharacterArt.Get(0,0)));
+            var step=JsonUtility.FromJson<ReplayStep>(JsonUtility.ToJson(new ReplayStep{assembly=2}));Assert.That(step.assembly,Is.EqualTo(2));Assert.That(step.skill,Is.EqualTo(-1));
+        }
+        [Test]
+        public void ResearchConsentRetentionAndPrivacy()
+        {
+            string folder=Path.Combine(Path.GetTempPath(),"scrap-research-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
+            string path=Path.Combine(folder,"journal.json");var now=DateTimeOffset.UtcNow;
+            var journal=new PlaytestJournal(path,()=>now);journal.Add("screen","home");Assert.That(journal.Data.events.Count,Is.Zero);
+            journal.Consent(true);journal.Add("preview","outfit_heavy_engineer");journal.Add("profile","User Name");
+            Assert.That(journal.Data.events.Count,Is.EqualTo(1));
+            var restored=new PlaytestJournal(path,()=>now);Assert.That(restored.Data.consent,Is.True);Assert.That(restored.Data.events.Count,Is.EqualTo(1));
+            now=now.AddDays(15);restored.Add("session","start");Assert.That(restored.Data.events.Count,Is.EqualTo(1));
+            string participant=restored.Data.participant;restored.Clear();Assert.That(restored.Data.participant,Is.Not.EqualTo(participant));Assert.That(restored.Data.events.Count,Is.Zero);
+            restored.Consent(false);restored.Add("screen","home");Assert.That(restored.Data.events.Count,Is.Zero);
+            Directory.Delete(folder,true);
+        }
+        [Test]
         public void FieldAndSupportPresentationDataRoundTrip()
         {
             var report=new BattleReport{task=1,taskChoice=2,taskCompleted=true,mods=63};

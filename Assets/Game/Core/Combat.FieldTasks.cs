@@ -5,8 +5,8 @@ namespace ScrapGuard.Core
     public enum FieldTask { None, Salvage, Defense, Escort }
     public sealed partial class Combat
     {
-        public FieldTask Task { get { return Challenge?FieldTask.None:Definition.Layout==1 || Definition.Layout==4?FieldTask.Salvage:Definition.Layout==2?FieldTask.Defense:Definition.Layout==3?FieldTask.Escort:FieldTask.None; } }
-        public V2 TaskPosition { get { return Task==FieldTask.Escort?new V2(270,660-TaskProgress*300):new V2(270,420); } }
+        public FieldTask Task { get { return Challenge?FieldTask.None:(Definition.Layout==0 && Stage==0 || Definition.Layout==1 || Definition.Layout==4)?FieldTask.Salvage:Definition.Layout==2?FieldTask.Defense:Definition.Layout==3?FieldTask.Escort:FieldTask.None; } }
+        public V2 TaskPosition { get { return Task==FieldTask.Escort?new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),660-TaskProgress*300):new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),420); } }
         public float TaskProgress { get; private set; }
         public float TaskIntegrity { get; private set; }=100;
         public int TaskChoice { get; private set; }
@@ -22,7 +22,7 @@ namespace ScrapGuard.Core
         {
             get
             {
-                if(TaskCompleted)return TaskTitle+" 완료 · 작전 승리 시 골드 +"+(TaskChoice==2?400:200)+" / 부품 +"+(TaskChoice==2?4:2);
+                if(TaskCompleted)return FieldModule==0?"부품 확보! 현장 개조를 선택하세요 · 이번 전투 전용":FieldEngineering.Name(FieldModule,Hero)+" 가동 · 승리 시 추가 재화 지급";
                 if(TaskFailed)return TaskTitle+" 종료 · 본 작전은 계속됩니다";
                 if(Elapsed<12)return "선택 임무 예고 · "+TaskTitle+" · 12초에 개방";
                 if(Task==FieldTask.Salvage)return TaskChoice==2?"과부하 회수 · 20초 생존 / 화력 +20%, 받는 피해 +20%":"회수 장치에 접근해 안전 / 과부하 회수를 선택하세요";

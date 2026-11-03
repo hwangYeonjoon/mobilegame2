@@ -23,8 +23,8 @@ namespace ScrapGuard
             var right=CharacterArt.Draw(titleScreen,350,384,167,207,2,0);right.color=new Color(.85f,.85f,.85f,1);
             var lead=CharacterArt.Draw(titleScreen,133,294,274,325,0,0);
             lead.gameObject.AddComponent<ShowroomMotion>();
-            Ui.Label(titleScreen,"폭주한 로봇을 막고, 장비를 모아 성장하세요.\n완성한 수호대는 나만의 전시실에.",30,637,480,67,19,Ui.Ink,TextAnchor.MiddleCenter);
-            string[] pillars={"생존","성장","전시"};
+            Ui.Label(titleScreen,"부품을 회수하고, 전장에서 로봇을 개조하세요.\n동료와 정비소를 되살리고, 내 수호대를 전시하세요.",30,637,480,67,19,Ui.Ink,TextAnchor.MiddleCenter);
+            string[] pillars={"회수","개조","전시"};
             for(int i=0;i<3;i++)
             {
                 Ui.Box(titleScreen,73+i*136,734,122,43,Ui.Panel);

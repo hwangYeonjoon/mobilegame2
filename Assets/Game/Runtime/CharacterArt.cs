@@ -7,11 +7,23 @@ namespace ScrapGuard
     {
         static Texture2D atlas, expansion, outfitAtlas;
         static readonly Sprite[] outfitSprites=new Sprite[4];
+        static Texture2D railAtlas;
+        static readonly Sprite[] railSprites=new Sprite[4];
         static bool loaded;
         static readonly Sprite[,] sprites = new Sprite[ScrapGuard.Core.HeroCatalog.Count,3];
         public static Sprite Get(int hero, int skin, int outfit = 0, int pose = 0)
         {
             if (!ScrapGuard.Core.HeroCatalog.Valid(hero) || skin < 0 || skin >= ScrapGuard.Core.Social.Skins.Length) return null;
+            if(hero==1 && outfit==2)
+            {
+                if(railAtlas==null)railAtlas=Resources.Load<Texture2D>("Art/Ray-RailRanger-v1");
+                if(railAtlas!=null)
+                {
+                    pose=Mathf.Clamp(pose,0,3);
+                    if(railSprites[pose]==null)railSprites[pose]=Sprite.Create(railAtlas,new Rect((pose%2)*railAtlas.width/2f,(1-pose/2)*railAtlas.height/2f,railAtlas.width/2f,railAtlas.height/2f),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
+                    return railSprites[pose];
+                }
+            }
             if(hero==0 && outfit==1)
             {
                 if(outfitAtlas==null)outfitAtlas=Resources.Load<Texture2D>("Art/Luke-HeavyEngineer-v1");
@@ -52,7 +64,7 @@ namespace ScrapGuard
         public static Image Draw(Transform parent, float x, float y, float width, float height, int hero, int skin, int outfit = 0)
         {
             var image = Ui.Rect(parent,"GuardianArt",x,y,width,height).gameObject.AddComponent<Image>();
-            image.sprite = Get(hero,skin,outfit); image.color=hero==0 && outfit==1 ? Color.white : Tint(skin); image.preserveAspect = true; image.raycastTarget = false;
+            image.sprite = Get(hero,skin,outfit); image.color=outfit>0 ? Color.white : Tint(skin); image.preserveAspect = true; image.raycastTarget = false;
             return image;
         }
     }

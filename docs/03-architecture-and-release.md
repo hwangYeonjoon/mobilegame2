@@ -1,5 +1,55 @@
 # 서버와 안드로이드 출시 계획
 
+## 0.12 검증과 운영 변경
+
+- 앱 버전 0.12.0 / Android code 12 / 전투 규칙 10. 앱과 서버의 Core 규칙을 함께 배포한다. 이전 규칙의 활성 전투는 지급하지 않으며 계정 화면에서 취소 후 재시작할 수 있다.
+- `ReplayStep.assembly`는 현장 개조 선택 1~3만 허용한다. 이동·스킬·지원·필살기·회수 선택과 같은 단계에 섞거나 임무 완료 전에 장착하면 서버 검증에서 거절한다. 기존 저장 데이터의 누락 필드는 0(미장착)으로 해석한다.
+- `restoration_runs`는 서버가 재생한 30초 이상 일반 작전 승리+현장 임무 완료만 기록한다. 출격 당시 길드와 정산 시 길드가 같아야 하며 테스트 진행은 제외한다. run 기본 키, 계정/서비스 일자 한도 3, 전투 정산과 동일 DB 트랜잭션으로 중복·길드 이동 악용을 방지한다. 주간 6/15/30점 시설 외형은 조회 시 계산하며 재화 지급 경로가 없다. 탈퇴·차단된 인물은 기여자 목록에 노출하지 않지만 남은 기여의 익명 총합은 유지한다. 계정 삭제 시 해당 기여는 삭제되고 마지막 길드원이 탈퇴하면 길드와 기록을 삭제한다.
+- 공개 전시 목록은 기존 공개·차단 검사를 통과한 비테스트 프로필 중 각 페이지의 주간 소개 1명을 고른다. 상품 구매·응원 수로 가중하지 않고 별도 개인정보를 추가하지 않는다.
+- 신규 의상은 기존 소유권 리스트와 선택 ID 2를 사용한다. 레이 소유권·의상 보유·중복 구매·유료 보석 차감 규칙을 서버에서 검사한다. 실제 Google 상품 ID와 원화 제안가는 변경하지 않는다.
+- 새 화면 검증: `-smoke -engineeringSmoke`. 실제 Google 연결, 공개 배포, AdMob, 서명 AAB·Android 실기기 검증은 아래의 외부 준비 절차가 여전히 필요하다.
+
+## 0.11 연결과 출시 전 확인
+
+현재는 실행 가능한 연결 코드와 모의 공급자를 사용한 서버 상태 검증 단계다. Google Console 연동·Android 로그인·라이선스 구매·실제 환불·실기기 성능은 별도 검증이 필요하다. 일반 판매·공개 서버 배포는 수행하지 않았다.
+
+### Google 계정
+
+1. 실제 패키지와 서명 인증서 SHA를 Google Cloud Android 클라이언트에 등록한다. 기본 패키지는 `com.scrapguard.mobilegame2.prototype`이며 변경 시 빌드·Play 설정도 함께 맞춘다.
+2. Web OAuth 클라이언트 ID를 서버 `GOOGLE_WEB_CLIENT_ID`로 설정한다. 비밀키를 앱이나 Git에 넣지 않는다.
+3. Android에서 서버 게스트 계정을 만든 뒤 **현재 수호대에 Google 계정 연결**을 누른다. Credential Manager 1.5.0 / googleid 1.1.1이 서버의 5분 nonce를 포함한 토큰을 받고 서버가 서명·issuer·audience·expiry·nonce를 확인한다. 이메일을 계정 키로 쓰지 않는다.
+4. 다른 기기에서 **Google 계정으로 복구**하면 서버 진행을 유지하며 bearer 복구 코드를 교체한다. 다른 기기의 기존 연결도 끊긴다. 자동 계정 병합은 없다. 응답이 끊겼다면 저장된 새 코드로 일반 복구를 재시도하거나 Google 복구를 다시 수행한다.
+5. Android 복구 코드는 Keystore AES/GCM으로 암호화하며 기존 평문 세션은 읽을 때 이전한다. macOS 미리보기는 기존 개발용 로컬 세션 파일을 사용한다. 계정 삭제 시 Google 연결도 삭제된다.
+
+### Play 라이선스 테스트
+
+1. `CommerceCatalog`의 5개 상품을 Play Console에 등록하고 라이선스 테스터·테스트 결제 수단을 설정한다. 정식 체크아웃 가격은 Play 메타데이터에서 가져온다.
+2. 서비스 계정에 앱 구매 조회 권한을 부여한다. 서버 환경에 `GOOGLE_APPLICATION_CREDENTIALS` 파일 경로, `PLAY_PACKAGE_NAME`, `COMMERCE_MODE=license_test`를 설정한다. 컨테이너에서는 자격 증명 파일을 읽기 전용으로 마운트하고 내부 경로를 환경 변수에 전달한다. 기본 compose는 비밀 파일을 포함하거나 자동 마운트하지 않는다.
+3. `SCRAP_KEYSTORE_PATH`, `SCRAP_KEY_ALIAS`, `SCRAP_KEYSTORE_PASSWORD`, `SCRAP_KEY_PASSWORD`를 로컬에 설정한 경우에만 `ProjectBuilder.BuildAndroidBundle`이 서명된 비디버그 내부 테스트 AAB를 만든다. 빌드 후 설정의 비밀번호를 지운다. 키가 없으면 실패한다. 개발 APK를 업로드 가능한 내부 테스트 AAB로 오인하지 않는다.
+4. 내부 테스트 트랙으로 설치한 Android 앱의 **설정 → Play 테스트 상점·구매 복원**에서 시작한다. 자동으로 결제를 시작하지 않는다. Google 화면에 실제 청구 수단이 보이면 취소하고 라이선스 테스터 설정을 확인한다. 서버는 테스트 유형만 허용한다.
+5. 성공·보류·취소·네트워크 단절·서버 지급 직후 앱 종료·재설치·계정 변경·소모성/영구 권리 복원·환불을 확인한다. 환불 폴러는 시간 단위다. 일반 실결제 활성화는 별도 작업이며 현재 설정으로 켤 수 없다.
+
+### 플레이 관찰과 기기 측정
+
+설정 → 플레이 테스트 기록 → 동의하고 켜기 → 플레이 → 내보내기. 직접 전달받은 파일만 집계한다.
+
+```sh
+python3 Tools/playtest_report.py /path/to/playtest-export.json --output TestResults/playtest-report.json
+python3 Tools/android_device_check.py --adb /path/to/adb
+```
+
+기기 수집 도구는 정확히 한 대의 승인된 Android 기기가 있어야 하며 메모리·열·gfxinfo 증거를 저장한다. Unity GL 프레임은 gfxinfo에 모두 포함되지 않을 수 있어 게임 내 샘플도 함께 본다. 20분 전투, 백그라운드/복귀, 해상도·안전 영역, 터치, 공유 창, Keystore 복구를 직접 확인한다. 기기 미연결은 `not_tested`로 기록하며 통과로 처리하지 않는다.
+
+### 아직 필요한 외부 작업
+
+- Google Play/Cloud 설정·서명 파일 준비와 실제 라이선스 테스트·로그인·환불 결과 확보.
+- AdMob SDK·SSV·광고 동의 처리. 현재 광고 스킵은 검증된 테스트 권리로 서버 한도 보상만 받을 수 있다.
+- 공개 도메인·TLS·운영 백업·알림·부하 검증, 신고 처리 관리자 기능, 개인정보 안내·계정 삭제 웹 경로.
+- 실제 대상 연령 확정. 현재 청소년·성인 중심 가정이며 어린이를 포함하면 SDK·광고·동의·소셜 정책을 다시 검토한다.
+- 첫 플레이·재방문·보석 소비·의상 관심도 관찰 후 가격과 난이도 조정. 이번 가격은 매출을 검증한 가격이 아니다.
+
+공식 근거: [Unity IAP 구매 처리](https://docs.unity.com/en-us/iap/purchases), [Google 구매 상태](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.products), [환불 목록](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.voidedpurchases/list), [Google ID 토큰 검증](https://developers.google.com/identity/gsi/web/guides/verify-google-id-token), [Android Credential Manager](https://developer.android.com/identity/sign-in/credential-manager-siwg).
+
 전투는 기기에서 실행하고 계정·재화·아이템·출석·결제 권리는 서버가 확정한다. 초기에는 단일 API 서버와 관계형 데이터베이스로 구성해 운영 복잡도를 줄인다. 게임 서버 전체를 실시간 전투 서버로 만들 필요는 없지만, 클라이언트가 보낸 보상 금액을 그대로 저장하지 않는다.
 
 ## 기술 구성 제안

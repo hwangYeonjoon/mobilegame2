@@ -31,15 +31,15 @@ namespace ScrapGuard
             float moving = Mathf.Clamp01(combat.LastMovement.Length);
             float stride = Mathf.Sin(combat.Elapsed*17)*moving;
             float recoil = combat.ShotFlash/.11f;
-            player.anchoredPosition = new Vector2(combat.Position.x-20-Mathf.Cos(combat.Facing)*recoil*2,
-                -combat.Position.y+30+Mathf.Abs(stride)*2.5f);
-            player.localScale = new Vector3(.48f*(1+stride*.035f),.48f*(1-stride*.035f),1);
+            player.anchoredPosition = new Vector2(combat.Position.x-25.6f-Mathf.Cos(combat.Facing)*recoil*2,
+                -combat.Position.y+32+Mathf.Abs(stride)*2.5f);
+            player.localScale = new Vector3(.64f*(1+stride*.035f),.64f*(1-stride*.035f),1);
             player.localEulerAngles = new Vector3(0,0,-combat.LastMovement.x*5+stride*2-recoil*3);
             playerArt.rectTransform.localScale = new Vector3(Mathf.Cos(combat.Facing)<-.05f ? -1 : 1,1,1);
             int outfit=Outfits.Active(State,combat.Hero);
             playerArt.sprite=CharacterArt.Get(combat.Hero,State.selectedSkin,outfit,combat.UltimateFlash>0?3:combat.ShotFlash>0?2:moving>.1f && Mathf.Sin(combat.Elapsed*11)>0?1:0);
-            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : outfit==1?Color.white:CharacterArt.Tint(State.selectedSkin);
-            muzzle.color=outfit==1?OutfitVisuals.Copper:Ui.Gold;
+            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : outfit>0?Color.white:CharacterArt.Tint(State.selectedSkin);
+            muzzle.color=outfit>0?OutfitVisuals.Copper:Ui.Gold;
             playerShadow.anchoredPosition = new Vector2(combat.Position.x-20,-combat.Position.y-12);
             shieldRing.gameObject.SetActive(combat.Shield>0);
             shieldRing.anchoredPosition = new Vector2(combat.Position.x,-combat.Position.y);
@@ -83,8 +83,8 @@ namespace ScrapGuard
                 audioSource.PlayOneShot(ultimateClip);
             }
             var origin = new Vector2(combat.UltimateOrigin.x,-combat.UltimateOrigin.y);
-            if(Outfits.Active(State,combat.Hero)==1)OutfitVisuals.Gear(effectLayer,origin,240);
-            Color color = Outfits.Active(State,combat.Hero)==1?OutfitVisuals.Copper:combat.Hero == 1 ? Ui.Blue : combat.Hero == 2 ? Ui.Gold : combat.Hero==3 ? Ui.Gold : combat.Hero==4 ? Ui.Blue : Ui.Mint;
+            if(Outfits.Active(State,combat.Hero)>0)OutfitVisuals.Special(effectLayer,origin,240,Outfits.Active(State,combat.Hero));
+            Color color = Outfits.Active(State,combat.Hero)>0?OutfitVisuals.Copper:combat.Hero == 1 ? Ui.Blue : combat.Hero == 2 ? Ui.Gold : combat.Hero==3 ? Ui.Gold : combat.Hero==4 ? Ui.Blue : Ui.Mint;
             particles.Burst(combat.UltimateOrigin,combat.Hero==4?32:24,color,combat.Hero==3?220:150,combat.Hero==4?6:4);
             if(combat.Hero==3)
             {
@@ -101,8 +101,8 @@ namespace ScrapGuard
                 var beam = Ui.Rect(effectLayer,"PhotonBeam",origin.x,-origin.y,560,76);
                 beam.pivot = new Vector2(0,.5f);
                 beam.localEulerAngles = new Vector3(0,0,-Mathf.Atan2(combat.UltimateDirection.y,combat.UltimateDirection.x)*Mathf.Rad2Deg);
-                Ui.Box(beam,0,0,560,76,new Color(.2f,.65f,1,.28f),false);
-                Ui.Box(beam,0,21,560,34,Ui.Blue,false);
+                Ui.Box(beam,0,0,560,76,new Color(color.r,color.g,color.b,.28f),false);
+                Ui.Box(beam,0,21,560,34,color,false);
                 Ui.Box(beam,0,33,560,10,Color.white,false);
                 beam.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.65f,1,1);
             }

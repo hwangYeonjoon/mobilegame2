@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>disable</Nullable><UseSharedCompilation>false</UseSharedCompilation></PropertyGroup>
-  <ItemGroup><Compile Include="../../Assets/Game/Core/*.cs" Link="Core/%(Filename)%(Extension)" /><PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" /><PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" /></ItemGroup>
+  <ItemGroup><Compile Include="../../Assets/Game/Core/*.cs" Link="Core/%(Filename)%(Extension)" /><PackageReference Include="Google.Apis.Auth" Version="1.78.0" /><PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" /><PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" /></ItemGroup>
 </Project>

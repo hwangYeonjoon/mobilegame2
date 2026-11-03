@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if(!Endgame.IsChallenge(mode))return CommandResult.Fail("없는 도전이에요.");
-            if(mode==Endgame.WeeklyMode && !Endgame.Unlocked(State))return CommandResult.Fail("작전 05을 클리어하면 정식 도전이 열려요.");
+            if((mode==Endgame.WeeklyMode || mode==SkillTrial.Mode) && !Endgame.Unlocked(State))return CommandResult.Fail("작전 05를 완료하면 성장 도전과 실력전이 열려요.");
             if(string.IsNullOrEmpty(id) || !string.IsNullOrEmpty(State.activeRun) || State.receipts.Exists(r=>r.id==id))return CommandResult.Fail("진행 중이거나 정산된 전투예요.");
             State.activeRun=id;State.activeStage=4;State.activeMode=mode;State.activeWeek=Endgame.Week(clock());
             return CommandResult.Ok(mode==Endgame.PracticeMode ? "보상 없는 도전 연습을 시작해요." : "이번 주 코어에 도전하세요!");
@@ -17,19 +17,21 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if(combat==null || !combat.Ended || !Endgame.IsChallenge(State.activeMode) || combat.Mode!=State.activeMode || combat.RunId!=State.activeRun || State.receipts.Exists(r=>r.id==combat.RunId))return CommandResult.Fail("유효하지 않은 도전 결과예요.");
-            bool eligible=State.activeMode==Endgame.WeeklyMode && combat.Elapsed>=30;
+            bool skill=State.activeMode==SkillTrial.Mode;
+            bool eligible=(State.activeMode==Endgame.WeeklyMode || skill) && combat.Elapsed>=30;
             string week=State.activeWeek;
             if(eligible)
             {
-                var progress=Endgame.Find(State,week);
-                if(progress==null) { progress=new WeeklyProgress {week=week};State.weekly.Add(progress); }
+                var history=skill?State.skillWeekly:State.weekly;
+                var progress=history.Find(w=>w.week==week);
+                if(progress==null) { progress=new WeeklyProgress {week=week};history.Add(progress); }
                 progress.attempts++;progress.bestScore=Math.Max(progress.bestScore,combat.CoreScore);
-                State.totalRuns++;State.totalKills+=combat.Kills;State.dailyRuns++;State.dailyKills+=combat.Kills;
+                if(!skill){State.totalRuns++;State.totalKills+=combat.Kills;State.dailyRuns++;State.dailyKills+=combat.Kills;}
             }
             State.receipts.Add(new Receipt {id=combat.RunId,kind=State.activeMode,score=combat.CoreScore,week=week,seconds=combat.Elapsed,kills=combat.Kills,won=combat.Won,report=combat.Report()});
             State.activeRun=State.activeMode=State.activeWeek="";
             State.lastResultGold=0;State.lastResultBonus=true;
-            return CommandResult.Ok(eligible ? "주간 기록 저장 · 달성 보상을 확인하세요." : "연습 또는 30초 미만 기록은 보상·순위에 반영되지 않아요.");
+            return CommandResult.Ok(eligible ? skill?"동일 조건 실력 기록 저장 · 재화 보상 없음":"주간 기록 저장 · 달성 보상을 확인하세요." : "연습 또는 30초 미만 기록은 보상·순위에 반영되지 않아요.");
         }
         public CommandResult ExchangeCore(string offer)
         {

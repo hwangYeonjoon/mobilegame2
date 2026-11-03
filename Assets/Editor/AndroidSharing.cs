@@ -27,6 +27,8 @@ namespace ScrapGuard.Editor
             string gradle = Path.Combine(path,"build.gradle");
             if (!File.ReadAllText(gradle).Contains("androidx.core:core:1.15.0"))
                 File.AppendAllText(gradle, "\ndependencies { implementation 'androidx.core:core:1.15.0' }\n");
+            if (!File.ReadAllText(gradle).Contains("androidx.credentials:credentials:1.5.0"))
+                File.AppendAllText(gradle,"\ndependencies { implementation 'androidx.credentials:credentials:1.5.0'; implementation 'androidx.credentials:credentials-play-services-auth:1.5.0'; implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1' }\n");
             if (!File.ReadAllText(gradle).Contains("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
                 File.AppendAllText(gradle, "\ndependencies { implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22') }\n");
         }

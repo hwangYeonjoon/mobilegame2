@@ -7,18 +7,21 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
+        int featuredOutfit=2;
         void StyleShop()
         {
             var featured = Ui.Box(screen,24,239,492,359,Ui.Hex("263748")).transform;
-            Ui.Label(featured,"HEAVY WORKSHOP / 01",22,18,260,28,12,Ui.Gold);
-            Ui.Label(featured,"중장비 정비사",22,64,246,45,29,Ui.Ink);
-            Ui.Label(featured,"중장갑과 리벳 대포\n크레인 전개 · 전용 연출",22,121,220,68,18,Ui.Muted);
-            Ui.Label(featured,"루크 전용 의상\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
+            int outfit=featuredOutfit;
+            Ui.Button(featured,"중장비 정비사",22,16,214,35,()=>{featuredOutfit=1;Show("shop");},outfit==1?Ui.Mint:Ui.Raised,true,15);
+            Ui.Button(featured,"레일 레인저",248,16,222,35,()=>{featuredOutfit=2;Show("shop");},outfit==2?Ui.Gold:Ui.Raised,true,15);
+            Ui.Label(featured,Outfits.Label(outfit),22,64,246,45,29,Ui.Ink);
+            Ui.Label(featured,outfit==1?"중장갑과 리벳 대포\n크레인 전개 · 전용 연출":"철도 장갑과 레일건\n레일 섬광 · 전용 연출",22,121,220,68,18,Ui.Muted);
+            Ui.Label(featured,(outfit==1?"루크":"레이")+" 전용 · 대원 별도\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
             Ui.Disc(featured,238,68,224,new Color(1,.7f,.3f,.07f));
-            var art = CharacterArt.Draw(featured,232,56,244,246,0,0,1);
+            var art = CharacterArt.Draw(featured,232,56,244,246,Outfits.Hero(outfit),0,outfit);
             art.gameObject.AddComponent<ShowroomMotion>();
-            bool owned = Outfits.Owned(State);
-            Ui.Button(featured,owned ? "보유 의상 체험 · 장착" : "움직여 보기  ·  ◆ 600",22,282,448,55,OutfitRoom,Ui.Gold,true,19);
+            bool owned = Outfits.Owned(State,outfit);
+            Ui.Button(featured,owned ? "보유 의상 체험 · 장착" : "움직여 보기  ·  ◆ 600",22,282,448,55,()=>OutfitRoom(outfit),Ui.Gold,true,19);
             var earned = Ui.Box(screen,24,614,238,184,Ui.Panel).transform;
             CharacterArt.Draw(earned,127,10,106,112,State.showcaseHero,2);
             Ui.Label(earned,"빙하의 수호자",16,17,128,28,19,Ui.Blue);
@@ -32,7 +35,8 @@ namespace ScrapGuard
             Ui.Label(frame,"전시 프레임\n◆ 250 · 확정 구성",16,59,138,59,14,Ui.Muted);
             Ui.Button(frame,Social.HasFrame(State,3) ? "전시실에서 적용" : "프레임 살펴보기",14,128,210,42,
                 () => { if (Social.HasFrame(State,3)) CustomizeProfile(); else CosmeticOffer("frame_solar"); },Ui.Raised,true,16);
-            Ui.Button(screen,"전체 대원 공용 · 앰버 도색 살펴보기",24,808,492,43,()=>Wardrobe(1),Ui.Gold,true,17);
+            Ui.Button(screen,"신규 · 레일 레인저 체험",24,808,238,43,()=>OutfitRoom(2),Ui.Gold,true,15);
+            Ui.Button(screen,"공용 · 앰버 도색",278,808,238,43,()=>Wardrobe(1),Ui.Raised,true,15);
         }
         void Wardrobe(int skin, int hero = -1)
         {
@@ -64,16 +68,16 @@ namespace ScrapGuard
                     () => Wardrobe(next,previewHero),i == skin ? accent : Ui.Raised,true,17);
             }
             bool owned = Social.HasSkin(State,skin);
-            string detail = owned ? "보유 중 · 전체 대원 공용 · 전투 능력치 변화 없음" : skin == 1 ? "보석 300개 · 스킨 1종 확정 · 전체 대원 공용" : "적 1,000마리 처치 시 무료 획득 · 현재 " + State.totalKills;
+            string detail = owned ? "보유 중 · 전체 대원 공용 · 전투 능력치 변화 없음" : skin == 1 ? "보석 300개 · 도색 1종 확정 · 전체 대원 공용" : "적 1,000마리 처치 시 무료 획득 · 현재 " + State.totalKills;
             Ui.Label(card,detail,24,696,444,42,14,Ui.Muted,TextAnchor.MiddleCenter);
             if (owned)
-                Ui.Button(card,State.selectedSkin == skin ? "이 스킨을 사용 중이에요" : "내 수호대에 적용",24,761,444,61,
+                Ui.Button(card,State.selectedSkin == skin ? "이 도색을 사용 중이에요" : "내 수호대에 적용",24,761,444,61,
                     () => Change(new GameCommand("customize") { hero = State.showcaseHero, title = State.showcaseTitle, frame = State.showcaseFrame, skin = skin },() => Wardrobe(skin,previewHero)),null,State.selectedSkin != skin,19);
             else if (skin == 1)
                 Ui.Button(card,"구성 확인하고 구매",24,761,444,61,() => CosmeticOffer("skin_amber"),Ui.Gold,true,19);
             else
-                Ui.Button(card,"플레이로 획득하는 스킨",24,761,444,61,null,Ui.Raised,false,18);
-            Ui.Label(card,Outfits.Active(State,hero)==1?"루크 의상이 우선 표시돼요. 의상실에서 해제할 수 있어요.":"정비소 · 전투 · 전시 카드에 같은 외형으로 적용됩니다.",24,831,444,25,12,Ui.Muted,TextAnchor.MiddleCenter);
+                Ui.Button(card,"플레이로 획득하는 도색",24,761,444,61,null,Ui.Raised,false,18);
+            Ui.Label(card,Outfits.Active(State,hero)>0?"전용 의상이 우선 표시돼요. 의상실에서 해제할 수 있어요.":"정비소 · 전투 · 전시 카드에 같은 외형으로 적용됩니다.",24,831,444,25,12,Ui.Muted,TextAnchor.MiddleCenter);
         }
     }
     public sealed class ShowroomMotion : MonoBehaviour

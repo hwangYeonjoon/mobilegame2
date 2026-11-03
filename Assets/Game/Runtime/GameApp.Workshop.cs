@@ -8,7 +8,7 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        RectTransform turretArt, magnetField;
+        RectTransform turretArt, twinTurretArt, magnetField;
         void ModBook()
         {
             var card=Dialog("고철 개조 도감","전투 중 두 스킬을 조합하면 자동으로 개조됩니다.\n개조는 이번 전투에만 적용돼요.",820);
@@ -20,7 +20,7 @@ namespace ScrapGuard
                 Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+" Lv.3 + "+Catalog.SkillNames[Workshop.SubSkills[i]]+" Lv.2",17,48,410,30,15,Ui.Gold);
                 Ui.Label(row,Workshop.ModDetails[i],17,87,410,51,16,Ui.Muted);
             }
-            Ui.Label(card,"화력 / 제어 / 생존 · 같은 스킬도 다른 개조로 이어집니다",24,759,444,34,13,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,"현장 개조 · 대원 전용 효과",24,759,444,38,FieldEngineeringGuide,Ui.Mint,true,16);
         }
         string ModHint(int skill)
         {
@@ -51,7 +51,8 @@ namespace ScrapGuard
             },null,owned || progress.blueprints>=Workshop.BlueprintCost,19);
             Ui.Button(card,"적 · 보스 도감",24,616,214,51,EnemyCodex,Ui.Raised,true,16);
             Ui.Button(card,"개조 조합 도감",254,616,214,51,ModBook,Ui.Raised,true,16);
-            Ui.Button(card,"이 지역 작전 보기",24,690,444,51,()=>CampaignMap(region),Ui.Raised,true,17);
+            Ui.Button(card,State.collectionTarget==region?"수집 목표 해제":"수집 목표로 등록",24,690,214,51,()=>Change(new GameCommand("region_target"){stage=State.collectionTarget==region?-1:region},()=>RegionCollection(region)),Ui.Mint,true,16);
+            Ui.Button(card,"이 지역 작전 보기",254,690,214,51,()=>CampaignMap(region),Ui.Raised,true,16);
             Ui.Label(card,"기본 장갑에 지역 색을 적용한 도색입니다.\n정비소·전투·전시·공개한 길드 지원에 적용됩니다.",24,762,444,57,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void ConfirmRegionCraft(int region)
@@ -80,7 +81,7 @@ namespace ScrapGuard
         {
             var receipt=State.receipts.Find(r=>r.id==combat.RunId);var report=receipt==null?combat.Report():receipt.report;
             if(report==null){Info("전투 분석","이전 버전 기록에는 상세 분석이 없어요.");return;}
-            var card=Dialog("이번 전투 분석",combat.Challenge?"코어 균열":Catalog.StageNames[combat.Stage],850);
+            var card=Dialog("이번 전투 분석",combat.Challenge?FieldEngineering.TrialTitle(combat.Mode):Catalog.StageNames[combat.Stage],850);
             int cause=Workshop.MainCause(report);
             Ui.Label(card,(report.cause>0?"종료 원인  ":"주요 피해  ")+Workshop.CauseNames[cause],24,128,444,40,24,Ui.Gold);
             Ui.Label(card,Workshop.Advice[cause],24,184,444,69,18);
@@ -88,7 +89,7 @@ namespace ScrapGuard
             string damage="";for(int i=1;i<Math.Min(Workshop.CauseNames.Length,report.damage.Length);i++)if(report.damage[i]>0)damage+=Workshop.CauseNames[i]+"  "+Mathf.CeilToInt(report.damage[i])+"\n";
             Ui.Label(card,"받은 체력 피해 · 보호막 흡수 제외",24,325,444,28,15,Ui.Muted);
             var list=Ui.Scroll(card,24,363,444,147,Math.Max(147,damage.Split('\n').Length*29));Ui.Label(list,damage.Length==0?"체력 피해 없음":damage,12,0,420,Math.Max(147,damage.Split('\n').Length*29),17);
-            string mods="";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
+            string mods=report.fieldModule>0?FieldEngineering.Name(report.fieldModule,report.hero)+" (현장 장착)\n":"";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
             Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 공격 Lv.3 + 보조 Lv.2를 노려 보세요.":mods),24,534,444,101,14,Ui.Mint);
             string skills="";for(int i=0;i<report.skills.Length;i++)if(report.skills[i]>0)skills+=(skills.Length>0?" · ":"")+Catalog.SkillNames[i]+" "+report.skills[i];
             Ui.Label(card,skills,24,650,444,79,14,Ui.Muted);
@@ -110,36 +111,42 @@ namespace ScrapGuard
                 Ui.Box(turretArt,18,-8,3,5,Ui.Hex("D8BAFF"),false);
                 Ui.Disc(turretArt,10,10,8,Ui.Hex("E8C6FF"));
             }
+            if(twinTurretArt==null){twinTurretArt=Instantiate(turretArt,effectLayer);twinTurretArt.name="Twin sentry";}
+            twinTurretArt.gameObject.SetActive(combat.FieldModule==1 && combat.Hero==0);
+            var twin=combat.Position-(combat.TurretPosition-combat.Position);
+            twinTurretArt.anchoredPosition=new Vector2(twin.x,-twin.y);
+            twinTurretArt.localEulerAngles=new Vector3(0,0,combat.Elapsed*100);
             turretArt.gameObject.SetActive(combat.HasMod(2));
             turretArt.anchoredPosition=new Vector2(combat.TurretPosition.x,-combat.TurretPosition.y);
             turretArt.localEulerAngles=new Vector3(0,0,-combat.Elapsed*100);
         }
-        void WeeklyRecordCard()
+        void WeeklyRecordCard(){WeeklyRecordCard(false);}
+        void WeeklyRecordCard(bool skill)
         {
-            string week=CurrentWeek();var progress=Endgame.Find(State,week);int score=progress==null?0:progress.bestScore;
+            string week=CurrentWeek();var progress=skill?State.skillWeekly.Find(w=>w.week==week):Endgame.Find(State,week);int score=progress==null?0:progress.bestScore;
             var modalCard=Dialog("주간 기록 카드","이번 주에 저장된 개인 최고 기록을 공유하세요.",850);
             var plate=Ui.Box(modalCard,24,139,444,550,Ui.Background).rectTransform;
             Ui.Box(plate,0,0,444,5,FrameColor(State.showcaseFrame),false);
-            Ui.Label(plate,"SCRAP GUARD / CORE RIFT",20,23,404,30,14,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Label(plate,skill?"고철 수호대 / 동일 조건 실력전":"고철 수호대 / 주간 성장 도전",20,23,404,30,14,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Label(plate,State.displayName,20,62,404,38,26,Ui.Ink,TextAnchor.MiddleCenter);
-            CharacterArt.Draw(plate,107,113,230,234,State.showcaseHero,State.selectedSkin,Outfits.Active(State,State.showcaseHero));
+            CharacterArt.Draw(plate,107,113,230,234,skill?0:State.showcaseHero,State.selectedSkin,Outfits.Active(State,skill?0:State.showcaseHero));
             Ui.Label(plate,score.ToString("N0")+"점",20,358,404,69,42,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(plate,Social.Titles[State.showcaseTitle]+" · "+Social.Skins[State.selectedSkin],20,440,404,48,17,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(plate,week+" 주간 · "+(!Online?"로컬 체험":State.testProgress?"테스트 기록":"서버 저장 기록"),20,506,404,25,13,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(modalCard,"카드 이미지 공유",24,715,444,55,()=>{if(!exportingCard)StartCoroutine(ExportCard(plate));},null,score>0,18);
-            Ui.Label(modalCard,score>0?"내 이름·도색·칭호와 주간 최고 점수가 포함됩니다.":"정식 주간 도전 기록을 먼저 저장하세요.",24,785,444,36,14,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(modalCard,score>0?"내 이름·도색·칭호와 주간 최고 점수가 포함됩니다.":"주간 도전 기록을 먼저 저장하세요.",24,785,444,36,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void SupportArrivalCard()
         {
             var support=combat.Support;bool show=support.showIdentity;
             Color accent=show?FrameColor(support.frame):Ui.Blue;
-            if(show && support.outfit==1)OutfitVisuals.Gear(effectLayer,new Vector2(combat.Position.x,-combat.Position.y),90);
+            if(show && support.outfit>0)OutfitVisuals.Special(effectLayer,new Vector2(combat.Position.x,-combat.Position.y),90,support.outfit);
             var card=Ui.Box(effectLayer,18,244,306,111,Ui.Panel).rectTransform;
             Ui.Box(card,0,0,4,111,accent,false);
             CharacterArt.Draw(card,12,9,80,90,support.hero,show?support.skin:0,show?support.outfit:0);
             Ui.Label(card,show?support.name:"길드 지원 도착",104,11,190,30,19,accent);
             Ui.Label(card,show?Social.Titles[Mathf.Clamp(support.title,0,Social.Titles.Length-1)]:"비공개 대원",104,47,190,25,13,Ui.Muted);
-            Ui.Label(card,show?(support.outfit==1?Outfits.Name:Social.Skins[Mathf.Clamp(support.skin,0,Social.Skins.Length-1)]):SupportNames[support.hero],104,77,190,25,13,Ui.Ink);
+            Ui.Label(card,show?(support.outfit>0?Outfits.Label(support.outfit):Social.Skins[Mathf.Clamp(support.skin,0,Social.Skins.Length-1)]):SupportNames[support.hero],104,77,190,25,13,Ui.Ink);
             card.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(3,1,1);
         }
     }

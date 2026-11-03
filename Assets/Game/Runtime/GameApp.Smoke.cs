@@ -11,7 +11,7 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        bool smokeActive;
+        bool smokeActive,smokeRecover;
         bool smokeCapturing;
         string smokeOutput;
         readonly List<string> smokeErrors = new List<string>();
@@ -24,11 +24,12 @@ namespace ScrapGuard
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-smokeOutput") smokeOutput = args[i + 1];
             Directory.CreateDirectory(smokeOutput);
             Application.logMessageReceived += (message, stack, type) => { if (type == LogType.Exception || type == LogType.Error || type == LogType.Assert) smokeErrors.Add(message); };
-            StartCoroutine(Array.IndexOf(args,"-experienceSmoke")>=0 ? ExperienceSmokeRoutine() : Array.IndexOf(args,"-artSmoke")>=0 ? ArtSmokeRoutine() : Array.IndexOf(args,"-outfitSmoke")>=0 ? OutfitSmokeRoutine() : Array.IndexOf(args,"-expansionSmoke")>=0 ? ExpansionSmokeRoutine() : Array.IndexOf(args,"-workshopSmoke")>=0 ? WorkshopSmokeRoutine() : Array.IndexOf(args,"-campaignSmoke")>=0 ? CampaignSmokeRoutine() : Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
+            StartCoroutine(Array.IndexOf(args,"-engineeringSmoke")>=0 ? EngineeringSmokeRoutine() : Array.IndexOf(args,"-commerceSmoke")>=0 ? CommerceSmokeRoutine() : Array.IndexOf(args,"-experienceSmoke")>=0 ? ExperienceSmokeRoutine() : Array.IndexOf(args,"-artSmoke")>=0 ? ArtSmokeRoutine() : Array.IndexOf(args,"-outfitSmoke")>=0 ? OutfitSmokeRoutine() : Array.IndexOf(args,"-expansionSmoke")>=0 ? ExpansionSmokeRoutine() : Array.IndexOf(args,"-workshopSmoke")>=0 ? WorkshopSmokeRoutine() : Array.IndexOf(args,"-campaignSmoke")>=0 ? CampaignSmokeRoutine() : Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
         }
         void UpdateSmoke() { }
         V2 SmokeMovement()
         {
+            if(smokeRecover && !combat.TaskCompleted)return (combat.TaskPosition-combat.Position).Normal;
             V2 away = new V2();
             foreach (var e in combat.Enemies)
             {

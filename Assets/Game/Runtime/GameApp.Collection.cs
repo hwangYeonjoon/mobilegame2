@@ -86,7 +86,7 @@ namespace ScrapGuard
                 Ui.Label(row, Catalog.HeroNames[i] + "  Lv." + State.heroes[i].level, 124, 15, 350, 38, 23);
                 Ui.Label(row, Catalog.HeroRoles[i], 124, 59, 350, 34, 15, i == 0 ? Ui.Mint : i == 1 ? Ui.Gold : Ui.Blue);
                 Ui.Label(row, "기본 공격 " + HeroCatalog.All[i].Attack + " · 체력 " + HeroCatalog.All[i].Health, 124, 98, 350, 29, 14, Ui.Muted);
-                Ui.Label(row, "필살기 · " + Combat.UltimateNames[i],124,124,350,22,12,Ui.Mint);
+                Ui.Label(row, "필살기 · " + Combat.UltimateNames[i]+(i==0?" / 현장 쌍둥이 포탑":i==1?" / 현장 질주 레일건":""),124,124,350,22,12,Ui.Mint);
                 if (unlocked)
                 {
                     Ui.Button(row, selected ? "선택 중" : "출격 대원 선택", 124, 148, 180, 49, () => Change(new GameCommand("hero_select") { hero = hero }), selected ? Ui.Raised : Ui.Mint, !selected, 15);
@@ -116,11 +116,11 @@ namespace ScrapGuard
             Ui.Button(screen,"스타일 컬렉션",24,176,238,46,() => { shopSupplies = false; Show("shop"); },shopSupplies ? Ui.Raised : Ui.Mint,true,17);
             Ui.Button(screen,"보급 · 장비",278,176,238,46,() => { shopSupplies = true; Show("shop"); },shopSupplies ? Ui.Mint : Ui.Raised,true,17);
             if (!shopSupplies) { StyleShop(); return; }
-            var list = Ui.Scroll(screen, 24, 238, 492, 608, 2410);
+            var list = Ui.Scroll(screen, 24, 238, 492, 608, 2520);
             Ui.Label(list, "보급품", 0, 0, 492, 32, 22);
             ShopRow(list, 45, "공용 부품 ×20", "매일 1회 · 골드로 성장 재료 보충", "2,000 골드", () => ConfirmBuy("parts_gold", "부품 20개", "골드 2,000"), State.dailyPartsPurchases < 1);
             ShopRow(list, 154, "공용 부품 ×100", "매일 1회 · 확정 수량", "◆ 100", () => ConfirmBuy("parts_gems", "부품 100개", "보석 100"), State.dailyGemPartsPurchases < 1);
-            ShopRow(list, 263, "추가 보급 부품 ×10", "광고 체험 · 오늘 " + State.dailyRewardParts + "/2회", State.demoAdSkip ? "스킵 수령" : "무료 체험", () => RequestReward("parts"), State.dailyRewardParts < 2);
+            ShopRow(list, 263, "추가 보급 부품 ×10", "선택 보상 · 오늘 " + State.dailyRewardParts + "/2회", State.demoAdSkip || State.adSkip ? "스킵 수령" : "체험 안내", () => RequestReward("parts"), State.dailyRewardParts < 2);
             Ui.Label(list, "확정 장비 · 일반", 0, 391, 492, 36, 22);
             Ui.Label(list, "하루 총 2개 · 구매 " + State.dailyItemPurchases + "/2", 0, 427, 492, 27, 14, Ui.Muted);
             int[] sale = { 1, 2, 3, 4, 5, 7, 8, 10, 11 };
@@ -132,13 +132,16 @@ namespace ScrapGuard
             }
             Ui.Label(list, "희귀 장비 · 확정 구매", 0, 1460, 492, 38, 22);
             ShopRow(list, 1508, "희귀 충격 발사기", "능력치 ×1.35 · 장비별 영구 1회", "◆ 600", () => ConfirmBuy("rare:2", "희귀 충격 발사기", "보석 600"), !State.purchasedRare.Contains(2) && !State.items.Exists(i => i.definition == 2 && i.rarity == 2));
-            Ui.Label(list, "Google Play 상품 미리보기", 0, 1636, 492, 38, 22);
-            Ui.Label(list, "아직 연결되지 않았어요. 실제 결제는 발생하지 않습니다.", 0, 1677, 492, 38, 13, Ui.Muted);
-            int[] gems = { 100, 450, 1000 }; string[] prices = { "1,500원", "5,900원", "12,000원" };
-            for (int i = 0; i < 3; i++)
-                ShopRow(list, 1730 + i * 109, "보석 " + gems[i], "제안 가격 " + prices[i] + " · 정식 상품 등록 필요", "준비 중", () => Info("보석 충전 준비 중", "실제 Google 결제는 아직 연결되지 않았어요.\n로컬 체험의 테스트 도구에서만 체험 재화를 지급해요."));
-            ShopRow(list, 2070, "영구 광고 스킵", "제안 가격 9,900원 · 동일 일일 횟수", "혜택 보기", () => Info("영구 광고 스킵", "전투 추가 골드 하루 3회, 부품 하루 2회를\n광고 시청 없이 수령하는 상품입니다.\n테스트 도구에서 체험할 수 있어요."));
-            Ui.Label(list, "이 상점은 NPC 상점입니다.\n장비 판매는 장비 → 관리에서 진행하세요.\n보석을 현금으로 환전할 수 없습니다.", 0, 2203, 492, 120, 16, Ui.Muted);
+            Ui.Label(list, "Google Play 상품 미리보기", 0, 1636, 330, 38, 22);
+            Ui.Button(list,"보석 내역",356,1635,136,38,GemWalletPanel,Ui.Raised,true,14);
+            Ui.Label(list, "일반 판매 준비 중 · 이곳에서는 구성과 제안가만 확인해요.", 0, 1677, 492, 38, 13, Ui.Muted);
+            for(int i=0;i<CommerceCatalog.Offers.Length;i++)
+            {
+                var offer=CommerceCatalog.Offers[i];
+                ShopRow(list,1730+i*109,offer.Name,"테스트 제안가 "+offer.ProposedWon.ToString("N0")+"원", "혜택 보기",()=>StoreOfferPanel(offer));
+            }
+            Ui.Button(list,"의상 제작실 · 완성작과 다음 아이디어",0,2300,492,55,ConceptRoom,Ui.Mint,true,18);
+            Ui.Label(list,"무료 보상과 보석 상품의 구매 효력은 같아요.\n장비 판매는 장비 → 관리에서 진행하세요.\n보석을 현금으로 환전할 수 없습니다.",0,2380,492,105,16,Ui.Muted);
         }
         void ShopRow(Transform parent, float y, string title, string description, string action, Action clicked, bool enabled = true)
         {
@@ -149,10 +152,12 @@ namespace ScrapGuard
         }
         void ConfirmBuy(string offer, string name, string price)
         {
-            var card = Dialog("구매 확인", "구성품과 사용할 재화를 확인해 주세요.", 358);
+            var card = Dialog("구매 확인", "확정 구성 · 화면에 표시된 재화만 사용합니다.", 470);
             Ui.Label(card, name, 24, 128, 444, 45, 25, Ui.Ink, TextAnchor.MiddleCenter);
             Ui.Label(card, price, 24, 182, 444, 40, 21, Ui.Gold, TextAnchor.MiddleCenter);
-            Ui.Button(card, "구매하기", 24, 269, 444, 62, () => Change(new GameCommand("buy") { value = offer }));
+            int gems=offer=="hero"?1200:offer=="parts_gems"?100:offer.StartsWith("rare:")?600:0;
+            Ui.Button(card, "구매하기", 24, 269, 444, 62, () => Change(new GameCommand("buy") { value = offer }),null,gems==0 || State.gems>=gems && State.gemDebt==0);
+            if(gems>0)Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,365,444,51,()=>GemSources(gems,()=>ConfirmBuy(offer,name,price)),Ui.Raised,true,16);
         }
     }
 }

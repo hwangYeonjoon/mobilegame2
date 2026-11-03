@@ -9,7 +9,7 @@ namespace ScrapGuard.Core
         float turretTimer,repairTimer;
         int announcedMods;
         public int DefeatedRoles { get; private set; }
-        public int Mods { get { return Workshop.ModMask(Skills); } }
+        public int Mods { get { return Workshop.ModMask(Skills)|FieldMods; } }
         public bool HasMod(int id){return (Mods&(1<<id))!=0;}
         public V2 TurretPosition { get { return Position+V2.Angle(Elapsed*1.8f)*46; } }
         void UpdateMods(float dt)
@@ -35,6 +35,7 @@ namespace ScrapGuard.Core
                 if(target!=null)
                 {
                     turretTimer=.28f;
+                    if(FieldModule==1 && Hero==0)Bullets.Add(new Bullet {id=nextId++,position=Position-(origin-Position),velocity=(target.position-(Position-(origin-Position))).Normal*440,damage=Damage*.65f,life=1.7f,pierce=1,mod=true});
                     Bullets.Add(new Bullet {id=nextId++,position=origin,velocity=(target.position-origin).Normal*440,damage=Damage*.65f,life=1.7f,pierce=1,mod=true});
                 }
             }
@@ -56,7 +57,7 @@ namespace ScrapGuard.Core
         }
         public BattleReport Report()
         {
-            var result=new BattleReport {cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
+            var result=new BattleReport {cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,fieldModule=FieldModule,hero=Hero,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
             if(bossSpawned && !Challenge)
             {
                 result.bossRemaining=Won?0:-1;

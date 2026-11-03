@@ -27,3 +27,6 @@ cloud-session.json
 cloud-pending.json
 cloud-cache.json
 scrap-guard-v1.json*
+
+playtest-*.json
+commerce-pending.json

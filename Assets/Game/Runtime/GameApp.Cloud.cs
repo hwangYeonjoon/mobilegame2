@@ -75,7 +75,7 @@ namespace ScrapGuard
                 var invite = Ui.Input(card,"","초대 서버에서만 필요해요",24,370,444,80);
                 Ui.Button(card, "서버 계정 연결 / 복구", 24, 446, 444, 57, () => StartCoroutine(ConnectAccount(endpoint.text, secret.text, invite.text)));
                 Ui.Label(card, "처음 연결하면 새 수호대가 시작돼요.\n서버 주소는 운영자가 제공해야 합니다.\n기존 로컬 재화는 서버로 옮겨지지 않아요.\n\n개발 테스트: PC는 127.0.0.1:5187\nAndroid는 adb reverse 후 같은 주소 사용", 24, 526, 444, 166, 15, Ui.Muted);
-                Ui.Label(card, "Google 로그인·실제 결제는 아직 연결 전입니다.", 24, 706, 444, 40, 13, Ui.Muted);
+                Ui.Button(card,"Google 계정으로 복구",24,704,444,42,()=>GoogleRecoveryPanel(endpoint.text),Ui.Raised,true,16);
                 return;
             }
             Ui.Label(card, cloudReady ? "연결됨 · 서버 저장 사용" : "연결 확인 필요 · 저장된 화면만 표시 중", 24, 137, 444, 40, 17, cloudReady ? Ui.Mint : Ui.Gold);
@@ -85,7 +85,8 @@ namespace ScrapGuard
             Ui.Button(card, "중단된 작전 종료 (보상 없음)", 24, 392, 444, 53, () => Change(new GameCommand("battle_cancel"), AccountPanel), Ui.Raised, cloudReady && !string.IsNullOrEmpty(State.activeRun) && cloud.Pending == null, 16);
             Ui.Button(card, "로컬 체험으로 전환", 24, 459, 444, 53, () => { cloud.Disconnect(); selectedGuildSupport=null; cloudReady = false; Store = localStore; selectedStage = State.unlockedStage; Show("home"); }, Ui.Raised);
             Ui.Button(card, "서버 계정 삭제", 24, 553, 444, 53, DeleteAccountPanel, Ui.Raised, cloudReady && cloud.Pending == null);
-            Ui.Label(card, "복구 코드는 계정의 열쇠입니다.\n공개 ID와 달리 다른 사람에게 공유하지 마세요.\n삭제 시 서버의 성장·공개 프로필도 삭제됩니다.", 24, 632, 444, 94, 15, Ui.Muted);
+            Ui.Button(card,"현재 수호대에 Google 계정 연결",24,623,444,47,()=>StartGoogleIdentity(cloud.Session.endpoint,true),Ui.Mint,true,16);
+            Ui.Label(card,"복구 코드는 비밀로 보관하세요.\nGoogle 연결 후 다른 기기에서 복구할 수 있어요.",24,692,444,52,14,Ui.Muted);
         }
         IEnumerator ConnectAccount(string endpoint, string secret, string inviteCode = "")
         {

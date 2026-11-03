@@ -40,7 +40,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 8;
+        public const int RulesVersion = 10;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -93,9 +93,12 @@ namespace ScrapGuard.Core
             if(Mode!="" && !Endgame.IsChallenge(Mode))throw new ArgumentException("Unknown combat mode");
             if(support!=null && (Challenge || support.hero<0 || support.hero>=HeroCatalog.Count || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
             Support=support;
+            GuildAtStart=state.activeGuild;
             Definition=Campaign.Get(stage);
+            FieldVariant=Definition.Region==0?0:(int)((uint)seed%3);
             Blocks=Challenge?new MapRect[0]:Campaign.Blocks(Definition);
             Zones=Challenge?new MapRect[0]:Campaign.Zones(Definition);
+            if(Mode==SkillTrial.Mode)state=SkillTrial.Loadout();
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
@@ -165,6 +168,7 @@ namespace ScrapGuard.Core
             UpdateEnemies(dt);
             if (Ended) return;
             UpdateMods(dt);
+            UpdateEngineering(dt);
             UpdateWeapons(dt);
             UpdateSupport(dt);
             UpdateBullets(dt);

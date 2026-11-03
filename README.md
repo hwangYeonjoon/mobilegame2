@@ -1,5 +1,25 @@
 # mobilegame2 안드로이드 생존 성장 게임
 
+**0.12.0 회수·개조·공동 복구·BM 개선**: 첫 작전부터 현장 임무를 마치고 전투용 개조를 선택한다. 포탑/자력 절단기/수리기 중 하나를 무료 장착하며 루크는 쌍둥이 포탑, 레이는 이동 충전 레일건으로 달라진다. 2지역 이후 임무 위치·호위 경로 3가지, 지역 도색 수집 목표, 공개 목록의 주간 대원 소개, 길드 공동 정비소 3단계 복구를 추가했다. 전투 규칙은 **10**이다.
+
+레이 전용 **레일 레인저**는 600보석 확정 구매로 실제 장착·자세 4종·사격/필살기/지원 연출·기본 외형 비교를 지원한다. 레이는 별도이며 미보유 시 의상 구매를 막는다. 기존 중장비 정비사와 함께 실제 의상 2종이며 나머지 콘셉트 2종은 미구현이다. 보석 부족분·무료 획득처·묶음 제안가 안내, 실력전 보상 문구 수정과 기록 카드 공유를 반영했다. 상세 내용은 [보완 내역](docs/10-reference-gap-review.md)과 [BM](docs/02-economy-and-bm.md)을 따른다.
+
+0.12 규칙 검증: 코어 73/73, 서버 201개, Unity EditMode 93/93, 로컬 Docker HTTP·백업·재시작 14개 통과. 새 화면 실행(`TestResults/Engineering012Final`)과 실제 로컬 서버 연결·현장 개조 리플레이 정산(`TestResults/Cloud012Final`) 모두 오류 0이다. 일부 화면 검증의 전투·길드 상태는 명시적인 테스트 상태로 재현하며 실제 서버 전투 판정과 중복·위조·한도 검사는 별도 자동 검사로 검증한다. macOS·Android 빌드를 완료했고 APK 버전 0.12.0/code 12·ARM64·서명·16KB 정렬 검사 결과는 `TestResults/apk-012-verification.json`을 따른다. 일반 현금 판매·AdMob·공개 서버 배포·실기기 실행은 이번에도 수행하지 않았다.
+
+레일 레인저의 4자세 아틀라스는 내장 imagegen으로 생성했다. [이미지](Assets/Resources/Art/Ray-RailRanger-v1.png)와 [생성 프롬프트·참조 기록](ArtSource/Ray-RailRanger-v1.prompt.txt)을 함께 보관한다.
+
+아래 0.11 이하 설명은 구현 이력이다. 원화 제안가와 무료 보석 수급은 0.11에서 변경하지 않았다. 이전 규칙으로 시작한 서버 작전은 계정 화면에서 종료한 후 새로 출격한다.
+
+**0.11.0 BM·실력전·출시 기반**: 보석 묶음 300/600/1,200/2,600과 원화 테스트 가격, 성장 기록과 분리된 동일 조건 실력전, 동의 기반 로컬 플레이 기록·집계, 의상 콘셉트 3종과 선호도, 지원 동료 전시실 이동을 추가했다. Unity IAP 5.4.4의 Play 라이선스 테스트 결제·서버 검증·복원·유료 보석 원장·환불 회수, Android Credential Manager의 Google 계정 연결·복구와 Keystore 저장 코드도 제공한다. 전투 규칙은 **9**다.
+
+**연결 코드와 실제 서비스 검증은 구분한다.** Google 콘솔 설정·실기기 검증은 미완료이며 일반 현금 판매와 AdMob 광고 송출은 비활성이다. 서명된 내부 테스트 AAB는 로컬 서명 환경변수가 있어야 생성된다. 아래 0.10 이하의 내용은 당시 구현 이력이며 최신 가격·연결 절차는 [BM 문서](docs/02-economy-and-bm.md)와 [출시 절차](docs/03-architecture-and-release.md)를 따른다.
+
+플레이 테스트 기록은 설정에서 선택 동의 후 기기에만 저장하며 자동 전송하지 않는다. 내보낸 파일은 `python3 Tools/playtest_report.py <파일> --output TestResults/playtest-report.json`으로 집계한다. `python3 Tools/android_device_check.py --adb <adb경로>`는 한 대의 승인된 Android 기기에서 성능 증거를 수집하며 미연결이면 `not_tested`로 기록한다.
+
+0.11 검증: 코어 68/68, 서버 187개, Unity EditMode 87/87, 로컬 Docker HTTP·백업·재시작 14개 통과. `TestResults/Commerce011Delivery`, `TestResults/CloudSmoke011Final`에 화면 검증 결과를 저장한다. Google 공급자 검증은 모의 공급자를 사용한 계정·지급 상태 테스트이며, 실제 Google 서명 토큰·라이선스 구매·기기 동작을 검증한 결과가 아니다. Android 패키지 결과는 `TestResults/apk-011-verification.json`을 따른다. 서명 키가 제공되지 않아 내부 테스트 AAB는 생성하지 않았다.
+
+Play 테스트 시작에는 Google Cloud Web/Android 클라이언트 설정, Play Console 상품·테스터, 서버 서비스 계정, 로컬 업로드 서명이 필요하다. 공개 서버 운영에는 도메인과 운영 환경이 필요하다. 비밀키는 채팅이나 Git에 넣지 않고 서버 환경과 읽기 전용 자격 증명 파일로 전달한다. 이전 버전에서 진행 중이던 작전은 계정 화면에서 종료 후 규칙 9로 다시 시작한다.
+
 탕탕특공대의 한 손 생존 전투를 참고해, 짧은 전투와 장비·캐릭터 육성, 출석, NPC 상점, 보석 결제, 광고 보상으로 이어지는 Android 게임을 만든다.
 
 **0.10.0 전투·현장 임무·전시 확장**: 첫 작전의 성장 간격과 첫 지역의 적 무리/정비 구간, 명중·처치·회수 효과음과 연속 처치 표시를 추가했다. 선택형 부품 회수·중계기 방어·수송 드론 호위, 개조 6종, 지역별 대형 시설물과 조명, 보상 등장 연출을 제공한다. 의상 기본 외형 비교·대원 확대 감상·사진 카드, 서버 검증에 따른 주간 길드 지원 활약 전시도 연결했다. 전투 규칙 버전은 **8**이며 이전 서버 작전은 계정 화면에서 종료 후 새로 출격해야 한다.
@@ -14,12 +34,12 @@
 
 로컬 체험은 서버 없이 플레이할 수 있다. 별도로 실행한 서버에 연결하면 새 게스트 계정으로 시작하며, 출석·재화·장비·성장·전투 보상을 서버가 저장하고 확정한다. 로컬 재화는 서버에 가져오지 않는다.
 
-실제 Google Play 결제·AdMob 광고·Google 로그인은 아직 연결하지 않았다. 상점의 현금 상품은 준비 중으로 표시하고, 로컬 체험의 설정 → 테스트 도구에서 체험 재화와 광고 스킵을 제공한다. 서버 계정에서는 테스트 지급을 차단한다. 현재 빌드는 스토어 배포본이 아니며 개발 빌드만 허용한다.
+Google 로그인·Play 라이선스 테스트 결제 코드는 추가했지만 실제 프로젝트 자격 증명·상품·테스터 설정은 연결하지 않았다. AdMob SDK와 SSV는 아직 미연결이다. 일반 상점은 제안가 미리보기이며 실제 판매하지 않는다. 개발 빌드의 로컬 테스트 도구에서 체험 재화와 광고 스킵을 제공하고 서버에는 임의 테스트 지급을 허용하지 않는다. Play 라이선스 테스트 지급 계정은 테스트 진행으로 표시한다.
 
 ## 실행
 
 - Unity `6000.3.7f1`로 이 폴더를 열고 `Assets/Scenes/Workshop.unity`에서 Play를 누른다. 씬의 카메라 외 UI와 전투 오브젝트는 실행 시 생성된다.
-- Android APK: `Builds/Android/ScrapGuard-prototype.apk` — 0.10.0 개발 빌드(code 10). 서명·ARM64 라이브러리·16KB 정렬 검사 통과. 실기기 실행은 미검증.
+- Android APK: `Builds/Android/ScrapGuard-prototype.apk` — 0.12.0 개발 빌드(code 12). 실기기 실행은 미검증.
 - macOS 미리보기: `Builds/macOS/ScrapGuard.app`.
 - 조작은 화면 드래그 또는 WASD·방향키. 공격은 자동이며 레벨업 때 스킬을 선택한다. 필살기는 충전 후 우측 하단 버튼 또는 Space. 빌린 길드 대원은 전투 시작 8초 후 지원 버튼 또는 Q로 호출한다. 일시정지는 우측 상단 또는 ESC.
 - 빠른 검증은 설정 → 테스트 도구 → 45초 빠른 전투 테스트를 사용한다. 보스 처치에 걸리는 시간에 따라 종료 시각은 늘어난다.
@@ -54,7 +74,7 @@ Android USB 테스트는 `adb reverse tcp:5187 tcp:5187` 실행 후 같은 루�
 | 특수 던전 | 코어 균열 90초, 주간 기록·달성 보상·전용 파편 교환·트로피 전시 |
 | 서버 | ASP.NET Core + SQLite, 게스트 복구, 서버 시각, 거래 원장, 요청 재시도, 입력 재현 전투 정산 |
 
-로컬 파일과 시간은 사용자가 변경할 수 있다. 서버 계정은 별도의 권한·원장을 사용하지만 실제 유료 결제의 검증·환불·권리 처리는 미구현이다. 현재 서버도 공개 운영 준비를 마친 배포본은 아니다.
+로컬 파일과 시간은 사용자가 변경할 수 있다. 서버 계정은 별도의 권한·원장을 사용한다. 구매·환불·권리 처리는 라이선스 테스트 경로를 구현했으며 일반 실결제와 Google 실제 환불·복원 관측은 미검증이다. 현재 서버도 공개 운영 준비를 마친 배포본은 아니다.
 
 ## 빌드와 검증
 
@@ -68,7 +88,7 @@ unity run . -- -nographics -buildTarget Android -executeMethod ScrapGuard.Editor
 
 `unity` 명령이 PATH에 없으면 `/Users/kd-server/.unity/bin/unity`를 사용한다. Android 빌드는 Android Build Support, SDK 36, NDK, OpenJDK가 필요하다. API 26 이상·ARM64 기기를 대상으로 한다. Android SDK 36은 target SDK이며 최소 설치 OS와 다르다.
 
-Unity 메뉴에서도 **Scrap Guard → Build Android APK / Build macOS Preview**를 실행할 수 있다. `Configure Project`는 초기 씬과 Android 설정을 준비한다. 실수로 운영 빌드를 만들지 않도록 `PrototypeBuildGuard`가 Development가 아닌 빌드를 차단한다.
+Unity 메뉴에서도 **Scrap Guard → Build Android APK / Build macOS Preview**를 실행할 수 있다. `Configure Project`는 초기 씬과 Android 설정을 준비한다. `PrototypeBuildGuard`는 개발 빌드와 명시적인 서명 내부 테스트 AAB 경로만 허용한다. 일반 실결제 활성화 기능은 없으며 내부 테스트 빌드도 운영 출시 승인을 의미하지 않는다.
 
 저장 위치는 `Application.persistentDataPath/scrap-guard-v1.json`이며 `.bak`에 직전 저장이 남는다. macOS에서는 일반적으로 `~/Library/Application Support/ScrapGuard/고철 수호대/`다. 테스트는 별도 임시 경로를 사용한다.
 
@@ -162,7 +182,7 @@ open -n Builds/macOS/ScrapGuard.app --args -profilePath /private/tmp/scrap-art09
 
 상점 거래는 NPC와의 거래로 가정한다. 유저 간 거래·경매장·현금 환전은 초기 범위에 없다. 직접 이동하는 전투를 기본안으로 두고, 완전 방치형을 원하면 전투 조작과 재화 수급표부터 변경한다.
 
-다음 개발 단계는 Android 실기기 성능·터치 조작과 실제 이용자의 첫 10분 플레이 관찰, 개조·현장 임무·지역 보상 밸런스 조정이다. 출시 전 Google 계정 연동·실제 Play 결제 검증·AdMob SSV를 연결해야 한다. 길드 공동 보스와 시즌 패스는 아직 구현하지 않았다.
+다음 단계는 Google 콘솔·테스터·서명 설정과 실제 계정/구매/환불 검증, Android 실기기 성능·터치 조작과 이용자의 첫 10분 관찰이다. AdMob SDK·SSV와 공개 운영 환경은 아직 연결해야 한다. 길드 공동 보스·시즌 패스, 콘셉트 의상의 실제 장착·동작은 미구현이다.
 
 9. [0.5 지역·작전 확장](docs/09-campaign-expansion.md) — 30작전·맵 판정·적 행동·기존 계정 호환·검증.
 10. [유명 게임 비교와 개선 우선순위](docs/10-reference-gap-review.md) — 공식 출처, 부족한 점, 다음 개발 완료 기준.

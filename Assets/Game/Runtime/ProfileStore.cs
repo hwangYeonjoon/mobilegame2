@@ -40,7 +40,7 @@ namespace ScrapGuard
                 if (s == null || s.version != 1 || s.items == null || s.equipped == null || s.equipped.Count != 3 || s.heroes == null || s.heroes.Count < 3 || s.heroes.Count > HeroCatalog.Count || s.receipts == null)
                     return null;
                 HeroCatalog.Normalize(s);
-                if (s.gold < 0 || s.parts < 0 || s.gems < 0 || s.selectedHero < 0 || s.selectedHero >= HeroCatalog.Count || !s.heroes[s.selectedHero].unlocked) return null;
+                if (s.gold < 0 || s.parts < 0 || s.gems < 0 || s.paidGems<0 || s.paidGems>s.gems || s.gemDebt<0 || s.selectedHero < 0 || s.selectedHero >= HeroCatalog.Count || !s.heroes[s.selectedHero].unlocked) return null;
                 foreach (var item in s.items) if (item.definition < 0 || item.definition >= Catalog.Items.Length || item.rarity < 0 || item.rarity > 2 || item.level < 1 || item.level > 20) return null;
                 for (int slot = 0; slot < 3; slot++) { var item = s.items.Find(i => i.id == s.equipped[slot]); if (item == null || Catalog.Items[item.definition].Slot != slot) return null; }
                 return s;

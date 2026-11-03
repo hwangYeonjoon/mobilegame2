@@ -54,7 +54,7 @@ namespace ScrapGuard
                 Ui.Label(card, new[] { "일반", "고급", "희귀" }[item.rarity] + "  +" + (item.level - 1), ix + 19, 398, 111, 25, 13, Ui.Muted);
             }
             Ui.Label(card, "정복 " + p.stages + "/" + Campaign.Count + "     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 445, 428, 30, 15, Ui.Ink, TextAnchor.MiddleCenter);
-            string status = p.local ? "LOCAL PLAY · 로컬 체험 기록" : "SERVER PLAY · ID " + p.id;
+            string status = p.local ? "로컬 체험 기록" : (p.test?"테스트 진행 · 공개 ID ":"서버 기록 · 공개 ID ") + p.id;
             Ui.Label(card, status, 32, 483, 428, 22, 11, Ui.Muted, TextAnchor.MiddleCenter);
             return card;
         }
@@ -120,7 +120,7 @@ namespace ScrapGuard
             Ui.Box(card,28,136,436,335,frame ? Ui.Gold : Ui.Raised);
             Ui.Box(card,32,140,428,327,Ui.Background);
             CharacterArt.Draw(card,126,158,240,286,State.showcaseHero,frame ? State.selectedSkin : 1);
-            Ui.Label(card,frame ? "전시 프로필 전용 프레임" : "대원 3종 공용 · 정비소·전투·전시에 적용",24,485,444,40,16,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,frame ? "전시 프로필 전용 프레임" : "전체 대원 공용 · 정비소·전투·전시에 적용",24,485,444,40,16,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Label(card,"확정 구성 1종 · 보석 " + (frame ? "250" : "300") + "개",24,539,444,44,22,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Button(card, "보석으로 구매", 24, 616, 444, 60, () => Change(new GameCommand("cosmetic_buy") { value = id }, () => Wardrobe(frame ? State.selectedSkin : 1)));
         }
@@ -145,7 +145,16 @@ namespace ScrapGuard
             var card = Dialog("수호대 전시 광장", "같은 서버에 공개한 플레이어의 성장 기록이에요.\n서로의 장비를 구경하고 응원을 보내세요.", 868);
             var search = Ui.Input(card, "", "공개 ID 12자리", 24, 138, 300, 12);
             Ui.Button(card, "찾기", 336, 138, 132, 52, () => StartCoroutine(LoadPublic(search.text.Trim().ToUpperInvariant())), Ui.Raised, true, 16);
-            var content = Ui.Scroll(card, 24, 212, 444, 532, Math.Max(532, list.profiles.Count * 113));
+            var featured=list.profiles.Find(p=>p.id==list.featuredId);
+            if(featured!=null)
+            {
+                var pick=Ui.Box(card,24,205,444,128,Ui.Background).transform;
+                CharacterArt.Draw(pick,6,11,95,105,featured.hero,featured.skin,featured.outfit);
+                Ui.Label(pick,"이번 주 발견 · "+featured.name,113,8,312,30,20,Ui.Gold);
+                Ui.Label(pick,"이 목록에서 주간 선정 · 구매 여부와 무관",113,43,312,28,12,Ui.Muted);
+                Ui.Button(pick,"전시실 방문",113,79,312,38,()=>StartCoroutine(LoadPublic(featured.id)),Ui.Mint,true,16);
+            }
+            var content = Ui.Scroll(card, 24, featured==null?212:347, 444, featured==null?532:397, Math.Max(532, list.profiles.Count * 113));
             if (list.profiles.Count == 0) Ui.Label(content, "아직 볼 수 있는 프로필이 없어요.\n내 프로필을 공개하고 친구에게 ID를 알려 주세요.", 8, 165, 428, 110, 17, Ui.Muted, TextAnchor.MiddleCenter);
             for (int i = 0; i < list.profiles.Count; i++)
             {
@@ -187,6 +196,7 @@ namespace ScrapGuard
         }
         void PublicPanel(PublicProfile p)
         {
+            Track("profile_view","public");
             var card = Dialog("수호대 기록", "공개 ID " + p.id + " · 응원 " + p.likes, 870);
             var preview = DrawProfile(card, p, 24, 130); preview.localScale = Vector3.one * (444f / 492f);
             Ui.Button(preview,"확대 감상",355,258,105,31,()=>GuardianGallery(p,()=>PublicPanel(p)),Ui.Raised,true,13);

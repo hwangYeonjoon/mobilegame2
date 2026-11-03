@@ -51,7 +51,8 @@ namespace ScrapGuard
             var panel=Dialog(guild.name,"지원 출격 오늘 "+guild.remaining+"/3회 남음 · 정원 20명\n동료 대원의 소유권과 성장 기록은 그대로 유지돼요.",900);
             Ui.Button(panel,"초대 코드 복사",24,140,214,45,()=>{GUIUtility.systemCopyBuffer=guild.code;Toast("길드 초대 코드를 복사했어요.");},Ui.Raised,true,15);
             Ui.Button(panel,"내 지원 대원 등록",254,140,214,45,SupportRegistration,Ui.Mint,true,15);
-            Ui.Button(panel,"이번 주 지원 활약 · 대원 전시",24,197,444,42,()=>SupportHall(guild),Ui.Gold,true,16);
+            Ui.Button(panel,"이번 주 지원 활약",24,197,214,42,()=>SupportHall(guild),Ui.Gold,true,16);
+            Ui.Button(panel,"공동 정비소 · 복구",254,197,214,42,()=>RestorationPanel(guild),Ui.Mint,true,16);
             var list=Ui.Scroll(panel,24,252,444,443,Math.Max(443,guild.members.Count*113));
             for(int i=0;i<guild.members.Count;i++)
             {
@@ -67,7 +68,7 @@ namespace ScrapGuard
             Ui.Label(panel,selectedGuildSupport==null?"동료의 대원을 선택하면 출격 전에 확인해요.":"선택: "+selectedGuildSupport.name+" · "+SupportNames[selectedGuildSupport.hero],24,712,444,40,15,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(panel,"지원 없이 출격하기",24,762,214,48,()=>{selectedGuildSupport=null;CloseModal();Toast("지원 선택을 해제했어요.");},Ui.Raised,true,14);
             Ui.Button(panel,"길드 탈퇴",254,762,214,48,()=>ConfirmGuildLeave(guild.leader),Ui.Raised,true,15);
-            Ui.Label(panel,"일반 구역 전용 · 출격 시 1회 차감 · 중단 시 반환 없음\n주간 코어 균열에서는 동료 지원을 사용할 수 없어요.",24,829,444,47,12,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(panel,"일반 구역 전용 · 출격 시 1회 차감 · 중단 시 반환 없음\n성장 도전·실력전에서는 지원을 사용할 수 없어요.",24,829,444,47,12,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void GuildChange(GameCommand command)
         {

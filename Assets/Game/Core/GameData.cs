@@ -12,13 +12,17 @@ namespace ScrapGuard.Core
         public bool locked;
     }
     [Serializable] public class HeroProgress { public int id; public int level = 1; public bool unlocked; }
-    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems; public bool won; public int kills; public float seconds; public int score; public string week; public int blueprints; public BattleReport report; }
+    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems;
+        public int paidGems,gemDebt;
+        public bool adSkip; public bool won; public int kills; public float seconds; public int score; public string week; public int blueprints; public BattleReport report; }
     [Serializable] public class GameState
     {
         public int version = 1;
         public int gold = 1800;
         public int parts = 30;
         public int gems;
+        public int paidGems,gemDebt;
+        public bool adSkip;
         public int coreShards;
         public int collectionVersion, enemyDiscoveries, bossDiscoveries;
         public List<RegionProgress> regions = new List<RegionProgress>();
@@ -41,7 +45,8 @@ namespace ScrapGuard.Core
         public string activeMode = "", activeWeek = "";
         public int dailySupportStarts;
         public List<WeeklyProgress> weekly = new List<WeeklyProgress>();
-        public string activeRun = "";
+        public List<WeeklyProgress> skillWeekly = new List<WeeklyProgress>();
+        public string activeRun = "", activeGuild = "";
         public int activeStage;
         public string lastResultId = "";
         public int lastResultGold;
@@ -54,6 +59,7 @@ namespace ScrapGuard.Core
         public int showcaseTitle;
         public int showcaseFrame;
         public int selectedSkin, selectedOutfit;
+        public int collectionTarget=-1;
         public int guideVersion;
         public bool guideIntroSeen, guideMoved, guideUltimate, guideUpgrade, guideMod;
         public bool publicProfile;

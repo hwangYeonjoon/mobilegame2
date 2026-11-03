@@ -13,6 +13,7 @@ namespace ScrapGuard
     {
         public string endpoint = "http://127.0.0.1:5187", secret = "", playerId = "";
         public bool enabled;
+        public string secretCipher;
         public long revision;
     }
     public sealed class CloudClient
@@ -26,6 +27,12 @@ namespace ScrapGuard
         {
             sessionPath = Path.Combine(folder, "cloud-session.json"); pendingPath = Path.Combine(folder, "cloud-pending.json");
             Session = Read<CloudSession>(sessionPath) ?? new CloudSession(); Pending = Read<GameCommand>(pendingPath);
+#if UNITY_ANDROID && !UNITY_EDITOR
+            if(!string.IsNullOrEmpty(Session.secretCipher))
+            {try{using(var bridge=new AndroidJavaClass("com.scrapguard.mobile.GoogleIdentityBridge"))Session.secret=bridge.CallStatic<string>("decrypt",Session.secretCipher);}
+            catch(AndroidJavaException){Session.secret="";Session.enabled=false;}}
+            if(!string.IsNullOrEmpty(Session.secret)){try{SaveSession();}catch(AndroidJavaException){Session.enabled=false;}}
+#endif
         }
         T Read<T>(string path) where T:class
         { try { return File.Exists(path) ? JsonUtility.FromJson<T>(File.ReadAllText(path)) : null; } catch { return null; } }
@@ -34,7 +41,15 @@ namespace ScrapGuard
             Directory.CreateDirectory(Path.GetDirectoryName(path)); File.WriteAllText(path + ".tmp", value);
             if (File.Exists(path)) File.Replace(path + ".tmp", path, null); else File.Move(path + ".tmp", path);
         }
-        public void SaveSession() { Atomic(sessionPath, JsonUtility.ToJson(Session)); }
+        public void SaveSession()
+        {
+            var saved=JsonUtility.FromJson<CloudSession>(JsonUtility.ToJson(Session));
+#if UNITY_ANDROID && !UNITY_EDITOR
+            using(var bridge=new AndroidJavaClass("com.scrapguard.mobile.GoogleIdentityBridge"))saved.secretCipher=string.IsNullOrEmpty(Session.secret)?"":bridge.CallStatic<string>("encrypt",Session.secret);
+            saved.secret="";
+#endif
+            Atomic(sessionPath,JsonUtility.ToJson(saved));
+        }
         public static string NewSecret()
         {
             var bytes = new byte[32]; using (var rng = RandomNumberGenerator.Create()) rng.GetBytes(bytes);
@@ -84,6 +99,27 @@ namespace ScrapGuard
                 done(reply);
             });
         }
+        public IEnumerator GoogleChallenge(string endpoint,bool link,string freshSecret,Action<string,long> done)
+        {
+            if(!ValidEndpoint(endpoint)||Pending!=null){done("",400);yield break;}
+            Session.endpoint=endpoint.Trim().TrimEnd('/');
+            yield return Request("/v1/auth/google/challenge","POST",JsonUtility.ToJson(new GoogleChallengeRequest{link=link,secret=freshSecret}),done);
+        }
+        public IEnumerator GoogleFinish(GoogleLoginRequest request,Action<ServerReply> done)
+        {
+            if(Pending!=null){done(new ServerReply{message="미확인 거래를 먼저 동기화해 주세요."});yield break;}
+            if(!request.link){Session.secret=request.secret;Session.enabled=false;if(!Persist(SaveSession)){done(StorageFailure());yield break;}}
+            yield return Request("/v1/auth/google/finish","POST",JsonUtility.ToJson(request),(body,status)=>{
+                var reply=Parse(body,status);
+                if(reply.success&&!Persist(()=>{Accept(reply);Session.enabled=true;SaveSession();}))reply=StorageFailure();
+                done(reply);
+            });
+        }
+        public IEnumerator VerifyPurchase(PurchaseRequest purchase,Action<ServerReply> done)
+        {
+            if(Pending!=null){done(new ServerReply{message="미확인 게임 거래를 먼저 동기화해 주세요."});yield break;}
+            yield return Request("/v1/commerce/verify","POST",JsonUtility.ToJson(purchase),(body,status)=>{var reply=Parse(body,status);if(reply.state!=null)Persist(()=>Accept(reply));done(reply);});
+        }
         public IEnumerator Get(string path, Action<string,long> done) { yield return Request(path, "GET", null, done); }
         public IEnumerator Send(string path, string method, GameCommand body, Action<string,long> done)
         { yield return Request(path, method, body == null ? null : JsonUtility.ToJson(body), done); }
@@ -102,6 +138,7 @@ namespace ScrapGuard
             try { action(); return true; }
             catch (IOException) { return false; }
             catch (UnauthorizedAccessException) { return false; }
+            catch (AndroidJavaException) { return false; }
         }
         static ServerReply StorageFailure() { return new ServerReply { message = "계정 요청 기록을 저장하지 못했어요. 저장 공간을 확인하고 다시 동기화해 주세요." }; }
         void Accept(ServerReply reply) { Latest = reply; Session.playerId = reply.playerId; Session.revision = reply.revision; SaveSession(); }
