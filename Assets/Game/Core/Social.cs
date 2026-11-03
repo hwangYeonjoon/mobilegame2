@@ -34,7 +34,7 @@ namespace ScrapGuard.Core
             if (!HasTitle(s, s.showcaseTitle)) s.showcaseTitle = 0;
             if (!HasFrame(s, s.showcaseFrame)) s.showcaseFrame = 0;
             if (!HasSkin(s, s.selectedSkin)) s.selectedSkin = 0;
-            if(!Outfits.Valid(s.selectedOutfit) || !Outfits.Owned(s,s.selectedOutfit))s.selectedOutfit=0;
+            Outfits.Normalize(s);
             if(s.collectionTarget < -1 || s.collectionTarget>=Campaign.Regions.Length)s.collectionTarget=-1;
             StarterGuide.Normalize(s);
             for (int i = 0; i < 3; i++)
@@ -74,12 +74,13 @@ namespace ScrapGuard.Core
         public static CommandResult Buy(GameState s, string id)
         {
             Normalize(s);
-            int price = id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : (id == Outfits.Key || id == Outfits.RailKey) ? Outfits.Price : -1;
+            int outfit=Outfits.Find(id);
+            int price = id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : outfit>0 ? Outfits.Price : -1;
             if (price < 0) return CommandResult.Fail("등록되지 않은 꾸미기 상품이에요.");
-            if(id==Outfits.RailKey && !s.heroes[1].unlocked)return CommandResult.Fail("레이를 먼저 모집해 주세요. 의상은 대원을 포함하지 않아요.");
+            if(outfit>0 && !s.heroes[Outfits.Hero(outfit)].unlocked)return CommandResult.Fail(Outfits.HeroName(outfit)+"를 먼저 모집해 주세요. 의상은 대원을 포함하지 않아요.");
             if (s.ownedCosmetics.Contains(id)) return CommandResult.Fail("이미 가지고 있는 꾸미기 상품이에요.");
             if (s.gems < price) return CommandResult.Fail("보석 " + price + "개가 필요해요.");
-            if(!PremiumWallet.Spend(s,price))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요."); s.ownedCosmetics.Add(id);
+            if(!PremiumWallet.Spend(s,price))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요."); s.ownedCosmetics.Add(id);if(outfit>0 && s.outfitTarget==outfit)s.outfitTarget=0;
             return CommandResult.Ok("꾸미기 획득! 전시실에서 적용해 보세요.");
         }
         public static PublicProfile Build(GameState s, string id = "", bool local = true)

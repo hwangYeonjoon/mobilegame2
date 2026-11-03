@@ -26,10 +26,12 @@ namespace ScrapGuard.Core
         public int hero = -1, level, skin, outfit, power, supportUses, supportWins, helpedMembers, restorationPoints;
         public bool leader, self;
     }
+    [Serializable] public class GuildMemorial { public string week; public int tier, points; }
     [Serializable] public class GuildView
     {
         public string id, name, code, week, featuredId;
-        public int remaining, restorationPoints, restorationToday;
+        public int remaining, restorationPoints, restorationToday, memorialWeeks;
+        public List<GuildMemorial> memorials = new List<GuildMemorial>();
         public bool leader;
         public List<GuildMember> members = new List<GuildMember>();
     }

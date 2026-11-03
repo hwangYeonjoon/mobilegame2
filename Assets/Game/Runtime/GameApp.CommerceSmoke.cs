@@ -12,7 +12,7 @@ namespace ScrapGuard
             Store.Change(e=>{e.State.testProgress=true;e.State.clearedStages.AddRange(new[]{0,1,2,3,4});e.State.selectedHero=3;e.State.heroes[3].unlocked=true;e.State.heroes[3].level=30;e.State.gems=600;return CommandResult.Ok("Isolated commerce fixtures");});
             Show("shop");yield return Capture("01-shop");GemWalletPanel();yield return Capture("00-wallet");
             foreach(var offer in CommerceCatalog.Offers){StoreOfferPanel(offer);yield return Capture("offer-"+offer.Id);}
-            ConceptRoom();yield return Capture("02-concepts");ClickVisibleButton("이 콘셉트가 좋아요");
+            ConceptRoom();yield return Capture("02-concepts");ClickVisibleButton("체험 · 스파크");
             ResearchPanel();yield return Capture("03-research");
             Show("weekly");yield return Capture("04-growth-hub");SkillTrialHub();yield return Capture("05-skill-hub");
             ClickVisibleButton("동일 조건 도전 시작");battlePaused=true;yield return Capture("06-skill-battle");

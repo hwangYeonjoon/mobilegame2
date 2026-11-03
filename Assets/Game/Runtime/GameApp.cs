@@ -62,6 +62,7 @@ namespace ScrapGuard
             if (!string.IsNullOrEmpty(Store.Notice)) Toast(Store.Notice);
             ShowTitleScreen();
             SetupSmoke(args);
+            SetupUpdates();
             if (Online) StartCoroutine(ReconnectCloud());
         }
         void FitScreen()
@@ -73,6 +74,8 @@ namespace ScrapGuard
         void Update()
         {
             FitScreen();
+            PollUpdateNotice();
+            if(updateOverlay!=null){updateOverlay.SetAsLastSibling();return;}
             MeasureFrame();
             if (titleScreen != null && titleScreen.gameObject.activeSelf)
             {
@@ -91,7 +94,8 @@ namespace ScrapGuard
         }
         void OnApplicationPause(bool paused)
         {
-            if (paused && !smokeActive && combat != null && !combat.Ended && !combat.Choosing) PauseBattle();
+            if(!paused && !smokeActive && cloud!=null && Root!=null && Time.unscaledTime-lastReleaseCheck>2)StartCoroutine(CheckAppUpdate(false));
+            if (paused && updateOverlay==null && !smokeActive && combat != null && !combat.Ended && !combat.Choosing) PauseBattle();
         }
         public void Toast(string text)
         {
@@ -100,6 +104,7 @@ namespace ScrapGuard
         }
         void Change(GameCommand command, Action after = null, bool redraw = true)
         {
+            if(UpdateBlocksPlay){ShowUpdatePanel();return;}
             if(command.type!=null&&command.type.StartsWith("demo_",StringComparison.Ordinal)&&!Debug.isDebugBuild&&!Application.isEditor){Toast("개발 빌드 전용 기능이에요.");return;}
             if (networkBusy) { Toast("서버 요청을 처리 중이에요."); return; }
             int previousGems=State.gems;
@@ -205,7 +210,8 @@ namespace ScrapGuard
             Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online && (Debug.isDebugBuild || Application.isEditor));
             Ui.Label(card, "이동: 화면 드래그 또는 WASD / 방향키\n공격은 자동 · 레벨업하면 스킬 선택\n일시정지: 전투 상단 버튼 또는 ESC", 24, 407, 444, 98, 16, Ui.Muted);
             Ui.Button(card,"플레이 테스트 · 기록 설정",24,526,444,48,ResearchPanel,Ui.Raised,true,17);
-            Ui.Label(card, "SCRAP GUARD  " + Application.version + "\nUnity Android · collector prototype", 24, 600, 444, 64, 13, Ui.Muted);
+            Ui.Button(card,"앱 "+AppRelease.Version+" · 업데이트 확인",24,596,444,48,()=>StartCoroutine(CheckAppUpdate(true)),Ui.Raised,true,17);
+            Ui.Label(card,"고철 수호대 · 회수하고 개조하는 생존 게임",24,662,444,25,12,Ui.Muted);
         }
         void Info(string title, string text)
         {

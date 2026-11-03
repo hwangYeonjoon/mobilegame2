@@ -40,7 +40,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 10;
+        public const int RulesVersion = 11;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -95,6 +95,7 @@ namespace ScrapGuard.Core
             Support=support;
             GuildAtStart=state.activeGuild;
             Definition=Campaign.Get(stage);
+            Condition=OperationConditions.Select(Definition.Region,seed,Challenge);
             FieldVariant=Definition.Region==0?0:(int)((uint)seed%3);
             Blocks=Challenge?new MapRect[0]:Campaign.Blocks(Definition);
             Zones=Challenge?new MapRect[0]:Campaign.Zones(Definition);
@@ -162,6 +163,7 @@ namespace ScrapGuard.Core
             if(!Challenge && Definition.Mission==Mission.Survive && Elapsed>=Duration) { Ended=true;Won=Hp>0;return; }
             FirstRegionPacing(dt);
             UpdateFieldTask(dt);
+            UpdateOperationCondition(dt);
             UpdateTerrain(dt);
             UpdateHazards(dt);
             if (Ended) return;
@@ -190,6 +192,7 @@ namespace ScrapGuard.Core
             float hp = (kind == 3 ? 7000 : kind == 2 ? 1800 : kind == 1 ? 110 : 150) * difficulty;
             var role=Challenge?EnemyRole.Pursuer:Definition.Enemies[random.Next(Definition.Enemies.Length)];
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
+            if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
             if(final)role=BossRole();
             Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
                 speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });

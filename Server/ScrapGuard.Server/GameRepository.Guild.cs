@@ -31,11 +31,22 @@ public sealed partial class GameRepository
                 owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE);
             CREATE INDEX IF NOT EXISTS restoration_week ON restoration_runs(guild,week);
             CREATE INDEX IF NOT EXISTS restoration_daily ON restoration_runs(owner,day);
+            CREATE TABLE IF NOT EXISTS guild_memorials(
+                guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+                week TEXT NOT NULL, tier INTEGER NOT NULL, points INTEGER NOT NULL,
+                PRIMARY KEY(guild,week));
             CREATE TABLE IF NOT EXISTS support_runs(
                 run TEXT PRIMARY KEY, week TEXT NOT NULL, guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
                 owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
                 borrower TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, won INTEGER NOT NULL);
             CREATE INDEX IF NOT EXISTS support_week ON support_runs(guild,week,owner);
+            """);
+        // Backfill completed 0.12 weeks without currency or personal identities. Preserve earned records.
+        Execute(db,null,"""
+            INSERT INTO guild_memorials(guild,week,tier,points)
+            SELECT guild,week,CASE WHEN COUNT(*)>=120 THEN 3 WHEN COUNT(*)>=60 THEN 2 ELSE 1 END,COUNT(*)
+            FROM restoration_runs GROUP BY guild,week HAVING COUNT(*)>=30
+            ON CONFLICT(guild,week) DO UPDATE SET tier=MAX(tier,excluded.tier),points=MAX(points,excluded.points);
             """);
         using var columns=Sql(db,null,"PRAGMA table_info(accounts)");bool present=false;
         using(var r=columns.ExecuteReader())while(r.Read())if(r.GetString(1)=="run_support")present=true;
@@ -96,6 +107,9 @@ public sealed partial class GameRepository
             using var q=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE guild=$guild AND week=$week AND owner=$owner",("$guild",guild),("$week",result.week),("$owner",member.id));
             member.restorationPoints=Convert.ToInt32(q.ExecuteScalar());
         }
+        using(var q=Sql(db,tx,"SELECT COUNT(*) FROM guild_memorials WHERE guild=$guild",("$guild",guild)))result.memorialWeeks=Convert.ToInt32(q.ExecuteScalar());
+        using(var q=Sql(db,tx,"SELECT week,tier,points FROM guild_memorials WHERE guild=$guild ORDER BY week DESC LIMIT 52",("$guild",guild)))
+        using(var r=q.ExecuteReader())while(r.Read())result.memorials.Add(new GuildMemorial{week=r.GetString(0),tier=r.GetInt32(1),points=r.GetInt32(2)});
         return result;
     }
     void RecordRestoration(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
@@ -107,6 +121,9 @@ public sealed partial class GameRepository
         using var count=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE owner=$owner AND day=$day",("$owner",account.Id),("$day",day));
         if(Convert.ToInt32(count.ExecuteScalar())>=GuildRestoration.DailyLimit)return;
         Execute(db,tx,"INSERT OR IGNORE INTO restoration_runs(run,week,day,guild,owner) VALUES($run,$week,$day,$guild,$owner)",("$run",combat.RunId),("$week",Endgame.Week(clock())),("$day",day),("$guild",guild),("$owner",account.Id));
+        using var total=Sql(db,tx,"SELECT COUNT(*) FROM restoration_runs WHERE guild=$guild AND week=$week",("$guild",guild),("$week",Endgame.Week(clock())));
+        int points=Convert.ToInt32(total.ExecuteScalar()),tier=GuildRestoration.Honor(points);
+        if(tier>0)Execute(db,tx,"INSERT INTO guild_memorials(guild,week,tier,points) VALUES($guild,$week,$tier,$points) ON CONFLICT(guild,week) DO UPDATE SET tier=MAX(tier,excluded.tier),points=MAX(points,excluded.points)",("$guild",guild),("$week",Endgame.Week(clock())),("$tier",tier),("$points",points));
     }
     void RecordSupport(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
     {

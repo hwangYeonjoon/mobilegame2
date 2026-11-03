@@ -9,6 +9,50 @@ namespace ScrapGuard.Tests
     public class GameTests
     {
         [Test]
+        public void UpdateCachePreservesSessionAndPendingJournal()
+        {
+            string folder=Path.Combine(Path.GetTempPath(),"scrap-update-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
+            try
+            {
+                var cloud=new CloudClient(folder);cloud.Session.endpoint="https://game.example.com";cloud.Session.secret=CloudClient.NewSecret();cloud.Session.enabled=true;cloud.SaveSession();
+                var pending=new GameCommand("attendance");string json=JsonUtility.ToJson(pending);File.WriteAllText(Path.Combine(folder,"cloud-pending.json"),json);
+                var p=new ReleasePolicy{latestBuild=15,minimumBuild=15,latestVersion="0.15.0",combatRules=Combat.RulesVersion,packageName=AppRelease.Package};
+                Assert.That(cloud.ObserveRelease(cloud.Session.endpoint,p),Is.True);
+                var restored=new CloudClient(folder);Assert.That(restored.UpdateBlocked,Is.True);Assert.That(restored.Pending.requestId,Is.EqualTo(pending.requestId));Assert.That(restored.Session.secret,Is.EqualTo(cloud.Session.secret));
+                Assert.That(File.ReadAllText(Path.Combine(folder,"cloud-pending.json")),Is.EqualTo(json));
+                p.packageName="foreign";Assert.That(restored.ObserveRelease(restored.Session.endpoint,p),Is.False);Assert.That(new CloudClient(folder).UpdateBlocked,Is.True);
+                p.packageName=AppRelease.Package;p.minimumBuild=14;p.latestBuild=14;p.latestVersion=AppRelease.Version;restored.ObserveRelease(restored.Session.endpoint,p);
+                Assert.That(new CloudClient(folder).UpdateBlocked,Is.False);Assert.That(new CloudClient(folder).Pending.requestId,Is.EqualTo(pending.requestId));
+                restored.Session.endpoint="https://other.example.com";restored.SaveSession();Assert.That(new CloudClient(folder).Release,Is.Null);
+            }
+            finally{Directory.Delete(folder,true);}
+        }
+        [Test]
+        public void ReleaseWireRoundTrip()
+        {
+            var reply=new ServerReply{code="client_update_required",release=new ReleasePolicy{latestBuild=15,minimumBuild=15,latestVersion="0.15.0",packageName=AppRelease.Package,combatRules=Combat.RulesVersion,playAvailable=true}};
+            var copy=JsonUtility.FromJson<ServerReply>(JsonUtility.ToJson(reply));Assert.That(ReleaseRules.Evaluate(copy.release,14,Combat.RulesVersion),Is.EqualTo(UpdateRequirement.Required));
+            Assert.That(copy.code,Is.EqualTo("client_update_required"));
+        }
+        [Test]
+        public void FullWardrobeAndMemorialRoundTrip()
+        {
+            var s=GameState.New();s.gems=2400;
+            for(int id=1;id<=Outfits.Count;id++)
+            {
+                int hero=Outfits.Hero(id);s.heroes[hero].unlocked=true;ScrapGuard.Core.Social.Buy(s,Outfits.Product(id));Outfits.Equip(s,id);
+                var cells=new System.Collections.Generic.HashSet<Rect>();
+                for(int pose=0;pose<4;pose++){var sprite=CharacterArt.Get(hero,0,id,pose);Assert.That(sprite,Is.Not.Null);Assert.That(sprite.texture.name,Is.EqualTo(Outfits.Assets[id]));cells.Add(sprite.rect);}
+                Assert.That(cells.Count,Is.EqualTo(4));
+            }
+            var copy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));ScrapGuard.Core.Social.Normalize(copy);
+            for(int id=1;id<=Outfits.Count;id++)Assert.That(Outfits.Active(copy,Outfits.Hero(id)),Is.EqualTo(id));
+            var legacy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s).Replace("\"heroOutfits\":[1,2,0,3,4],", ""));
+            Assert.That(legacy.heroOutfits==null || legacy.heroOutfits.Count==0,Is.True);legacy.selectedOutfit=2;ScrapGuard.Core.Social.Normalize(legacy);Assert.That(Outfits.Active(legacy,1),Is.EqualTo(2));
+            var guild=new GuildView{memorialWeeks=1};guild.memorials.Add(new GuildMemorial{week="2026-11-02",tier=3,points=120});
+            var restored=JsonUtility.FromJson<GuildView>(JsonUtility.ToJson(guild));Assert.That(restored.memorials[0].tier,Is.EqualTo(3));
+        }
+        [Test]
         public void RailOutfitAtlasAndSaveRoundTrip()
         {
             var s=GameState.New();s.heroes[1].unlocked=true;s.gems=600;

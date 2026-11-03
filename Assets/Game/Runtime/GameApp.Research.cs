@@ -8,7 +8,6 @@ namespace ScrapGuard
     public partial class GameApp
     {
         PlaytestJournal research;
-        Sprite conceptSprite;
         int frameSamples,slowFrames;double frameSeconds;
         void SetupResearch(string profile)
         {
@@ -52,22 +51,7 @@ namespace ScrapGuard
             Ui.Label(card,"정식 판매 시 Google Play가 제공하는 가격을\n확인한 뒤 결제합니다. 지금은 예약·청구하지 않아요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,"관심 표시 · 결제 아님",24,477,444,54,()=>{Track("offer_interest",offer.Id);Toast(research.Data.consent?"이 기기의 테스트 기록에 남겼어요.":"관심도 기록은 설정에서 동의한 경우에만 저장돼요.");},Ui.Mint,true,17);
         }
-        void ConceptRoom()
-        {
-            var card=Dialog("의상 제작실","레일 레인저는 체험 가능 · 나머지 2종은 제작 검토 중",890);
-            var atlas=Resources.Load<Texture2D>("Art/OutfitConcepts-v1");
-            if(atlas!=null){var art=Ui.Box(card,24,135,444,185,Color.white,false);if(conceptSprite==null)conceptSprite=Sprite.Create(atlas,new Rect(0,0,atlas.width,atlas.height),new Vector2(.5f,.5f),100);art.sprite=conceptSprite;art.preserveAspect=true;}
-            for(int i=0;i<CommerceCatalog.ConceptIds.Length;i++)
-            {
-                string id=CommerceCatalog.ConceptIds[i];float y=341+i*139;
-                var row=Ui.Box(card,24,y,444,125,Ui.Background).transform;
-                Ui.Label(row,CommerceCatalog.ConceptNames[i],16,10,410,30,20,Ui.Gold);
-                Ui.Label(row,CommerceCatalog.ConceptDetails[i]+(i==0?"\n완성 구성: 외형·사격·필살기·지원 등장":"\n목표 구성: 전용 외형·사격·필살기·지원 등장"),16,45,410,41,12,Ui.Muted);
-                if(i==0){Ui.Button(row,"완성 의상 체험 · 보석 600개",16,88,410,31,()=>OutfitRoom(2),Ui.Gold,true,15);continue;}
-                Ui.Button(row,"이 콘셉트가 좋아요",16,88,410,31,()=>{Track("concept_interest",id);Toast(research.Data.consent?"선호도를 이 기기에 기록했어요.":"기록 설정에 동의하면 선호도를 저장할 수 있어요.");},Ui.Raised,true,15);
-            }
-            Ui.Label(card,"의상은 외형·연출만 변경하며 대원을 포함하지 않아요.\n폭풍 지휘자·오로라 수호자는 아직 구매할 수 없어요.",24,789,444,61,15,Ui.Muted,TextAnchor.MiddleCenter);
-        }
+        void ConceptRoom(){OutfitCollection();}
         void SkillTrialHub()
         {
             var progress=State.skillWeekly.Find(w=>w.week==CurrentWeek());

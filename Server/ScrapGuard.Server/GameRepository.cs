@@ -129,7 +129,7 @@ public sealed partial class GameRepository
             var e = new Economy(a.State, clock); CommandResult result;
             if (command.type == "battle_start")
             {
-                if (command.rulesVersion != Combat.RulesVersion) throw new ApiFault(426,"새 전투 버전으로 앱을 업데이트해 주세요.");
+                if (command.rulesVersion != Combat.RulesVersion) throw new ApiFault(409,"이전 버전에서 보낸 출격 요청이에요. 최신 상태에서 다시 출격해 주세요.");
                 a.RunRules = Combat.RulesVersion;
                 if (command.quick) throw new ApiFault(400, "서버 작전에는 빠른 테스트를 사용할 수 없어요.");
                 string id = Guid.NewGuid().ToString("N"); a.RunSeed = RandomNumberGenerator.GetInt32(1, int.MaxValue);

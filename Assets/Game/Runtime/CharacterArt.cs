@@ -5,33 +5,23 @@ namespace ScrapGuard
 {
     public static class CharacterArt
     {
-        static Texture2D atlas, expansion, outfitAtlas;
-        static readonly Sprite[] outfitSprites=new Sprite[4];
-        static Texture2D railAtlas;
-        static readonly Sprite[] railSprites=new Sprite[4];
+        static Texture2D atlas, expansion;
+        static readonly Texture2D[] outfitAtlases=new Texture2D[ScrapGuard.Core.Outfits.Count+1];
+        static readonly Sprite[,] outfitFrames=new Sprite[ScrapGuard.Core.Outfits.Count+1,4];
         static bool loaded;
         static readonly Sprite[,] sprites = new Sprite[ScrapGuard.Core.HeroCatalog.Count,3];
         public static Sprite Get(int hero, int skin, int outfit = 0, int pose = 0)
         {
             if (!ScrapGuard.Core.HeroCatalog.Valid(hero) || skin < 0 || skin >= ScrapGuard.Core.Social.Skins.Length) return null;
-            if(hero==1 && outfit==2)
+            if(ScrapGuard.Core.Outfits.Valid(outfit) && ScrapGuard.Core.Outfits.Hero(outfit)==hero)
             {
-                if(railAtlas==null)railAtlas=Resources.Load<Texture2D>("Art/Ray-RailRanger-v1");
-                if(railAtlas!=null)
+                if(outfitAtlases[outfit]==null)outfitAtlases[outfit]=Resources.Load<Texture2D>("Art/"+ScrapGuard.Core.Outfits.Assets[outfit]);
+                var sheet=outfitAtlases[outfit];
+                if(sheet!=null)
                 {
                     pose=Mathf.Clamp(pose,0,3);
-                    if(railSprites[pose]==null)railSprites[pose]=Sprite.Create(railAtlas,new Rect((pose%2)*railAtlas.width/2f,(1-pose/2)*railAtlas.height/2f,railAtlas.width/2f,railAtlas.height/2f),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
-                    return railSprites[pose];
-                }
-            }
-            if(hero==0 && outfit==1)
-            {
-                if(outfitAtlas==null)outfitAtlas=Resources.Load<Texture2D>("Art/Luke-HeavyEngineer-v1");
-                if(outfitAtlas!=null)
-                {
-                    pose=Mathf.Clamp(pose,0,3);
-                    if(outfitSprites[pose]==null)outfitSprites[pose]=Sprite.Create(outfitAtlas,new Rect((pose%2)*outfitAtlas.width/2f,(1-pose/2)*outfitAtlas.height/2f,outfitAtlas.width/2f,outfitAtlas.height/2f),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
-                    return outfitSprites[pose];
+                    if(outfitFrames[outfit,pose]==null)outfitFrames[outfit,pose]=Sprite.Create(sheet,new Rect((pose%2)*sheet.width/2f,(1-pose/2)*sheet.height/2f,sheet.width/2f,sheet.height/2f),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
+                    return outfitFrames[outfit,pose];
                 }
             }
             if(skin>=3)skin=0;

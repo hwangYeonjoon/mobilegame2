@@ -140,7 +140,7 @@ namespace ScrapGuard
                 var offer=CommerceCatalog.Offers[i];
                 ShopRow(list,1730+i*109,offer.Name,"테스트 제안가 "+offer.ProposedWon.ToString("N0")+"원", "혜택 보기",()=>StoreOfferPanel(offer));
             }
-            Ui.Button(list,"의상 제작실 · 완성작과 다음 아이디어",0,2300,492,55,ConceptRoom,Ui.Mint,true,18);
+            Ui.Button(list,"의상 컬렉션 · 수집 목표와 대원별 장착",0,2300,492,55,ConceptRoom,Ui.Mint,true,18);
             Ui.Label(list,"무료 보상과 보석 상품의 구매 효력은 같아요.\n장비 판매는 장비 → 관리에서 진행하세요.\n보석을 현금으로 환전할 수 없습니다.",0,2380,492,105,16,Ui.Muted);
         }
         void ShopRow(Transform parent, float y, string title, string description, string action, Action clicked, bool enabled = true)

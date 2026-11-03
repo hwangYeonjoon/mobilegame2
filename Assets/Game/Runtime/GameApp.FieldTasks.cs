@@ -74,7 +74,7 @@ namespace ScrapGuard
                 Ui.Label(card,FieldEngineering.Name(i,State.selectedHero),24,y,444,35,23,Ui.Mint);
                 Ui.Label(card,FieldEngineering.Detail(i,State.selectedHero),24,y+44,444,70,17,Ui.Muted);
             }
-            Ui.Label(card,"루크는 포탑 2기 · 레이는 이동 충전 레일건\n스킬 조합으로 같은 개조를 완성해도 효과는 중복되지 않아요.",24,614,444,65,15,Ui.Muted);
+            Ui.Label(card,"대원마다 전용 개조가 달라져요. 대원 선택 후 확인하세요.\n스킬 조합으로 같은 개조를 완성해도 효과는 중복되지 않아요.",24,614,444,65,15,Ui.Muted);
         }
         void SelectFieldModule(int module)
         {

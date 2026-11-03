@@ -60,5 +60,25 @@ static class RestorationChecks
         repo=new GameRepository(path,()=>now);check(repo.Guild(a).restorationPoints==3,"restoration survives restart");
         now=now.AddDays(7);check(repo.Guild(a).restorationPoints==0,"new week starts fresh construction");
         Apply(a,new GameCommand("region_target"){stage=6});check(repo.Bootstrap(a).state.collectionTarget==6,"server persists collection target");
+        string guild=repo.Guild(a).id;
+        void SeedContributions(int number)
+        {
+            // Historical aggregate fixture: real replay above remains the settlement under test.
+            using var db=new SqliteConnection("Data Source="+path);db.Open();using var tx=db.BeginTransaction();
+            for(int i=0;i<number;i++){using var q=db.CreateCommand();q.Transaction=tx;q.CommandText="INSERT INTO restoration_runs(run,week,day,guild,owner) VALUES($run,$week,'fixture-history',$guild,$owner)";q.Parameters.AddWithValue("$run",Guid.NewGuid().ToString("N"));q.Parameters.AddWithValue("$week",Endgame.Week(now));q.Parameters.AddWithValue("$guild",guild);q.Parameters.AddWithValue("$owner",bb.playerId);q.ExecuteNonQuery();}tx.Commit();
+        }
+        SeedContributions(29);Finish(Start());
+        check(repo.Guild(a).memorials.Count==1 && repo.Guild(a).memorials[0].tier==1,"verified 30th contribution creates permanent memorial");
+        SeedContributions(30);Finish(Start());check(repo.Guild(a).memorials[0].tier==2 && repo.Guild(a).memorialWeeks==1,"60 points upgrades one weekly memorial");
+        SeedContributions(58);Finish(Start());check(repo.Guild(a).memorials[0].tier==3 && repo.Guild(a).memorials[0].points==120,"120 point stretch memorial");
+        now=now.AddDays(7);repo=new GameRepository(path,()=>now);
+        check(repo.Guild(a).restorationPoints==0 && repo.Guild(a).memorialWeeks==1 && repo.Guild(a).memorials[0].tier==3,"weekly reset and restart retain permanent guild achievement");
+        repo.Delete(a);check(repo.Guild(b).memorials[0].points==120,"earned anonymous guild memorial survives contributor deletion");
+        SeedContributions(30);repo=new GameRepository(path,()=>now);
+        check(repo.Guild(b).memorialWeeks==2 && repo.Guild(b).memorials[0].tier==1,"legacy completed week backfills once");
+        repo=new GameRepository(path,()=>now);check(repo.Guild(b).memorialWeeks==2,"backfill is idempotent");
+        Apply(b,new GameCommand("guild_leave"));
+        using(var db=new SqliteConnection("Data Source="+path)){db.Open();using var q=db.CreateCommand();q.CommandText="SELECT COUNT(*) FROM guild_memorials";check(Convert.ToInt32(q.ExecuteScalar())==0,"guild dissolution removes memorials");}
+
     }
 }

@@ -15,6 +15,7 @@ if (builder.Configuration["verify-backup"] is string verify)
     DatabaseMaintenance.Verify(verify); Console.WriteLine("DATABASE_VERIFIED"); return;
 }
 var operations = new ServerOperations(builder.Configuration);
+var clientRelease = new ClientRelease(builder.Configuration);
 builder.Services.Configure<ForwardedHeadersOptions>(o => ServerOperations.ConfigureProxy(o,builder.Configuration["TRUSTED_PROXY_IPS"]));
 builder.WebHost.UseUrls(builder.Configuration["SERVER_URLS"] ?? "http://127.0.0.1:5187");
 builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 2 * 1024 * 1024);
@@ -46,6 +47,10 @@ app.Use(async (ctx, next) =>
     ctx.Response.Headers.CacheControl = "no-store";
     try
     {
+        if(!ClientRelease.Exempt(ctx.Request.Path.Value??"",ctx.Request.Method) && !clientRelease.Accepts(ctx.Request.Headers[AppRelease.BuildHeader].ToString(),ctx.Request.Headers[AppRelease.RulesHeader].ToString()))
+        {
+            ctx.Response.StatusCode=426;await ctx.Response.WriteAsJsonAsync(clientRelease.Rejection());return;
+        }
         if (operations.Maintenance && ctx.Request.Method != "GET")
         {
             ctx.Response.Headers.RetryAfter = "60"; throw new ApiFault(503,"서버 점검 중이에요. 진행 기록을 보관했으니 잠시 뒤 동기화해 주세요.");
@@ -61,7 +66,8 @@ string Token(HttpContext ctx)
     if (!header.StartsWith("Bearer ", StringComparison.Ordinal)) throw new ApiFault(401, "계정 연결이 필요해요.");
     return header.Substring(7);
 }
-app.MapGet("/health", () => new { status = "ok", version = "0.12.0", commerce = "disabled", maintenance = operations.Maintenance });
+app.MapGet("/v1/release", () => clientRelease.Policy);
+app.MapGet("/health", () => new { status = "ok", version = AppRelease.Version, commerce = "disabled", maintenance = operations.Maintenance });
 app.MapGet("/health/ready", () => DatabaseMaintenance.Ready(databasePath) ? Results.Ok(new { status = "ready" }) : Results.Json(new { status = "unavailable" },statusCode:503));
 app.MapPost("/v1/auth/guest", (GuestRequest body, GameRepository repo) => { operations.CheckRegistration(body.inviteCode); return repo.Register(body.secret); }).RequireRateLimiting("register");
 app.MapPost("/v1/auth/google/challenge",(HttpContext ctx,GoogleChallengeRequest body,GoogleIdentityFlow flow)=>flow.Begin(body.link?Token(ctx):null,body)).RequireRateLimiting("register");

@@ -16,7 +16,7 @@ namespace ScrapGuard
         public string secretCipher;
         public long revision;
     }
-    public sealed class CloudClient
+    public sealed partial class CloudClient
     {
         readonly string sessionPath, pendingPath;
         public CloudSession Session { get; private set; }
@@ -27,6 +27,7 @@ namespace ScrapGuard
         {
             sessionPath = Path.Combine(folder, "cloud-session.json"); pendingPath = Path.Combine(folder, "cloud-pending.json");
             Session = Read<CloudSession>(sessionPath) ?? new CloudSession(); Pending = Read<GameCommand>(pendingPath);
+            releasePath=Path.Combine(folder,"release-cache.json");LoadRelease(Session.endpoint);
 #if UNITY_ANDROID && !UNITY_EDITOR
             if(!string.IsNullOrEmpty(Session.secretCipher))
             {try{using(var bridge=new AndroidJavaClass("com.scrapguard.mobile.GoogleIdentityBridge"))Session.secret=bridge.CallStatic<string>("decrypt",Session.secretCipher);}
@@ -68,6 +69,8 @@ namespace ScrapGuard
             if (Pending != null && (endpoint != Session.endpoint || secret != Session.secret)) { done(new ServerReply { message = "미확인 거래를 먼저 동기화해 주세요." }); yield break; }
             Session.endpoint = endpoint; Session.secret = secret;
             if (!Persist(SaveSession)) { done(StorageFailure()); yield break; }
+            bool releaseReady=false;yield return CheckRelease(endpoint,ok=>releaseReady=ok);
+            if(!releaseReady || UpdateBlocked){done(UpdateFailure());yield break;}
             string path = create ? "/v1/auth/guest" : "/v1/bootstrap";
             yield return Request(path, create ? "POST" : "GET", create ? JsonUtility.ToJson(new GuestRequest { secret = secret, inviteCode = inviteCode }) : null, (body,status) =>
             {
@@ -78,6 +81,7 @@ namespace ScrapGuard
         }
         public IEnumerator Execute(GameCommand command, Action<ServerReply> done)
         {
+            if(UpdateBlocked && ReleaseEndpoint==Session.endpoint){ReleaseNotice=true;done(UpdateFailure());yield break;}
             if (Busy) { done(new ServerReply { message = "이전 요청을 처리 중이에요." }); yield break; }
             if (Pending != null && Pending.requestId != command.requestId) { done(new ServerReply { message = "미확인 요청이 있어요. 계정 화면에서 다시 동기화해 주세요." }); yield break; }
             if (Pending == null)
@@ -91,7 +95,7 @@ namespace ScrapGuard
                 var reply = Parse(body,status);
                 if (reply.state != null && !Persist(() => Accept(reply))) { done(StorageFailure()); return; }
                 // Network/5xx failures retain the exact journal for an idempotent retry.
-                if (reply.success || status >= 400 && status < 500 && status != 408 && status != 429)
+                if (ReleaseRules.CompletePending(reply.success,status))
                 {
                     if (!Persist(() => { if (File.Exists(pendingPath)) File.Delete(pendingPath); })) { done(StorageFailure()); return; }
                     Pending = null;
@@ -103,6 +107,8 @@ namespace ScrapGuard
         {
             if(!ValidEndpoint(endpoint)||Pending!=null){done("",400);yield break;}
             Session.endpoint=endpoint.Trim().TrimEnd('/');
+            bool releaseReady=false;yield return CheckRelease(Session.endpoint,ok=>releaseReady=ok);
+            if(!releaseReady || UpdateBlocked){done(JsonUtility.ToJson(UpdateFailure()),426);yield break;}
             yield return Request("/v1/auth/google/challenge","POST",JsonUtility.ToJson(new GoogleChallengeRequest{link=link,secret=freshSecret}),done);
         }
         public IEnumerator GoogleFinish(GoogleLoginRequest request,Action<ServerReply> done)
@@ -142,25 +148,34 @@ namespace ScrapGuard
         }
         static ServerReply StorageFailure() { return new ServerReply { message = "계정 요청 기록을 저장하지 못했어요. 저장 공간을 확인하고 다시 동기화해 주세요." }; }
         void Accept(ServerReply reply) { Latest = reply; Session.playerId = reply.playerId; Session.revision = reply.revision; SaveSession(); }
-        IEnumerator Request(string path, string method, string body, Action<string,long> done)
+        IEnumerator Request(string path, string method, string body, Action<string,long> done,string endpoint=null)
         {
             if (Busy) { done("",0); yield break; }
             Busy = true;
-            using (var req = new UnityWebRequest(Session.endpoint + path, method))
+            using (var req = new UnityWebRequest((endpoint??Session.endpoint) + path, method))
             {
-                req.downloadHandler = new DownloadHandlerBuffer(); req.timeout = 25;
+                req.downloadHandler = new DownloadHandlerBuffer(); req.timeout = path=="/v1/release"?8:25;
+                req.SetRequestHeader(AppRelease.BuildHeader,AppRelease.Build.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                req.SetRequestHeader(AppRelease.RulesHeader,Combat.RulesVersion.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 if (body != null) { req.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(body)); req.SetRequestHeader("Content-Type", "application/json"); }
-                if (!string.IsNullOrEmpty(Session.secret)) req.SetRequestHeader("Authorization", "Bearer " + Session.secret);
+                if (path!="/v1/release" && endpoint==null && !string.IsNullOrEmpty(Session.secret)) req.SetRequestHeader("Authorization", "Bearer " + Session.secret);
                 UnityWebRequestAsyncOperation operation = null;
                 try { operation = req.SendWebRequest(); } catch (InvalidOperationException) { }
                 if (operation != null) yield return operation;
-                Busy = false; done(req.downloadHandler.text, req.responseCode);
+                Busy = false;
+                if(req.responseCode==426)
+                {
+                    var reply=Parse(req.downloadHandler.text,426);
+                    ObserveRelease(endpoint??Session.endpoint,reply.release);
+                }
+                done(req.downloadHandler.text, req.responseCode);
             }
         }
         public void Disconnect() { Session.enabled = false; SaveSession(); }
         public void Forget()
         {
-            Session = new CloudSession(); Pending = null; Latest = null; SaveSession();
+            Session = new CloudSession(); Pending = null; Latest = null; Release=null;ReleaseEndpoint=null;ReleaseNotice=false; SaveSession();
+            if(File.Exists(releasePath))File.Delete(releasePath);
             if (File.Exists(pendingPath)) File.Delete(pendingPath);
         }
     }

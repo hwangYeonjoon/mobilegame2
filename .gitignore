@@ -26,6 +26,7 @@ Tools/**/obj/
 cloud-session.json
 cloud-pending.json
 cloud-cache.json
+release-cache.json
 scrap-guard-v1.json*
 
 playtest-*.json

@@ -7,16 +7,18 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        int featuredOutfit=2;
+        int featuredOutfit=3;
         void StyleShop()
         {
             var featured = Ui.Box(screen,24,239,492,359,Ui.Hex("263748")).transform;
             int outfit=featuredOutfit;
-            Ui.Button(featured,"중장비 정비사",22,16,214,35,()=>{featuredOutfit=1;Show("shop");},outfit==1?Ui.Mint:Ui.Raised,true,15);
-            Ui.Button(featured,"레일 레인저",248,16,222,35,()=>{featuredOutfit=2;Show("shop");},outfit==2?Ui.Gold:Ui.Raised,true,15);
+            for(int i=1;i<=Outfits.Count;i++)
+            {
+                int choice=i;Ui.Button(featured,Outfits.HeroName(i),22+(i-1)*114,16,106,35,()=>{featuredOutfit=choice;Show("shop");},outfit==i?Ui.Gold:Ui.Raised,true,16);
+            }
             Ui.Label(featured,Outfits.Label(outfit),22,64,246,45,29,Ui.Ink);
-            Ui.Label(featured,outfit==1?"중장갑과 리벳 대포\n크레인 전개 · 전용 연출":"철도 장갑과 레일건\n레일 섬광 · 전용 연출",22,121,220,68,18,Ui.Muted);
-            Ui.Label(featured,(outfit==1?"루크":"레이")+" 전용 · 대원 별도\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
+            Ui.Label(featured,Outfits.Details[outfit].Replace(" · ","\n"),22,121,220,78,18,Ui.Muted);
+            Ui.Label(featured,Outfits.HeroName(outfit)+" 전용 · 대원 별도\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
             Ui.Disc(featured,238,68,224,new Color(1,.7f,.3f,.07f));
             var art = CharacterArt.Draw(featured,232,56,244,246,Outfits.Hero(outfit),0,outfit);
             art.gameObject.AddComponent<ShowroomMotion>();
@@ -35,7 +37,7 @@ namespace ScrapGuard
             Ui.Label(frame,"전시 프레임\n◆ 250 · 확정 구성",16,59,138,59,14,Ui.Muted);
             Ui.Button(frame,Social.HasFrame(State,3) ? "전시실에서 적용" : "프레임 살펴보기",14,128,210,42,
                 () => { if (Social.HasFrame(State,3)) CustomizeProfile(); else CosmeticOffer("frame_solar"); },Ui.Raised,true,16);
-            Ui.Button(screen,"신규 · 레일 레인저 체험",24,808,238,43,()=>OutfitRoom(2),Ui.Gold,true,15);
+            Ui.Button(screen,"의상 컬렉션 · 4종",24,808,238,43,OutfitCollection,Ui.Gold,true,15);
             Ui.Button(screen,"공용 · 앰버 도색",278,808,238,43,()=>Wardrobe(1),Ui.Raised,true,15);
         }
         void Wardrobe(int skin, int hero = -1)

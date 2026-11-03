@@ -1,0 +1,6 @@
+Use case: stylized-concept. Production sprite atlas for an Android robot survival game. Use the supplied concept sheet ONLY as identity/style reference, not as a layout template. Make ONE square transparent 2x2 sprite sheet of the SAME robot in four distinct full-body poses: top-left idle ready, top-right walking, bottom-left attacking, bottom-right ultimate deployed. All four face three-quarter front, consistent scale, feet baseline, generous 12% empty transparent padding in each quadrant and clear gutter. Polished stylized painted metal, readable at 60 pixels. No text, borders, ground, shadows, scenery, extra robots or effects crossing cell boundaries. True transparent background. Subject: ONLY the middle golden storm commander robot from the reference: gold armored helmet, cyan eyes, two tall Tesla coils on shoulders, blue electricity, lightning staff. Attack pose points staff forward; ultimate opens shoulder coil fins with small blue electrical arcs contained in silhouette. Keep the same gold/cyan identity in all four cells.
+
+Tool: built-in image_gen; transparent_background=true.
+Reference: Assets/Resources/Art/OutfitConcepts-v1.png (identity reference only).
+Original: /Users/kd-server/.codex/generated_images/01a19a0d-09de-75a1-ac02-222a71ac93fb/exec-2f67197b-0510-4494-a62d-54d33a3790a7.png
+Atlas: 2x2; idle, walk, attack, ultimate.

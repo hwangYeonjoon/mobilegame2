@@ -59,6 +59,8 @@ namespace ScrapGuard.Core
         public int showcaseTitle;
         public int showcaseFrame;
         public int selectedSkin, selectedOutfit;
+        public List<int> heroOutfits;
+        public int outfitTarget;
         public int collectionTarget=-1;
         public int guideVersion;
         public bool guideIntroSeen, guideMoved, guideUltimate, guideUpgrade, guideMod;

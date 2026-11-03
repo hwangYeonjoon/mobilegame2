@@ -82,12 +82,12 @@ namespace ScrapGuard
             v.head=Ui.Disc(root,-6,-4,8,Color.white);
             v.core=Ui.Box(root,-9,-1,10,2,Color.white,false);return root;
         }
-        public void Render(Bullet bullet,int level,bool copper,float time)
+        public void Render(Bullet bullet,int level,int outfit,float time)
         {
             var root=(RectTransform)transform;
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
-            var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:copper?OutfitVisuals.Copper:Ui.Gold;
+            var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
             float length=bullet.pierce>0?35:bullet.mod?30:15+level*2;
             trail.rectTransform.sizeDelta=new Vector2(length,bullet.blast?7:4);
             trail.rectTransform.anchoredPosition=new Vector2(-length,bullet.blast?3.5f:2);

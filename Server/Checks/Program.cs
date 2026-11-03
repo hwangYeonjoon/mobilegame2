@@ -47,7 +47,7 @@ try
     repo.Block(b,initial.playerId,true); Check(repo.Gallery(b,"").profiles.Count == 0,"blocked profile omitted");
     Fails(() => repo.GetProfile(b,initial.playerId),404,"block also suppresses direct lookup");
     repo.Block(b,initial.playerId,false); Check(repo.GetProfile(b,initial.playerId).likes == 0,"unblock restores view without old likes");
-    Fails(() => Apply(a,new GameCommand("battle_start") { rulesVersion=0 }),426,"old combat clients require update");
+    Fails(() => Apply(a,new GameCommand("battle_start") { rulesVersion=0 }),409,"stale combat request rejected after client compatibility gate");
     var started = Apply(a,new GameCommand("battle_start") { stage = 0 });
     Check(started.ticket.rulesVersion==Combat.RulesVersion,"ticket identifies combat rules");
     Fails(() => Apply(a,new GameCommand("battle_finish",started.ticket.id) {rulesVersion=2,replay=new()}),409,"mismatched rules cannot settle");
@@ -128,6 +128,8 @@ try
     CommerceChecks.Run(folder,Check);
     IdentityChecks.Run(folder,Check);
     RestorationChecks.Run(folder,Check);
+    WardrobeChecks.Run(folder,Check);
+    ReleaseChecks.Run(Check);
     Console.WriteLine(count + " checks passed");
 }
 finally { SqliteConnection.ClearAllPools(); if (Directory.Exists(folder)) Directory.Delete(folder,true); }

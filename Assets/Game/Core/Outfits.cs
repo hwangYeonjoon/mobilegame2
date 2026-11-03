@@ -5,18 +5,59 @@ namespace ScrapGuard.Core
         public const string Key = "outfit_heavy_engineer", Name = "중장비 정비사";
         public const int Price = 600;
         public const string RailKey="outfit_rail_ranger", RailName="레일 레인저";
-        public static int Hero(int id){return id==2?1:0;}
-        public static string Label(int id){return id==2?RailName:Name;}
-        public static string Product(int id){return id==2?RailKey:Key;}
-        public static bool Valid(int id){return id==1 || id==2;}
+        public const int Count=4;
+        public static readonly string[] Keys={"",Key,RailKey,"outfit_storm_commander","outfit_aurora_keeper"};
+        public static readonly string[] Labels={"기본 외형",Name,RailName,"폭풍 지휘자","오로라 수호자"};
+        public static readonly string[] Assets={"","Luke-HeavyEngineer-v1","Ray-RailRanger-v1","Spark-StormCommander-v1","Iris-AuroraKeeper-v1"};
+        public static readonly string[] Details={"","중장갑 · 리벳 대포 · 크레인 전개","철도 장갑 · 레일건 · 붉은 스카프","황금 장갑 · 쌍둥이 코일 · 전격 날개","수정 왕관 · 눈꽃 방패 · 결정 망토"};
+        public static int Hero(int id){return id==2?1:id==3?3:id==4?4:0;}
+        public static string HeroName(int id){return HeroCatalog.All[Hero(id)].Name.Split(' ')[1];}
+        public static string Label(int id){return Valid(id)?Labels[id]:Labels[0];}
+        public static string Product(int id){return Valid(id)?Keys[id]:"";}
+        public static int Find(string key){for(int i=1;i<=Count;i++)if(Keys[i]==key)return i;return 0;}
+        public static bool Valid(int id){return id>=1 && id<=Count;}
         public static bool Owned(GameState s,int id=1) { return Valid(id) && s.ownedCosmetics != null && s.ownedCosmetics.Contains(Product(id)); }
-        public static int Active(GameState s, int hero) { return Valid(s.selectedOutfit) && Hero(s.selectedOutfit)==hero && Owned(s,s.selectedOutfit)?s.selectedOutfit:0; }
+        public static void Normalize(GameState s)
+        {
+            if(s.heroOutfits==null || s.heroOutfits.Count==0)
+            {
+                s.heroOutfits=new System.Collections.Generic.List<int>(new int[HeroCatalog.Count]);
+                if(Valid(s.selectedOutfit) && Owned(s,s.selectedOutfit))s.heroOutfits[Hero(s.selectedOutfit)]=s.selectedOutfit;
+            }
+            while(s.heroOutfits.Count<HeroCatalog.Count)s.heroOutfits.Add(0);
+            if(s.heroOutfits.Count>HeroCatalog.Count)s.heroOutfits.RemoveRange(HeroCatalog.Count,s.heroOutfits.Count-HeroCatalog.Count);
+            for(int h=0;h<HeroCatalog.Count;h++)if(!Owned(s,s.heroOutfits[h]) || Hero(s.heroOutfits[h])!=h || !s.heroes[h].unlocked)s.heroOutfits[h]=0;
+            if(!Owned(s,s.selectedOutfit))s.selectedOutfit=0;
+            if(!Valid(s.outfitTarget) || Owned(s,s.outfitTarget))s.outfitTarget=0;
+        }
+        public static int Active(GameState s, int hero)
+        {
+            if(!HeroCatalog.Valid(hero))return 0;
+            int id=s.heroOutfits!=null && s.heroOutfits.Count>hero?s.heroOutfits[hero]:s.selectedOutfit;
+            return Valid(id) && Hero(id)==hero && Owned(s,id) && s.heroes[hero].unlocked?id:0;
+        }
         public static CommandResult Equip(GameState s, int id)
         {
             if(id!=0 && (!Owned(s,id) || !s.heroes[Hero(id)].unlocked))return CommandResult.Fail("의상과 전용 대원을 보유해야 장착할 수 있어요.");
+            Normalize(s);
+            // Legacy clear command retains its all-outfits meaning. New UI clears one hero explicitly.
+            if(id==0)for(int h=0;h<s.heroOutfits.Count;h++)s.heroOutfits[h]=0;
+            else s.heroOutfits[Hero(id)]=id;
             s.selectedOutfit=id;
-            return CommandResult.Ok(id==0?"의상을 해제하고 기존 도색을 표시해요.":Label(id)+" 장착 · 전투 능력치는 같아요.");
+            return CommandResult.Ok(id==0?"의상을 해제하고 기존 도색을 표시해요.":Label(id)+" 장착 · 다른 대원의 의상은 유지돼요.");
         }
+        public static CommandResult Clear(GameState s,int hero)
+        {
+            if(!HeroCatalog.Valid(hero))return CommandResult.Fail("없는 대원이에요.");
+            Normalize(s);s.heroOutfits[hero]=0;if(Valid(s.selectedOutfit)&&Hero(s.selectedOutfit)==hero)s.selectedOutfit=0;
+            return CommandResult.Ok("이 대원의 의상을 해제했어요. 다른 대원은 그대로예요.");
+        }
+        public static CommandResult Target(GameState s,int id)
+        {
+            if(id!=0 && (!Valid(id)||Owned(s,id)))return CommandResult.Fail("아직 보유하지 않은 의상을 선택하세요.");
+            s.outfitTarget=id;return CommandResult.Ok(id==0?"의상 목표를 해제했어요.":Label(id)+" 수집 목표 저장 · 자동 구매되지 않아요.");
+        }
+
     }
 
     public static class StarterGuide

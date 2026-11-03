@@ -97,7 +97,7 @@ namespace ScrapGuard
             actor.rectTransform.localScale=new Vector3((flipped?-1:1)*(1+stride*.018f),1-stride*.018f,1);
             if(pose==2 && t>=nextShot)
             {
-                nextShot=t+.45f;var shot=Ui.Box(transform,flipped?293:76,216,75,6,outfit>0?OutfitVisuals.Copper:Ui.Gold,false);
+                nextShot=t+.45f;var shot=Ui.Box(transform,flipped?293:76,216,75,6,outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold,false);
                 shot.gameObject.AddComponent<CombatBurst>().Configure(.25f,.4f,1);
             }
         }

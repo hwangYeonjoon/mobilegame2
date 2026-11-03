@@ -13,6 +13,8 @@
     <Compile Include="../../Assets/Tests/EditMode/FieldTaskSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/CommerceSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/EngineeringSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/RetentionSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/ReleaseSpecification.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>

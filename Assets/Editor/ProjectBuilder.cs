@@ -20,10 +20,10 @@ namespace ScrapGuard.Editor
         public static void Configure()
         {
             PlayerSettings.companyName = "ScrapGuard"; PlayerSettings.productName = "고철 수호대";
-            PlayerSettings.bundleVersion = "0.12.0";
-            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, "com.scrapguard.mobilegame2.prototype");
-            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone, "com.scrapguard.mobilegame2.prototype");
-            PlayerSettings.Android.bundleVersionCode = 12;
+            PlayerSettings.bundleVersion = ScrapGuard.Core.AppRelease.Version;
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android, ScrapGuard.Core.AppRelease.Package);
+            PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Standalone, ScrapGuard.Core.AppRelease.Package);
+            PlayerSettings.Android.bundleVersionCode = ScrapGuard.Core.AppRelease.Build;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
             PlayerSettings.Android.targetSdkVersion = (AndroidSdkVersions)36;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;

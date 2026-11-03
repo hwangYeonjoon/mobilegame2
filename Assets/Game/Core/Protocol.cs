@@ -19,7 +19,8 @@ namespace ScrapGuard.Core
     [Serializable] public class ServerReply
     {
         public bool success;
-        public string message, playerId, serverTime;
+        public string message, playerId, serverTime, code;
+        public ReleasePolicy release;
         public long revision;
         public GameState state;
         public BattleTicket ticket;
@@ -49,6 +50,8 @@ namespace ScrapGuard.Core
                 case "hero_upgrade": return e.UpgradeHero();
                 case "rename": return Social.Rename(e.State, c.value);
                 case "customize": return Social.Customize(e.State, c.hero, c.title, c.frame, c.skin);
+                case "outfit_clear": return Outfits.Clear(e.State,c.hero);
+                case "outfit_target": return Outfits.Target(e.State,c.skin);
                 case "outfit_equip": return Outfits.Equip(e.State,c.skin);
                 case "guide_seen": e.State.guideIntroSeen=true; return CommandResult.Ok("안내는 정비소에서 다시 볼 수 있어요.");
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);

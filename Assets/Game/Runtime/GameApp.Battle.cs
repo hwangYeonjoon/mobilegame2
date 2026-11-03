@@ -31,6 +31,7 @@ namespace ScrapGuard
         public Combat CurrentCombat { get { return combat; } }
         public void StartBattle(int stage, bool quick = false, string mode = "", string supportId = null)
         {
+            if(UpdateBlocksPlay){ShowUpdatePanel();return;}
             if (networkBusy) return;
             if (Online)
             {
@@ -220,7 +221,7 @@ namespace ScrapGuard
                     else view=BulletVisual.Create(bulletLayer);
                     view.gameObject.SetActive(true); bulletViews[b.id] = view;
                 }
-                view.GetComponent<BulletVisual>().Render(b,combat.Skills[0],Outfits.Active(State,combat.Hero)>0,combat.Elapsed);
+                view.GetComponent<BulletVisual>().Render(b,combat.Skills[0],Outfits.Active(State,combat.Hero),combat.Elapsed);
             }
             Recycle(bulletViews, bulletPool); alive.Clear();
             foreach (var p in combat.Pickups)
@@ -343,10 +344,11 @@ namespace ScrapGuard
         {
             if (combat == null || combat.Ended || combat.Choosing) return;
             battlePaused = true; dragging = false;
-            var card = Dialog("잠시 정비 중", "작전은 일시정지되어 있어요.", 382);
-            Ui.Button(card, "계속하기", 24, 149, 444, 62, () => { battlePaused = false; CloseModal(); });
-            Ui.Button(card, combat.Challenge ? "도전 종료하고 기록 저장" : "작전 종료하고 보상 받기", 24, 232, 444, 58, () => { battlePaused = false; combat.Abandon(); CloseModal(); FinishBattle(); }, Ui.Raised, true, 17);
-            Ui.Label(card, "30초 미만 전투는 일일 전투 횟수에서 제외돼요.", 24, 310, 444, 43, 13, Ui.Muted);
+            var card = Dialog("잠시 정비 중", "작전은 일시정지되어 있어요.", 500);
+            Ui.Label(card,combat.Challenge?FieldEngineering.TrialTitle(combat.Mode):OperationConditions.Names[combat.Condition]+"\n"+OperationConditions.Details[combat.Condition],24,138,444,78,16,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Button(card, "계속하기", 24, 235, 444, 62, () => { battlePaused = false; CloseModal(); });
+            Ui.Button(card, combat.Challenge ? "도전 종료하고 기록 저장" : "작전 종료하고 보상 받기", 24, 318, 444, 58, () => { battlePaused = false; combat.Abandon(); CloseModal(); FinishBattle(); }, Ui.Raised, true, 17);
+            Ui.Label(card, "30초 미만 전투는 일일 전투 횟수에서 제외돼요.", 24, 406, 444, 43, 13, Ui.Muted);
             card.GetChild(2).gameObject.SetActive(false);
         }
         void ChooseBattleSkill(int skill)

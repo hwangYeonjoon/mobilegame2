@@ -52,7 +52,7 @@ namespace ScrapGuard
             var preview=modal.GetComponentInChildren<OutfitPreview>();if(!preview.BaseLook)smokeErrors.Add("Outfit comparison failed");
             ClickVisibleButton("중장비 의상으로 돌아가기");if(preview.BaseLook)smokeErrors.Add("Comparison did not restore outfit");yield return Capture("13-outfit-comparison");
             if(before!=JsonUtility.ToJson(State))smokeErrors.Add("Comparison modified ownership or wallet");
-            CloseModal();Store.Change(e=>{e.State.ownedCosmetics.Add(Outfits.Key);e.State.selectedOutfit=1;return CommandResult.Ok("Gallery fixture");});
+            CloseModal();Store.Change(e=>{e.State.ownedCosmetics.Add(Outfits.Key);Outfits.Equip(e.State,1);return CommandResult.Ok("Gallery fixture");});
             Show("showcase");ClickVisibleButton("확대 감상");yield return Capture("14-large-guardian");
             ClickVisibleButton("이동");yield return Capture("15-walk-preview");ClickVisibleButton("필살기");yield return Capture("16-ultimate-preview");
             var guild=new GuildView{id="fixture",name="테스트 전시 길드",week="실행 검증 전용",featuredId="fixture-owner",remaining=3};
