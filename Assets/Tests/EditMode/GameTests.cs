@@ -8,6 +8,33 @@ namespace ScrapGuard.Tests
 {
     public class GameTests
     {
+        [Test]
+        public void FieldAndSupportPresentationDataRoundTrip()
+        {
+            var report=new BattleReport{task=1,taskChoice=2,taskCompleted=true,mods=63};
+            var restored=JsonUtility.FromJson<BattleReport>(JsonUtility.ToJson(report));
+            Assert.That(restored.taskCompleted && restored.taskChoice==2 && restored.mods==63,Is.True);
+            var step=JsonUtility.FromJson<ReplayStep>("{\"encounter\":2,\"skill\":-1}");
+            Assert.That(step.encounter,Is.EqualTo(2));Assert.That(step.frames,Is.Zero);
+            var guild=new GuildView{week="2026-11-02",featuredId="helper"};guild.members.Add(new GuildMember{id="helper",supportUses=4,supportWins=3,helpedMembers=2});
+            var copy=JsonUtility.FromJson<GuildView>(JsonUtility.ToJson(guild));Assert.That(copy.members[0].helpedMembers,Is.EqualTo(2));Assert.That(copy.featuredId,Is.EqualTo("helper"));
+        }
+        [Test]
+        public void OutfitAndGuideRoundTrip()
+        {
+            var state=GameState.New();state.gems=600;ScrapGuard.Core.Social.Buy(state,Outfits.Key);Outfits.Equip(state,1);
+            state.guideMoved=state.guideUltimate=true;
+            var restored=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(state));new Economy(restored,()=>DateTimeOffset.UtcNow);
+            Assert.That(Outfits.Active(restored,0),Is.EqualTo(1));Assert.That(restored.gems,Is.Zero);Assert.That(restored.guideMoved && restored.guideUltimate,Is.True);
+            var rects=new System.Collections.Generic.HashSet<Rect>();
+            for(int pose=0;pose<4;pose++)
+            {
+                var art=CharacterArt.Get(0,0,1,pose);Assert.That(art,Is.Not.Null);Assert.That(art.texture.name,Is.EqualTo("Luke-HeavyEngineer-v1"));
+                rects.Add(art.rect);Assert.That(art.rect.xMax,Is.LessThanOrEqualTo(art.texture.width));Assert.That(art.rect.yMax,Is.LessThanOrEqualTo(art.texture.height));
+            }
+            Assert.That(rects.Count,Is.EqualTo(4));Assert.That(CharacterArt.Get(1,0,1),Is.SameAs(CharacterArt.Get(1,0)));
+        }
+
         [TestCaseSource(typeof(CoreSpecification), nameof(CoreSpecification.Names))]
         public void CoreRules(string name) { CoreSpecification.Run(name); }
         [Test]
@@ -80,17 +107,17 @@ namespace ScrapGuard.Tests
             Assert.That(CloudClient.ValidEndpoint("https://game.example.com?key=x"),Is.False);
         }
         [Test]
-        public void AllNineCharacterArtVariantsAreAvailable()
+        public void AllCharacterArtVariantsAreAvailable()
         {
-            var distinct = new System.Collections.Generic.HashSet<Rect>();
-            for (int hero = 0; hero < 3; hero++) for (int skin = 0; skin < 3; skin++)
+            var distinct = new System.Collections.Generic.HashSet<string>();
+            for (int hero = 0; hero < HeroCatalog.Count; hero++) for (int skin = 0; skin < 3; skin++)
             {
                 var sprite = CharacterArt.Get(hero,skin); Assert.That(sprite,Is.Not.Null);
                 Assert.That(sprite.rect.xMin,Is.GreaterThanOrEqualTo(0)); Assert.That(sprite.rect.yMin,Is.GreaterThanOrEqualTo(0));
                 Assert.That(sprite.rect.xMax,Is.LessThanOrEqualTo(sprite.texture.width)); Assert.That(sprite.rect.yMax,Is.LessThanOrEqualTo(sprite.texture.height));
-                distinct.Add(sprite.rect);
+                distinct.Add(sprite.texture.name+":"+sprite.rect);
             }
-            Assert.That(distinct.Count,Is.EqualTo(9));
+            Assert.That(distinct.Count,Is.EqualTo(HeroCatalog.Count*3));
             Assert.That(CharacterArt.Get(0,1),Is.SameAs(CharacterArt.Get(0,1)));
         }
         [Test]
@@ -124,19 +151,19 @@ namespace ScrapGuard.Tests
             Assert.That(font, Is.Not.Null); Assert.That(font.HasCharacter('고'), Is.True); Assert.That(font.HasCharacter('석'), Is.True);
         }
         [Test]
-        public void RoleAndBossArtHasAllFortyFourStates()
+        public void RoleAndBossArtHasAllStates()
         {
             for(int set=0;set<2;set++)
             {
-                var rects=new System.Collections.Generic.HashSet<Rect>();
-                for(int role=0;role<(set==0?6:5);role++)for(int pose=0;pose<4;pose++)
+                var rects=new System.Collections.Generic.HashSet<string>();
+                for(int role=0;role<(set==0?6:Campaign.Regions.Length);role++)for(int pose=0;pose<4;pose++)
                 {
                     var sprite=BattleArt.Role(role,pose,set==1);Assert.That(sprite,Is.Not.Null);
                     Assert.That(sprite.rect.xMin,Is.GreaterThanOrEqualTo(0));Assert.That(sprite.rect.yMin,Is.GreaterThanOrEqualTo(0));
                     Assert.That(sprite.rect.xMax,Is.LessThanOrEqualTo(sprite.texture.width+.01f));Assert.That(sprite.rect.yMax,Is.LessThanOrEqualTo(sprite.texture.height+.01f));
-                    rects.Add(sprite.rect);
+                    rects.Add(sprite.texture.name+":"+sprite.rect);
                 }
-                Assert.That(rects.Count,Is.EqualTo(set==0?24:20));
+                Assert.That(rects.Count,Is.EqualTo(set==0?24:Campaign.Regions.Length*4));
             }
         }
         [Test]
@@ -150,7 +177,23 @@ namespace ScrapGuard.Tests
             Assert.That(ScrapGuard.Core.Social.HasSkin(restored,7),Is.True);Assert.That(restored.selectedSkin,Is.EqualTo(7));
             Assert.That(Workshop.Region(restored,4).blueprints,Is.Zero);
             Assert.That(restored.receipts[0].report.mods,Is.EqualTo(7));Assert.That(restored.receipts[0].report.bossRemaining,Is.EqualTo(.25f));
-            for(int hero=0;hero<3;hero++)for(int skin=3;skin<8;skin++)Assert.That(CharacterArt.Get(hero,skin),Is.Not.Null);
+            for(int hero=0;hero<HeroCatalog.Count;hero++)for(int skin=3;skin<ScrapGuard.Core.Social.Skins.Length;skin++)Assert.That(CharacterArt.Get(hero,skin),Is.Not.Null);
+        }
+        [Test]
+        public void LegacyThreeHeroSaveMigratesAndPersistsNewRecruit()
+        {
+            string directory=Path.Combine(Path.GetTempPath(),"scrap-legacy-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(directory);
+            string path=Path.Combine(directory,"profile.json");
+            try
+            {
+                var old=GameState.New();old.heroes.RemoveRange(3,2);old.heroes[1].unlocked=true;old.heroes[1].level=9;old.selectedHero=1;old.clearedStages.Add(11);old.gems=321;
+                File.WriteAllText(path,JsonUtility.ToJson(old));var store=new ProfileStore(path);
+                Assert.That(store.ReadOnly,Is.False);Assert.That(store.State.heroes.Count,Is.EqualTo(5));Assert.That(store.State.heroes[1].level,Is.EqualTo(9));
+                Assert.That(store.Change(e=>e.RecruitHero(3)).Success,Is.True);
+                Assert.That(store.Change(e=>e.SelectHero(3)).Success,Is.True);
+                var restored=new ProfileStore(path);Assert.That(restored.State.selectedHero,Is.EqualTo(3));Assert.That(restored.State.gems,Is.EqualTo(321));Assert.That(restored.State.heroes[4].unlocked,Is.False);
+            }
+            finally { Directory.Delete(directory,true); }
         }
     }
 }

@@ -133,11 +133,11 @@ namespace ScrapGuard
         void Home()
         {
             var heroPanel = Ui.Box(screen, 24, 178, 492, 303, Ui.Panel).transform;
-            Ui.Label(heroPanel, "READY FOR THE NEXT RUN", 20, 16, 280, 24, 12, Ui.Muted);
+            Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",16,10,276,38,GuidePanel,Ui.Raised,true,15);
             Ui.Button(heroPanel,"개조 · 수집",308,10,164,38,()=>RegionCollection(Campaign.Get(selectedStage).Region),Ui.Raised,true,15);
             for (int i = 0; i < 6; i++) Ui.Box(heroPanel, 20, 66 + i * 32, 452, 1, new Color(.3f, .45f, .5f, .13f), false);
             Ui.Disc(heroPanel, 150, 57, 196, new Color(.2f, .9f, .7f, .05f));
-            Ui.Robot(heroPanel, 180, 65, 1.7f, State.selectedHero, skin: State.selectedSkin);
+            Ui.Robot(heroPanel, 180, 65, 1.7f, State.selectedHero, skin: State.selectedSkin, outfit: Outfits.Active(State,State.selectedHero));
             Ui.Label(heroPanel, Catalog.HeroNames[State.selectedHero], 20, 226, 450, 35, 25, Ui.Ink, TextAnchor.MiddleCenter);
             Ui.Label(heroPanel, "Lv." + State.heroes[State.selectedHero].level + "    공격 " + Catalog.Attack(State) + "    체력 " + Catalog.Health(State), 20, 262, 450, 25, 15, Ui.Muted, TextAnchor.MiddleCenter);
             Ui.Button(screen, "출석  " + (Store.Economy.CanAttend ? "받기" : "완료"), 24, 497, 236, 53, Attendance, Ui.Raised, true, 18);

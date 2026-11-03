@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
     {
         public GameState State { get; private set; }
         readonly Func<DateTimeOffset> clock;
-        public Economy(GameState state, Func<DateTimeOffset> clock, bool refresh = true) { State = state; Campaign.Normalize(state); Endgame.Normalize(state); Workshop.Normalize(state); this.clock = clock; if (refresh) RefreshDay(); }
+        public Economy(GameState state, Func<DateTimeOffset> clock, bool refresh = true) { State = state; HeroCatalog.Normalize(state); Campaign.Normalize(state); Endgame.Normalize(state); Workshop.Normalize(state); StarterGuide.Normalize(state); this.clock = clock; if (refresh) RefreshDay(); }
         public void RefreshDay()
         {
             string today = Catalog.ServiceDate(clock());
@@ -102,7 +102,7 @@ namespace ScrapGuard.Core
             if (item.level >= 20) return CommandResult.Fail("최대 강화 단계예요.");
             int gold = 300 * item.level, parts = 2 * item.level;
             if (State.gold < gold || State.parts < parts) return CommandResult.Fail("강화에 필요한 골드 또는 부품이 부족해요.");
-            State.gold -= gold; State.parts -= parts; item.level++;
+            State.gold -= gold; State.parts -= parts; item.level++; State.guideUpgrade=true;
             return CommandResult.Ok("강화 성공 · Lv." + item.level);
         }
         public CommandResult UpgradeHero()
@@ -115,7 +115,7 @@ namespace ScrapGuard.Core
         }
         public CommandResult SelectHero(int id)
         {
-            if (id < 0 || id >= 3 || !State.heroes[id].unlocked) return CommandResult.Fail("먼저 캐릭터를 해금해 주세요.");
+            if (id < 0 || id >= HeroCatalog.Count || !State.heroes[id].unlocked) return CommandResult.Fail("먼저 캐릭터를 해금해 주세요.");
             State.selectedHero = id; return CommandResult.Ok(Catalog.HeroNames[id] + " 출격 준비");
         }
         public CommandResult Equip(string id)

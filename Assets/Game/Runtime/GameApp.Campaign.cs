@@ -12,7 +12,7 @@ namespace ScrapGuard
             for(int r=0;r<Campaign.Regions.Length;r++)
             {
                 int choice=r;
-                Ui.Button(card,(r+1).ToString(),24+r*90,122,84,44,()=>CampaignMap(choice),r==region?Ui.Mint:Ui.Raised,true,18);
+                Ui.Button(card,(r+1).ToString(),24+r*(450f/Campaign.Regions.Length),122,450f/Campaign.Regions.Length-6,44,()=>CampaignMap(choice),r==region?Ui.Mint:Ui.Raised,true,18);
             }
             Ui.Label(card,Campaign.Regions[region],24,179,444,35,25,Ui.Ink);
             Ui.Label(card,Campaign.Mechanics[region],24,220,444,32,15,Ui.Muted);
@@ -39,6 +39,8 @@ namespace ScrapGuard
             Ui.Label(card,"등장 유형  "+enemies+"\n"+(stage.Mission==Mission.Eliminate?"보스  "+stage.Boss:"끝까지 살아남으면 작전 성공"),24,243,444,76,17,Ui.Muted);
             Ui.Label(card,"성공 보상  골드 "+stage.Gold+" · 부품 "+stage.Parts,24,338,444,36,18,Ui.Gold);
             Ui.Label(card,cleared?"최초 보상 수령 완료":"최초 완료  보석 50 + "+Catalog.Items[stage.FirstItem].Name+"\n보관함이 가득 차면 부품 30개로 지급",24,390,444,67,16,Ui.Muted);
+            string field=stage.Layout==1 || stage.Layout==4?"회수 · 안전 / 과부하 선택":stage.Layout==2?"중계기 방어":stage.Layout==3?"수송 드론 호위":"지역 보스 공략";
+            Ui.Label(card,"현장 변화: "+field,24,460,444,25,13,Ui.Blue);
             Ui.Button(card,unlocked?"이 작전 선택":"이전 작전을 완료하세요",24,494,444,57,()=>{selectedStage=id;CloseModal();Show("home");},null,unlocked,19);
             Ui.Button(card,"지역 지도로",24,565,444,42,()=>CampaignMap(stage.Region),Ui.Raised,true,16);
         }

@@ -77,20 +77,26 @@ namespace ScrapGuard
         }
         void Heroes()
         {
-            var list = Ui.Scroll(screen, 24, 178, 492, 668, 720);
-            for (int i = 0; i < 3; i++)
+            var list = Ui.Scroll(screen, 24, 178, 492, 668, HeroCatalog.Count*232);
+            for (int i = 0; i < HeroCatalog.Count; i++)
             {
                 int hero = i; float y = i * 232; bool unlocked = State.heroes[i].unlocked; bool selected = State.selectedHero == i;
                 var row = Ui.Box(list, 0, y, 492, 215, Ui.Panel).transform;
-                Ui.Robot(row, 22, 48, .95f, i, skin: State.selectedSkin);
+                Ui.Robot(row, 22, 48, .95f, i, skin: State.selectedSkin, outfit: Outfits.Active(State,i));
                 Ui.Label(row, Catalog.HeroNames[i] + "  Lv." + State.heroes[i].level, 124, 15, 350, 38, 23);
                 Ui.Label(row, Catalog.HeroRoles[i], 124, 59, 350, 34, 15, i == 0 ? Ui.Mint : i == 1 ? Ui.Gold : Ui.Blue);
-                Ui.Label(row, "기본 공격 " + new[] { 100, 110, 90 }[i] + " · 체력 " + new[] { 1000, 850, 1200 }[i], 124, 98, 350, 29, 14, Ui.Muted);
+                Ui.Label(row, "기본 공격 " + HeroCatalog.All[i].Attack + " · 체력 " + HeroCatalog.All[i].Health, 124, 98, 350, 29, 14, Ui.Muted);
                 Ui.Label(row, "필살기 · " + Combat.UltimateNames[i],124,124,350,22,12,Ui.Mint);
                 if (unlocked)
                 {
                     Ui.Button(row, selected ? "선택 중" : "출격 대원 선택", 124, 148, 180, 49, () => Change(new GameCommand("hero_select") { hero = hero }), selected ? Ui.Raised : Ui.Mint, !selected, 15);
                     if (selected) Ui.Button(row, "레벨업", 316, 148, 158, 49, HeroUpgrade, Ui.Raised, true, 16);
+                }
+                else if(HeroCatalog.All[i].RecruitStage>=0)
+                {
+                    bool ready=HeroCatalog.CanRecruit(State,i);
+                    Ui.Button(row,ready?"무료 모집 · 작전 보상":"작전 "+(HeroCatalog.All[i].RecruitStage+1).ToString("D2")+" 완료로 모집",124,148,350,49,
+                        ()=>{if(ready)Change(new GameCommand("hero_recruit"){hero=hero});else CampaignDetails(HeroCatalog.All[hero].RecruitStage);},ready?Ui.Mint:Ui.Raised,true,16);
                 }
                 else Ui.Button(row, i == 1 ? "◆ 1,200 해금" : "누적 출석 7일 해금", 124, 148, 350, 49,
                     () => { if (hero == 1) ConfirmBuy("hero", "돌격수 레이", "보석 1,200"); else Attendance(); }, Ui.Raised, true, 16);

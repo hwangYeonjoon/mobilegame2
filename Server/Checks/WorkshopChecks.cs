@@ -30,7 +30,15 @@ static class WorkshopChecks
             db.Open();using var q=db.CreateCommand();q.CommandText="SELECT COUNT(*) FROM ledger WHERE currency='blueprints:0' AND delta=-8 AND balance=0";
             check((long)q.ExecuteScalar()==1,"craft is audited once in blueprint ledger");
         }
-        var started=Apply(a,new GameCommand("battle_start"));var combat=new Combat(started.state,0,started.ticket.id,started.ticket.seed);var recorder=new ReplayRecorder();
+        var started=Apply(a,new GameCommand("battle_start"));
+        // A fixed seed in this isolated database guarantees the run actually earns a mod.
+        // Production tickets keep their random seeds; the client cannot change the stored seed.
+        using(var db=new SqliteConnection("Data Source="+path))
+        {
+            db.Open();using var q=db.CreateCommand();q.CommandText="UPDATE accounts SET run_seed=41 WHERE id=$id";q.Parameters.AddWithValue("$id",aa.playerId);q.ExecuteNonQuery();
+        }
+        started.ticket.seed=41;
+        var combat=new Combat(started.state,0,started.ticket.id,started.ticket.seed);var recorder=new ReplayRecorder();
         for(int i=0;i<14000 && !combat.Ended;i++)
         {
             if(combat.Choosing)
@@ -45,6 +53,7 @@ static class WorkshopChecks
         if(!combat.Ended)combat.Abandon();now=now.AddMinutes(8);
         var command=new GameCommand("battle_finish",started.ticket.id){replay=recorder.Steps,won=!combat.Won,kills=999999};
         var settled=Apply(a,command);var receipt=settled.state.receipts.Find(r=>r.id==started.ticket.id);
+        check(settled.state.guideMoved && settled.state.guideUltimate && settled.state.guideMod,"guide progression comes from server-verified movement ultimate and mod");
         check(combat.Mods>0 && receipt.report.mods==combat.Mods && receipt.kills==combat.Kills,"server verifies earned mods and ignores forged client result");
         check(receipt.report.cause==combat.Report().cause && receipt.report.damage.SequenceEqual(combat.Report().damage),"report uses authoritative replay damage");
         check(receipt.blueprints==(combat.Won?1:0) && Workshop.Region(settled.state,0).blueprints==receipt.blueprints,"blueprints require verified campaign success");

@@ -11,7 +11,7 @@ namespace ScrapGuard.Core
     [Serializable] public class PublicProfile
     {
         public string id, name;
-        public int hero, heroLevel, title, frame, skin, attack, health, kills, stages, attendance, likes;
+        public int hero, heroLevel, title, frame, skin, outfit, attack, health, kills, stages, attendance, likes;
         public int coreBest, trophy = -1;
         public bool local, test, liked;
         public List<ShowcaseItem> items = new List<ShowcaseItem>();
@@ -23,10 +23,10 @@ namespace ScrapGuard.Core
         public static readonly string[] Titles = { "새내기 정비사", "첫 구역의 수호자", "꾸준한 발걸음", "천 대의 증인", "코어 정복자", "균열의 개척자" };
         public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "작전 5개 클리어", "코어 파편 12개 교환" };
         public static readonly string[] Frames = { "작업대", "첫 승리", "푸른 궤적", "태양의 테두리", "코어 궤도" };
-        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛" };
+        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛", "번개의 황금빛", "용광로의 홍옥빛" };
         public static void Normalize(GameState s)
         {
-            Campaign.Normalize(s); Endgame.Normalize(s); Workshop.Normalize(s);
+            HeroCatalog.Normalize(s); Campaign.Normalize(s); Endgame.Normalize(s); Workshop.Normalize(s);
             if (string.IsNullOrWhiteSpace(s.displayName)) s.displayName = "새내기 정비사";
             if (s.ownedCosmetics == null) s.ownedCosmetics = new List<string>();
             if (s.showcaseItems == null) s.showcaseItems = new List<string>();
@@ -34,6 +34,8 @@ namespace ScrapGuard.Core
             if (!HasTitle(s, s.showcaseTitle)) s.showcaseTitle = 0;
             if (!HasFrame(s, s.showcaseFrame)) s.showcaseFrame = 0;
             if (!HasSkin(s, s.selectedSkin)) s.selectedSkin = 0;
+            if(s.selectedOutfit != 1 || !Outfits.Owned(s))s.selectedOutfit=0;
+            StarterGuide.Normalize(s);
             for (int i = 0; i < 3; i++)
             {
                 if (s.showcaseItems.Count <= i) s.showcaseItems.Add(s.equipped[i]);
@@ -71,7 +73,7 @@ namespace ScrapGuard.Core
         public static CommandResult Buy(GameState s, string id)
         {
             Normalize(s);
-            int price = id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : -1;
+            int price = id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : id == Outfits.Key ? Outfits.Price : -1;
             if (price < 0) return CommandResult.Fail("등록되지 않은 꾸미기 상품이에요.");
             if (s.ownedCosmetics.Contains(id)) return CommandResult.Fail("이미 가지고 있는 꾸미기 상품이에요.");
             if (s.gems < price) return CommandResult.Fail("보석 " + price + "개가 필요해요.");
@@ -82,18 +84,15 @@ namespace ScrapGuard.Core
         {
             Normalize(s);
             var p = new PublicProfile { id = id, name = s.displayName, hero = s.showcaseHero, heroLevel = s.heroes[s.showcaseHero].level,
-                title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, kills = s.totalKills, stages = s.clearedStages.Count,
+                title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
                 attendance = s.attendanceCount, local = local, test = s.testProgress };
-            float attack = new[] { 100,110,90 }[p.hero] * (1 + .03f * (p.heroLevel - 1));
-            float hp = new[] { 1000,850,1200 }[p.hero] * (1 + .03f * (p.heroLevel - 1));
             for (int slot = 0; slot < 3; slot++)
             {
                 var item = s.items.Find(x => x.id == s.showcaseItems[slot]);
                 p.items.Add(new ShowcaseItem { definition = item.definition, rarity = item.rarity, level = item.level });
-                if (slot == 0) attack += 30 * Catalog.Multiplier(item);
-                if (slot == 1) hp += 180 * Catalog.Multiplier(item);
             }
-            p.attack = (int)attack; p.health = (int)hp;
+            p.attack=Catalog.AttackFor(p.hero,p.heroLevel,s.items.Find(i=>i.id==s.showcaseItems[0]));
+            p.health=Catalog.HealthFor(p.hero,p.heroLevel,s.items.Find(i=>i.id==s.showcaseItems[1]));
             p.trophy=Endgame.Trophy(s);foreach(var week in s.weekly)p.coreBest=Math.Max(p.coreBest,week.bestScore);
             return p;
         }

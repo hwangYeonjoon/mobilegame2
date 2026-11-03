@@ -8,6 +8,9 @@
     <Compile Include="../../Assets/Game/Core/*.cs" />
     <Compile Include="../../Assets/Tests/EditMode/CoreSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/WorkshopSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/ExpansionSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/OutfitSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/FieldTaskSpecification.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
 </Project>

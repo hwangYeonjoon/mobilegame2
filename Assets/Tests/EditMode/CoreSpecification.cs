@@ -5,14 +5,14 @@ namespace ScrapGuard.Tests
 {
     public static partial class CoreSpecification
     {
-        public static readonly string[] Names = { "AttendanceBoundary", "AttendanceCannotRepeat", "AttendanceSkipAndCycle", "ClockBackwards", "InsufficientFunds", "ShopLimitsAndReset", "RareLifetimeLimit", "SellGuards", "TransferConservesLevels", "HeroUnlock", "DuplicateBattle", "WrongStage", "FirstClearOnlyOnce", "AbandonNoDailyCredit", "RewardCaps", "RewardReplay", "OldResultCannotFarm", "MissionClaimOnce", "CombatPausesForChoices", "InvalidSkillRejected", "CharacterStats", "CombatDeath", "BossVictory", "SpawnBudget", "ShowcaseMigration", "CosmeticsDoNotAffectStats", "ShowcaseOwnership", "NicknameValidation", "ShowcaseSoldItem", "ReplayRoundTrip", "ReplayRejectsInvalidInput", "UltimateRules", "UltimateHeroGeometry", "UltimateReplay", "UltimateRejectsForgery", "WeeklyBoundary", "ChallengeReplay", "WeeklyRewardRules", "CoreExchangeRules", "SupportReplay", "SupportGuards", "CampaignProgression", "CampaignMigration", "CampaignReplay", "CampaignTerrain", "CampaignEnemyRoles", "ModGeometry", "ModReplay", "BattleDamageReport", "CollectionMigration", "RegionRewardsAndCraft" };
+        public static readonly string[] Names = { "AttendanceBoundary", "AttendanceCannotRepeat", "AttendanceSkipAndCycle", "ClockBackwards", "InsufficientFunds", "ShopLimitsAndReset", "RareLifetimeLimit", "SellGuards", "TransferConservesLevels", "HeroUnlock", "DuplicateBattle", "WrongStage", "FirstClearOnlyOnce", "AbandonNoDailyCredit", "RewardCaps", "RewardReplay", "OldResultCannotFarm", "MissionClaimOnce", "CombatPausesForChoices", "InvalidSkillRejected", "CharacterStats", "CombatDeath", "BossVictory", "SpawnBudget", "ShowcaseMigration", "CosmeticsDoNotAffectStats", "ShowcaseOwnership", "NicknameValidation", "ShowcaseSoldItem", "ReplayRoundTrip", "ReplayRejectsInvalidInput", "UltimateRules", "UltimateHeroGeometry", "UltimateReplay", "UltimateRejectsForgery", "WeeklyBoundary", "ChallengeReplay", "WeeklyRewardRules", "CoreExchangeRules", "SupportReplay", "SupportGuards", "CampaignProgression", "CampaignMigration", "CampaignReplay", "CampaignTerrain", "CampaignEnemyRoles", "ModGeometry", "ModReplay", "BattleDamageReport", "CollectionMigration", "RegionRewardsAndCraft", "ExpansionMigration", "ExpansionRecruitment", "ExpansionHeroCombat", "ExpansionReplay", "ExpansionTerrainAndRewards", "OutfitOwnership", "OutfitReplayEquality", "GuideProofAndMigration", "EarlyBattleProgression", "FieldTaskChoiceGuards", "FieldTaskReplayAndRewards", "FieldTaskDefenseAndEscort", "ExpandedModMechanics" };
         public static void Run(string name) { typeof(CoreSpecification).GetMethod(name).Invoke(null, null); }
         static DateTimeOffset Now = new DateTimeOffset(2026, 11, 2, 0, 0, 0, TimeSpan.Zero);
         static Economy New() { return new Economy(GameState.New(), () => Now); }
         static void Check(bool value, string message) { if (!value) throw new Exception(message); }
         public static void CampaignProgression()
         {
-            var e=New();Check(Campaign.Count==30,"30 operations");
+            var e=New();Check(Campaign.Count==42,"42 operations");
             Check(!e.BeginRun("locked",1).Success,"sequential unlock");
             for(int stage=0;stage<Campaign.Count;stage++)
             {
@@ -20,11 +20,11 @@ namespace ScrapGuard.Tests
                 Check(e.BeginRun("clear"+stage,stage).Success,"operation starts");
                 Check(e.FinishRun("clear"+stage,stage,true,20,d.Duration).Success,"operation settles");
             }
-            Check(e.State.clearedStages.Count==30 && e.State.gems==1500 && e.State.unlockedStage==29,"all rewards and final bound");
+            Check(e.State.clearedStages.Count==Campaign.Count && e.State.gems==Campaign.Count*50 && e.State.unlockedStage==Campaign.Count-1,"all rewards and final bound");
             int gems=e.State.gems,count=e.State.items.Count;
             e.BeginRun("repeat",29);e.FinishRun("repeat",29,true,20,270);
             Check(e.State.gems==gems && e.State.items.Count==count,"repeat cannot duplicate first rewards");
-            Check(!e.BeginRun("overflow",30).Success && !e.BeginRun("negative",-1).Success,"stage bounds");
+            Check(!e.BeginRun("overflow",Campaign.Count).Success && !e.BeginRun("negative",-1).Success,"stage bounds");
         }
         public static void CampaignMigration()
         {
@@ -133,7 +133,7 @@ namespace ScrapGuard.Tests
         {
             var state=GameState.New();state.selectedHero=hero;
             var c=new Combat(state,0,"ultimate",23);
-            for(int i=0;i<760;i++) { c.Enemies.Clear();c.Bullets.Clear();c.Pickups.Clear();c.Tick(ReplayRecorder.Step,new V2()); }
+            for(int i=0;i<760;i++) { if(c.Choosing)c.Choose(c.Choices[0]);c.Enemies.Clear();c.Bullets.Clear();c.Pickups.Clear();c.Tick(ReplayRecorder.Step,new V2()); }
             c.Enemies.Clear(); Check(c.CanUltimate,"charge over time"); return c;
         }
         public static void UltimateRules()

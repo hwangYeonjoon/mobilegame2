@@ -27,7 +27,7 @@ namespace ScrapGuard.Core
     [Serializable] public class GuestRequest { public string secret, inviteCode; }
     [Serializable] public class ReplayStep
     {
-        public int x, y, frames, skill = -1;
+        public int x, y, frames, encounter, skill = -1;
         public bool ultimate, support;
     }
     public static class CommandDispatcher
@@ -44,10 +44,13 @@ namespace ScrapGuard.Core
                 case "upgrade": return e.Upgrade(c.id);
                 case "transfer": return e.Transfer(c.id, c.other);
                 case "sell": return e.Sell(c.id);
+                case "hero_recruit": return e.RecruitHero(c.hero);
                 case "hero_select": return e.SelectHero(c.hero);
                 case "hero_upgrade": return e.UpgradeHero();
                 case "rename": return Social.Rename(e.State, c.value);
                 case "customize": return Social.Customize(e.State, c.hero, c.title, c.frame, c.skin);
+                case "outfit_equip": return Outfits.Equip(e.State,c.skin);
+                case "guide_seen": e.State.guideIntroSeen=true; return CommandResult.Ok("안내는 정비소에서 다시 볼 수 있어요.");
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);
                 case "showcase_equipment": e.State.showcaseItems = new List<string>(e.State.equipped); return CommandResult.Ok("현재 장비를 전시했어요.");
                 case "visibility": e.State.publicProfile = c.enabled; return CommandResult.Ok(c.enabled ? "프로필을 공개했어요." : "프로필을 비공개로 바꿨어요.");
@@ -90,10 +93,11 @@ namespace ScrapGuard.Core
             int x = (int)Math.Round(Math.Max(-1, Math.Min(1, move.x)) * 100);
             int y = (int)Math.Round(Math.Max(-1, Math.Min(1, move.y)) * 100);
             var last = Steps.Count > 0 ? Steps[Steps.Count - 1] : null;
-            if (last != null && !last.ultimate && !last.support && last.skill == -1 && last.x == x && last.y == y && last.frames < 120) last.frames++;
+            if (last != null && !last.ultimate && !last.support && last.encounter==0 && last.skill == -1 && last.x == x && last.y == y && last.frames < 120) last.frames++;
             else Steps.Add(new ReplayStep { x = x, y = y, frames = 1, skill = -1 });
             return new V2(x / 100f, y / 100f);
         }
+        public void Encounter(int choice){Steps.Add(new ReplayStep{encounter=choice});}
         public void Support() { Steps.Add(new ReplayStep { support = true }); }
         public void Ultimate() { Steps.Add(new ReplayStep { ultimate = true }); }
         public void Choose(int skill) { Steps.Add(new ReplayStep { skill = skill }); }
@@ -103,12 +107,13 @@ namespace ScrapGuard.Core
             int frames = 0;
             foreach (var step in steps)
             {
-                if (step == null || step.skill < -1 || step.skill > 7 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
+                if (step == null || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 7 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
                     throw new ArgumentException("전투 입력이 올바르지 않아요.");
+                if(step.encounter!=0 && (step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 현장 선택이에요.");
                 if (step.support && (step.ultimate || step.skill != -1 || step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 지원 호출이에요.");
                 if (step.ultimate && (step.skill != -1 || step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 필살기 입력이에요.");
                 if (step.skill >= 0 && (step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 스킬 입력이에요.");
-                if (!step.ultimate && !step.support && step.skill == -1 && step.frames < 1) throw new ArgumentException("비어 있는 전투 입력이에요.");
+                if (!step.ultimate && !step.support && step.encounter==0 && step.skill == -1 && step.frames < 1) throw new ArgumentException("비어 있는 전투 입력이에요.");
                 frames += step.frames;
             }
             if (frames > 18000 || frames * Step > elapsedSeconds + 2) throw new ArgumentException("실제 경과 시간보다 긴 전투 기록이에요.");
@@ -116,7 +121,8 @@ namespace ScrapGuard.Core
             foreach (var step in steps)
             {
                 if (combat.Ended) throw new ArgumentException("종료된 전투 뒤에 입력이 있어요.");
-                if (step.support) { if (!combat.UseSupport()) throw new ArgumentException("사용할 수 없는 지원 호출이에요."); }
+                if(step.encounter!=0){if(!combat.ChooseTask(step.encounter))throw new ArgumentException("선택할 수 없는 현장 임무예요.");}
+                else if (step.support) { if (!combat.UseSupport()) throw new ArgumentException("사용할 수 없는 지원 호출이에요."); }
                 else if (step.ultimate) { if (!combat.UseUltimate()) throw new ArgumentException("충전되지 않은 필살기 입력이에요."); }
                 else if (step.skill >= 0) { if (!combat.Choose(step.skill)) throw new ArgumentException("선택할 수 없는 스킬이에요."); }
                 else for (int i = 0; i < step.frames; i++)

@@ -76,12 +76,12 @@ namespace ScrapGuard
             input.characterLimit = limit; input.text = value; input.lineType = InputField.LineType.SingleLine;
             return input;
         }
-        public static RectTransform Robot(Transform parent, float x, float y, float scale, int hero, bool enemy = false, int skin = 0)
+        public static RectTransform Robot(Transform parent, float x, float y, float scale, int hero, bool enemy = false, int skin = 0, int outfit = 0)
         {
             var root = Rect(parent, "Robot", x, y, 80, 100); root.localScale = Vector3.one * scale;
             if (!enemy && CharacterArt.Get(hero,skin) != null)
             {
-                CharacterArt.Draw(root,-8,0,96,100,hero,skin);
+                CharacterArt.Draw(root,-8,0,96,100,hero,skin,outfit);
                 return root;
             }
             Color c = enemy ? Red : skin == 1 ? Gold : skin == 2 ? Hex("B7E8FF") : hero == 0 ? Mint : hero == 1 ? Gold : Blue;

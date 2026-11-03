@@ -36,7 +36,10 @@ namespace ScrapGuard
             player.localScale = new Vector3(.48f*(1+stride*.035f),.48f*(1-stride*.035f),1);
             player.localEulerAngles = new Vector3(0,0,-combat.LastMovement.x*5+stride*2-recoil*3);
             playerArt.rectTransform.localScale = new Vector3(Mathf.Cos(combat.Facing)<-.05f ? -1 : 1,1,1);
-            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : CharacterArt.Tint(State.selectedSkin);
+            int outfit=Outfits.Active(State,combat.Hero);
+            playerArt.sprite=CharacterArt.Get(combat.Hero,State.selectedSkin,outfit,combat.UltimateFlash>0?3:combat.ShotFlash>0?2:moving>.1f && Mathf.Sin(combat.Elapsed*11)>0?1:0);
+            playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : outfit==1?Color.white:CharacterArt.Tint(State.selectedSkin);
+            muzzle.color=outfit==1?OutfitVisuals.Copper:Ui.Gold;
             playerShadow.anchoredPosition = new Vector2(combat.Position.x-20,-combat.Position.y-12);
             shieldRing.gameObject.SetActive(combat.Shield>0);
             shieldRing.anchoredPosition = new Vector2(combat.Position.x,-combat.Position.y);
@@ -47,7 +50,7 @@ namespace ScrapGuard
             muzzle.rectTransform.localScale = Vector3.one*(.5f+recoil*.7f);
             muzzle.rectTransform.localEulerAngles = new Vector3(0,0,-combat.Facing*Mathf.Rad2Deg);
             arena.anchoredPosition = combat.UltimateFlash>.3f
-                ? new Vector2(Mathf.Sin(combat.Elapsed*95)*2,Mathf.Cos(combat.Elapsed*80)*2) : Vector2.zero;
+                ? new Vector2(Mathf.Sin(combat.Elapsed*95)*2,Mathf.Cos(combat.Elapsed*80)*2) : combat.HurtFlash>0?new Vector2(Mathf.Sin(combat.Elapsed*85),0):Vector2.zero;
             if (combat.UltimateUses != renderedUltimate)
             {
                 renderedUltimate = combat.UltimateUses;
@@ -80,7 +83,19 @@ namespace ScrapGuard
                 audioSource.PlayOneShot(ultimateClip);
             }
             var origin = new Vector2(combat.UltimateOrigin.x,-combat.UltimateOrigin.y);
-            Color color = combat.Hero == 1 ? Ui.Blue : combat.Hero == 2 ? Ui.Gold : Ui.Mint;
+            if(Outfits.Active(State,combat.Hero)==1)OutfitVisuals.Gear(effectLayer,origin,240);
+            Color color = Outfits.Active(State,combat.Hero)==1?OutfitVisuals.Copper:combat.Hero == 1 ? Ui.Blue : combat.Hero == 2 ? Ui.Gold : combat.Hero==3 ? Ui.Gold : combat.Hero==4 ? Ui.Blue : Ui.Mint;
+            particles.Burst(combat.UltimateOrigin,combat.Hero==4?32:24,color,combat.Hero==3?220:150,combat.Hero==4?6:4);
+            if(combat.Hero==3)
+            {
+                for(int i=0;i<8;i++)
+                {
+                    var arcRoot=Ui.Rect(effectLayer,"Discharge arc",0,0,540,960);
+                    var arc=arcRoot.gameObject.AddComponent<LightningArc>();arc.raycastTarget=false;arc.color=color;
+                    arc.From=origin;arc.To=origin+new Vector2(Mathf.Cos(i*Mathf.PI/4),Mathf.Sin(i*Mathf.PI/4))*300;
+                    floating.Add(new FloatingEffect{root=arcRoot,life=.65f,total=.65f});
+                }
+            }
             if (combat.Hero == 1)
             {
                 var beam = Ui.Rect(effectLayer,"PhotonBeam",origin.x,-origin.y,560,76);
@@ -89,33 +104,35 @@ namespace ScrapGuard
                 Ui.Box(beam,0,0,560,76,new Color(.2f,.65f,1,.28f),false);
                 Ui.Box(beam,0,21,560,34,Ui.Blue,false);
                 Ui.Box(beam,0,33,560,10,Color.white,false);
-                beam.gameObject.AddComponent<CombatBurst>().Configure(.65f,1,1);
+                beam.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.65f,1,1);
             }
             else
             {
-                float diameter = combat.Hero == 2 ? 360 : 490;
+                float diameter = combat.Hero == 2 ? 360 : combat.Hero==3 ? 620 : combat.Hero==4 ? 520 : 490;
                 for (int i=0;i<3;i++)
                 {
                     var ring = CombatRing.Create(effectLayer,diameter,color,i==0 ? .018f : .035f);
                     ring.anchoredPosition = origin;
-                    ring.gameObject.AddComponent<CombatBurst>().Configure(.8f+i*.1f,.12f+i*.09f,1);
+                    ring.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.8f+i*.1f,.12f+i*.09f,1);
                 }
                 for(int i=0;i<12;i++)
                 {
                     float angle=i*Mathf.PI/6;
                     var spark=Ui.Box(effectLayer,origin.x+Mathf.Cos(angle)*70,-origin.y+Mathf.Sin(angle)*70,6,38,color,false).rectTransform;
                     spark.pivot=new Vector2(.5f,.5f); spark.localEulerAngles=new Vector3(0,0,-angle*Mathf.Rad2Deg-90);
-                    spark.gameObject.AddComponent<CombatBurst>().Configure(.55f,.7f,1.7f);
+                    spark.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.55f,.7f,1.7f);
                 }
             }
             var label=Ui.Label(effectLayer,Combat.UltimateNames[combat.Hero],80,266,380,50,30,color,TextAnchor.MiddleCenter);
-            label.gameObject.AddComponent<CombatBurst>().Configure(1.1f,1,1);
+            label.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(1.1f,1,1);
         }
     }
     public sealed class CombatBurst : MonoBehaviour
     {
         float age,duration,startScale,endScale;
         Graphic[] graphics; Color[] colors;
+        Combat clock;float lastTime;
+        public CombatBurst WithClock(Combat source){clock=source;lastTime=source.Elapsed;return this;}
         public void Configure(float lifetime,float from,float to)
         {
             duration=lifetime;startScale=from;endScale=to;
@@ -126,7 +143,9 @@ namespace ScrapGuard
         void Update()
         {
             if(graphics==null)return;
-            age+=Time.deltaTime;float t=Mathf.Clamp01(age/duration);
+            float delta=clock==null?Time.deltaTime:Mathf.Max(0,clock.Elapsed-lastTime);
+            if(clock!=null)lastTime=clock.Elapsed;
+            age+=delta;float t=Mathf.Clamp01(age/duration);
             transform.localScale=Vector3.one*Mathf.Lerp(startScale,endScale,1-(1-t)*(1-t));
             for(int i=0;i<graphics.Length;i++) { var c=colors[i];c.a*=1-t;graphics[i].color=c; }
             if(age>=duration)Destroy(gameObject);

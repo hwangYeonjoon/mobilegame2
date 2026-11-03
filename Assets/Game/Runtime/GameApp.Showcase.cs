@@ -17,6 +17,7 @@ namespace ScrapGuard
         void Showcase()
         {
             showcaseCard = DrawProfile(screen, Social.Build(State, Online ? cloud.Session.playerId : "", !Online), 24, 176);
+            Ui.Button(showcaseCard,"확대 감상",355,258,105,31,()=>GuardianGallery(Social.Build(State,Online?cloud.Session.playerId:"",!Online),()=>Show("showcase")),Ui.Raised,true,13);
             Ui.Button(screen, "내 프로필 꾸미기", 24, 724, 238, 55, CustomizeProfile, Ui.Raised, true, 17);
             Ui.Button(screen, "카드 이미지 공유", 278, 724, 238, 55, () => { if (!exportingCard) StartCoroutine(ExportCard(showcaseCard)); }, null, true, 17);
             Ui.Button(screen,"기록 · 트로피 전시대",24,793,238,51,()=>TrophyRoom(Social.Build(State,Online?cloud.Session.playerId:"",!Online)),Ui.Raised,true,16);
@@ -40,7 +41,7 @@ namespace ScrapGuard
                 var orbit=CombatRing.Create(card,166,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(246,-216);
                 for(int n=0;n<6;n++)Ui.Disc(card,240+Mathf.Cos(n*Mathf.PI/3)*83,210+Mathf.Sin(n*Mathf.PI/3)*83,12,Ui.Hex("C89BFF"));
             }
-            Ui.Robot(card, 185, 143, 1.48f, p.hero, skin: p.skin);
+            Ui.Robot(card, 185, 143, 1.48f, p.hero, skin: p.skin, outfit: p.outfit);
             Ui.Label(card, "Lv." + p.heroLevel + "  " + Catalog.HeroNames[p.hero], 32, 293, 428, 31, 21, Ui.Ink, TextAnchor.MiddleCenter);
             Ui.Label(card, "공격 " + p.attack + "   ·   체력 " + p.health, 32, 327, 428, 24, 14, Ui.Muted, TextAnchor.MiddleCenter);
             for (int i = 0; i < p.items.Count && i < 3; i++)
@@ -60,51 +61,52 @@ namespace ScrapGuard
         void CustomizeProfile()
         {
             Social.Normalize(State);
-            var card = Dialog("나를 보여 주는 전시실", "업적은 플레이로, 도색과 프레임은 취향대로.\n꾸미기는 전투 능력치를 바꾸지 않아요.", 870);
-            var content = Ui.Scroll(card, 24, 137, 444, 699, 1987);
+            int heroExtra=((HeroCatalog.Count+2)/3-1)*57,skinExtra=(Social.Skins.Length-8)*57;
+            var card = Dialog("나를 보여 주는 전시실", "업적은 플레이로, 도색과 프레임은 취향대로.\n전용 의상은 상점 → 스타일 → 의상 체험에서 관리해요.", 870);
+            var content = Ui.Scroll(card, 24, 137, 444, 699, 1987+heroExtra+skinExtra);
             Ui.Label(content, "닉네임", 0, 0, 444, 30, 17, Ui.Mint);
             var name = Ui.Input(content, State.displayName, "닉네임 2~12자", 0, 38, 300, 12);
             Ui.Button(content, "저장", 314, 38, 130, 52, () => Change(new GameCommand("rename") { value = name.text }, CustomizeProfile), Ui.Raised, true, 16);
             Ui.Label(content, "대표 수호대원", 0, 108, 444, 33, 17, Ui.Mint);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < HeroCatalog.Count; i++)
             {
                 int hero = i;
-                Ui.Button(content, Catalog.HeroNames[i] + (State.showcaseHero == i ? " ✓" : ""), i * 150, 150, 144, 49,
-                    () => Customize(hero: hero), State.showcaseHero == i ? Ui.Mint : Ui.Raised, State.heroes[i].unlocked, 15);
+                Ui.Button(content, Catalog.HeroNames[i] + (State.showcaseHero == i ? " ✓" : ""), (i%3)*150, 150+(i/3)*57, 144, 49,
+                    () => Customize(hero: hero), State.showcaseHero == i ? Ui.Mint : Ui.Raised, State.heroes[i].unlocked, 13);
             }
-            Ui.Label(content, "전시 장비는 출격 장비와 따로 보관돼요.\n판매한 전시 장비는 현재 장착 장비로 대체됩니다.", 0, 212, 444, 64, 14, Ui.Muted);
-            Ui.Button(content, "현재 장착한 3종으로 전시 갱신", 0, 288, 444, 52, () => Change(new GameCommand("showcase_equipment"), CustomizeProfile), Ui.Raised, true, 17);
-            Ui.Label(content, "플레이로 얻는 칭호", 0, 358, 444, 33, 17, Ui.Mint);
+            Ui.Label(content, "전시 장비는 출격 장비와 따로 보관돼요.\n판매한 전시 장비는 현재 장착 장비로 대체됩니다.", 0, 212+heroExtra, 444, 64, 14, Ui.Muted);
+            Ui.Button(content, "현재 장착한 3종으로 전시 갱신", 0, 288+heroExtra, 444, 52, () => Change(new GameCommand("showcase_equipment"), CustomizeProfile), Ui.Raised, true, 17);
+            Ui.Label(content, "플레이로 얻는 칭호", 0, 358+heroExtra, 444, 33, 17, Ui.Mint);
             for (int i = 0; i < Social.Titles.Length; i++)
             {
                 int title = i; bool owned = Social.HasTitle(State, i);
-                Ui.Button(content, Social.Titles[i] + (State.showcaseTitle == i ? " ✓" : ""), 0, 402 + i * 57, 226, 47, () => Customize(title: title), State.showcaseTitle == i ? Ui.Mint : Ui.Raised, owned, 15);
-                Ui.Label(content, Social.TitleGoals[i], 240, 402 + i * 57, 204, 47, 13, owned ? Ui.Ink : Ui.Muted);
+                Ui.Button(content, Social.Titles[i] + (State.showcaseTitle == i ? " ✓" : ""), 0, 402+heroExtra + i * 57, 226, 47, () => Customize(title: title), State.showcaseTitle == i ? Ui.Mint : Ui.Raised, owned, 15);
+                Ui.Label(content, Social.TitleGoals[i], 240, 402+heroExtra + i * 57, 204, 47, 13, owned ? Ui.Ink : Ui.Muted);
             }
-            Ui.Label(content, "프로필 프레임", 0, 757, 444, 33, 17, Ui.Mint);
+            Ui.Label(content, "프로필 프레임", 0, 757+heroExtra, 444, 33, 17, Ui.Mint);
             string[] frameGoals = { "기본 제공", "첫 구역 클리어", "누적 출석 7일", "확정 구매 · ◆ 250", "코어 파편 20개 교환" };
             for (int i = 0; i < Social.Frames.Length; i++)
             {
                 int frame = i; bool owned = Social.HasFrame(State, i);
-                Ui.Button(content, Social.Frames[i] + (State.showcaseFrame == i ? " ✓" : ""), 0, 799 + i * 57, 226, 47,
+                Ui.Button(content, Social.Frames[i] + (State.showcaseFrame == i ? " ✓" : ""), 0, 799+heroExtra + i * 57, 226, 47,
                     () => { if (owned) Customize(frame: frame); else if(frame==4)CoreExchange();else CosmeticOffer("frame_solar"); }, State.showcaseFrame == i ? Ui.Mint : Ui.Raised, owned || i >= 3, 15);
-                Ui.Label(content, frameGoals[i], 240, 799 + i * 57, 204, 47, 13, Ui.Muted);
+                Ui.Label(content, frameGoals[i], 240, 799+heroExtra + i * 57, 204, 47, 13, Ui.Muted);
             }
-            Ui.Label(content, "대원 도색 · 정비소와 전투에도 적용", 0, 1097, 444, 33, 17, Ui.Mint);
+            Ui.Label(content, Outfits.Active(State,0)==1?"대원 도색 · 루크는 장착 의상이 우선":"대원 도색 · 정비소와 전투에도 적용", 0, 1097+heroExtra, 444, 33, 17, Ui.Mint);
             string[] skinGoals = { "기본 제공", "확정 구매 · ◆ 300", "적 1,000마리 처치" };
             for (int i = 0; i < Social.Skins.Length; i++)
             {
                 int skin = i; bool owned = Social.HasSkin(State, i);
-                Ui.Button(content, Social.Skins[i] + (State.selectedSkin == i ? " ✓" : ""), 0, 1139 + i * 57, 226, 47,
+                Ui.Button(content, Social.Skins[i] + (State.selectedSkin == i ? " ✓" : ""), 0, 1139+heroExtra + i * 57, 226, 47,
                     () => { if (owned) Customize(skin: skin); else Wardrobe(skin); }, State.selectedSkin == i ? Ui.Mint : Ui.Raised, owned || i == 1 || i>=3, 15);
-                Ui.Label(content, (i<3?skinGoals[i]:Campaign.Regions[i-3]+" 설계도 8개"), 240, 1139 + i * 57, 204, 47, 13, Ui.Muted);
+                Ui.Label(content, (i<3?skinGoals[i]:Campaign.Regions[i-3]+" 설계도 8개"), 240, 1139+heroExtra + i * 57, 204, 47, 13, Ui.Muted);
             }
-            Ui.Label(content, "프로필 공개", 0, 1617, 444, 33, 17, Ui.Mint);
-            Ui.Label(content, Online ? "공개하면 닉네임·대원·장비·성장 기록을\n이 서버의 다른 플레이어가 보고 응원할 수 있어요." : "로컬 카드는 이미지로 공유할 수 있어요.\n전시 광장 공개는 서버 계정에서 가능합니다.", 0, 1659, 444, 65, 15, Ui.Muted);
-            Ui.Button(content, !Online ? "서버 계정 연결하기" : State.publicProfile ? "비공개로 바꾸기" : "프로필 공개하기", 0, 1743, 444, 54,
+            Ui.Label(content, "프로필 공개", 0, 1617+heroExtra+skinExtra, 444, 33, 17, Ui.Mint);
+            Ui.Label(content, Online ? "공개하면 닉네임·대원·장비·성장 기록을\n이 서버의 다른 플레이어가 보고 응원할 수 있어요." : "로컬 카드는 이미지로 공유할 수 있어요.\n전시 광장 공개는 서버 계정에서 가능합니다.", 0, 1659+heroExtra+skinExtra, 444, 65, 15, Ui.Muted);
+            Ui.Button(content, !Online ? "서버 계정 연결하기" : State.publicProfile ? "비공개로 바꾸기" : "프로필 공개하기", 0, 1743+heroExtra+skinExtra, 444, 54,
                 () => { if (!Online) AccountPanel(); else if (State.publicProfile) Change(new GameCommand("visibility") { enabled = false }, CustomizeProfile); else ConfirmPublish(); }, Ui.Raised, true, 17);
-            Ui.Label(content, "응원 수에 재화나 전투 보상은 연결되지 않습니다.\n획득 조건과 가격은 프로토타입 밸런스입니다.", 0, 1819, 444, 66, 14, Ui.Muted);
-            Ui.Button(content, "전시실로 돌아가기", 0, 1909, 444, 54, () => Show("showcase"));
+            Ui.Label(content, "응원 수에 재화나 전투 보상은 연결되지 않습니다.\n획득 조건과 가격은 프로토타입 밸런스입니다.", 0, 1819+heroExtra+skinExtra, 444, 66, 14, Ui.Muted);
+            Ui.Button(content, "전시실로 돌아가기", 0, 1909+heroExtra+skinExtra, 444, 54, () => Show("showcase"));
         }
         void Customize(int hero = -1, int title = -1, int frame = -1, int skin = -1)
         {
@@ -148,7 +150,7 @@ namespace ScrapGuard
             for (int i = 0; i < list.profiles.Count; i++)
             {
                 var p = list.profiles[i]; var row = Ui.Box(content, 0, i * 113, 444, 101, Ui.Raised).transform;
-                Ui.Robot(row, 15, 11, .7f, p.hero, skin:p.skin);
+                Ui.Robot(row, 15, 11, .7f, p.hero, skin:p.skin,outfit:p.outfit);
                 Ui.Label(row, p.name, 88, 10, 223, 34, 21);
                 Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/" + Campaign.Count + " · 응원 " + p.likes, 88, 45, 223, 46, 13, FrameColor(p.frame));
                 Ui.Button(row, "보기", 337, 25, 93, 52, () => StartCoroutine(LoadPublic(p.id)), null, true, 16);
@@ -187,6 +189,7 @@ namespace ScrapGuard
         {
             var card = Dialog("수호대 기록", "공개 ID " + p.id + " · 응원 " + p.likes, 870);
             var preview = DrawProfile(card, p, 24, 130); preview.localScale = Vector3.one * (444f / 492f);
+            Ui.Button(preview,"확대 감상",355,258,105,31,()=>GuardianGallery(p,()=>PublicPanel(p)),Ui.Raised,true,13);
             bool other = p.id != cloud.Session.playerId;
             Ui.Button(card, p.liked ? "응원 취소" : "멋져요! 응원하기", 24, 627, 444, 56,
                 () => StartCoroutine(SocialAction(p.id, "like", new GameCommand { enabled = !p.liked }, () => StartCoroutine(LoadPublic(p.id)))), null, other, 18);

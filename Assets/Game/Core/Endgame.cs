@@ -11,7 +11,7 @@ namespace ScrapGuard.Core
     }
     [Serializable] public class RankEntry
     {
-        public int rank, score, hero, skin;
+        public int rank, score, hero, skin, outfit;
         public string id, name;
     }
     [Serializable] public class WeeklyBoard
@@ -23,20 +23,20 @@ namespace ScrapGuard.Core
     [Serializable] public class GuildMember
     {
         public string id, name;
-        public int hero = -1, level, skin, power;
+        public int hero = -1, level, skin, outfit, power, supportUses, supportWins, helpedMembers;
         public bool leader, self;
     }
     [Serializable] public class GuildView
     {
-        public string id, name, code;
+        public string id, name, code, week, featuredId;
         public int remaining;
         public bool leader;
         public List<GuildMember> members = new List<GuildMember>();
     }
     [Serializable] public class SupportSnapshot
     {
-        public string owner, name;
-        public int hero, skin, power;
+        public string owner, name, guild;
+        public int hero, skin, outfit, power;
         public bool showIdentity;
         public int title, frame, trophy;
     }

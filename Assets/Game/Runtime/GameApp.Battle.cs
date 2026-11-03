@@ -10,6 +10,11 @@ namespace ScrapGuard
     public partial class GameApp
     {
         Combat combat;
+        ArenaScenery scenery;
+        CombatParticles particles;
+        float presentationTime;
+        int presentedBoss;
+        RectTransform bossCue;
         RectTransform arena, enemyLayer, pickupLayer, bulletLayer, hazardLayer, effectLayer, player, drone, joystick, stick;
         readonly List<RectTransform> saws = new List<RectTransform>();
         readonly Dictionary<int, RectTransform> enemyViews = new Dictionary<int, RectTransform>(), bulletViews = new Dictionary<int, RectTransform>(), pickupViews = new Dictionary<int, RectTransform>(), hazardViews = new Dictionary<int, RectTransform>();
@@ -17,7 +22,8 @@ namespace ScrapGuard
         readonly List<int> stale = new List<int>();
         readonly Stack<RectTransform> enemyPool = new Stack<RectTransform>(), bulletPool = new Stack<RectTransform>(), pickupPool = new Stack<RectTransform>(), hazardPool = new Stack<RectTransform>();
         readonly List<FloatingEffect> floating = new List<FloatingEffect>();
-        Image hpFill, xpFill, bossFill;
+        readonly List<BattleEffect> frameBattleEffects=new List<BattleEffect>();
+        Image hpFill, xpFill, bossFill, bossBackdrop;
         Text hpText, timeText, killText, levelText, bossText, skillText;
         bool battlePaused, choicesShown, resultShown, dragging;
         Vector2 dragStart;
@@ -53,25 +59,29 @@ namespace ScrapGuard
             enemyPool.Clear(); bulletPool.Clear(); pickupPool.Clear(); hazardPool.Clear();
             arena = Ui.Rect(screen, "Arena", 0, 0, 540, 960);
             arena.gameObject.AddComponent<RectMask2D>().padding = new Vector4(0,128,0,177);
-            BattleArt.Floor(arena,stage,combat.Challenge);
+            scenery=ArenaScenery.Build(arena,stage,combat.Challenge);
+            presentationTime=0;presentedBoss=-1;bossCue=null;
             pickupLayer = Ui.Rect(arena, "Experience", 0, 0, 540, 960);
             hazardLayer = Ui.Rect(arena, "Warnings", 0, 0, 540, 960);
             enemyLayer = Ui.Rect(arena, "Enemies", 0, 0, 540, 960);
             bulletLayer = Ui.Rect(arena, "Projectiles", 0, 0, 540, 960);
             playerShadow = Ui.Disc(arena,0,0,40,new Color(0,0,0,.32f)).rectTransform;
             playerShadow.sizeDelta = new Vector2(40,13);
-            player = Ui.Robot(arena, 0, 0, .48f, State.selectedHero, skin: State.selectedSkin);
+            player = Ui.Robot(arena, 0, 0, .48f, State.selectedHero, skin: State.selectedSkin, outfit: Outfits.Active(State,State.selectedHero));
             playerArt = player.GetComponentInChildren<Image>();
             playerArt.rectTransform.pivot = new Vector2(.5f,.5f);
             playerArt.rectTransform.anchoredPosition = new Vector2(40,-50);
             drone = Ui.Robot(arena, 0, 0, .24f, 0);
             for (int i = 0; i < 6; i++)
             {
-                var saw = Ui.Disc(arena, 0, 0, 23, Ui.Muted).rectTransform;
-                Ui.Box(saw, 8, -4, 7, 31, Ui.Muted, false); Ui.Box(saw, -4, 8, 31, 7, Ui.Muted, false); Ui.Disc(saw, 7, 7, 9, Ui.Panel);
+                var saw=Ui.Rect(arena,"Orbit saw",0,0,27,27);saw.pivot=new Vector2(.5f,.5f);
+                var teeth=saw.gameObject.AddComponent<SawGraphic>();teeth.color=Ui.Hex("C9E4E9");teeth.raycastTarget=false;
+                Ui.Disc(saw,9,9,9,Ui.Hex("E8B85E"));Ui.Disc(saw,12,12,3,Ui.Panel);
                 saws.Add(saw);
             }
             effectLayer = Ui.Rect(arena, "Effects", 0, 0, 540, 960);
+            particles=CombatParticles.Create(effectLayer);
+            hazardLayer.SetAsLastSibling();
             SetupCombatEffects();turretArt=null;magnetField=null;
             Ui.Label(screen, combat.Challenge ? "코어 균열 / " + (mode==Endgame.PracticeMode?"연습":"주간 도전") : "작전 " + (stage + 1).ToString("D2") + "  /  " + Catalog.StageNames[stage], 24, 20, 406, 28, 16, Ui.Mint);
             Ui.Button(screen, "Ⅱ", 451, 23, 65, 50, PauseBattle, Ui.Raised, true, 22);
@@ -84,6 +94,8 @@ namespace ScrapGuard
             xpFill = Ui.Box(screen, 24, 153, 0, 7, Ui.Blue);
             levelText = Ui.Label(screen, "Lv.1", 24, 832, 100, 28, 17, Ui.Mint);
             skillText = Ui.Label(screen, "", 130, 832, 386, 40, 12, Ui.Muted, TextAnchor.MiddleRight);
+            guideHint=Ui.Label(screen,"",40,227,460,45,14,Ui.Ink,TextAnchor.MiddleCenter);
+            bossBackdrop=Ui.Box(screen,72,183,396,49,new Color(.035f,.055f,.08f,.78f),true);
             bossText = Ui.Label(screen, "", 80, 187, 380, 30, 16, Ui.Red, TextAnchor.MiddleCenter);
             bossFill = Ui.Box(screen, 80, 221, 0, 7, Ui.Red);
             joystick = Ui.Disc(screen, 64, 846, 95, new Color(.5f, .8f, .8f, .12f)).rectTransform;
@@ -93,7 +105,7 @@ namespace ScrapGuard
             ultimateLabel = ultimateButton.GetComponentInChildren<Text>();
             Ui.Box(screen,351,934,158,4,Ui.Background,false);
             ultimateFill = Ui.Box(screen,351,934,79,4,Ui.Mint,false);
-            SetupSupportButton();
+            SetupSupportButton();SetupFieldTask();SetupBattleFeedback();
             RenderBattle();
         }
         Vector2 PointerPosition()
@@ -143,23 +155,28 @@ namespace ScrapGuard
             if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame) TriggerSupport();
             V2 movement = smokeActive ? SmokeMovement() : Movement();
             battleAccumulator += Mathf.Min(Time.deltaTime, .1f);
+            frameBattleEffects.Clear();
             while (battleAccumulator >= ReplayRecorder.Step && !combat.Ended && !combat.Choosing)
             {
                 battleAccumulator -= ReplayRecorder.Step;
                 combat.Tick(ReplayRecorder.Step, recorder.Move(movement));
+                frameBattleEffects.AddRange(combat.Effects);
             }
+            combat.Effects.Clear();combat.Effects.AddRange(frameBattleEffects);
             RenderBattle();
             if (combat.Ended) FinishBattle(); else if (combat.Choosing) ShowChoices();
         }
         void RenderBattle()
         {
+            float presentationDelta=Mathf.Max(0,combat.Elapsed-presentationTime);presentationTime=combat.Elapsed;
+            scenery.Render(combat.Elapsed);particles.Advance(presentationDelta);
             RenderPlayerMotion();
             drone.gameObject.SetActive(combat.Skills[3] > 0);
             drone.anchoredPosition = new Vector2(combat.DronePosition.x - 10, -(combat.DronePosition.y - 14));
             for (int i = 0; i < saws.Count; i++)
             {
                 bool active = combat.Skills[1] > 0 && i < 1 + combat.Skills[1]; saws[i].gameObject.SetActive(active);
-                if (active) { V2 p = combat.SawPosition(i); saws[i].anchoredPosition = new Vector2(p.x - 11, -p.y + 11); saws[i].localEulerAngles = new Vector3(0, 0, combat.Elapsed * 250); }
+                if (active) { V2 p = combat.SawPosition(i); saws[i].anchoredPosition = new Vector2(p.x, -p.y); saws[i].localEulerAngles = new Vector3(0, 0, combat.Elapsed * 250); }
             }
             hpFill.rectTransform.sizeDelta = new Vector2(492 * Mathf.Clamp01(combat.Hp / combat.MaxHp), 20);
             hpFill.color = combat.Hp < combat.MaxHp * .3f ? Ui.Red : Ui.Mint;
@@ -174,32 +191,22 @@ namespace ScrapGuard
                 alive.Add(e.id); RectTransform view;
                 if (!enemyViews.TryGetValue(e.id, out view))
                 {
-                    if (enemyPool.Count > 0) { view = enemyPool.Pop(); view.gameObject.SetActive(true); }
-                    else
-                    {
-                        var art = Ui.Box(enemyLayer,0,0,48,48,Color.white,false);
-                        art.preserveAspect = true; view = art.rectTransform;
-                        view.pivot = new Vector2(.5f,.5f);
-                        Ui.Label(view,"",8,0,32,24,17,Ui.Ink,TextAnchor.MiddleCenter);
-                    }
+                    if (enemyPool.Count > 0) { view = enemyPool.Pop(); view.GetComponent<EnemyVisual>().ResetState();view.gameObject.SetActive(true); }
+                    else view=EnemyVisual.Create(enemyLayer);
                     enemyViews[e.id] = view;
                 }
-                float size = e.Radius * (e.kind == 3 ? 3.5f : 3.8f);
-                view.sizeDelta = new Vector2(size,size);
-                view.localScale = e.windup>0?new Vector3(1.08f,.92f,1):e.attackFlash>0?new Vector3(.96f,1.06f,1):Vector3.one;
-                view.anchoredPosition = new Vector2(e.position.x,-e.position.y);
-                view.localEulerAngles = new Vector3(0,0,Mathf.Sin(combat.Elapsed*8+e.id)*(e.kind == 3 ? 1.5f : 3));
-                var enemyImage = view.GetComponent<Image>();
-                int pose=e.flash>0?3:e.windup>0?1:e.attackFlash>0 || e.dash>0?2:0;
-                enemyImage.sprite = BattleArt.Role(e.core?4:e.finalBoss?combat.Definition.Region:(int)e.role,pose,e.finalBoss||e.core);
-                enemyImage.color = e.flash > 0 ? new Color(1,.7f,.6f) : Color.white;
-                var mark=view.GetComponentInChildren<Text>();
-                mark.text=e.windup>0?"!":BattleArt.RoleMark(e.role);
-                mark.rectTransform.anchoredPosition=new Vector2(size/2-16,20);
-                if(e.role==EnemyRole.Charger && (e.windup>0 || e.dash>0))view.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(e.direction.y,e.direction.x)*Mathf.Rad2Deg+90);
+                var actor=view.GetComponent<EnemyVisual>();actor.Render(e,combat.Definition.Region,combat.Elapsed);
+                if(actor.JustHit){particles.Burst(e.position,3,Ui.Gold,65,2);HitFeedback();}
+                if((e.finalBoss||e.core) && presentedBoss!=e.id)
+                {
+                    presentedBoss=e.id;
+                    PresentBossCue(e,combat.Challenge?"코어 균열 활성화":combat.Definition.Boss+" 출현",false);
+                }
+                if(actor.JustRaged)PresentBossCue(e,"위험 단계 · 공격 예고에 집중하세요",true);
                 if (e.finalBoss || e.core) boss = e;
             }
             Recycle(enemyViews, enemyPool);
+            bossBackdrop.gameObject.SetActive(boss!=null);
             bossText.text = boss == null ? "" : combat.Challenge ? "최고 보상 목표 · 코어 피해 30,000점" : combat.Definition.Boss + " · " + (boss.hp<boss.maxHp*.5f?"위험 단계":"위험 예고를 피하세요");
             bossFill.rectTransform.sizeDelta = new Vector2(boss == null ? 0 : 380 * Mathf.Clamp01(combat.Challenge ? combat.CoreScore/30000f : boss.hp / boss.maxHp), 7);
             alive.Clear();
@@ -209,17 +216,10 @@ namespace ScrapGuard
                 if (!bulletViews.TryGetValue(b.id, out view))
                 {
                     if (bulletPool.Count > 0) view = bulletPool.Pop();
-                    else
-                    {
-                        view = Ui.Box(bulletLayer,0,0,20,6,Ui.Gold).rectTransform;
-                        view.pivot = new Vector2(.5f,.5f);
-                        Ui.Box(view,-5,1,11,4,Color.white,false);
-                    }
+                    else view=BulletVisual.Create(bulletLayer);
                     view.gameObject.SetActive(true); bulletViews[b.id] = view;
                 }
-                view.anchoredPosition = new Vector2(b.position.x, -b.position.y);
-                view.localEulerAngles = new Vector3(0, 0, -Mathf.Atan2(b.velocity.y, b.velocity.x) * Mathf.Rad2Deg);
-                view.GetComponent<Image>().color = b.mod ? Ui.Hex("D6B1FF") : b.drone ? Ui.Mint : Ui.Gold;
+                view.GetComponent<BulletVisual>().Render(b,combat.Skills[0],Outfits.Active(State,combat.Hero)==1,combat.Elapsed);
             }
             Recycle(bulletViews, bulletPool); alive.Clear();
             foreach (var p in combat.Pickups)
@@ -244,7 +244,9 @@ namespace ScrapGuard
                     else
                     {
                         view = Ui.Box(hazardLayer,0,0,100,100,new Color(1,.25f,.2f,.25f),false).rectTransform;
-                        Ui.Label(view,"!",0,0,100,100,28,Ui.Red,TextAnchor.MiddleCenter);
+                        var outline=Ui.Rect(view,"Damage boundary",0,0,100,100);
+                        var newBoundary=outline.gameObject.AddComponent<WarningShape>();newBoundary.color=Ui.Hex("FF735B");newBoundary.raycastTarget=false;
+                        Ui.Label(view,"!",0,0,100,100,24,Ui.Hex("FFE6A0"),TextAnchor.MiddleCenter);
                     }
                     view.gameObject.SetActive(true); hazardViews[h.id] = view;
                 }
@@ -253,39 +255,67 @@ namespace ScrapGuard
                 view.anchoredPosition = new Vector2(h.position.x-width/2, -(h.position.y-height/2));
                 var warning=view.GetComponent<Image>();
                 warning.sprite=h.width>0?null:Ui.Circle;warning.type=Image.Type.Simple;
-                warning.color = new Color(1, .25f, .2f, .15f + .3f * Mathf.Abs(Mathf.Sin(h.delay * 12)));
+                warning.color = new Color(1, .18f, .12f, .10f + .10f * Mathf.Abs(Mathf.Sin(h.delay * 12)));
+                var boundary=view.GetComponentInChildren<WarningShape>();boundary.rectTransform.sizeDelta=new Vector2(width,height);boundary.SetCircle(h.width<=0);
+                boundary.color=Color.Lerp(Ui.Hex("FF735B"),Ui.Hex("FFF0B0"),.3f*Mathf.Abs(Mathf.Sin(h.delay*12)));
                 var text=view.GetComponentInChildren<Text>();text.rectTransform.sizeDelta=new Vector2(width,height);
             }
             Recycle(hazardViews, hazardPool);
             foreach (var effect in combat.Effects)
             {
-                if (floating.Count >= 36) break;
+                EventFeedback(effect);
+                if(effect.kind==10)particles.Burst(effect.position,18,Ui.Mint,90,4);
+                if(effect.kind==7 || effect.kind==10)continue;
+                if(effect.kind==3 && boss!=null && effect.text==combat.Definition.Boss+" 출현!")continue;
+                if(effect.kind==5)particles.Burst(effect.position,effect.radius>=23?10:5,Ui.Hex("DDB482"),90,4);
+                if(effect.kind==2)particles.Burst(effect.position,12,Ui.Hex("FFBF72"),130,3);
+                if (floating.Count >= 36) continue;
                 RectTransform visual;
                 if(effect.kind==8)
                 {
-                    V2 delta=effect.end-effect.position;
-                    visual=Ui.Box(effectLayer,effect.position.x,effect.position.y,delta.Length,4,Ui.Blue,false).rectTransform;
-                    visual.pivot=new Vector2(0,.5f);visual.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg);
+                    visual=Ui.Rect(effectLayer,"Chain arc",0,0,540,960);
+                    var arc=visual.gameObject.AddComponent<LightningArc>();arc.raycastTarget=false;arc.color=Ui.Hex("A5EFFF");
+                    arc.From=new Vector2(effect.position.x,-effect.position.y);arc.To=new Vector2(effect.end.x,-effect.end.y);
                 }
                 else if (!string.IsNullOrEmpty(effect.text))
                     visual = Ui.Label(effectLayer, effect.text, effect.position.x - 70, effect.position.y - 30, 140, 35, effect.kind == 3 ? 21 : 16,
                         effect.kind == 1 ? Ui.Red : effect.kind == 6 ? Ui.Mint : Ui.Gold, TextAnchor.MiddleCenter).rectTransform;
                 else
-                    visual = Ui.Disc(effectLayer, effect.position.x - effect.radius, effect.position.y - effect.radius, effect.radius * 2,
-                        effect.kind == 4 ? new Color(.3f, .8f, 1, .20f) : new Color(1, .7f, .3f, .22f)).rectTransform;
+                {
+                    visual=CombatRing.Create(effectLayer,Mathf.Max(8,effect.radius*2),effect.kind==4?new Color(.4f,.86f,1,.65f):new Color(1,.72f,.3f,.5f),effect.kind==4?.022f:.04f);
+                    visual.anchoredPosition=new Vector2(effect.position.x,-effect.position.y);
+                }
                 floating.Add(new FloatingEffect { root = visual, life = .55f, total = .55f, text = !string.IsNullOrEmpty(effect.text) });
             }
             combat.Effects.Clear();
             RenderModEffects();
             RenderUltimateHud();
-            RenderSupport();
+            RenderGuideHint();
+            RenderSupport();RenderFieldTask();RenderBattleFeedback();
             for (int i = floating.Count - 1; i >= 0; i--)
             {
-                var f = floating[i]; f.life -= Time.deltaTime;
+                var f = floating[i]; f.life -= presentationDelta;
                 if (f.life <= 0) { Destroy(f.root.gameObject); floating.RemoveAt(i); continue; }
-                if (f.text) f.root.anchoredPosition += Vector2.up * (30 * Time.deltaTime);
+                if (f.text) f.root.anchoredPosition += Vector2.up * (30 * presentationDelta);
                 var graphic = f.root.GetComponent<Graphic>(); Color color = graphic.color; color.a = Mathf.Min(color.a, f.life / f.total); graphic.color = color;
             }
+        }
+        void PresentBossCue(Enemy enemy,string label,bool rage)
+        {
+            if(bossCue!=null)
+            {
+                for(int i=floating.Count-1;i>=0;i--)if(floating[i].root==bossCue)floating.RemoveAt(i);
+                Destroy(bossCue.gameObject);bossCue=null;
+            }
+            if(floating.Count>=34)return;
+            var text=Ui.Label(effectLayer,label,24,236,492,28,17,rage?Ui.Hex("FFD7C0"):Ui.Gold,TextAnchor.MiddleCenter).rectTransform;
+            var shadow=text.gameObject.AddComponent<Shadow>();shadow.effectColor=new Color(0,0,0,.8f);shadow.effectDistance=new Vector2(1,-1);
+            bossCue=text;
+            floating.Add(new FloatingEffect{root=text,life=2.2f,total=2.2f,text=false});
+            var ring=CombatRing.Create(effectLayer,enemy.Radius*3.5f,rage?Ui.Red:Ui.Gold,.025f);
+            ring.anchoredPosition=new Vector2(enemy.position.x,-enemy.position.y);
+            floating.Add(new FloatingEffect{root=ring,life=1,total=1,text=false});
+            particles.Burst(enemy.position,18,rage?Ui.Red:Ui.Gold,115,3);
         }
         void Recycle(Dictionary<int, RectTransform> views, Stack<RectTransform> pool)
         {
@@ -350,6 +380,9 @@ namespace ScrapGuard
             Ui.Label(card, TimeLabel(receipt != null ? receipt.seconds : combat.Elapsed) + " 생존    " + (receipt != null ? receipt.kills : combat.Kills) + "마리 처치    Lv." + combat.Level, 24, 184, 444, 40, 17, Ui.Muted, TextAnchor.MiddleCenter);
             Ui.Box(card, 24, 249, 444, 92, Ui.Raised);
             Ui.Label(card, receipt == null ? "보상 저장 완료" : "골드 +" + receipt.gold + "   부품 +" + receipt.parts + (receipt.blueprints>0 ? "\n지역 설계도 +"+receipt.blueprints : "") + (receipt.gems > 0 ? " · 최초 보석 +" + receipt.gems : ""), 39, 258, 414, 74, 19, Ui.Gold, TextAnchor.MiddleCenter);
+            foreach(var text in card.GetComponentsInChildren<Text>())if(text.text.StartsWith("골드 +"))text.gameObject.AddComponent<RewardReveal>().Initialize(text);
+            if(receipt!=null && receipt.report!=null && receipt.report.taskCompleted)
+                Ui.Label(card,"현장 임무 보상 포함 · 골드 +"+(receipt.report.taskChoice==2?400:200)+" / 부품 +"+(receipt.report.taskChoice==2?4:2),24,334,444,25,12,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(card,"전투 분석 · 조합 확인",24,360,444,51,BattleAnalysis,Ui.Mint,true,18);
             bool canBonus = !Online && !State.lastResultBonus && State.lastResultGold > 0 && State.dailyRewardGold < 3 && State.lastResultDate == State.serviceDate;
             Ui.Button(card, State.lastResultBonus ? "추가 보상 수령 완료" : "추가 골드 +50%  ·  " + (State.demoAdSkip ? "스킵" : "광고 체험"), 24, 433, 444, 57,
@@ -357,6 +390,7 @@ namespace ScrapGuard
             int stage = combat.Stage;
             Ui.Button(card, "다시 출격", 24, 519, 214, 62, () => { combat = null; StartBattle(stage); });
             Ui.Button(card, "장비 정비", 254, 519, 214, 62, () => { combat = null; Show("gear"); }, Ui.Raised);
+            if(StarterGuide.Next(State)<5)Ui.Button(card,"다음 목표 · "+StarterGuide.Names[StarterGuide.Next(State)],24,591,444,34,()=>{combat=null;Show("home");GuidePanel();},Ui.Raised,true,14);
             Ui.Button(card, "정비소로 돌아가기", 24, 632, 444, 51, () => { combat = null; Show("home"); }, Ui.Panel, true, 16);
             card.GetChild(2).gameObject.SetActive(false);
         }

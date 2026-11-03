@@ -4,9 +4,9 @@ namespace ScrapGuard.Core
 {
     public sealed partial class Combat
     {
-        readonly float[] damageTaken=new float[9];
+        readonly float[] damageTaken=new float[13];
         DamageCause endCause;
-        float turretTimer;
+        float turretTimer,repairTimer;
         int announcedMods;
         public int DefeatedRoles { get; private set; }
         public int Mods { get { return Workshop.ModMask(Skills); } }
@@ -15,12 +15,18 @@ namespace ScrapGuard.Core
         void UpdateMods(float dt)
         {
             int unlocked=Mods&~announcedMods;
-            for(int i=0;i<3;i++)if((unlocked&(1<<i))!=0)Effects.Add(new BattleEffect {position=Position,kind=7,text=Workshop.ModNames[i]+" 개조 완성!"});
+            for(int i=0;i<Workshop.ModNames.Length;i++)if((unlocked&(1<<i))!=0)Effects.Add(new BattleEffect {position=Position,kind=7,text=Workshop.ModNames[i]+" 개조 완성!"});
             announcedMods|=Mods;
             if(HasMod(0))foreach(var enemy in Enemies)
             {
                 float distance=V2.Distance(Position,enemy.position);
                 if(!enemy.core && !enemy.finalBoss && distance>45 && distance<150)enemy.position=Slide(enemy.position,(Position-enemy.position).Normal*(95*dt),Math.Min(enemy.Radius,20));
+            }
+            repairTimer-=dt;
+            if(HasMod(4) && repairTimer<=0)
+            {
+                repairTimer=10;Hp=Math.Min(MaxHp,Hp+MaxHp*.03f);Shield=Math.Max(Shield,MaxHp*.08f);
+                Effects.Add(new BattleEffect{position=DronePosition,kind=6,text="수리 드론 +3%"});
             }
             turretTimer-=dt;
             if(HasMod(2) && turretTimer<=0)
@@ -50,7 +56,7 @@ namespace ScrapGuard.Core
         }
         public BattleReport Report()
         {
-            var result=new BattleReport {cause=(int)endCause,mods=Mods,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
+            var result=new BattleReport {cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
             if(bossSpawned && !Challenge)
             {
                 result.bossRemaining=Won?0:-1;

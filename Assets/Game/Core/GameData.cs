@@ -53,7 +53,9 @@ namespace ScrapGuard.Core
         public int showcaseHero;
         public int showcaseTitle;
         public int showcaseFrame;
-        public int selectedSkin;
+        public int selectedSkin, selectedOutfit;
+        public int guideVersion;
+        public bool guideIntroSeen, guideMoved, guideUltimate, guideUpgrade, guideMod;
         public bool publicProfile;
         public bool testProgress;
         public List<string> showcaseItems = new List<string>();
@@ -66,13 +68,14 @@ namespace ScrapGuard.Core
         public List<Receipt> receipts = new List<Receipt>();
         public static GameState New()
         {
-            var state = new GameState();
+            var state = new GameState { guideVersion = 1 };
             for (int i = 0; i < 3; i++)
             {
                 var item = new Item { id = Guid.NewGuid().ToString("N"), definition = i == 0 ? 0 : i == 1 ? 6 : 9 };
                 state.items.Add(item); state.equipped.Add(item.id);
-                state.heroes.Add(new HeroProgress { id = i, unlocked = i == 0 });
+
             }
+            for (int i = 0; i < HeroCatalog.Count; i++) state.heroes.Add(new HeroProgress { id = i, unlocked = i == 0 });
             return state;
         }
     }
@@ -85,8 +88,8 @@ namespace ScrapGuard.Core
     }
     public static class Catalog
     {
-        public static readonly string[] HeroNames = { "정비사 루크", "돌격수 레이", "수호자 볼트" };
-        public static readonly string[] HeroRoles = { "드론 피해 +15%", "치명타 +5% · 빠른 이동", "20초마다 보호막 생성" };
+        public static readonly string[] HeroNames = Array.ConvertAll(HeroCatalog.All, h => h.Name);
+        public static readonly string[] HeroRoles = Array.ConvertAll(HeroCatalog.All, h => h.Passive);
         public static readonly string[] StageNames = Array.ConvertAll(Campaign.Stages, s => s.Name);
         public static readonly string[] StageDescriptions = Array.ConvertAll(Campaign.Stages, s => s.Description);
         public static readonly string[] RarityNames = { "일반", "고급", "희귀" };
@@ -108,18 +111,18 @@ namespace ScrapGuard.Core
         };
         public static int Attack(GameState s)
         {
-            float baseValue = new[] { 100, 110, 90 }[s.selectedHero];
-            baseValue *= 1 + .03f * (s.heroes[s.selectedHero].level - 1);
             var weapon = s.items.Find(i => i.id == s.equipped[0]);
-            if (weapon != null) baseValue += 30 * Multiplier(weapon);
-            return (int)baseValue;
+            return AttackFor(s.selectedHero,s.heroes[s.selectedHero].level,weapon);
         }
         public static int Health(GameState s)
         {
-            float hp = new[] { 1000, 850, 1200 }[s.selectedHero] * (1 + .03f * (s.heroes[s.selectedHero].level - 1));
             var armor = s.items.Find(i => i.id == s.equipped[1]);
-            return (int)(hp + (armor == null ? 0 : 180 * Multiplier(armor)));
+            return HealthFor(s.selectedHero,s.heroes[s.selectedHero].level,armor);
         }
+        public static int AttackFor(int hero,int level,Item weapon)
+        { return (int)(HeroCatalog.All[hero].Attack*(100+3*(level-1))/100f+(weapon==null?0:30*Multiplier(weapon))); }
+        public static int HealthFor(int hero,int level,Item armor)
+        { return (int)(HeroCatalog.All[hero].Health*(100+3*(level-1))/100f+(armor==null?0:180*Multiplier(armor))); }
         public static float Multiplier(Item item) { return new[] { 1f, 1.15f, 1.35f }[item.rarity] * (1 + .05f * (item.level - 1)); }
         public static string ServiceDate(DateTimeOffset utc) { return utc.ToOffset(TimeSpan.FromHours(9)).AddHours(-5).ToString("yyyy-MM-dd"); }
     }

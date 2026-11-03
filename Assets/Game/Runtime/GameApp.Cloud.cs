@@ -59,6 +59,7 @@ namespace ScrapGuard
             }
             SetNetworkBusy(false); Show(page); Toast(reply.message);
             if (!reply.success || !string.IsNullOrEmpty(State.activeRun)) AccountPanel();
+            else if(titleScreen==null && !smokeActive && !State.guideIntroSeen)Change(new GameCommand("guide_seen"),GuidePanel);
         }
         void AccountPanel()
         {

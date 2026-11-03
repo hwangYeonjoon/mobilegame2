@@ -9,20 +9,21 @@ namespace ScrapGuard
     {
         GuildMember selectedGuildSupport;
         Button supportButton;Text supportText;RectTransform supportArt;
-        static readonly string[] SupportNames={"현장 수리","관통 지원","방호 지원"};
-        static readonly string[] SupportDetails={"체력 25% 수리 + 8초 사격 지원","8초간 빠른 관통 사격 지원","체력 40% 보호막 + 8초 사격 지원"};
+        static readonly string[] SupportNames=Array.ConvertAll(HeroCatalog.All,h=>h.SupportName);
+        static readonly string[] SupportDetails=Array.ConvertAll(HeroCatalog.All,h=>h.SupportDetail);
         void OpenGuild()
         {
             if(Online && cloudReady){StartCoroutine(LoadGuild());return;}
-            var card=Dialog("함께 싸우는 길드","길드 동료의 대원을 빌려 일반 구역을 공략하세요.",650);
-            for(int i=0;i<3;i++)
+            var card=Dialog("함께 싸우는 길드","길드 동료의 대원을 빌려 일반 구역을 공략하세요.",820);
+            var list=Ui.Scroll(card,24,140,444,476,HeroCatalog.Count*117);
+            for(int i=0;i<HeroCatalog.Count;i++)
             {
-                CharacterArt.Draw(card,28,145+i*117,80,95,i,0);
-                Ui.Label(card,SupportNames[i],123,150+i*117,328,33,22,Ui.Mint);
-                Ui.Label(card,SupportDetails[i],123,192+i*117,328,49,16,Ui.Muted);
+                CharacterArt.Draw(list,4,i*117,80,95,i,0);
+                Ui.Label(list,SupportNames[i],99,5+i*117,328,33,22,Ui.Mint);
+                Ui.Label(list,SupportDetails[i],99,47+i*117,328,49,16,Ui.Muted);
             }
-            Ui.Label(card,"하루 지원 출격 3회 · 전투마다 한 번 호출\n길드 생성·가입은 서버 계정에서 이용할 수 있어요.",24,501,444,55,15,Ui.Muted,TextAnchor.MiddleCenter);
-            Ui.Button(card,"계정 · 서버 연결",24,579,444,50,AccountPanel);
+            Ui.Label(card,"하루 지원 출격 3회 · 전투마다 한 번 호출\n길드 생성·가입은 서버 계정에서 이용할 수 있어요.",24,646,444,55,15,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,"계정 · 서버 연결",24,739,444,50,AccountPanel);
         }
         IEnumerator LoadGuild()
         {
@@ -50,11 +51,12 @@ namespace ScrapGuard
             var panel=Dialog(guild.name,"지원 출격 오늘 "+guild.remaining+"/3회 남음 · 정원 20명\n동료 대원의 소유권과 성장 기록은 그대로 유지돼요.",900);
             Ui.Button(panel,"초대 코드 복사",24,140,214,45,()=>{GUIUtility.systemCopyBuffer=guild.code;Toast("길드 초대 코드를 복사했어요.");},Ui.Raised,true,15);
             Ui.Button(panel,"내 지원 대원 등록",254,140,214,45,SupportRegistration,Ui.Mint,true,15);
-            var list=Ui.Scroll(panel,24,204,444,491,Math.Max(491,guild.members.Count*113));
+            Ui.Button(panel,"이번 주 지원 활약 · 대원 전시",24,197,444,42,()=>SupportHall(guild),Ui.Gold,true,16);
+            var list=Ui.Scroll(panel,24,252,444,443,Math.Max(443,guild.members.Count*113));
             for(int i=0;i<guild.members.Count;i++)
             {
                 var m=guild.members[i];float y=i*113;Ui.Box(list,0,y,444,103,Ui.Raised);
-                if(m.hero>=0)CharacterArt.Draw(list,7,y+10,78,83,m.hero,m.skin);
+                if(m.hero>=0)CharacterArt.Draw(list,7,y+10,78,83,m.hero,m.skin,m.outfit);
                 Ui.Label(list,m.name+(m.self?" (나)":""),96,y+8,229,29,19);
                 Ui.Label(list,m.hero<0?"지원 대원 미등록":SupportNames[m.hero]+" · Lv."+m.level+"\n"+SupportDetails[m.hero],96,y+41,226,53,12,Ui.Muted);
                 Ui.Button(list,m.self?"등록 변경":selectedGuildSupport!=null&&selectedGuildSupport.id==m.id?"선택됨":"동행 선택",332,y+27,101,49,()=>
@@ -74,15 +76,16 @@ namespace ScrapGuard
         }
         void SupportRegistration()
         {
-            var card=Dialog("내 대원 지원 등록","프로필 공개 시 지원에 도색·이름·칭호가 표시돼요.",650);
-            for(int i=0;i<3;i++)
+            var card=Dialog("내 대원 지원 등록","프로필 공개 시 지원에 도색·이름·칭호가 표시돼요.",820);
+            var list=Ui.Scroll(card,24,140,444,570,HeroCatalog.Count*118);
+            for(int i=0;i<HeroCatalog.Count;i++)
             {
-                int hero=i;float y=144+i*118;CharacterArt.Draw(card,24,y,80,96,i,State.selectedSkin);
-                Ui.Label(card,Catalog.HeroNames[i],120,y+1,330,34,21);
-                Ui.Label(card,SupportDetails[i],120,y+39,330,27,14,Ui.Muted);
-                Ui.Button(card,State.heroes[i].unlocked?"지원 대원으로 등록":"대원 미보유",120,y+76,330,34,()=>GuildChange(new GameCommand("guild_support"){hero=hero,enabled=true}),Ui.Raised,State.heroes[i].unlocked,15);
+                int hero=i;float y=i*118;CharacterArt.Draw(list,0,y,80,96,i,State.selectedSkin,Outfits.Active(State,i));
+                Ui.Label(list,Catalog.HeroNames[i],96,y+1,330,34,21);
+                Ui.Label(list,SupportDetails[i],96,y+39,330,27,14,Ui.Muted);
+                Ui.Button(list,State.heroes[i].unlocked?"지원 대원으로 등록":"대원 미보유",96,y+76,330,34,()=>GuildChange(new GameCommand("guild_support"){hero=hero,enabled=true}),Ui.Raised,State.heroes[i].unlocked,15);
             }
-            Ui.Button(card,"지원 등록 해제",24,555,444,54,()=>GuildChange(new GameCommand("guild_support"){enabled=false}),Ui.Raised,true,16);
+            Ui.Button(card,"지원 등록 해제",24,745,444,54,()=>GuildChange(new GameCommand("guild_support"){enabled=false}),Ui.Raised,true,16);
         }
         void ConfirmGuildLeave(bool leader)
         {
@@ -94,7 +97,7 @@ namespace ScrapGuard
         {
             if(!Online || selectedGuildSupport==null){StartBattle(selectedStage);return;}
             var member=selectedGuildSupport;var card=Dialog("길드 동료와 출격",member.name+"의 "+Catalog.HeroNames[member.hero],458);
-            CharacterArt.Draw(card,24,142,106,121,member.hero,member.skin);
+            CharacterArt.Draw(card,24,142,106,121,member.hero,member.skin,member.outfit);
             Ui.Label(card,SupportDetails[member.hero]+"\n전투 시작 8초 후 한 번 호출할 수 있어요.",150,149,310,100,17,Ui.Mint);
             Ui.Label(card,"출격 시 하루 이용 횟수 1회가 차감돼요.\n전투를 중단해도 반환되지 않아요.",24,278,444,53,15,Ui.Muted);
             Ui.Button(card,"지원 없이",24,359,214,57,()=>StartBattle(selectedStage),Ui.Raised,true,17);
@@ -105,13 +108,13 @@ namespace ScrapGuard
             supportButton=null;supportArt=null;
             if(combat.Support==null)return;
             supportButton=Ui.Button(screen,"",183,876,146,66,TriggerSupport,Ui.Blue,true,15);supportText=supportButton.GetComponentInChildren<Text>();
-            supportArt=CharacterArt.Draw(effectLayer,0,0,44,52,combat.Support.hero,combat.Support.skin).rectTransform;
+            supportArt=CharacterArt.Draw(effectLayer,0,0,44,52,combat.Support.hero,combat.Support.skin,combat.Support.outfit).rectTransform;
         }
         void TriggerSupport()
         {
             if(combat==null || battlePaused || networkBusy || !combat.UseSupport())return;
             recorder.Support();dragging=false;SupportArrivalCard();
-            var label=Ui.Label(effectLayer,SupportNames[combat.Support.hero]+"!",80,290,380,44,26,Ui.Blue,TextAnchor.MiddleCenter);
+            var label=Ui.Label(effectLayer,SupportNames[combat.Support.hero]+"!",80,363,380,44,26,Ui.Blue,TextAnchor.MiddleCenter);
             label.gameObject.AddComponent<CombatBurst>().Configure(1.3f,1,1);RenderBattle();
         }
         void RenderSupport()

@@ -154,6 +154,7 @@ public sealed partial class GameRepository
                 try { simulation = ReplayRecorder.Verify(Decode<GameState>(a.RunSnapshot), a.State.activeStage, command.id, a.RunSeed, command.replay, (clock() - DateTimeOffset.Parse(a.RunStarted)).TotalSeconds, a.State.activeMode, a.RunSupport==null?null:Decode<SupportSnapshot>(a.RunSupport)); }
                 catch (ArgumentException ex) { throw new ApiFault(400, ex.Message); }
                 RecordWeekly(db,tx,a,simulation);
+                RecordSupport(db,tx,a,simulation);
                 result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
                 a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }

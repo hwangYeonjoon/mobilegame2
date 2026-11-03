@@ -57,7 +57,7 @@ string Token(HttpContext ctx)
     if (!header.StartsWith("Bearer ", StringComparison.Ordinal)) throw new ApiFault(401, "계정 연결이 필요해요.");
     return header.Substring(7);
 }
-app.MapGet("/health", () => new { status = "ok", version = "0.6.0", commerce = "disabled", maintenance = operations.Maintenance });
+app.MapGet("/health", () => new { status = "ok", version = "0.10.0", commerce = "disabled", maintenance = operations.Maintenance });
 app.MapGet("/health/ready", () => DatabaseMaintenance.Ready(databasePath) ? Results.Ok(new { status = "ready" }) : Results.Json(new { status = "unavailable" },statusCode:503));
 app.MapPost("/v1/auth/guest", (GuestRequest body, GameRepository repo) => { operations.CheckRegistration(body.inviteCode); return repo.Register(body.secret); }).RequireRateLimiting("register");
 app.MapGet("/v1/bootstrap", (HttpContext ctx, GameRepository repo) => repo.Bootstrap(Token(ctx)));

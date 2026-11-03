@@ -37,6 +37,7 @@ namespace ScrapGuard
         {
             if(titleScreen==null)return;
             titleScreen.gameObject.SetActive(false);Destroy(titleScreen.gameObject);titleScreen=null;
+            if(!smokeActive && (!Online || cloudReady) && !networkBusy && !State.guideIntroSeen)Change(new ScrapGuard.Core.GameCommand("guide_seen"),GuidePanel);
         }
     }
 }

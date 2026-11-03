@@ -38,7 +38,14 @@ namespace ScrapGuard.Core
                 foreach(var zone in Zones)if(zone.Contains(Position)){Hurt(65+Definition.Region*15,DamageCause.Poison);poisonTimer=.8f;break;}
             }
             terrainTimer-=dt;
-            if(terrainTimer>0 || (Definition.Region!=1 && Definition.Region!=4))return;
+            if(terrainTimer>0 || (Definition.Region!=1 && Definition.Region!=4 && Definition.Region!=5 && Definition.Region!=6))return;
+            if(Definition.Region>=5)
+            {
+                terrainTimer=Definition.Region==5?5.5f:6.5f;
+                var zone=Zones[terrainPulse++%Zones.Length];
+                Warn(zone.Center,0,Definition.Region==5?1.6f:2f,Definition.Region==5?190:230,zone.W,zone.H,Definition.Region==5?DamageCause.Electricity:DamageCause.Heat);
+                return;
+            }
             terrainTimer=Definition.Region==1?7:9;
             if(Definition.Region==1)
             {
@@ -54,7 +61,7 @@ namespace ScrapGuard.Core
         EnemyRole BossRole()
         {
             if(Challenge)return EnemyRole.Pursuer;
-            return new[]{EnemyRole.Charger,EnemyRole.Artillery,EnemyRole.Bomber,EnemyRole.Shield,EnemyRole.Summoner}[Definition.Region];
+            return Campaign.BossRole(Definition.Region);
         }
         void Warn(V2 position,float radius,float delay,float damage,float width=0,float height=0,DamageCause cause=DamageCause.Artillery)
         {
@@ -64,7 +71,10 @@ namespace ScrapGuard.Core
         void UpdateEnemyRole(Enemy e,float dt)
         {
             if(e.core)return;
-            V2 direction=(Position-e.position).Normal;float distance=V2.Distance(Position,e.position);
+            V2 goal=TaskActive && Task==FieldTask.Defense && !e.finalBoss?TaskPosition:Position;
+            V2 direction=(goal-e.position).Normal;float distance=V2.Distance(goal,e.position);
+            e.slowTime=Math.Max(0,e.slowTime-dt);e.freezeTime=Math.Max(0,e.freezeTime-dt);
+            if(e.freezeTime>0)return;
             e.cooldown-=dt;float speed=e.speed;
             if(e.role==EnemyRole.Charger)
             {
@@ -73,7 +83,9 @@ namespace ScrapGuard.Core
                     e.windup-=dt;if(e.windup<=0){e.dash=.65f;e.attackFlash=.65f;}return;
                 }
                 if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?190:240;}
-                else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=.8f;e.cooldown=4.5f;return;}
+                else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=.8f;e.cooldown=4.5f;
+                    if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat);
+                    return;}
             }
             else if(e.role==EnemyRole.Artillery)
             {
@@ -81,7 +93,12 @@ namespace ScrapGuard.Core
                 if(e.cooldown<=0)
                 {
                     e.cooldown=e.finalBoss?3:4.8f;e.attackFlash=.4f;
-                    Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100);
+                    if(e.finalBoss && Definition.Region==5)
+                    {
+                        Warn(Position,0,1.5f,185,400,28,DamageCause.Electricity);
+                        if(e.hp<e.maxHp*.5f)Warn(Position,0,1.9f,185,28,400,DamageCause.Electricity);
+                    }
+                    else Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100);
                     if(e.finalBoss && e.hp<e.maxHp*.5f)
                     { Warn(Position+new V2(100,0),50,1.7f,130);Warn(Position-new V2(100,0),50,1.7f,130); }
                 }
@@ -111,6 +128,7 @@ namespace ScrapGuard.Core
                     if(!IsBlocked(p))Enemies.Add(new Enemy {id=nextId++,kind=1,role=EnemyRole.Pursuer,position=p,hp=90*Definition.Difficulty,maxHp=90*Definition.Difficulty,speed=68});
                 }
             }
+            if(e.slowTime>0)speed*=e.finalBoss?.85f:.7f;
             var before=e.position;
             e.position=Slide(e.position,direction*(speed*dt),Math.Min(e.Radius,20));
             if(speed>0 && V2.Distance(before,e.position)<speed*dt*.2f)

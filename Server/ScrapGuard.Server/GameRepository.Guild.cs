@@ -20,10 +20,19 @@ public sealed partial class GameRepository
                 owner TEXT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
                 guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,hero INTEGER NOT NULL DEFAULT -1);
             CREATE INDEX IF NOT EXISTS guild_roster ON guild_members(guild,owner);
+            CREATE TABLE IF NOT EXISTS support_runs(
+                run TEXT PRIMARY KEY, week TEXT NOT NULL, guild TEXT NOT NULL REFERENCES guilds(id) ON DELETE CASCADE,
+                owner TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+                borrower TEXT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE, won INTEGER NOT NULL);
+            CREATE INDEX IF NOT EXISTS support_week ON support_runs(guild,week,owner);
             """);
         using var columns=Sql(db,null,"PRAGMA table_info(accounts)");bool present=false;
         using(var r=columns.ExecuteReader())while(r.Read())if(r.GetString(1)=="run_support")present=true;
         if(!present)Execute(db,null,"ALTER TABLE accounts ADD COLUMN run_support TEXT");
+        bool hasOutfit=false;
+        using(var query=Sql(db,null,"PRAGMA table_info(weekly_records)"))
+        using(var reader=query.ExecuteReader())while(reader.Read())if(reader.GetString(1)=="outfit")hasOutfit=true;
+        if(!hasOutfit)Execute(db,null,"ALTER TABLE weekly_records ADD COLUMN outfit INTEGER NOT NULL DEFAULT 0");
     }
     string GuildId(SqliteConnection db,SqliteTransaction tx,string owner)
     {
@@ -33,12 +42,12 @@ public sealed partial class GameRepository
     int SupportPower(GameState state,int hero)
     {
         var weapon=state.items.Find(i=>i.id==state.equipped[0]);
-        return Math.Min(350,(int)(new[]{100,110,90}[hero]*(1+.03f*(state.heroes[hero].level-1))+30*Catalog.Multiplier(weapon)));
+        return Math.Min(350,Catalog.AttackFor(hero,state.heroes[hero].level,weapon));
     }
     public GuildView Guild(string token)
     {
         using var db=Open();using var tx=db.BeginTransaction();var viewer=Load(db,tx,token);new Economy(viewer.State,clock);
-        var result=new GuildView {remaining=Math.Max(0,3-viewer.State.dailySupportStarts)};
+        var result=new GuildView {week=Endgame.Week(clock()),remaining=Math.Max(0,3-viewer.State.dailySupportStarts)};
         string guild=GuildId(db,tx,viewer.Id);if(guild==null)return result;
         using(var query=Sql(db,tx,"SELECT name,code,leader FROM guilds WHERE id=$id",("$id",guild)))
         using(var r=query.ExecuteReader())
@@ -54,9 +63,31 @@ public sealed partial class GameRepository
             if(Blocked(db,tx,viewer.Id,member.id))continue;
             var target=Load(db,tx,member.id,true);int hero=member.hero;
             result.members.Add(new GuildMember {id=target.Id,name=target.State.displayName,hero=hero,self=target.Id==viewer.Id,
-                level=hero<0?0:target.State.heroes[hero].level,skin=target.State.selectedSkin,power=hero<0?0:SupportPower(target.State,hero)});
+                level=hero<0?0:target.State.heroes[hero].level,skin=target.State.selectedSkin,outfit=Outfits.Active(target.State,hero),power=hero<0?0:SupportPower(target.State,hero)});
         }
+        foreach(var member in result.members)
+        {
+            using var stats=Sql(db,tx,"SELECT borrower,won FROM support_runs WHERE guild=$guild AND week=$week AND owner=$owner",("$guild",guild),("$week",result.week),("$owner",member.id));
+            var helped=new HashSet<string>();using var rows=stats.ExecuteReader();
+            while(rows.Read())
+            {
+                string borrower=rows.GetString(0);
+                if(!result.members.Exists(m=>m.id==borrower))continue;
+                member.supportUses++;if(rows.GetInt32(1)>0){member.supportWins++;helped.Add(borrower);}
+            }
+            member.helpedMembers=helped.Count;
+        }
+        result.featuredId=result.members.Where(m=>m.hero>=0 && m.helpedMembers>0).OrderByDescending(m=>m.helpedMembers).ThenByDescending(m=>m.supportWins).ThenBy(m=>m.id,StringComparer.Ordinal).Select(m=>m.id).FirstOrDefault();
         return result;
+    }
+    void RecordSupport(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
+    {
+        var support=combat.Support;
+        if(combat.Challenge || !combat.SupportUsed || combat.Elapsed<30 || support==null || string.IsNullOrEmpty(support.guild))return;
+        if(GuildId(db,tx,account.Id)!=support.guild || GuildId(db,tx,support.owner)!=support.guild || Blocked(db,tx,account.Id,support.owner))return;
+        // Only verified calls count. Abandoned runs may count as use, never as a helped clear.
+        Execute(db,tx,"INSERT OR IGNORE INTO support_runs(run,week,guild,owner,borrower,won) VALUES($run,$week,$guild,$owner,$borrower,$won)",
+            ("$run",combat.RunId),("$week",Endgame.Week(clock())),("$guild",support.guild),("$owner",support.owner),("$borrower",account.Id),("$won",combat.Won?1:0));
     }
     CommandResult GuildCommand(SqliteConnection db,SqliteTransaction tx,Account a,GameCommand command)
     {
@@ -112,10 +143,10 @@ public sealed partial class GameRepository
         if(a.State.dailySupportStarts>=3)throw new ApiFault(400,"오늘 길드 지원 3회를 모두 사용했어요.");
         using var query=Sql(db,tx,"SELECT hero FROM guild_members WHERE owner=$owner",("$owner",id));int hero=Convert.ToInt32(query.ExecuteScalar());
         var target=Load(db,tx,id,true);
-        if(hero<0 || hero>2 || !target.State.heroes[hero].unlocked)throw new ApiFault(400,"지원 등록이 해제된 대원이에요.");
+        if(hero<0 || hero>=HeroCatalog.Count || !target.State.heroes[hero].unlocked)throw new ApiFault(400,"지원 등록이 해제된 대원이에요.");
         a.State.dailySupportStarts++;
         bool show=target.State.publicProfile;
-        return new SupportSnapshot {owner=id,name=show?target.State.displayName:"길드 지원 대원",hero=hero,skin=show?target.State.selectedSkin:0,power=SupportPower(target.State,hero),
+        return new SupportSnapshot {owner=id,guild=guild,name=show?target.State.displayName:"길드 지원 대원",hero=hero,skin=show?target.State.selectedSkin:0,outfit=show?Outfits.Active(target.State,hero):0,power=SupportPower(target.State,hero),
             showIdentity=show,title=show?target.State.showcaseTitle:0,frame=show?target.State.showcaseFrame:0,trophy=show?Endgame.Trophy(target.State):-1};
     }
 }

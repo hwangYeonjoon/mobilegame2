@@ -12,34 +12,36 @@ namespace ScrapGuard
         void ModBook()
         {
             var card=Dialog("고철 개조 도감","전투 중 두 스킬을 조합하면 자동으로 개조됩니다.\n개조는 이번 전투에만 적용돼요.",820);
-            for(int i=0;i<3;i++)
+            var list=Ui.Scroll(card,24,140,444,600,Workshop.ModNames.Length*163);
+            for(int i=0;i<Workshop.ModNames.Length;i++)
             {
-                float y=152+i*182;var row=Ui.Box(card,24,y,444,165,Ui.Background).transform;
-                Ui.Label(row,Workshop.ModNames[i],17,12,410,34,23,Ui.Mint);
-                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+" Lv.3 + "+Catalog.SkillNames[Workshop.SubSkills[i]]+" Lv.2",17,54,410,30,16,Ui.Gold);
-                Ui.Label(row,Workshop.ModDetails[i],17,94,410,52,17,Ui.Muted);
+                float y=i*163;var row=Ui.Box(list,0,y,444,151,Ui.Background).transform;
+                Ui.Label(row,Workshop.ModNames[i],17,9,410,34,22,Ui.Mint);
+                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+" Lv.3 + "+Catalog.SkillNames[Workshop.SubSkills[i]]+" Lv.2",17,48,410,30,15,Ui.Gold);
+                Ui.Label(row,Workshop.ModDetails[i],17,87,410,51,16,Ui.Muted);
             }
-            Ui.Label(card,"스킬 선택 화면에서 필요한 조합과 완성 여부를 확인하세요.",24,718,444,55,15,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,"화력 / 제어 / 생존 · 같은 스킬도 다른 개조로 이어집니다",24,759,444,34,13,Ui.Muted,TextAnchor.MiddleCenter);
         }
         string ModHint(int skill)
         {
-            for(int i=0;i<3;i++)if(Workshop.MainSkills[i]==skill || Workshop.SubSkills[i]==skill)
+            string hints="";int shown=0;
+            for(int i=0;i<Workshop.ModNames.Length && shown<2;i++)if(Workshop.MainSkills[i]==skill || Workshop.SubSkills[i]==skill)
             {
                 int main=combat.Skills[Workshop.MainSkills[i]]+(Workshop.MainSkills[i]==skill?1:0);
                 int sub=combat.Skills[Workshop.SubSkills[i]]+(Workshop.SubSkills[i]==skill?1:0);
-                return "\n"+Workshop.ModNames[i]+(main>=3 && sub>=2?" 완성":" · "+Math.Min(main,3)+"/3 + "+Math.Min(sub,2)+"/2");
+                hints+="\n"+Workshop.ModNames[i]+(main>=3 && sub>=2?" 완성!":" · "+Math.Min(main,3)+"/3 + "+Math.Min(sub,2)+"/2");shown++;
             }
-            return "";
+            return hints;
         }
         void RegionCollection(int region)
         {
             Workshop.Normalize(State);var progress=Workshop.Region(State,region);int skin=region+3;bool owned=Social.HasSkin(State,skin);
             var card=Dialog("지역 수집 · 전용 도색","작전 완료마다 확정 설계도 · 뽑기 없음",850);
-            for(int i=0;i<Campaign.Regions.Length;i++){int r=i;Ui.Button(card,(r+1).ToString(),24+i*90,128,84,42,()=>RegionCollection(r),r==region?Ui.Mint:Ui.Raised,true,17);}
+            for(int i=0;i<Campaign.Regions.Length;i++){int r=i;Ui.Button(card,(r+1).ToString(),24+i*(450f/Campaign.Regions.Length),128,450f/Campaign.Regions.Length-6,42,()=>RegionCollection(r),r==region?Ui.Mint:Ui.Raised,true,17);}
             Ui.Label(card,Campaign.Regions[region],24,187,444,39,25);
             CharacterArt.Draw(card,35,247,144,155,State.showcaseHero,skin);
             Ui.Label(card,Social.Skins[skin],195,251,270,38,23,CharacterArt.Tint(skin));
-            Ui.Label(card,"3대원 공용 도색\n능력치 변화 없음\n이 지역 작전에서만 설계도 획득",195,299,270,93,16,Ui.Muted);
+            Ui.Label(card,"전체 대원 공용 도색\n능력치 변화 없음\n이 지역 작전에서만 설계도 획득",195,299,270,93,16,Ui.Muted);
             Ui.Label(card,"설계도 "+progress.blueprints+" / "+Workshop.BlueprintCost+"     완료 "+progress.wins+"회",24,420,444,37,21,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(card,"성공 1개 · 지역 마지막 작전 성공 2개\n"+(owned?"도색 제작 완료": "제작까지 "+Math.Max(0,Workshop.BlueprintCost-progress.blueprints)+"개 남았어요."),24,465,444,54,16,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,owned?State.selectedSkin==skin?"사용 중인 도색":"내 대원에 적용":"설계도 8개로 제작",24,539,444,57,()=>
@@ -62,15 +64,15 @@ namespace ScrapGuard
         void EnemyCodex()
         {
             var card=Dialog("기계 생태 도감","처치한 적과 토벌한 지역 보스가 기록됩니다.",870);
-            var list=Ui.Scroll(card,24,136,444,695,11*107);
+            var list=Ui.Scroll(card,24,136,444,695,(6+Campaign.Regions.Length)*107);
             string[] names={"고철 집게","돌진 드릴","포격 궤도차","자폭 반응로","방패 보행기","소환 송신기"};
             string[] tips={"접촉 전에 거리를 확보하세요","돌진 준비 후 옆으로 회피","포격 예고 원을 벗어나세요","자폭 준비 중에는 거리를 벌리세요","가까이 접근하면 방패 감쇄가 해제돼요","소환기를 먼저 처리하세요"};
-            for(int i=0;i<11;i++)
+            for(int i=0;i<6+Campaign.Regions.Length;i++)
             {
                 bool boss=i>=6;int index=boss?i-6:i;bool discovered=((boss?State.bossDiscoveries:State.enemyDiscoveries)&(1<<index))!=0;float y=i*107;
                 var row=Ui.Box(list,0,y,444,97,Ui.Background).transform;
                 var art=Ui.Box(row,8,7,82,82,discovered?Color.white:new Color(.2f,.24f,.27f,1),false);art.sprite=BattleArt.Role(index,0,boss);art.preserveAspect=true;
-                Ui.Label(row,boss?Campaign.Get(index*6+5).Boss:names[index],104,9,324,29,20,discovered?Ui.Ink:Ui.Muted);
+                Ui.Label(row,boss?Campaign.FinalStage(index).Boss:names[index],104,9,324,29,20,discovered?Ui.Ink:Ui.Muted);
                 Ui.Label(row,discovered?(boss?Campaign.Regions[index]+" · 토벌 기록 보유":tips[index]):"미발견 · 전투에서 처치하면 기록",104,45,322,43,14,Ui.Muted);
             }
         }
@@ -83,11 +85,11 @@ namespace ScrapGuard
             Ui.Label(card,(report.cause>0?"종료 원인  ":"주요 피해  ")+Workshop.CauseNames[cause],24,128,444,40,24,Ui.Gold);
             Ui.Label(card,Workshop.Advice[cause],24,184,444,69,18);
             Ui.Label(card,report.bossRemaining<0?"보스 잔여 체력: 미등장 또는 해당 없음":"보스 잔여 체력  "+Mathf.CeilToInt(report.bossRemaining*100)+"%",24,269,444,35,18,Ui.Mint);
-            string damage="";for(int i=1;i<Math.Min(9,report.damage.Length);i++)if(report.damage[i]>0)damage+=Workshop.CauseNames[i]+"  "+Mathf.CeilToInt(report.damage[i])+"\n";
+            string damage="";for(int i=1;i<Math.Min(Workshop.CauseNames.Length,report.damage.Length);i++)if(report.damage[i]>0)damage+=Workshop.CauseNames[i]+"  "+Mathf.CeilToInt(report.damage[i])+"\n";
             Ui.Label(card,"받은 체력 피해 · 보호막 흡수 제외",24,325,444,28,15,Ui.Muted);
             var list=Ui.Scroll(card,24,363,444,147,Math.Max(147,damage.Split('\n').Length*29));Ui.Label(list,damage.Length==0?"체력 피해 없음":damage,12,0,420,Math.Max(147,damage.Split('\n').Length*29),17);
-            string mods="";for(int i=0;i<3;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
-            Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 공격 Lv.3 + 보조 Lv.2를 노려 보세요.":mods),24,534,444,101,18,Ui.Mint);
+            string mods="";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
+            Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 공격 Lv.3 + 보조 Lv.2를 노려 보세요.":mods),24,534,444,101,14,Ui.Mint);
             string skills="";for(int i=0;i<report.skills.Length;i++)if(report.skills[i]>0)skills+=(skills.Length>0?" · ":"")+Catalog.SkillNames[i]+" "+report.skills[i];
             Ui.Label(card,skills,24,650,444,79,14,Ui.Muted);
             Ui.Button(card,"결과로 돌아가기",24,760,444,53,ShowResult,Ui.Raised,true,18);
@@ -98,8 +100,15 @@ namespace ScrapGuard
             magnetField.gameObject.SetActive(combat.HasMod(0));magnetField.anchoredPosition=new Vector2(combat.Position.x,-combat.Position.y);
             if(turretArt==null)
             {
-                turretArt=Ui.Box(effectLayer,0,0,21,21,Ui.Hex("D6B1FF"),false).rectTransform;
-                turretArt.pivot=new Vector2(.5f,.5f);Ui.Box(turretArt,7,-10,6,20,Ui.Ink,false);
+                turretArt=Ui.Rect(effectLayer,"Rivet sentry",0,0,28,28);turretArt.pivot=new Vector2(.5f,.5f);
+                Ui.Disc(turretArt,0,0,28,Ui.Hex("253344"));
+                Ui.Disc(turretArt,3,3,22,Ui.Hex("AC8ADE"));
+                Ui.Disc(turretArt,7,7,14,Ui.Hex("3A3358"));
+                Ui.Box(turretArt,6,-8,5,20,Ui.Hex("BDD3E6"),false);
+                Ui.Box(turretArt,17,-8,5,20,Ui.Hex("BDD3E6"),false);
+                Ui.Box(turretArt,7,-8,3,5,Ui.Hex("D8BAFF"),false);
+                Ui.Box(turretArt,18,-8,3,5,Ui.Hex("D8BAFF"),false);
+                Ui.Disc(turretArt,10,10,8,Ui.Hex("E8C6FF"));
             }
             turretArt.gameObject.SetActive(combat.HasMod(2));
             turretArt.anchoredPosition=new Vector2(combat.TurretPosition.x,-combat.TurretPosition.y);
@@ -113,7 +122,7 @@ namespace ScrapGuard
             Ui.Box(plate,0,0,444,5,FrameColor(State.showcaseFrame),false);
             Ui.Label(plate,"SCRAP GUARD / CORE RIFT",20,23,404,30,14,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Label(plate,State.displayName,20,62,404,38,26,Ui.Ink,TextAnchor.MiddleCenter);
-            CharacterArt.Draw(plate,107,113,230,234,State.showcaseHero,State.selectedSkin);
+            CharacterArt.Draw(plate,107,113,230,234,State.showcaseHero,State.selectedSkin,Outfits.Active(State,State.showcaseHero));
             Ui.Label(plate,score.ToString("N0")+"점",20,358,404,69,42,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(plate,Social.Titles[State.showcaseTitle]+" · "+Social.Skins[State.selectedSkin],20,440,404,48,17,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(plate,week+" 주간 · "+(!Online?"로컬 체험":State.testProgress?"테스트 기록":"서버 저장 기록"),20,506,404,25,13,Ui.Muted,TextAnchor.MiddleCenter);
@@ -124,13 +133,14 @@ namespace ScrapGuard
         {
             var support=combat.Support;bool show=support.showIdentity;
             Color accent=show?FrameColor(support.frame):Ui.Blue;
+            if(show && support.outfit==1)OutfitVisuals.Gear(effectLayer,new Vector2(combat.Position.x,-combat.Position.y),90);
             var card=Ui.Box(effectLayer,18,244,306,111,Ui.Panel).rectTransform;
             Ui.Box(card,0,0,4,111,accent,false);
-            CharacterArt.Draw(card,12,9,80,90,support.hero,show?support.skin:0);
+            CharacterArt.Draw(card,12,9,80,90,support.hero,show?support.skin:0,show?support.outfit:0);
             Ui.Label(card,show?support.name:"길드 지원 도착",104,11,190,30,19,accent);
             Ui.Label(card,show?Social.Titles[Mathf.Clamp(support.title,0,Social.Titles.Length-1)]:"비공개 대원",104,47,190,25,13,Ui.Muted);
-            Ui.Label(card,show?Social.Skins[Mathf.Clamp(support.skin,0,Social.Skins.Length-1)]:SupportNames[support.hero],104,77,190,25,13,Ui.Ink);
-            card.gameObject.AddComponent<CombatBurst>().Configure(2.5f,1,1);
+            Ui.Label(card,show?(support.outfit==1?Outfits.Name:Social.Skins[Mathf.Clamp(support.skin,0,Social.Skins.Length-1)]):SupportNames[support.hero],104,77,190,25,13,Ui.Ink);
+            card.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(3,1,1);
         }
     }
 }
