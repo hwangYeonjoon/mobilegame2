@@ -7,15 +7,15 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        int featuredOutfit=3;
+        int featuredOutfit=8;
         void StyleShop()
         {
+            var currentScreen=screen;RefreshOutfitCatalog(()=>{if(currentScreen!=null&&currentScreen==screen)Show("shop");});
             var featured = Ui.Box(screen,24,239,492,359,Ui.Hex("263748")).transform;
             int outfit=featuredOutfit;
-            for(int i=1;i<=Outfits.Count;i++)
-            {
-                int choice=i;Ui.Button(featured,Outfits.HeroName(i),22+(i-1)*114,16,106,35,()=>{featuredOutfit=choice;Show("shop");},outfit==i?Ui.Gold:Ui.Raised,true,16);
-            }
+            Ui.Button(featured,"이전",22,16,66,35,()=>{featuredOutfit=outfit==1?Outfits.Count:outfit-1;Show("shop");},Ui.Raised,true,15);
+            Ui.Button(featured,Outfits.Collections[Outfits.Collection(outfit)]+" · "+outfit+" / "+Outfits.Count,96,16,300,35,OutfitCollection,Ui.Raised,true,16);
+            Ui.Button(featured,"다음",404,16,66,35,()=>{featuredOutfit=outfit==Outfits.Count?1:outfit+1;Show("shop");},Ui.Raised,true,15);
             Ui.Label(featured,Outfits.Label(outfit),22,64,246,45,29,Ui.Ink);
             Ui.Label(featured,Outfits.Details[outfit].Replace(" · ","\n"),22,121,220,78,18,Ui.Muted);
             Ui.Label(featured,Outfits.HeroName(outfit)+" 전용 · 대원 별도\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
@@ -23,7 +23,7 @@ namespace ScrapGuard
             var art = CharacterArt.Draw(featured,232,56,244,246,Outfits.Hero(outfit),0,outfit);
             art.gameObject.AddComponent<ShowroomMotion>();
             bool owned = Outfits.Owned(State,outfit);
-            Ui.Button(featured,owned ? "보유 의상 체험 · 장착" : "움직여 보기  ·  ◆ 600",22,282,448,55,()=>OutfitRoom(outfit),Ui.Gold,true,19);
+            Ui.Button(featured,owned ? "보유 의상 체험 · 장착" : OutfitForSale(outfit)?"움직여 보기  ·  ◆ 600":OutfitSaleLabel(outfit),22,282,448,55,()=>OutfitRoom(outfit),Ui.Gold,true,19);
             var earned = Ui.Box(screen,24,614,238,184,Ui.Panel).transform;
             CharacterArt.Draw(earned,127,10,106,112,State.showcaseHero,2);
             Ui.Label(earned,"빙하의 수호자",16,17,128,28,19,Ui.Blue);
@@ -37,7 +37,7 @@ namespace ScrapGuard
             Ui.Label(frame,"전시 프레임\n◆ 250 · 확정 구성",16,59,138,59,14,Ui.Muted);
             Ui.Button(frame,Social.HasFrame(State,3) ? "전시실에서 적용" : "프레임 살펴보기",14,128,210,42,
                 () => { if (Social.HasFrame(State,3)) CustomizeProfile(); else CosmeticOffer("frame_solar"); },Ui.Raised,true,16);
-            Ui.Button(screen,"의상 컬렉션 · 4종",24,808,238,43,OutfitCollection,Ui.Gold,true,15);
+            Ui.Button(screen,"의상 컬렉션 · "+Outfits.Count+"종",24,808,238,43,OutfitCollection,Ui.Gold,true,15);
             Ui.Button(screen,"공용 · 앰버 도색",278,808,238,43,()=>Wardrobe(1),Ui.Raised,true,15);
         }
         void Wardrobe(int skin, int hero = -1)

@@ -19,7 +19,7 @@ def main():
     for name,path in [('api','/health'),('database','/health/ready'),('services','/health/services')]:
         try:
             with urlopen(a.url.rstrip('/')+path,timeout=10) as response:data=json.load(response)
-            checks[name]={'ok': not data.get('refunds',{}).get('needsAttention',False),'details':data}
+            checks[name]={'ok': not (data.get('refunds',{}).get('needsAttention',False) or data.get('refundRecovery',{}).get('needsAttention',False)),'details':data}
         except Exception as e: checks[name]={'ok':False,'error_type':type(e).__name__}
     if a.backup_dir:
         backups=list(a.backup_dir.glob('*.db'))

@@ -161,7 +161,7 @@ namespace ScrapGuard
             catch (AndroidJavaException) { return false; }
         }
         static ServerReply StorageFailure() { return new ServerReply { message = "계정 요청 기록을 저장하지 못했어요. 저장 공간을 확인하고 다시 동기화해 주세요." }; }
-        void Accept(ServerReply reply) { Latest = reply; Session.playerId = reply.playerId; Session.revision = reply.revision; SaveSession(); }
+        void Accept(ServerReply reply) { ObserveContent(reply.content); Latest = reply; Session.playerId = reply.playerId; Session.revision = reply.revision; SaveSession(); }
         IEnumerator Request(string path, string method, string body, Action<string,long> done,string endpoint=null)
         {
             if (Busy) { done("",0); yield break; }
@@ -188,7 +188,7 @@ namespace ScrapGuard
         public void Disconnect() { Session.enabled = false; SaveSession(); }
         public void Forget()
         {
-            Session = new CloudSession(); Pending = null; Latest = null; Release=null;ReleaseEndpoint=null;ReleaseNotice=false; SaveSession();
+            Session = new CloudSession(); Pending = null; Latest = null; Content=null; Release=null;ReleaseEndpoint=null;ReleaseNotice=false; SaveSession();
             if(File.Exists(releasePath))File.Delete(releasePath);
             if (File.Exists(pendingPath)) File.Delete(pendingPath);
         }

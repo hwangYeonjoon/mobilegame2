@@ -13,6 +13,73 @@ Play Console에는 새 게임 앱을 생성하고 위 패키지로 서명 AAB를
 
 패키지명은 이전 프로토타입과 달라 Android에서 별도 앱으로 설치된다. 이전 로컬 저장이나 세션을 자동으로 가져오지 않는다. Google 계정·콘솔·서명·외부 서버를 이번 변경으로 생성하거나 연결한 것은 아니다.
 
+## 0.19 환불·통계·콘텐츠 운영
+
+앱 0.19.0/code 19, 최소 호환 code 19. 클라이언트와 서버를 함께 배포한다. 결제·광고·RTDN 기본값은 비활성이고 외부 계정/공개 서버는 연결하지 않았다. 아래가 이전 환불·통계·예약 미구현 설명을 대체한다.
+
+### 환불 수신과 장기 중단 복구
+
+- `POST /v1/commerce/rtdn`: Google JWT 서명·issuer·audience·검증된 서비스 계정 이메일, 구독 경로·패키지를 확인한다. 수신함 DB 커밋 후 204를 반환한다. 동일 messageId 중복은 무시하고 내용 충돌은 거절한다. 게임 버전 헤더는 요구하지 않으며 게임 bearer로 인증을 대신할 수 없다.
+- 알림 자체로 지급/회수하지 않고 Google 구매 API를 재조회한다. 취소 알림에 아직 PURCHASED가 보이면 재시도한다. 1분 주기로 최대 25개 처리, 실패 간격은 1~60분이다. Google 테스트/구독 알림은 보석 지급에 사용하지 않는다. 실제 결제는 기존 검증 경로에서만 지급된다.
+- 환불 목록은 마지막 성공 시각을 저장하고 24시간 겹쳐서 시간 단위로 조회한다. 중복 회수는 원장이 차단한다. [Voided Purchases API의 조회 범위는 최근 30일](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.voidedpurchases/list)이므로, 그보다 긴 중단은 개별 구매 재검증으로 보완한다.
+- 새 검증/복원부터 구매 토큰을 Data Protection으로 암호화 저장한다. 미회수 구매를 오래된 확인 순으로 1분당 최대 100개, 동일 건은 하루 간격으로 재검증한다. 목록 API 장애가 개별 재검증을 막지 않는다. API 실패·키 손실·기존 해시만 있는 구매는 자동 복구를 보장할 수 없으며 `refund-status`의 missingTokens/failures로 확인한다. 기존 해시 기록은 사용자의 정상 구매 복원 때 토큰을 보충한다. API가 더 이상 조회하지 못하는 거래는 Play Console 내역과 수동 대조한다.
+- 회수 완료 시 암호화 토큰을 지우며 중복 방지용 해시는 유지한다. 계정 삭제 시 저장/대기 중 토큰을 제거한다. 완료 수신함은 35일 후 정리하며 실패한 건은 재시도를 위해 유지한다.
+- `/health/services` 및 `--ops refund-status`에 대기 건수·최대 재시도·토큰 누락·재검증 실패·30일 초과 공백을 표시한다. 공백 표시는 과거 발생 사실로 유지되므로 운영자가 거래 대조 후 관리한다. `Tools/service_health.py`는 이 상태도 장애 신호로 반환한다.
+
+실제 연결 순서:
+
+1. 이 게임 Cloud 프로젝트에 Pub/Sub 주제와 인증 push 구독을 만들고, Play Console RTDN 설정에 주제를 연결한다. Google Play 게시자 권한과 push 서비스 계정의 ID 토큰 발급 권한을 공식 안내대로 설정한다.
+2. `RTDN_ENABLED=true`, `RTDN_AUDIENCE=https://운영도메인/v1/commerce/rtdn`, `RTDN_SERVICE_ACCOUNT_EMAIL=구독의-push-서비스계정`, `RTDN_SUBSCRIPTION=projects/프로젝트/subscriptions/구독`을 지정한다. audience는 구독의 인증 audience와 정확히 일치시킨다. 결제 검증용 서비스 계정/ADC와 push 신원은 역할이 다르다.
+3. 먼저 license_test 모드로 Play Console 테스트 알림, 실제 테스트 구매 취소, 서버 일시 중단 후 재전송을 검증한다. Pub/Sub 미전달 메시지·재시도도 별도로 모니터링한다. 외부 권한과 실제 Google 통신은 로컬 가짜 제공자 검사로 대체하지 않는다.
+
+참조: [RTDN 구조](https://developer.android.com/google/play/billing/rtdn-reference), [인증된 Pub/Sub push](https://docs.cloud.google.com/pubsub/docs/authenticate-push-subscriptions), [개별 구매 v2 상태](https://developers.google.com/android-publisher/api-ref/rest/v3/purchases.productsv2).
+
+**백업 변경**: `--backup-database`와 `Server/Deploy/backup.sh`는 DB와 인접한 `<DB경로>.keys`를 함께 복사한다. Docker에서는 `/data/scrapguard.db.keys`가 DB와 같은 영구 볼륨 안에 있다. 키 디렉터리는 운영 계정만 접근하도록 제한하지만 키 XML 자체는 별도 암호화되지 않으므로, DB+키를 외부에 보관할 때 암호화 저장소를 사용한다. 복구 시 서버를 정지하고 DB와 키 디렉터리를 새 DB 이름에 맞춰 **함께** 복구한다. 이전 버전의 DB만 복원하면 새 암호화 토큰을 읽지 못한다. 백업 사본에서 토큰을 실제 복호화하는 검사를 추가했다.
+
+### BM 지표와 로컬 대시보드
+
+앱 `설정 → 플레이 테스트 기록 → 온라인 의상 체험 통계`에 별도 선택 동의를 추가했다. 기존 기기 내 테스트 기록은 여전히 자동 전송하지 않는다. 동의한 온라인 계정의 미보유 의상 체험을 계정/의상/UTC 일자별 1회, 90일 보관하며 시간 단위 작업으로 만료 기록을 정리한다. 동의 철회는 서버 체험 기록을 삭제한다. 전송 실패를 오프라인에 쌓지 않으므로 일부 체험은 누락될 수 있다.
+
+- 최근 7/30/90일: 동의한 체험 계정 중 기간 내 첫 체험 이후 7일 안에 구매한 계정 수/전환율. 최근 체험은 아직 관찰 중이다.
+- 실제 구매 횟수는 성공한 서버 거래만 집계하고 재시도는 중복 합산하지 않는다. 기존 과거 구매 이벤트는 소급하지 않으며 보고서에 수집 시작 시각을 표시한다.
+- 장착률은 **현재 장착 계정 / 현재 보유 계정**이다. 전투 사용 시간/노출률은 아니며 선택하지 않은 대원에 저장된 장착도 포함한다.
+- 보석 수급은 서버 원장의 증가/감소를 경로별로 집계한다. 환불 회수는 소비와 별도 카드에 표시한다. 무료/유료 지갑 증감이지 현금 매출이 아니다. 구매 보석의 부채 상계분·환불 부채는 지갑 증감에 포함되지 않는다.
+- 테스트 진행 계정은 기본 제외하며 `--include-tests true`로만 포함한다. 계정 삭제 시 연결된 통계도 제거한다. 보고서에는 계정 ID/복구 코드/구매 토큰을 싣지 않는다.
+
+저장된 집계 JSON을 HTML로 만들며 서버 공개 관리자 페이지는 제공하지 않는다. 아래는 프로젝트 루트에서 실행한다.
+
+```sh
+docker compose -f Server/Deploy/compose.yaml exec -T api dotnet ScrapGuard.Server.dll --ops metrics > /private/tmp/scrap-metrics.json
+python3 Tools/bm_dashboard.py --input /private/tmp/scrap-metrics.json --output /private/tmp/scrap-dashboard.html
+docker compose -f Server/Deploy/compose.yaml exec -T api dotnet ScrapGuard.Server.dll --ops refund-status
+```
+
+HTML 파일은 외부 CDN/업로드 없이 브라우저에서 열며 보고서 생성 당시의 스냅샷이다. 새 지표는 다시 내보낸다. 개인정보 안내 페이지에도 선택 체험 통계·보관 기간·운영 원장 처리 내용을 출시 전에 반영한다.
+
+### 의상 공개 예약
+
+`GET /v1/content`와 모든 상태 응답에 서버 시각/의상별 시작·종료·중지·최소 빌드를 전달한다. 서버 거래가 시작 포함/종료 제외 경계를 검증하므로 기기 시간을 바꿔도 먼저 살 수 없다. 완료된 구매 재시도와 보유 의상 장착은 판매 종료 후에도 유지된다. 앱은 서버 시각에서 경과 시간을 계산하고 상점 진입 시 최대 30초 간격으로 새로 확인한다. 5분 넘게 갱신하지 못한 일정은 구매를 잠시 막고 재확인을 안내한다.
+
+현재 10종은 모두 기존대로 판매 중이며, 운영자가 정할 때만 예약이 적용된다. 앱에 들어 있는 의상 ID만 예약 가능하고 새 원화/연출을 다운로드하는 기능은 아니다. 새 의상을 앱 업데이트에 먼저 포함하고, 같은 서버 버전으로 올린 뒤 예약한다. 오프라인 체험판에는 판매 예약을 적용하지 않는다.
+
+```sh
+docker compose -f Server/Deploy/compose.yaml exec -T api dotnet ScrapGuard.Server.dll --ops content
+# 예시: 예약을 적용할 때 의상·날짜·운영자·사유·32자리 요청 ID를 직접 지정한다.
+docker compose -f Server/Deploy/compose.yaml exec -T api dotnet ScrapGuard.Server.dll --ops content-set --outfit 10 --starts 2026-12-01T09:00:00+09:00 --ends 2027-01-01T09:00:00+09:00 --paused false --min-build 19 --operator OPERATOR --reason "12월 공개 계획" --request-id 9123456789abcdef0123456789abcdef
+```
+
+`content-set`은 전체 일정 교체다. starts/ends를 생략하면 해당 경계를 해제하고 `--paused true`는 신규 판매를 중지한다. 적용은 운영 감사 원장에 기록된다. 같은 요청 ID/같은 내용 재실행은 중복 적용하지 않고 다른 내용은 거절한다. 실수로 종료일을 지정하지 않도록 적용 후 `--ops content`로 확인한다.
+
+검증: 서버 320개, Unity EditMode 110개, 로컬 Docker HTTP·백업·재시작 35개 통과. `TestResults/LiveOps019`의 실제 로컬 서버 동의/철회 및 360×800 예약 표시 검사 오류 0. 예약 화면 일부는 명시적인 UI fixture이며 예약 거래 경계는 서버 검사에서 검증했다. macOS·Android 개발 빌드 및 APK 0.19.0/code 19 ARM64·서명·16KB 정렬 확인. Google 실거래/RTDN 및 Android 실기기 실행은 미검증이다.
+
+## 0.18 의상 카탈로그 배포
+
+앱 0.18.0/code 18, 최소 호환 code 18, 전투 규칙 11. 신규 의상 ID 8~10과 극한 작업반 컬렉션을 추가했다. 기존 구매·장착은 보존하며 앱과 서버를 함께 갱신한다. 실제 결제·광고 연결과 Android 실기기 검증은 별도다.
+
+## 0.17 의상 카탈로그 배포
+
+앱 0.17.0/code 17, 최소 호환 code 17, 전투 규칙 11. 신규 의상 ID 5~7을 구버전 클라이언트가 잘못 해석하지 않도록 최소 호환을 올렸다. 앱과 서버를 함께 갱신하며 기존 구매·장착 ID는 유지한다. Cloud/Play/AdMob 외부 설정과 실제 기기 검증은 여전히 미완료다. 업데이트 안내는 스토어 이동 방식 그대로이며 공개 전 Play 배포 가능 플래그는 false다.
+
 ## 0.16 외부 연결 전 서비스 준비
 
 앱 0.16/code 16, 최소 호환 code 14, 전투 규칙 11이다. 일반 구매 코드와 광고 SDK를 추가했지만 실제 Google 계정·공개 서버·광고·판매는 연결하지 않았다. 아래 내용이 과거 버전의 미구현 설명을 대체한다.
@@ -23,7 +90,7 @@ Play Console에는 새 게임 앱을 생성하고 위 패키지로 서명 AAB를
 - `COMMERCE_SALES_ENABLED`는 신규 구매 버튼을 제어한다. 판매 중지 중에도 이미 청구된 구매 검증·복원은 허용한다. Play Console 상품 판매 상태도 함께 관리한다.
 - `COMMERCE_DISABLED_PRODUCTS`는 판매에서 제외할 상품 ID 목록이다. 기본 배포에서는 광고 검증 전까지 `ad_skip_lifetime`을 제외한다.
 - 테스트/일반 영수증을 상호 거절하며, 테스트 진행 계정은 일반 구매를 사용할 수 없다. 기존 유료/무료 원장·환불·부채 조정은 유지한다.
-- `/health/services`는 결제/광고 모드와 환불 조회의 마지막 성공·실패, 연속 실패, 주의 필요 여부를 제공한다. 환불은 시간 단위 폴러다. RTDN 푸시와 장기 중단 복구는 별도 작업이다.
+- `/health/services`는 결제/광고 모드와 환불 조회의 마지막 성공·실패, 연속 실패, 주의 필요 여부를 제공한다. 0.19부터 RTDN 수신함과 장기 복구 재검증을 함께 운영한다.
 
 ### 광고 설정과 보상 처리
 

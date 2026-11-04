@@ -9,6 +9,19 @@ namespace ScrapGuard.Tests
     public class GameTests
     {
         [Test]
+        public void ScheduledContentRoundTripAndBoundaries()
+        {
+            var now=new DateTimeOffset(2026,11,4,0,0,0,TimeSpan.Zero);
+            var release=new OutfitRelease{id=1,minimumBuild=AppRelease.Build,startsAt=now.ToString("O"),endsAt=now.AddHours(1).ToString("O")};
+            var reply=new ServerReply{metricsConsent=true,content=new ContentCatalog{serverTime=now.ToString("O")}};reply.content.outfits.Add(release);
+            var copy=JsonUtility.FromJson<ServerReply>(JsonUtility.ToJson(reply));Assert.That(copy.metricsConsent,Is.True);
+            Assert.That(copy.content.outfits[0].Available(now,AppRelease.Build),Is.True);
+            Assert.That(release.Available(now.AddTicks(-1),AppRelease.Build),Is.False);
+            Assert.That(release.Available(now.AddHours(1),AppRelease.Build),Is.False);
+            Assert.That(release.Available(now,AppRelease.Build-1),Is.False);
+            release.paused=true;Assert.That(release.Available(now,AppRelease.Build),Is.False);
+        }
+        [Test]
         public void UpdateCachePreservesSessionAndPendingJournal()
         {
             string folder=Path.Combine(Path.GetTempPath(),"scrap-update-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(folder);
@@ -37,17 +50,22 @@ namespace ScrapGuard.Tests
         [Test]
         public void FullWardrobeAndMemorialRoundTrip()
         {
-            var s=GameState.New();s.gems=2400;
+            var s=GameState.New();s.gems=Outfits.Count*Outfits.Price;
             for(int id=1;id<=Outfits.Count;id++)
             {
-                int hero=Outfits.Hero(id);s.heroes[hero].unlocked=true;ScrapGuard.Core.Social.Buy(s,Outfits.Product(id));Outfits.Equip(s,id);
+                int hero=Outfits.Hero(id);s.heroes[hero].unlocked=true;
+                Assert.That(ScrapGuard.Core.Social.Buy(s,Outfits.Product(id)).Success,Is.True);Assert.That(Outfits.Equip(s,id).Success,Is.True);
                 var cells=new System.Collections.Generic.HashSet<Rect>();
                 for(int pose=0;pose<4;pose++){var sprite=CharacterArt.Get(hero,0,id,pose);Assert.That(sprite,Is.Not.Null);Assert.That(sprite.texture.name,Is.EqualTo(Outfits.Assets[id]));cells.Add(sprite.rect);}
                 Assert.That(cells.Count,Is.EqualTo(4));
             }
             var copy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));ScrapGuard.Core.Social.Normalize(copy);
-            for(int id=1;id<=Outfits.Count;id++)Assert.That(Outfits.Active(copy,Outfits.Hero(id)),Is.EqualTo(id));
-            var legacy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s).Replace("\"heroOutfits\":[1,2,0,3,4],", ""));
+            for(int id=1;id<=Outfits.Count;id++)Assert.That(Outfits.Owned(copy,id),Is.True);
+            for(int hero=0;hero<HeroCatalog.Count;hero++)Assert.That(Outfits.Active(copy,hero),Is.EqualTo(Outfits.Active(s,hero)));
+            Assert.That(Outfits.Active(copy,0),Is.EqualTo(6));Assert.That(Outfits.Active(copy,1),Is.EqualTo(7));Assert.That(Outfits.Active(copy,2),Is.EqualTo(10));
+            Assert.That(Outfits.Active(copy,3),Is.EqualTo(8));Assert.That(Outfits.Active(copy,4),Is.EqualTo(9));
+            Assert.That(Outfits.Equip(copy,1).Success,Is.True);Assert.That(Outfits.Active(copy,0),Is.EqualTo(1));Assert.That(Outfits.Active(copy,1),Is.EqualTo(7));
+            s.heroOutfits=null;var legacy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));
             Assert.That(legacy.heroOutfits==null || legacy.heroOutfits.Count==0,Is.True);legacy.selectedOutfit=2;ScrapGuard.Core.Social.Normalize(legacy);Assert.That(Outfits.Active(legacy,1),Is.EqualTo(2));
             var guild=new GuildView{memorialWeeks=1};guild.memorials.Add(new GuildMemorial{week="2026-11-02",tier=3,points=120});
             var restored=JsonUtility.FromJson<GuildView>(JsonUtility.ToJson(guild));Assert.That(restored.memorials[0].tier,Is.EqualTo(3));

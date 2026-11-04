@@ -18,7 +18,7 @@ def check(value, name):
     checks.append(name)
     print('PASS', name, flush=True)
 
-def request(path, data=None, token=None, build="16", rules="11"):
+def request(path, data=None, token=None, build="19", rules="11"):
     headers = {'Content-Type': 'application/json'}
     if build is not None:
         headers['X-Scrap-Build'] = build
@@ -29,21 +29,21 @@ def request(path, data=None, token=None, build="16", rules="11"):
     req = urllib.request.Request(BASE + path, data=None if data is None else json.dumps(data).encode(), headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=10) as reply:
-            return reply.status, json.load(reply)
+            return reply.status, (None if reply.status==204 else json.load(reply))
     except urllib.error.HTTPError as error:
         return error.code, json.load(error)
 
 def command(*args):
     return subprocess.run(COMPOSE + list(args), cwd=ROOT, check=True, capture_output=True, text=True).stdout
 
-check(request('/health')[1]['version'] == '0.16.0', 'container health version')
+check(request('/health')[1]['version'] == '0.19.0', 'container health version')
 check(request('/health/ready')[0] == 200, 'database readiness')
 check(request('/health/services')[1]['refunds']['status'] == 'disabled', 'service monitor distinguishes disabled commerce')
 status, release = request('/v1/release', build=None, rules=None)
-check(status == 200 and release['minimumBuild'] == 14 and release['latestBuild'] == 16 and not release['playAvailable'], 'public release policy is reachable without client headers')
-for build in [None, '13', '-1', '14,15']:
+check(status == 200 and release['minimumBuild'] == 19 and release['latestBuild'] == 19 and not release['playAvailable'], 'public release policy is reachable without client headers')
+for build in [None, '18', '-1', '18,19']:
     status, reply = request('/v1/bootstrap', build=build)
-    check(status == 426 and reply['code'] == 'client_update_required' and reply['release']['minimumBuild'] == 14, 'unsupported client receives structured update policy ' + str(build))
+    check(status == 426 and reply['code'] == 'client_update_required' and reply['release']['minimumBuild'] == 19, 'unsupported client receives structured update policy ' + str(build))
 check(request('/v1/bootstrap', rules='10')[0] == 426, 'incompatible client rules rejected by HTTP gate')
 
 check(request('/v1/auth/guest', {'secret': secret})[0] == 403, 'HTTP invitation guard')
@@ -58,6 +58,17 @@ summary = json.loads(command('exec','-T','api','dotnet','ScrapGuard.Server.dll',
 check('accounts' in summary and 'economy' in summary, 'local operations summary available')
 account = json.loads(command('exec','-T','api','dotnet','ScrapGuard.Server.dll','--ops','account','--account',initial['playerId']))
 check('ledger' in account and 'token' not in json.dumps(account), 'support account lookup excludes credentials')
+check(request('/v1/commerce/rtdn', {}, build=None, rules=None)[0] == 503, 'disabled RTDN fails closed without game headers')
+check(len(request('/v1/content')[1]['outfits']) == 10, 'public catalog exposes ten bundled outfits')
+check(request('/v1/metrics/preview', {'skin':1}, secret)[0] == 403, 'preview collection requires explicit consent')
+for enabled in [True, False]:
+    revision=request('/v1/bootstrap',token=secret)[1]['revision']
+    status, reply=request('/v1/commands', {'type':'metrics_consent','requestId':secrets.token_hex(16),'revision':revision,'enabled':enabled},secret)
+    check(status==200 and reply['metricsConsent']==enabled, 'HTTP consent state '+str(enabled))
+    if enabled:check(request('/v1/metrics/preview', {'skin':1}, secret)[0] == 204, 'consented preview accepted')
+initial=request('/v1/bootstrap',token=secret)[1]
+metrics=json.loads(command('exec','-T','api','dotnet','ScrapGuard.Server.dll','--ops','metrics'))
+check(len(metrics['windows'])==3 and secret not in json.dumps(metrics) and initial['playerId'] not in json.dumps(metrics), 'operator aggregate has periods and no account credentials')
 check(request('/v1/auth/google/challenge' , {'link':True}, secret)[0] == 503, 'missing Google configuration fails closed')
 check(request('/v1/skill', token=secret)[1]['entries'] == [], 'new skill board starts empty')
 attend = {'type':'attendance', 'requestId':secrets.token_hex(16), 'revision':initial['revision'], 'rulesVersion':4}
@@ -86,5 +97,5 @@ for attempt in range(30):
     time.sleep(.3)
 restored = request('/v1/bootstrap', token=secret)[1]
 check(restored['playerId'] == initial['playerId'] and restored['state']['gold'] == state['state']['gold'], 'container restart retains volume and account')
-(ROOT/'TestResults/deploy-016-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
+(ROOT/'TestResults/deploy-019-checks.json').write_text(json.dumps({'passed':len(checks), 'checks':checks, 'scope':'isolated loopback Docker, no public TLS'},indent=2)+'\n')
 print(len(checks), 'deployment checks passed')

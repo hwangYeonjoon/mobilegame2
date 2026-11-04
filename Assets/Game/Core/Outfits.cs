@@ -5,12 +5,18 @@ namespace ScrapGuard.Core
         public const string Key = "outfit_heavy_engineer", Name = "중장비 정비사";
         public const int Price = 600;
         public const string RailKey="outfit_rail_ranger", RailName="레일 레인저";
-        public const int Count=4;
-        public static readonly string[] Keys={"",Key,RailKey,"outfit_storm_commander","outfit_aurora_keeper"};
-        public static readonly string[] Labels={"기본 외형",Name,RailName,"폭풍 지휘자","오로라 수호자"};
-        public static readonly string[] Assets={"","Luke-HeavyEngineer-v1","Ray-RailRanger-v1","Spark-StormCommander-v1","Iris-AuroraKeeper-v1"};
-        public static readonly string[] Details={"","중장갑 · 리벳 대포 · 크레인 전개","철도 장갑 · 레일건 · 붉은 스카프","황금 장갑 · 쌍둥이 코일 · 전격 날개","수정 왕관 · 눈꽃 방패 · 결정 망토"};
-        public static int Hero(int id){return id==2?1:id==3?3:id==4?4:0;}
+        // Append only: persisted purchases, public profiles and guild supports share these IDs.
+        public const int Count=10, LatestCollection=2;
+        public static readonly string[] Collections={"공방의 전설","새 지평선","극한 작업반"};
+        public static readonly string[] Keys={"",Key,RailKey,"outfit_storm_commander","outfit_aurora_keeper","outfit_citadel_sentinel","outfit_orbital_mechanic","outfit_neon_tracker","outfit_solar_technician","outfit_abyss_explorer","outfit_deep_miner"};
+        public static readonly string[] Labels={"기본 외형",Name,RailName,"폭풍 지휘자","오로라 수호자","성채 파수꾼","궤도 정비사","네온 추적자","태양로 기술자","심해 탐사자","심층 채굴자"};
+        public static readonly string[] Assets={"","Luke-HeavyEngineer-v1","Ray-RailRanger-v1","Spark-StormCommander-v1","Iris-AuroraKeeper-v1","Volt-CitadelSentinel-v1","Luke-OrbitalMechanic-v1","Ray-NeonTracker-v1","Spark-SolarTechnician-v1","Iris-AbyssExplorer-v1","Volt-DeepMiner-v1"};
+        public static readonly string[] Details={"","중장갑 · 리벳 대포 · 크레인 전개","철도 장갑 · 레일건 · 붉은 스카프","황금 장갑 · 쌍둥이 코일 · 전격 날개","수정 왕관 · 눈꽃 방패 · 결정 망토","성벽 장갑 · 육각 방패 · 수호 깃발","우주 장갑 · 궤도 고리 · 위성 패널","질주 장갑 · 갈래 광선총 · 네온 스카프","태양 장갑 · 회전 터빈 · 방열 핀","잠수 장갑 · 음파 탐지기 · 산소 탱크","암반 장갑 · 나선 드릴 · 굴착 지지대"};
+        public static readonly string[] Effects={"기본 사격","리벳 탄환 · 기어 충격파","쌍선 탄환 · 레일 섬광","전격 탄환 · 번개 날개","결정 탄환 · 눈꽃 결정","육각 탄환 · 성문 전개","고리 탄환 · 위성 공전","갈래 탄환 · 네온 질주","태양 탄환 · 코로나 회전","음파 탄환 · 심해 파동","드릴 탄환 · 굴착 전개"};
+        public static readonly string[] Arrivals={"지원 도착","공방 가동","레일 접속","폭풍 전개","오로라 개방","성문 개방","궤도 진입","신호 포착","태양로 점화","심해 부상","지층 돌파"};
+        static readonly int[] Heroes={0,0,1,3,4,2,0,1,3,4,2};
+        public static int Hero(int id){return Valid(id)?Heroes[id]:0;}
+        public static int Collection(int id){return Valid(id)?(id>=8?2:id>=5?1:0):0;}
         public static string HeroName(int id){return HeroCatalog.All[Hero(id)].Name.Split(' ')[1];}
         public static string Label(int id){return Valid(id)?Labels[id]:Labels[0];}
         public static string Product(int id){return Valid(id)?Keys[id]:"";}

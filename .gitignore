@@ -31,3 +31,7 @@ scrap-guard-v1.json*
 
 playtest-*.json
 commerce-pending.json
+
+# Purchase-token encryption keys and exported operational backups
+*.db.keys/
+Server/Deploy/backups/

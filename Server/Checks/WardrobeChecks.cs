@@ -25,5 +25,19 @@ static class WardrobeChecks
         check(Outfits.Active(state,3)==0 && Outfits.Active(state,1)==2 && Outfits.Active(state,4)==4,"server clears only selected hero");
         bool rejected=false;try{Apply(new GameCommand("outfit_equip"){skin=999});}catch(ApiFault){rejected=true;}
         check(rejected && repo.Bootstrap(token).state.gems==600,"invalid wardrobe command cannot mutate wallet");
+        // New collections reuse the authoritative purchase path, including retry and restart behavior.
+        state=repo.Bootstrap(token).state;state.gems=(Outfits.Count-4)*Outfits.Price;state.heroes[2].unlocked=true;
+        using(var db=new SqliteConnection("Data Source="+path)){db.Open();using var q=db.CreateCommand();q.CommandText="UPDATE accounts SET state=$state WHERE id=$id";q.Parameters.AddWithValue("$state",JsonSerializer.Serialize(state,GameRepository.Json));q.Parameters.AddWithValue("$id",account.playerId);q.ExecuteNonQuery();}
+        for(int id=5;id<=Outfits.Count;id++)
+        {
+            int balance=repo.Bootstrap(token).state.gems;
+            var purchase=new GameCommand("cosmetic_buy"){value=Outfits.Product(id)};Apply(purchase);repo.Apply(token,purchase);
+            Apply(new GameCommand("outfit_equip"){skin=id});Apply(new GameCommand("customize"){hero=Outfits.Hero(id)});
+            check(repo.Bootstrap(token).state.gems==balance-Outfits.Price && repo.GetProfile(token,account.playerId).outfit==id,"new collection purchase is idempotent and visible "+id);
+        }
+        repo=new GameRepository(path);state=repo.Bootstrap(token).state;
+        check(state.gems==0 && Outfits.Active(state,0)==6 && Outfits.Active(state,1)==7 && Outfits.Active(state,2)==10 && Outfits.Owned(state,2),"multiple looks per hero persist without losing earlier ownership");
+        Apply(new GameCommand("outfit_equip"){skin=2});state=repo.Bootstrap(token).state;
+        check(Outfits.Active(state,1)==2 && Outfits.Active(state,0)==6 && Outfits.Active(state,2)==10,"old collection re-equip only changes its hero");
     }
 }

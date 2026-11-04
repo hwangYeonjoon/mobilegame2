@@ -26,10 +26,27 @@ namespace ScrapGuard
             Color tint=projectile?color:OutfitVisuals.Accent(outfit);
             if(projectile)
             {
+                Color highlight=new Color(1,1,1,tint.a);
                 if(outfit==1){Poly(vh,tint,.60f,.3f,.83f,.15f,1,.5f,.83f,.85f,.60f,.7f);Line(vh,tint,.08f,.5f,.65f,.5f,.09f);}
                 if(outfit==2){Line(vh,tint,0,.26f,.88f,.26f,.07f);Line(vh,tint,0,.74f,.88f,.74f,.07f);Poly(vh,Color.white,.72f,.15f,1,.5f,.72f,.85f,.85f,.5f);}
                 if(outfit==3){Poly(vh,tint,0,.7f,.43f,.36f,.38f,.68f,.85f,.18f,1,.45f,.65f,.7f,.68f,.40f,.18f,.94f);}
                 if(outfit==4){Poly(vh,tint,.37f,.5f,.7f,.12f,1,.5f,.7f,.88f);Line(vh,Color.white,.45f,.5f,.9f,.5f,.045f);Line(vh,tint,0,.5f,.27f,.5f,.06f);}
+                if(outfit==5){Poly(vh,tint,.35f,.22f,.75f,.22f,1,.5f,.75f,.78f,.35f,.78f,.15f,.5f);Line(vh,highlight,.43f,.38f,.75f,.38f,.025f);Line(vh,highlight,.59f,.38f,.59f,.65f,.025f);}
+                if(outfit==6){Oval(vh,tint,.65f,.5f,.27f,.34f,.045f);Line(vh,highlight,.32f,.5f,1,.5f,.025f);Line(vh,tint,0,.3f,.26f,.3f,.035f);Line(vh,tint,0,.7f,.26f,.7f,.035f);}
+                if(outfit==7){for(int i=0;i<3;i++){float x=i*.28f;Line(vh,tint,x,.2f,x+.27f,.5f,.04f);Line(vh,tint,x+.27f,.5f,x,.8f,.04f);}}
+                if(outfit==8)
+                {
+                    Poly(vh,highlight,.45f,.5f,.65f,.3f,.85f,.5f,.65f,.7f);
+                    for(int i=0;i<8;i++){float a=i*Mathf.PI/4;Line(vh,tint,.65f+Mathf.Cos(a)*.23f,.5f+Mathf.Sin(a)*.23f,.65f+Mathf.Cos(a)*.34f,.5f+Mathf.Sin(a)*.42f,.025f);}
+                    Line(vh,tint,0,.5f,.3f,.5f,.04f);
+                }
+                if(outfit==9)
+                    for(int i=0;i<3;i++)Oval(vh,tint,.25f+i*.25f,.5f,.10f,.16f+i*.12f,.027f);
+                if(outfit==10)
+                {
+                    Poly(vh,tint,.12f,.1f,1,.5f,.12f,.9f);
+                    for(int i=0;i<3;i++){float x=.24f+i*.19f;Line(vh,highlight,x,.25f+i*.08f,x+.12f,.75f-i*.08f,.024f);}
+                }
                 return;
             }
             // Keep ornamentation at the shoulders/back, leaving the face and weapon readable.
@@ -62,6 +79,33 @@ namespace ScrapGuard
                     Line(vh,tint,.5f+side*.43f,.60f,.5f+side*.30f,.39f,.005f);
                     Line(vh,Ui.Hex("CBFAFF"),.5f+side*.32f,.80f,.5f+side*.30f,.41f,.004f);
                 }
+            if(outfit==5)
+                for(int side=-1;side<=1;side+=2)
+                {
+                    float x=.5f+side*.32f;Line(vh,tint,x,.43f,x,.87f,.008f);
+                    Poly(vh,tint,x,.86f,x+side*.13f,.84f,x+side*.13f,.71f,x,.74f);
+                }
+            if(outfit==6){Oval(vh,tint,.5f,.57f,.40f,.34f,.006f);Line(vh,tint,.05f,.48f,.05f,.72f,.014f);Line(vh,tint,.95f,.48f,.95f,.72f,.014f);}
+            if(outfit==7)
+                for(int i=0;i<2;i++)
+                {float y=.62f-i*.12f;Line(vh,tint,.68f,y,.96f,y-.08f,.008f);Line(vh,tint,.96f,y-.08f,.80f,y-.21f,.006f);}
+            if(outfit==8)
+                for(int i=0;i<8;i++){float a=i*Mathf.PI/4;Line(vh,tint,.5f+Mathf.Cos(a)*.32f,.58f+Mathf.Sin(a)*.29f,.5f+Mathf.Cos(a)*.40f,.58f+Mathf.Sin(a)*.36f,.006f);}
+            if(outfit==9)
+                for(int side=-1;side<=1;side+=2)
+                {
+                    float x=.5f+side*.34f;Line(vh,tint,x,.54f,x,.80f,.005f);Oval(vh,tint,x,.82f,.025f,.025f,.005f);
+                }
+            if(outfit==10)
+                for(int side=-1;side<=1;side+=2)
+                {
+                    Line(vh,tint,.5f+side*.20f,.66f,.5f+side*.42f,.55f,.008f);
+                    Line(vh,tint,.5f+side*.42f,.55f,.5f+side*.43f,.29f,.008f);
+                }
+        }
+        void Oval(VertexHelper vh,Color c,float x,float y,float rx,float ry,float width)
+        {
+            for(int i=0;i<16;i++){float a=i*Mathf.PI/8,b=(i+1)*Mathf.PI/8;Line(vh,c,x+Mathf.Cos(a)*rx,y+Mathf.Sin(a)*ry,x+Mathf.Cos(b)*rx,y+Mathf.Sin(b)*ry,width);}
         }
         Vector2 Point(float x,float y){var r=rectTransform.rect;return new Vector2(r.xMin+x*r.width,r.yMin+y*r.height);}
         void Poly(VertexHelper vh,Color c,params float[] xy)
@@ -109,7 +153,7 @@ namespace ScrapGuard
         public static void Shot(Transform parent,Vector2 origin,int outfit,bool flipped=false)
         {
             var root=BulletVisual.Create(parent);
-            root.GetComponent<BulletVisual>().Render(new Bullet{position=new V2(origin.x,-origin.y),velocity=new V2(flipped?-1:1,0),chilling=outfit==4},1,outfit,0);
+            root.GetComponent<BulletVisual>().Render(new Bullet{position=new V2(origin.x,-origin.y),velocity=new V2(flipped?-1:1,0),chilling=Outfits.Valid(outfit)&&Outfits.Hero(outfit)==4},1,outfit,0);
             root.gameObject.AddComponent<PreviewProjectile>().Initialize(flipped?-1:1);
         }
         public static RectTransform Arrival(Transform parent,float x,float y,string name,int hero,int skin,int outfit,string subtitle,Combat clock=null)
@@ -117,19 +161,23 @@ namespace ScrapGuard
             var accent=Outfits.Valid(outfit)?OutfitVisuals.Accent(outfit):Ui.Mint;
             var card=Ui.Box(parent,x,y,414,90,Ui.Hex("132633"),true,"Support entrance").rectTransform;
             Ui.Box(card,0,0,4,90,accent,false);
+            card.gameObject.AddComponent<RectMask2D>();
+            var motif=Ui.Rect(card,"Arrival signature",309,6,96,78).gameObject.AddComponent<OutfitMark>();
+            motif.Configure(outfit,true);motif.color=new Color(accent.r,accent.g,accent.b,.16f);
             CharacterArt.Draw(card,8,-3,96,96,hero,skin,outfit);
             Ui.Label(card,name,112,7,288,25,19,Ui.Ink);
-            Ui.Label(card,Look(outfit,skin),112,35,288,24,16,accent);
+            Ui.Label(card,Look(outfit,skin)+(Outfits.Valid(outfit)?" · "+Outfits.Arrivals[outfit]:""),112,35,288,24,14,accent);
             Ui.Label(card,subtitle,112,63,288,20,12,Ui.Muted);
-            card.gameObject.AddComponent<SupportEntrance>().Initialize(clock);
+            card.gameObject.AddComponent<SupportEntrance>().Initialize(clock,outfit,motif.rectTransform);
             return card;
         }
     }
     public sealed class SupportEntrance : MonoBehaviour
     {
-        Combat clock;float previous,age;Vector2 origin;CanvasGroup group;
-        public void Initialize(Combat source)
+        Combat clock;float previous,age;Vector2 origin,motifOrigin;CanvasGroup group;int outfit;RectTransform motif;
+        public void Initialize(Combat source,int style=0,RectTransform ornament=null)
         {
+            outfit=style;motif=ornament;if(motif!=null)motifOrigin=motif.anchoredPosition;
             clock=source;previous=source==null?0:source.Elapsed;origin=((RectTransform)transform).anchoredPosition;
             group=gameObject.AddComponent<CanvasGroup>();group.blocksRaycasts=false;group.interactable=false;
         }
@@ -138,7 +186,17 @@ namespace ScrapGuard
             if(group==null)return;
             age+=clock==null?Time.unscaledDeltaTime:Mathf.Max(0,clock.Elapsed-previous);if(clock!=null)previous=clock.Elapsed;
             float enter=Mathf.Clamp01(age/.22f),leave=Mathf.Clamp01((age-2.4f)/.35f);
-            ((RectTransform)transform).anchoredPosition=origin+Vector2.left*(1-enter)*(1-enter)*65;
+            float ease=(1-enter)*(1-enter);
+            ((RectTransform)transform).anchoredPosition=origin+(outfit==5||outfit==10?Vector2.up*(outfit==10?60:35):outfit==6||outfit==9?Vector2.down*(outfit==9?45:25):Vector2.left*(outfit==7?110:65))*ease;
+            if(motif!=null)
+            {
+                if(outfit==6)motif.localEulerAngles=new Vector3(0,0,age*55);
+                else if(outfit==8)motif.localEulerAngles=new Vector3(0,0,-age*80);
+                else if(outfit==9)motif.localScale=Vector3.one*(.85f+Mathf.Sin(age*3)*.15f);
+                else if(outfit==10)motif.anchoredPosition=motifOrigin+Vector2.down*(Mathf.Sin(age*4)*7);
+                else if(outfit==7)motif.anchoredPosition=motifOrigin+Vector2.right*Mathf.Sin(age*5)*14;
+                else motif.localScale=Vector3.one*(1+Mathf.Sin(age*3)*.08f);
+            }
             group.alpha=enter*(1-leave);if(age>=2.75f)Destroy(gameObject);
         }
     }

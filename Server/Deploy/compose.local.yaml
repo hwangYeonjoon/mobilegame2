@@ -2,7 +2,7 @@
 name: scrapguard-local-check
 services:
   api:
-    image: scrapguard-api:0.16.0-check
+    image: scrapguard-api:0.19.0-check
     build:
       context: ../..
       dockerfile: Server/Deploy/Dockerfile

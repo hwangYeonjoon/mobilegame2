@@ -21,7 +21,7 @@ namespace ScrapGuard.Tests
         }
         public static void NewOutfitsHaveNoPower()
         {
-            foreach(int id in new[]{3,4})
+            for(int id=1;id<=Outfits.Count;id++)
             {
                 var s=GameState.New();s.selectedHero=s.showcaseHero=Outfits.Hero(id);s.heroes[s.selectedHero].unlocked=true;s.gems=600;
                 int attack=Catalog.Attack(s),health=Catalog.Health(s);

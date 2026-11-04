@@ -22,6 +22,7 @@ def inspect(values, client, signing=False):
     add('play_package', values.get('PLAY_PACKAGE_NAME') == client.get('packageName') and bool(client.get('packageName')), '서버와 앱의 동일한 Play 패키지명')
     add('commerce_mode', values.get('COMMERCE_MODE') in ('license_test','production'), '먼저 license_test 모드로 실제 거래 검증')
     add('production_gate', values.get('COMMERCE_MODE') != 'production' or values.get('COMMERCE_RELEASE_READY') == 'true', '실제 거래 검증 후 production 준비 완료 설정')
+    add('rtdn_push', values.get('RTDN_ENABLED') == 'true' and https(values.get('RTDN_AUDIENCE')) and values.get('RTDN_SERVICE_ACCOUNT_EMAIL','').endswith('.gserviceaccount.com') and bool(re.fullmatch(r'projects/[^/]+/subscriptions/[^/]+', values.get('RTDN_SUBSCRIPTION',''))), 'Google Pub/Sub 인증 push · audience · 서비스 계정 · 구독 경로 설정')
     app = client.get('adMobAppId', '')
     unit = client.get('rewardedUnitId', '')
     add('admob_game_app', bool(re.fullmatch(r'ca-app-pub-\d{16}~\d{10}', app)) and '3940256099942544' not in app, '같은 AdMob 계정에 이 게임을 별도 앱으로 등록')

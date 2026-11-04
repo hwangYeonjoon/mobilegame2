@@ -32,8 +32,10 @@ public sealed partial class GameRepository
         };
     }
     static List<Dictionary<string,object>> ReadRows(SqliteConnection db,string query,params (string,object)[] args)
+        =>ReadRows(db,null,query,args);
+    static List<Dictionary<string,object>> ReadRows(SqliteConnection db,SqliteTransaction tx,string query,params (string,object)[] args)
     {
-        using var q=Sql(db,null,query,args);using var r=q.ExecuteReader();var rows=new List<Dictionary<string,object>>();
+        using var q=Sql(db,tx,query,args);using var r=q.ExecuteReader();var rows=new List<Dictionary<string,object>>();
         while(r.Read()){var row=new Dictionary<string,object>();for(int i=0;i<r.FieldCount;i++)row[r.GetName(i)]=r.IsDBNull(i)?null:r.GetValue(i);rows.Add(row);}return rows;
     }
     public object OperationsReports()=>OperationsList("reports");

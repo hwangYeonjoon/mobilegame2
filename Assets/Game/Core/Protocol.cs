@@ -21,6 +21,8 @@ namespace ScrapGuard.Core
         public bool success;
         public string message, playerId, serverTime, code;
         public ReleasePolicy release;
+        public ContentCatalog content;
+        public bool metricsConsent;
         public long revision;
         public GameState state;
         public BattleTicket ticket;

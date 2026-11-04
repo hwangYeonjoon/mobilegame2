@@ -54,8 +54,10 @@ public sealed partial class GameRepository
         if (!hasRules) Execute(db,null,"ALTER TABLE accounts ADD COLUMN run_rules INTEGER NOT NULL DEFAULT 2");
         InitializeEndgame(db);
         InitializeCommerce(db);
+        InitializeRefunds(db,path);
         InitializeAds(db);
         InitializeOperations(db);
+        InitializeMetrics(db);InitializeContent(db);
     }
     SqliteConnection Open() { var db = new SqliteConnection(connectionString); db.Open(); return db; }
     static SqliteCommand Sql(SqliteConnection db, SqliteTransaction tx, string text, params (string, object)[] args)
@@ -92,7 +94,7 @@ public sealed partial class GameRepository
     ServerReply Reply(Account a, string message = "동기화 완료", bool success = true)
     {
         new Economy(a.State, clock).RefreshDay();
-        return new ServerReply { success = success, message = message, playerId = a.Id, state = a.State, revision = a.Revision, serverTime = clock().ToString("O"),
+        return new ServerReply { success = success, message = message, playerId = a.Id, content=Content(), metricsConsent=MetricsConsent(a.Id), state = a.State, revision = a.Revision, serverTime = clock().ToString("O"),
             ticket = string.IsNullOrEmpty(a.State.activeRun) ? null : new BattleTicket { id = a.State.activeRun, stage = a.State.activeStage, seed = a.RunSeed, rulesVersion = a.RunRules, mode=a.State.activeMode, week=a.State.activeWeek, hasSupport=a.RunSupport!=null, support=a.RunSupport==null?null:Decode<SupportSnapshot>(a.RunSupport) } };
     }
     public ServerReply Register(string secret)
@@ -127,11 +129,13 @@ public sealed partial class GameRepository
             if (a.Revision != command.revision) throw new ApiFault(409, "다른 기기에서 진행이 변경됐어요. 최신 상태에서 다시 시도해 주세요.", Reply(a, "진행 상태가 변경됐어요. 다시 시도해 주세요.", false));
             if(command.type=="ad_skip_reward"&&HasAdReservation(db,tx,a.Id,command.value))throw new ApiFault(409,"확인 중인 광고 보상을 먼저 처리해 주세요.");
             if(Moderated(db,tx,a.Id)&&(command.type=="rename"||command.type=="visibility"&&command.enabled))throw new ApiFault(403,"프로필 공개가 제한되어 있어요. 고객지원으로 문의해 주세요.");
+            RequireContentSale(db,tx,command);
             int paidBefore=a.State.paidGems;
             int gold = a.State.gold, gems = a.State.gems, parts = a.State.parts, shards=a.State.coreShards;
             var blueprintBalances=Enumerable.Range(0,Campaign.Regions.Length).Select(i=>Workshop.Region(a.State,i).blueprints).ToArray();
             var e = new Economy(a.State, clock); CommandResult result;
-            if (command.type == "battle_start")
+            if(command.type=="metrics_consent")result=SetMetricsConsent(db,tx,a,command.enabled);
+            else if (command.type == "battle_start")
             {
                 if (command.rulesVersion != Combat.RulesVersion) throw new ApiFault(409,"이전 버전에서 보낸 출격 요청이에요. 최신 상태에서 다시 출격해 주세요.");
                 a.RunRules = Combat.RulesVersion;
@@ -174,6 +178,7 @@ public sealed partial class GameRepository
             }
             if (!result.Success) throw new ApiFault(400, result.Message);
             AllocatePaidSpend(db,tx,a.Id,paidBefore-a.State.paidGems);
+            RecordMetricsCommand(db,tx,a,command);
             Social.Normalize(a.State); a.Revision++;
             Execute(db, tx, "UPDATE accounts SET state=$state,revision=$revision,run_snapshot=$snapshot,run_seed=$seed,run_started=$started,run_rules=$rules,run_support=$support WHERE id=$id",
                 ("$state", Encode(a.State)), ("$revision", a.Revision), ("$snapshot", a.RunSnapshot), ("$seed", a.RunSeed), ("$started", a.RunStarted), ("$rules",a.RunRules), ("$support",a.RunSupport), ("$id", a.Id));
@@ -264,6 +269,6 @@ public sealed partial class GameRepository
     }
     public void Delete(string token)
     {
-        lock (gate) { using var db = Open(); using var tx = db.BeginTransaction(); var a = Load(db, tx, token); LeaveGuild(db,tx,a.Id); Execute(db, tx, "DELETE FROM accounts WHERE id=$id", ("$id",a.Id)); tx.Commit(); }
+        lock (gate) { using var db = Open(); using var tx = db.BeginTransaction(); var a = Load(db, tx, token); LeaveGuild(db,tx,a.Id); Execute(db,tx,"UPDATE refund_inbox SET cipher='',status='deleted' WHERE token_hash IN (SELECT token_hash FROM purchases WHERE owner=$owner)",("$owner",a.Id)); Execute(db,tx,"UPDATE purchases SET token_cipher=NULL WHERE owner=$owner",("$owner",a.Id)); Execute(db, tx, "DELETE FROM accounts WHERE id=$id", ("$id",a.Id)); tx.Commit(); }
     }
 }

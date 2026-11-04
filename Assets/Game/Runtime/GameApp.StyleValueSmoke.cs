@@ -10,9 +10,10 @@ namespace ScrapGuard
         IEnumerator StyleValueSmokeRoutine()
         {
             DismissTitleScreen();CloseModal();
-            Store.Change(e=>{e.State.testProgress=true;e.State.gems=6000;e.State.gold=30000;e.State.parts=1000;return CommandResult.Ok("Isolated presentation fixtures");});
+            int fixtureGems=Outfits.Count*Outfits.Price+2400;
+            Store.Change(e=>{e.State.testProgress=true;e.State.gems=fixtureGems;e.State.gold=30000;e.State.parts=1000;return CommandResult.Ok("Isolated presentation fixtures");});
             Show("shop");PurchaseSupply("hero","돌격수 레이");yield return Capture("01-recruited");
-            if(!State.heroes[1].unlocked || State.gems!=4800)smokeErrors.Add("Recruit acquisition receipt mismatch");
+            if(!State.heroes[1].unlocked || State.gems!=fixtureGems-1200)smokeErrors.Add("Recruit acquisition receipt mismatch");
             ClickVisibleButton("레이를 출격 대원으로 선택");HeroUpgrade();ClickVisibleButton("레벨업");yield return Capture("02-growth-result");
             if(State.heroes[1].level!=2)smokeErrors.Add("Growth feedback changed upgrade flow");
             PurchaseSupply("rare:2","희귀 충격 발사기");yield return Capture("03-equipment-received");ClickVisibleButton("장비 확인 · 장착");yield return Capture("04-item-details");
@@ -32,6 +33,7 @@ namespace ScrapGuard
                 if(State.showcaseHero!=Outfits.Hero(id)||Outfits.Active(State,State.showcaseHero)!=id)smokeErrors.Add("Showcase not wearing acquired outfit");
                 string before=JsonUtility.ToJson(State);
                 OutfitRoom(id);ClickVisibleButton("전투 크기로 보기");ClickVisibleButton("사격");yield return Capture("09-battle-size-"+id);
+                ClickVisibleButton("필살기");yield return Capture("09a-ultimate-"+id);
                 ClickVisibleButton("기본 외형과 비교");yield return Capture("10-base-size-"+id);
                 var profile=ScrapGuard.Core.Social.Build(State,"",true);GuardianGallery(profile,()=>Show("showcase"));ClickVisibleButton("사격");yield return Capture("11-gallery-shot-"+id);
                 ClickVisibleButton("지원");yield return Capture("12-gallery-support-"+id);
@@ -60,7 +62,10 @@ namespace ScrapGuard
             if(string.IsNullOrEmpty(lastSharedPath)||!File.Exists(lastSharedPath))smokeErrors.Add("Missing updated export card");
             else File.Copy(lastSharedPath,Path.Combine(smokeOutput,"17-export-card.png"),true);
             Screen.SetResolution(360,800,FullScreenMode.Windowed);yield return new WaitForSecondsRealtime(.7f);
-            OutfitRoom(4);yield return Capture("18-small-screen-shop");
+            shopSupplies=false;Show("shop");yield return Capture("18-small-screen-shop");
+            ClickVisibleButton("다음");yield return Capture("18a-next-outfit");
+            OutfitCollection();ClickVisibleButton(Outfits.Collections[Outfits.LatestCollection]);yield return Capture("18b-new-collection");
+            OutfitRoom(Outfits.Count);yield return Capture("18c-small-screen-outfit");
             GuardianGallery(ScrapGuard.Core.Social.Build(State,"",true),()=>Show("showcase"));ClickVisibleButton("전투 크기로 보기");yield return Capture("19-small-screen-gallery");
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Style value fixture runtime errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
             Debug.Log("STYLE_VALUE_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);

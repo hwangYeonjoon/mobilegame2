@@ -39,7 +39,8 @@ public sealed partial class GameRepository
             using(var row=query.ExecuteReader())if(row.Read())
             {
                 if(row.IsDBNull(0)||row.GetString(0)!=a.Id||row.GetString(1)!=purchase.Product||row.GetInt32(2)!=0)throw new ApiFault(409,"이미 처리되었거나 회수된 구매예요.");
-                return Reply(a,"구매 확인 완료 · 중복 지급 없음");
+                row.Close();
+                StorePurchaseToken(db,tx,key,purchase);tx.Commit();return Reply(a,"구매 확인 완료 · 중복 지급 없음");
             }
             using(var voided=Sql(db,tx,"SELECT COUNT(*) FROM voided_tokens WHERE token_hash=$key",("$key",key)))if((long)voided.ExecuteScalar()>0)throw new ApiFault(409,"회수된 구매예요.");
             if(!purchase.Test && a.State.testProgress)throw new ApiFault(409,"테스트 진행 계정은 일반 결제를 사용할 수 없어요.");
@@ -49,8 +50,13 @@ public sealed partial class GameRepository
             if(!offer.Consumable)a.State.adSkip=true;
             Execute(db,tx,"INSERT INTO purchases(token_hash,owner,product,granted,remaining,created) VALUES($key,$owner,$product,$granted,$remaining,$time)",("$key",key),("$owner",a.Id),("$product",offer.Id),("$granted",offer.Gems),("$remaining",granted),("$time",clock().ToString("O")));
             // Amount applied to prior refund debt is already spent and must be restored if this grant is refunded.
+            StorePurchaseToken(db,tx,key,purchase);
             SaveCommerce(db,tx,a,key,"play_purchase",granted);tx.Commit();return Reply(a,purchase.Test?"Play 테스트 구매 지급 완료":"구매한 상품을 지급했어요.");
         }
+    }
+    void StorePurchaseToken(SqliteConnection db,SqliteTransaction tx,string key,VerifiedPurchase p)
+    {
+        Execute(db,tx,"UPDATE purchases SET token_cipher=$cipher,is_test=$test,verified_at=$now,attempt_at=$now,verify_error=NULL WHERE token_hash=$key",("$cipher",ProtectPurchase(p.Token)),("$test",p.Test?1:0),("$now",clock().ToUniversalTime().ToString("O")),("$key",key));
     }
     void SaveCommerce(SqliteConnection db,SqliteTransaction tx,Account a,string key,string kind,int delta)
     {
@@ -76,7 +82,7 @@ public sealed partial class GameRepository
             using(var r=q.ExecuteReader())
             {if(!r.Read()||r.IsDBNull(0)||r.GetInt32(4)!=0){r.Close();tx.Commit();return;}owner=r.GetString(0);product=r.GetString(1);granted=r.GetInt32(2);remaining=r.GetInt32(3);}
             var a=Load(db,tx,owner,true);a.State.gems-=remaining;a.State.paidGems-=remaining;a.State.gemDebt=checked(a.State.gemDebt+granted-remaining);
-            Execute(db,tx,"UPDATE purchases SET revoked=1,remaining=0 WHERE token_hash=$key",("$key",key));
+            Execute(db,tx,"UPDATE purchases SET revoked=1,remaining=0,token_cipher=NULL WHERE token_hash=$key",("$key",key));
             if(product=="ad_skip_lifetime")
             {using var count=Sql(db,tx,"SELECT COUNT(*) FROM purchases WHERE owner=$owner AND product='ad_skip_lifetime' AND revoked=0",("$owner",owner));a.State.adSkip=(long)count.ExecuteScalar()>0;}
             SaveCommerce(db,tx,a,key,"play_refund",-remaining);tx.Commit();

@@ -28,7 +28,11 @@ builder.Services.AddSingleton<AdMobVerifier>();
 builder.Services.AddSingleton<IGoogleIdentityToken,GoogleIdentityToken>();
 builder.Services.AddSingleton<GoogleIdentityFlow>();
 builder.Services.AddSingleton<ServiceMonitor>();
+builder.Services.AddSingleton(new RtdnPolicy(builder.Configuration));
+builder.Services.AddSingleton<IRtdnIdentity,GoogleRtdnIdentity>();
+builder.Services.AddSingleton<RtdnReceiver>();
 builder.Services.AddHostedService<PurchaseReconciler>();
+builder.Services.AddHostedService<MetricsRetention>();
 builder.Services.AddRateLimiter(o =>
 {
     o.RejectionStatusCode = 429;
@@ -71,8 +75,10 @@ string Token(HttpContext ctx)
     return header.Substring(7);
 }
 app.MapGet("/v1/release", () => clientRelease.Policy);
+app.MapGet("/v1/content", (GameRepository repo)=>repo.Content());
+app.MapPost("/v1/metrics/preview",(HttpContext ctx,GameCommand body,GameRepository repo)=>{repo.RecordOutfitPreview(Token(ctx),body.skin);return Results.NoContent();});
 app.MapGet("/health", () => new { status = "ok", version = AppRelease.Version, commerce = app.Services.GetRequiredService<GooglePlayPurchases>().Policy.Mode, maintenance = operations.Maintenance });
-app.MapGet("/health/services", (GooglePlayPurchases play,AdPolicy ads,ServiceMonitor monitor)=>new {commerce=play.Policy.Mode,newSales=play.Policy.SalesEnabled,ads=ads.Mode,refunds=monitor.Snapshot(play.Enabled)});
+app.MapGet("/health/services", (GooglePlayPurchases play,AdPolicy ads,ServiceMonitor monitor,GameRepository repo,RtdnPolicy rtdn)=>new {commerce=play.Policy.Mode,newSales=play.Policy.SalesEnabled,ads=ads.Mode,refunds=monitor.Snapshot(play.Enabled),refundRecovery=repo.RefundHealth(),rtdn=rtdn.Enabled});
 app.MapGet("/health/ready", () => DatabaseMaintenance.Ready(databasePath) ? Results.Ok(new { status = "ready" }) : Results.Json(new { status = "unavailable" },statusCode:503));
 app.MapPost("/v1/auth/guest", (GuestRequest body, GameRepository repo) => { operations.CheckRegistration(body.inviteCode); return repo.Register(body.secret); }).RequireRateLimiting("register");
 app.MapPost("/v1/auth/google/challenge",(HttpContext ctx,GoogleChallengeRequest body,GoogleIdentityFlow flow)=>flow.Begin(body.link?Token(ctx):null,body)).RequireRateLimiting("register");
@@ -81,6 +87,13 @@ app.MapGet("/v1/bootstrap", (HttpContext ctx, GameRepository repo) => repo.Boots
 app.MapPost("/v1/commands", (HttpContext ctx, GameCommand body, GameRepository repo) => repo.Apply(Token(ctx), body)).RequireRateLimiting("commands");
 app.MapGet("/v1/commerce", (HttpContext ctx, GameRepository repo,GooglePlayPurchases play) => repo.Commerce(Token(ctx),play.Policy));
 app.MapPost("/v1/commerce/verify", (HttpContext ctx,PurchaseRequest body,GameRepository repo,GooglePlayPurchases play) => repo.VerifyPurchase(Token(ctx),body,play,ctx.RequestAborted)).RequireRateLimiting("commands");
+app.MapPost("/v1/commerce/rtdn",async(HttpContext ctx,RtdnReceiver receiver)=>{
+    if(ctx.Request.ContentLength>32768)throw new ApiFault(413,"Push payload too large.");
+    using var reader=new StreamReader(ctx.Request.Body);var buffer=new char[32769];int count=0,n;
+    while(count<buffer.Length&&(n=await reader.ReadAsync(buffer.AsMemory(count),ctx.RequestAborted))>0)count+=n;
+    if(count>32768)throw new ApiFault(413,"Push payload too large.");
+    await receiver.Receive(ctx.Request.Headers.Authorization.ToString(),new string(buffer,0,count));return Results.NoContent();
+});
 app.MapGet("/v1/ads", (AdPolicy p) => new AdRewardStatus{enabled=p.Enabled,mode=p.Mode,unitId=p.UnitId});
 app.MapPost("/v1/ads/claims", (HttpContext ctx,GameCommand body,GameRepository repo,AdPolicy p)=>repo.CreateAdClaim(Token(ctx),body,p)).RequireRateLimiting("commands");
 app.MapGet("/v1/ads/claims", (HttpContext ctx,GameRepository repo)=>new { claims=repo.RecentAds(Token(ctx)) });

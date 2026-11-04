@@ -1,7 +1,7 @@
 name: scrapguard-beta
 services:
   api:
-    image: scrapguard-api:${RELEASE_TAG:-0.16.0}
+    image: scrapguard-api:${RELEASE_TAG:-0.19.0}
     build:
       context: ../..
       dockerfile: Server/Deploy/Dockerfile
@@ -9,9 +9,9 @@ services:
     environment:
       SERVER_URLS: http://+:8080
       GAME_DB: /data/scrapguard.db
-      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-16}
-      CLIENT_MIN_BUILD: ${CLIENT_MIN_BUILD:-14}
-      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.16.0}
+      CLIENT_LATEST_BUILD: ${CLIENT_LATEST_BUILD:-19}
+      CLIENT_MIN_BUILD: ${CLIENT_MIN_BUILD:-19}
+      CLIENT_LATEST_VERSION: ${CLIENT_LATEST_VERSION:-0.19.0}
       PLAY_UPDATE_AVAILABLE: ${PLAY_UPDATE_AVAILABLE:-false}
       CLIENT_UPDATE_NOTES: ${CLIENT_UPDATE_NOTES:-새로운 수호대 콘텐츠와 안정성 개선을 확인하세요.}
       COMMERCE_MODE: ${COMMERCE_MODE:-disabled}
@@ -22,6 +22,10 @@ services:
       ADS_RELEASE_READY: ${ADS_RELEASE_READY:-false}
       ADMOB_REWARDED_UNIT_ID: ${ADMOB_REWARDED_UNIT_ID:-}
       PLAY_PACKAGE_NAME: ${PLAY_PACKAGE_NAME:-io.github.hwangyeonjoon.scrapguard}
+      RTDN_ENABLED: ${RTDN_ENABLED:-false}
+      RTDN_AUDIENCE: ${RTDN_AUDIENCE:-}
+      RTDN_SERVICE_ACCOUNT_EMAIL: ${RTDN_SERVICE_ACCOUNT_EMAIL:-}
+      RTDN_SUBSCRIPTION: ${RTDN_SUBSCRIPTION:-}
       GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       TRUSTED_PROXY_IPS: 172.31.248.2
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}

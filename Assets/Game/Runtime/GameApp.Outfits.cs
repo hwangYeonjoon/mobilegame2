@@ -10,7 +10,9 @@ namespace ScrapGuard
         void OutfitRoom(int id)
         {
             Track("preview",Outfits.Product(id));
+            if(Online&&cloudReady)StartCoroutine(cloud.SendOutfitPreview(id));
             var card=Dialog(Outfits.Label(id), Outfits.HeroName(id)+" 전용 의상 · 보석 600개\n외형·연출만 변경 · 대원 별도 · 능력치 변화 없음",880);
+            RefreshOutfitCatalog(()=>{if(card!=null)OutfitRoom(id);});
             var stage=Ui.Box(card,24,144,444,361,Ui.Background);stage.raycastTarget=true;stage.gameObject.AddComponent<RectMask2D>();
             Ui.Label(stage.transform,"외형 체험 · 드래그로 이동",14,8,416,28,14,Ui.Muted,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<OutfitPreview>();preview.Initialize(id);
@@ -18,22 +20,23 @@ namespace ScrapGuard
             Ui.Button(card,"사격",24,519,140,45,preview.Fire,Ui.Raised,true,17);
             Ui.Button(card,"필살기",176,519,140,45,preview.Ultimate,Ui.Gold,true,17);
             Ui.Button(card,"지원 등장",328,519,140,45,preview.Support,Ui.Raised,true,17);
-            Ui.Label(card,Outfits.Details[id]+"\n"+OutfitVisuals.Description(id),24,580,444,62,18,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,Outfits.Details[id]+"\n"+OutfitVisuals.Description(id),24,580,444,62,16,Ui.Ink,TextAnchor.MiddleCenter);
             Button comparison=null;
             comparison=Ui.Button(card,"기본 외형과 비교",24,653,444,43,()=>{preview.Compare();comparison.name=preview.BaseLook?(id==1?"중장비 의상으로 돌아가기":Outfits.Label(id)+"로 돌아가기"):"기본 외형과 비교";comparison.GetComponentInChildren<Text>().text=comparison.name;},Ui.Raised,true,16);
             bool owned=Outfits.Owned(State,id),equipped=Outfits.Active(State,Outfits.Hero(id))==id;
             bool heroOwned=State.heroes[Outfits.Hero(id)].unlocked;
-            Ui.Button(card,owned?(equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착"):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,727,444,57,
-                ()=>{if(owned)Change(new GameCommand(equipped?"outfit_clear":"outfit_equip"){skin=id,hero=Outfits.Hero(id)},()=>OutfitRoom(id));else if(!heroOwned){CloseModal();Show("heroes");}else OutfitPurchase(id);},Ui.Gold,true,18);
+            Ui.Button(card,owned?(equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착"):!OutfitForSale(id)?OutfitSaleLabel(id):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,727,444,57,
+                ()=>{if(owned)Change(new GameCommand(equipped?"outfit_clear":"outfit_equip"){skin=id,hero=Outfits.Hero(id)},()=>OutfitRoom(id));else if(!heroOwned){CloseModal();Show("heroes");}else OutfitPurchase(id);},Ui.Gold,owned||OutfitForSale(id),18);
             Ui.Button(card,owned?"의상 컬렉션 · 대원별 장착 확인":State.outfitTarget==id?"수집 목표 해제":"수집 목표로 저장 · 자동 구매 없음",24,805,444,39,
                 ()=>{if(owned)OutfitCollection();else Change(new GameCommand("outfit_target"){skin=State.outfitTarget==id?0:id},()=>OutfitRoom(id));},Ui.Raised,true,15);
         }
         void OutfitPurchase(){OutfitPurchase(1);}
         void OutfitPurchase(int id)
         {
+            if(!OutfitForSale(id)){OutfitRoom(id);return;}
             var card=Dialog("의상을 구매할까요?",Outfits.Label(id)+" 1종 · "+Outfits.HeroName(id)+" 전용 · 대원 별도",490);
             Ui.Label(card,"보석 600개 차감\n이동·사격·필살기 자세와 전용 연출 포함\n능력치 보너스 없음 · 구매 후 별도 장착",24,128,444,104,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Button(card,"보석 600개로 구매",24,255,444,55,()=>PurchaseOutfit(id),Ui.Gold,State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
+            Ui.Button(card,"보석 600개로 구매",24,255,444,55,()=>PurchaseOutfit(id),Ui.Gold,OutfitForSale(id) && State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
             Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,323,444,43,()=>GemSources(Outfits.Price,()=>OutfitPurchase(id)),Ui.Raised,true,16);
             Ui.Button(card,"체험으로 돌아가기",24,393,444,43,()=>OutfitRoom(id),Ui.Raised,true,16);
         }
@@ -87,10 +90,13 @@ namespace ScrapGuard
     public static class OutfitVisuals
     {
         public static readonly Color Copper=Ui.Hex("FFAD58");
-        public static Color Accent(int id){return id==3?Ui.Hex("69CAFF"):id==4?Ui.Hex("D6AAFF"):Copper;}
-        public static string Description(int id){return id==3?"전격 사격 / 번개 날개 / 지원 등장 연출":id==4?"냉각 사격 / 눈꽃 결정 / 지원 등장 연출":id==2?"주황빛 사격 / 레일 섬광 / 지원 등장 연출":"구리빛 탄환 / 기어 충격파 / 지원 등장 연출";}
+        public static Color Accent(int id){return id==3?Ui.Hex("69CAFF"):id==4?Ui.Hex("D6AAFF"):id==5?Ui.Hex("66E8CF"):id==6?Ui.Hex("8ADFFF"):id==7?Ui.Hex("FF80D9"):id==8?Ui.Hex("FFD16C"):id==9?Ui.Hex("72F0DF"):id==10?Ui.Hex("FF917A"):Copper;}
+        public static string Description(int id){return Outfits.Valid(id)?Outfits.Effects[id]+" · "+Outfits.Arrivals[id]:"기본 지원 등장";}
         public static void Special(Transform parent,Vector2 origin,float radius,int outfit)
         {
+            if(!Outfits.Valid(outfit))return;
+            if(outfit>=8){ExtremeWorkshop(parent,origin,radius,outfit);return;}
+            if(outfit>=5){NewHorizon(parent,origin,radius,outfit);return;}
             if(outfit==1){Gear(parent,origin,radius);return;}
             if(outfit>=3)
             {
@@ -116,6 +122,65 @@ namespace ScrapGuard
             for(int i=-1;i<=1;i++)Ui.Box(root,-radius,i*14-3,radius*2,6,i==0?Color.white:Copper,false);
             root.gameObject.AddComponent<CombatBurst>().Configure(.65f,.35f,1);
         }
+        static void ExtremeWorkshop(Transform parent,Vector2 origin,float radius,int outfit)
+        {
+            var root=Ui.Rect(parent,"Extreme signature "+outfit,origin.x,-origin.y,0,0);var tint=Accent(outfit);
+            if(outfit==8)
+            {
+                var halo=CombatRing.Create(root,radius*1.25f,tint,.018f);halo.anchoredPosition=Vector2.zero;
+                for(int i=0;i<8;i++)
+                {
+                    var spoke=Ui.Rect(root,"Corona fin",0,0,0,0);spoke.localEulerAngles=new Vector3(0,0,i*45);
+                    var fin=Ui.Box(spoke,-3,-radius*.94f,6,radius*.24f,tint,false).rectTransform;fin.localEulerAngles=new Vector3(0,0,25);
+                }
+            }
+            else if(outfit==9)
+            {
+                for(int i=0;i<3;i++){var ring=CombatRing.Create(root,radius*(.65f+i*.45f),new Color(tint.r,tint.g,tint.b,1-i*.2f),.014f);ring.anchoredPosition=new Vector2(0,i*8);}
+            }
+            else
+            {
+                for(int i=0;i<3;i++)
+                {
+                    var drill=Ui.Rect(root,"Drill impact",-radius*.85f+i*radius*.60f,-radius*.25f,radius*.48f,radius*.75f);
+                    drill.localEulerAngles=new Vector3(0,0,-90);
+                    var mark=drill.gameObject.AddComponent<OutfitMark>();mark.Configure(10,true);mark.color=tint;
+                }
+            }
+            root.gameObject.AddComponent<OutfitSignatureMotion>().Initialize(outfit);
+            root.gameObject.AddComponent<CombatBurst>().Configure(.9f,.35f,1.05f);
+        }
+        static void NewHorizon(Transform parent,Vector2 origin,float radius,int outfit)
+        {
+            var root=Ui.Rect(parent,"Outfit signature "+outfit,origin.x,-origin.y,0,0);var tint=Accent(outfit);
+            if(outfit==5)
+            {
+                for(int side=-1;side<=1;side+=2)
+                {
+                    var gate=Ui.Rect(root,"Citadel gate",side*radius*.48f,0,0,0);
+                    Ui.Box(gate,-radius*.28f,-radius*.6f,radius*.56f,5,tint,false);
+                    Ui.Box(gate,-radius*.28f,-radius*.6f,5,radius*1.2f,tint,false);
+                    Ui.Box(gate,radius*.28f,-radius*.6f,5,radius*1.2f,tint,false);
+                    for(int i=0;i<3;i++)Ui.Box(gate,-radius*.26f+i*radius*.2f,-radius*.72f,radius*.12f,radius*.12f,tint,false);
+                }
+            }
+            else if(outfit==6)
+            {
+                var ring=CombatRing.Create(root,radius*1.65f,tint,.016f);ring.anchoredPosition=Vector2.zero;
+                for(int i=0;i<3;i++)
+                {
+                    float a=i*Mathf.PI*2/3;var satellite=Ui.Rect(root,"Orbit satellite",Mathf.Cos(a)*radius*.82f,-Mathf.Sin(a)*radius*.82f,24,24);
+                    var mark=satellite.gameObject.AddComponent<OutfitMark>();mark.Configure(6,true);mark.color=Color.white;
+                }
+            }
+            else for(int i=0;i<3;i++)
+            {
+                var trail=Ui.Rect(root,"Neon chevron",-radius+i*radius*.55f,-radius*.4f,radius*.7f,radius*.8f);
+                var mark=trail.gameObject.AddComponent<OutfitMark>();mark.Configure(7,true);mark.color=tint;
+            }
+            root.gameObject.AddComponent<OutfitSignatureMotion>().Initialize(outfit);
+            root.gameObject.AddComponent<CombatBurst>().Configure(.85f,.5f,1.1f);
+        }
         public static void Gear(Transform parent,Vector2 origin,float radius)
         {
             var root=Ui.Rect(parent,"EngineerGear",origin.x,-origin.y,0,0);
@@ -128,5 +193,10 @@ namespace ScrapGuard
             }
             root.gameObject.AddComponent<CombatBurst>().Configure(.9f,.25f,1);
         }
+    }
+    public sealed class OutfitSignatureMotion : MonoBehaviour
+    {
+        int outfit;public void Initialize(int id){outfit=id;}
+        void Update(){if(outfit==6||outfit==8)transform.Rotate(0,0,(outfit==8?-60:90)*Time.deltaTime);else if(outfit==7)((RectTransform)transform).anchoredPosition+=Vector2.right*(45*Time.deltaTime);else if(outfit==10)((RectTransform)transform).anchoredPosition+=Vector2.down*(35*Time.deltaTime);}
     }
 }

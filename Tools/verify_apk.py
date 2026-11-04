@@ -22,7 +22,7 @@ def run(args):
 
 badging = run([bin_dir / 'aapt', 'dump', 'badging', apk])
 assert "package: name='io.github.hwangyeonjoon.scrapguard'" in badging
-assert "versionName='0.16.0'" in badging and "versionCode='16'" in badging
+assert "versionName='0.19.0'" in badging and "versionCode='19'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'36'" in badging
 assert "native-code: 'arm64-v8a'" in badging
 manifest = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'AndroidManifest.xml'])
@@ -60,10 +60,10 @@ with zipfile.ZipFile(apk) as archive:
         libraries.append({'name': name, 'load_alignments': load_alignments})
 assert libraries
 report = {'apk': str(apk), 'bytes': apk.stat().st_size, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
-          'package': 'io.github.hwangyeonjoon.scrapguard', 'version': '0.16.0', 'versionCode': 16, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
+          'package': 'io.github.hwangyeonjoon.scrapguard', 'version': '0.19.0', 'versionCode': 19, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
           'v2_signature': True, 'zip_16kb': True, 'file_provider': True, 'backup_disabled': True,
           'libraries': libraries, 'device_execution': 'not tested'}
-(result_dir / 'apk-016-verification.json').write_text(json.dumps(report, indent=2) + '\n')
-(result_dir / 'apk-016-manifest.txt').write_text(manifest + '\n' + paths)
+(result_dir / 'apk-019-verification.json').write_text(json.dumps(report, indent=2) + '\n')
+(result_dir / 'apk-019-manifest.txt').write_text(manifest + '\n' + paths)
 print(json.dumps({key:value for key,value in report.items() if key != 'libraries'}, indent=2))
 print('ELF libraries checked:', len(libraries))

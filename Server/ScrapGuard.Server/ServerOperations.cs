@@ -72,14 +72,26 @@ public static class DatabaseMaintenance
     public static void Backup(string source, string destination)
     {
         if (!File.Exists(source)) throw new FileNotFoundException("Source database does not exist.",source);
-        if (Path.GetFullPath(source) == Path.GetFullPath(destination) || File.Exists(destination)) throw new IOException("Backup destination must be a new file.");
+        if (Path.GetFullPath(source) == Path.GetFullPath(destination) || File.Exists(destination) || Directory.Exists(destination+".keys")) throw new IOException("Backup destination must be a new file.");
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(destination))!);
         string temporary = destination + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
             using (var input = Open(source,SqliteOpenMode.ReadOnly))
             using (var output = Open(temporary,SqliteOpenMode.ReadWriteCreate)) input.BackupDatabase(output);
-            Verify(temporary); File.Move(temporary,destination);
+            Verify(temporary);
+            // Keys are created before ciphertext commits. Copy after the SQLite snapshot.
+            if(Directory.Exists(source+".keys"))
+            {
+                var keys=Directory.CreateDirectory(destination+".keys");
+                if(!OperatingSystem.IsWindows())File.SetUnixFileMode(keys.FullName,UnixFileMode.UserRead|UnixFileMode.UserWrite|UnixFileMode.UserExecute);
+                foreach(var key in Directory.EnumerateFiles(source+".keys","*.xml"))
+                {
+                    string target=Path.Combine(keys.FullName,Path.GetFileName(key));File.Copy(key,target);
+                    if(!OperatingSystem.IsWindows())File.SetUnixFileMode(target,UnixFileMode.UserRead|UnixFileMode.UserWrite);
+                }
+            }
+            File.Move(temporary,destination);
         }
         finally { if (File.Exists(temporary)) File.Delete(temporary); }
     }
