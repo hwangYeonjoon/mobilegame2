@@ -1,5 +1,9 @@
 # mobilegame2 안드로이드 생존 성장 게임
 
+출시 식별자: 게임 이름 **고철 수호대**, Android 패키지 **`io.github.hwangyeonjoon.scrapguard`**. Google Cloud 프로젝트 표시 이름은 **Scrap Guard**, 생성할 프로젝트 ID는 **`scrapguard-prod`**로 정했다. Cloud 프로젝트 생성·ID 사용 가능 여부는 아직 확인하지 않았으며, 이미 사용 중이면 고유한 접미사를 붙인다. 기존 Google/Play/AdMob 계정에서 이 게임용 앱과 인증 설정을 추가한다.
+
+패키지 변경 이후 APK는 이전 `com.scrapguard.mobilegame2.prototype` 개발 앱과 별도로 설치된다. 기존 Android 로컬 저장은 자동으로 옮겨지지 않는다. 현재 버전 0.16/code 16과 전투 규칙 11은 유지하며 실제 결제·광고는 계속 비활성이다.
+
 
 **0.16.0 외부 연결 전 서비스 준비**: 일반/라이선스 테스트 결제 모드, 신규 판매 중지와 기존 구매 복원 분리, 상품별 판매 제외, Google Mobile Ads 11.6.0·UMP, 서버 광고 보상 예약·ECDSA SSV 검증, 보상 내역·취소, 운영자 CLI와 서비스 상태 점검을 추가했다. 기본값은 결제·광고 모두 비활성이며 운영 계정이나 외부 서버를 연결하지 않았다. 전투·가격·무료 보상과 규칙 **11**은 유지한다.
 
@@ -202,7 +206,7 @@ open -n Builds/macOS/ScrapGuard.app --args -profilePath /private/tmp/scrap-art09
 | 플랫폼 | Android 우선, Google Play 배포 |
 | 조작 | 세로 화면, 한 손 이동, 자동 공격 |
 | 플레이 | 5~8분 생존 전투와 영구 성장 |
-| 가제와 소재 | 고철 수호대 — 드론과 재활용 무기로 폭주 로봇을 정리하는 정비사 |
+| 게임 이름과 소재 | 고철 수호대 — 드론과 재활용 무기로 폭주 로봇을 정리하는 정비사 |
 | 엔진 | Unity 6.3 LTS 계열 후보, C# 2D |
 | 상점 | 시스템 상점에서 확정 구매, 불필요한 장비를 골드로 판매 |
 | 핵심 BM | 보석 충전, 확정 캐릭터 해금, 영구 광고 스킵 |

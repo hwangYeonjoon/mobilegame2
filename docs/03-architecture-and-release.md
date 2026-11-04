@@ -1,5 +1,18 @@
 # 서버와 안드로이드 출시 계획
 
+## 확정한 앱·프로젝트 식별자
+
+| 항목 | 값 | 상태 |
+| --- | --- | --- |
+| 게임 표시 이름 | 고철 수호대 | 앱에 적용 |
+| Android 패키지 | `io.github.hwangyeonjoon.scrapguard` | 앱·서버 기본값·검증 도구에 적용 |
+| Google Cloud 프로젝트 표시 이름 | Scrap Guard | 콘솔 생성 예정 |
+| Google Cloud 프로젝트 ID | `scrapguard-prod` | 사용 가능 여부 미확인, 중복 시 접미사 추가 |
+
+Play Console에는 새 게임 앱을 생성하고 위 패키지로 서명 AAB를 올린다. 같은 Google 계정의 Cloud 프로젝트에서 Android OAuth(위 패키지 + 실제 배포 서명의 SHA-1), Web OAuth, 구매 검증용 서비스 계정을 준비한다. AdMob도 기존 계정에 별도 앱과 보상형 광고 단위를 생성한다. 프로젝트 ID와 OAuth Client ID, AdMob App ID는 서로 다른 값이다.
+
+패키지명은 이전 프로토타입과 달라 Android에서 별도 앱으로 설치된다. 이전 로컬 저장이나 세션을 자동으로 가져오지 않는다. Google 계정·콘솔·서명·외부 서버를 이번 변경으로 생성하거나 연결한 것은 아니다.
+
 ## 0.16 외부 연결 전 서비스 준비
 
 앱 0.16/code 16, 최소 호환 code 14, 전투 규칙 11이다. 일반 구매 코드와 광고 SDK를 추가했지만 실제 Google 계정·공개 서버·광고·판매는 연결하지 않았다. 아래 내용이 과거 버전의 미구현 설명을 대체한다.
@@ -119,7 +132,7 @@ local_load_check는 격리된 127.0.0.1:5190 서버에 인증된 읽기 40회(�
 
 ### Google 계정
 
-1. 실제 패키지와 서명 인증서 SHA를 Google Cloud Android 클라이언트에 등록한다. 기본 패키지는 `com.scrapguard.mobilegame2.prototype`이며 변경 시 빌드·Play 설정도 함께 맞춘다.
+1. 실제 패키지와 서명 인증서 SHA를 Google Cloud Android 클라이언트에 등록한다. 출시 패키지는 `io.github.hwangyeonjoon.scrapguard`이며 빌드·Play 설정도 동일하게 맞춘다.
 2. Web OAuth 클라이언트 ID를 서버 `GOOGLE_WEB_CLIENT_ID`로 설정한다. 비밀키를 앱이나 Git에 넣지 않는다.
 3. Android에서 서버 게스트 계정을 만든 뒤 **현재 수호대에 Google 계정 연결**을 누른다. Credential Manager 1.5.0 / googleid 1.1.1이 서버의 5분 nonce를 포함한 토큰을 받고 서버가 서명·issuer·audience·expiry·nonce를 확인한다. 이메일을 계정 키로 쓰지 않는다.
 4. 다른 기기에서 **Google 계정으로 복구**하면 서버 진행을 유지하며 bearer 복구 코드를 교체한다. 다른 기기의 기존 연결도 끊긴다. 자동 계정 병합은 없다. 응답이 끊겼다면 저장된 새 코드로 일반 복구를 재시도하거나 Google 복구를 다시 수행한다.
@@ -170,7 +183,7 @@ python3 Tools/android_device_check.py --adb /path/to/adb
 
 Unity는 6.3 LTS 지원을 안내하고 있다. 인접한 기존 `mobilegame` 저장소에서도 Unity `6000.3.7f1`, Unity IAP `5.4.4`, Google Mobile Ads `11.5.0` 사용을 확인했다. 이를 호환성 검토의 출발점으로만 사용하며, 새 프로젝트 패치와 SDK 버전은 Android 빌드 검증 후 고정한다. [Unity 지원 안내](https://unity.com/releases/unity-6/support)
 
-현재 `mobilegame2` 0.2에는 로컬 체험과 별도의 ASP.NET Core + SQLite 서버 계정이 구현되어 있다. Spring Boot 초기 제안 대신 Unity와 경제·전투 C# 코드를 공유하는 구성을 선택했다. 이 문서의 결제·광고·운영 확장 부분은 후속 대상이며, 실제 API와 구현 범위는 [0.2 문서](05-showcase-and-server.md)를 기준으로 한다. 프로토타입 패키지명은 `com.scrapguard.mobilegame2.prototype`이고 개발 빌드 서명을 사용한다. 기존 게임의 계정, 상품 ID, 광고 ID와 패키지명은 신규 앱에서 재사용하지 않는다. 운영 패키지명과 업로드 서명 키는 출시 작업에서 별도로 확정한다.
+현재 `mobilegame2` 0.2에는 로컬 체험과 별도의 ASP.NET Core + SQLite 서버 계정이 구현되어 있다. Spring Boot 초기 제안 대신 Unity와 경제·전투 C# 코드를 공유하는 구성을 선택했다. 이 문서의 결제·광고·운영 확장 부분은 후속 대상이며, 실제 API와 구현 범위는 [0.2 문서](05-showcase-and-server.md)를 기준으로 한다. 프로토타입 패키지명은 `com.scrapguard.mobilegame2.prototype`이고 개발 빌드 서명을 사용한다. 기존 게임의 계정, 상품 ID, 광고 ID와 패키지명은 신규 앱에서 재사용하지 않는다. 운영 패키지명은 위 확정 식별자를 따르고 업로드 서명 키는 별도로 준비한다.
 
 ```mermaid
 flowchart TB

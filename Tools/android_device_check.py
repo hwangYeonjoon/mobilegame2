@@ -6,7 +6,7 @@ from pathlib import Path
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--adb', default='adb')
-p.add_argument('--package', default='com.scrapguard.mobilegame2.prototype')
+p.add_argument('--package', default='io.github.hwangyeonjoon.scrapguard')
 p.add_argument('--output', type=Path, default=Path('TestResults/AndroidDevice'))
 a = p.parse_args()
 def run(*args):

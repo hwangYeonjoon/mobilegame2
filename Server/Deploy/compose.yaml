@@ -21,7 +21,7 @@ services:
       ADS_MODE: ${ADS_MODE:-disabled}
       ADS_RELEASE_READY: ${ADS_RELEASE_READY:-false}
       ADMOB_REWARDED_UNIT_ID: ${ADMOB_REWARDED_UNIT_ID:-}
-      PLAY_PACKAGE_NAME: ${PLAY_PACKAGE_NAME:-com.scrapguard.mobilegame2.prototype}
+      PLAY_PACKAGE_NAME: ${PLAY_PACKAGE_NAME:-io.github.hwangyeonjoon.scrapguard}
       GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       TRUSTED_PROXY_IPS: 172.31.248.2
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}

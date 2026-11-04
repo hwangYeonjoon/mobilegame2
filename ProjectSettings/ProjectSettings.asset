@@ -166,8 +166,8 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.scrapguard.mobilegame2.prototype
-    Standalone: com.scrapguard.mobilegame2.prototype
+    Android: io.github.hwangyeonjoon.scrapguard
+    Standalone: io.github.hwangyeonjoon.scrapguard
   buildNumber:
     Standalone: 0
     VisionOS: 0
