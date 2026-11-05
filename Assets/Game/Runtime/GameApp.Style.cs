@@ -11,34 +11,39 @@ namespace ScrapGuard
         void StyleShop()
         {
             var currentScreen=screen;RefreshOutfitCatalog(()=>{if(currentScreen!=null&&currentScreen==screen)Show("shop");});
-            var featured = Ui.Box(screen,24,239,492,359,Ui.Hex("263748")).transform;
+            var list=ShopScroll(258,MenuBottom-258,1190,3);
+            var featured=WorkshopStage.Draw(list,0,0,492,394,Ui.Gold);
             int outfit=featuredOutfit;
-            Ui.Button(featured,"이전",22,16,66,35,()=>{featuredOutfit=outfit==1?Outfits.Count:outfit-1;Show("shop");},Ui.Raised,true,15);
-            Ui.Button(featured,Outfits.Collections[Outfits.Collection(outfit)]+" · "+outfit+" / "+Outfits.Count,96,16,300,35,OutfitCollection,Ui.Raised,true,16);
-            Ui.Button(featured,"다음",404,16,66,35,()=>{featuredOutfit=outfit==Outfits.Count?1:outfit+1;Show("shop");},Ui.Raised,true,15);
-            Ui.Label(featured,Outfits.Label(outfit),22,64,246,45,29,Ui.Ink);
-            Ui.Label(featured,Outfits.Details[outfit].Replace(" · ","\n"),22,121,220,78,18,Ui.Muted);
-            Ui.Label(featured,Outfits.HeroName(outfit)+" 전용 · 대원 별도\n능력치 변화 없음",22,203,210,55,15,Ui.Gold);
-            Ui.Disc(featured,238,68,224,new Color(1,.7f,.3f,.07f));
-            var art = CharacterArt.Draw(featured,232,56,244,246,Outfits.Hero(outfit),0,outfit);
+            Ui.Label(featured,Outfits.Collections[Outfits.Collection(outfit)],22,14,448,30,18,Ui.Gold);
+            Ui.Label(featured,Outfits.Label(outfit),22,57,245,72,30,Ui.Ink);
+            Ui.Label(featured,Outfits.Details[outfit].Replace(" · ","\n"),22,138,220,85,19,Ui.Muted);
+            Ui.Label(featured,Outfits.HeroName(outfit)+" 전용\n능력치 변화 없음",22,238,210,58,18,Ui.Gold);
+            var art=CharacterArt.Draw(featured,230,42,246,264,Outfits.Hero(outfit),0,outfit);
             art.gameObject.AddComponent<ShowroomMotion>();
-            bool owned = Outfits.Owned(State,outfit);
-            Ui.Button(featured,owned ? "보유 의상 체험 · 장착" : OutfitForSale(outfit)?"움직여 보기  ·  ◆ 600":OutfitSaleLabel(outfit),22,282,448,55,()=>OutfitRoom(outfit),Ui.Gold,true,19);
-            var earned = Ui.Box(screen,24,614,238,184,Ui.Panel).transform;
-            CharacterArt.Draw(earned,127,10,106,112,State.showcaseHero,2);
-            Ui.Label(earned,"빙하의 수호자",16,17,128,28,19,Ui.Blue);
-            Ui.Label(earned,"플레이로 획득\n처치 " + Mathf.Min(1000,State.totalKills) + "/1,000",16,59,132,59,14,Ui.Muted);
-            Ui.Button(earned,"서리 도색 보기",14,128,210,42,() => Wardrobe(2),Ui.Raised,true,16);
-            var frame = Ui.Box(screen,278,614,238,184,Ui.Panel).transform;
-            Ui.Box(frame,156,20,54,74,Ui.Gold);
-            Ui.Box(frame,159,23,48,68,Ui.Background);
-            CharacterArt.Draw(frame,162,28,42,58,State.showcaseHero,State.selectedSkin);
-            Ui.Label(frame,"태양의 테두리",16,17,138,28,19,Ui.Gold);
-            Ui.Label(frame,"전시 프레임\n◆ 250 · 확정 구성",16,59,138,59,14,Ui.Muted);
-            Ui.Button(frame,Social.HasFrame(State,3) ? "전시실에서 적용" : "프레임 살펴보기",14,128,210,42,
-                () => { if (Social.HasFrame(State,3)) CustomizeProfile(); else CosmeticOffer("frame_solar"); },Ui.Raised,true,16);
-            Ui.Button(screen,"의상 컬렉션 · "+Outfits.Count+"종",24,808,238,43,OutfitCollection,Ui.Gold,true,15);
-            Ui.Button(screen,"공용 · 앰버 도색",278,808,238,43,()=>Wardrobe(1),Ui.Raised,true,15);
+            bool owned=Outfits.Owned(State,outfit);
+            Ui.Button(featured,owned?"보유 의상 체험 · 장착":OutfitForSale(outfit)?"움직여 보기 · 보석 600":OutfitSaleLabel(outfit),22,310,448,68,()=>OutfitRoom(outfit),Ui.Gold,true,22);
+            Ui.Label(list,"다른 모습도 골라 보세요",0,413,492,34,23);
+            for(int i=0;i<3;i++)
+            {
+                int id=(featuredOutfit+i)%Outfits.Count+1;float x=i*168;
+                var thumb=Ui.Button(list,"",x,462,156,218,()=>{featuredOutfit=id;shopOffsets[3]=0;Show("shop");},Ui.Panel).transform;
+                CharacterArt.Draw(thumb,9,7,138,136,Outfits.Hero(id),0,id);
+                Ui.Label(thumb,Outfits.Label(id),8,148,140,61,18,Ui.Ink,TextAnchor.MiddleCenter);
+            }
+            Ui.Button(list,"전체 의상 · 대원별 / 보유별 찾기",0,699,492,72,OutfitCollection,Ui.Gold,true,21);
+            var earned=Ui.Box(list,0,792,238,275,Ui.Panel).transform;
+            CharacterArt.Draw(earned,117,10,112,122,State.showcaseHero,2);
+            Ui.Label(earned,"빙하의\n수호자",14,18,118,69,22,Ui.Blue);
+            Ui.Label(earned,"플레이로 획득\n처치 "+Mathf.Min(1000,State.totalKills)+"/1,000",14,129,210,62,18,Ui.Muted);
+            Ui.Button(earned,"서리 도색 보기",12,199,214,64,()=>Wardrobe(2),Ui.Raised,true,20);
+            var frame=Ui.Box(list,254,792,238,275,Ui.Panel).transform;
+            Ui.Box(frame,145,20,70,102,Ui.Gold);Ui.Box(frame,149,24,62,94,Ui.Background);
+            CharacterArt.Draw(frame,151,27,58,88,State.showcaseHero,State.selectedSkin);
+            Ui.Label(frame,"태양의\n테두리",14,18,128,69,22,Ui.Gold);
+            Ui.Label(frame,"전시 프레임\n보석 250 · 확정 구성",14,129,210,62,18,Ui.Muted);
+            Ui.Button(frame,Social.HasFrame(State,3)?"전시실에서 적용":"프레임 살펴보기",12,199,214,64,
+                ()=>{if(Social.HasFrame(State,3))CustomizeProfile();else CosmeticOffer("frame_solar");},Ui.Raised,true,19);
+            Ui.Button(list,"전체 대원 공용 · 앰버 도색",0,1088,492,72,()=>Wardrobe(1),Ui.Raised,true,21);
         }
         void Wardrobe(int skin, int hero = -1)
         {

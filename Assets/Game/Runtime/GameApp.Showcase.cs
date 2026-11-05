@@ -16,48 +16,52 @@ namespace ScrapGuard
         Color FrameColor(int frame) { return frame == 4 ? Ui.Hex("C89BFF") : frame == 1 || frame == 3 ? Ui.Gold : frame == 2 ? Ui.Blue : Ui.Mint; }
         void Showcase()
         {
-            showcaseCard = DrawProfile(screen, Social.Build(State, Online ? cloud.Session.playerId : "", !Online), 24, 176);
-            Ui.Button(showcaseCard,"확대 감상",355,258,105,31,()=>GuardianGallery(Social.Build(State,Online?cloud.Session.playerId:"",!Online),()=>Show("showcase")),Ui.Raised,true,13);
-            Ui.Button(screen, "내 프로필 꾸미기", 24, 724, 238, 55, CustomizeProfile, Ui.Raised, true, 17);
-            Ui.Button(screen, "카드 이미지 공유", 278, 724, 238, 55, () => { if (!exportingCard) StartCoroutine(ExportCard(showcaseCard)); }, null, true, 17);
-            Ui.Button(screen,"기록 · 트로피 전시대",24,793,238,51,()=>TrophyRoom(Social.Build(State,Online?cloud.Session.playerId:"",!Online)),Ui.Raised,true,16);
-            Ui.Button(screen, "다른 수호대 구경", 278, 793, 238, 51, () => { if (Online && cloudReady) StartCoroutine(LoadGallery("")); else AccountPanel(); }, Ui.Raised, true, 17);
+            var body=Ui.Scroll(screen,24,176,492,MenuBottom-176,880);
+            var profile=Social.Build(State,Online?cloud.Session.playerId:"",!Online);
+            showcaseCard=DrawProfile(body,profile,0,0);
+            Ui.Button(body,"확대 감상 · 움직임과 공격 연출",0,548,492,72,()=>GuardianGallery(profile,()=>Show("showcase")),Ui.Gold,true,22);
+            Ui.Button(body,"내 프로필 꾸미기",0,636,238,72,CustomizeProfile,Ui.Raised,true,20);
+            Ui.Button(body,"카드 이미지 공유",254,636,238,72,()=>{if(!exportingCard)StartCoroutine(ExportCard(showcaseCard));},null,true,20);
+            Ui.Button(body,"장비 · 기록 보기",0,724,238,72,()=>ProfileEquipment(profile),Ui.Raised,true,20);
+            Ui.Button(body,"다른 수호대 구경",254,724,238,72,()=>{if(Online&&cloudReady)StartCoroutine(LoadGallery(""));else AccountPanel();},Ui.Raised,true,20);
+            Ui.Label(body,"마음에 드는 모습과 플레이 기록을 함께 전시하세요.",0,817,492,48,18,Ui.Muted,TextAnchor.MiddleCenter);
         }
-        RectTransform DrawProfile(Transform parent, PublicProfile p, float x, float y)
+        RectTransform DrawProfile(Transform parent,PublicProfile p,float x,float y)
         {
-            Color accent = FrameColor(p.frame);
-            var card = Ui.Box(parent, x, y, 492, 530, accent, true, "ShowcaseCard").rectTransform;
-            Ui.Box(card, 3, 3, 486, 524, Ui.Background);
-            Ui.Box(card, 18, 18, 456, 494, Ui.Panel);
-            Ui.Label(card, "SCRAP GUARD  /  MY GUARDIAN", 32, 26, 428, 25, 12, accent);
-            Ui.Label(card, p.name, 32, 57, 428, 43, 29, Ui.Ink, TextAnchor.MiddleCenter);
-            Ui.Label(card, "〈 " + Social.Titles[p.title] + " 〉", 32, 100, 428, 32, 17, accent, TextAnchor.MiddleCenter);
-            for (int i = 0; i < 4; i++) Ui.Box(card, 49, 155 + i * 36, 394, 1, new Color(accent.r,accent.g,accent.b,.12f), false);
-            Ui.Disc(card, 151, 139, 190, new Color(accent.r,accent.g,accent.b,.08f));
-            if (p.frame == 3)
-                for (int i = 0; i < 8; i++) { float a = i * Mathf.PI / 4; var r = Ui.Box(card, 241 + Mathf.Cos(a) * 113, 210 + Mathf.Sin(a) * 65, 6, 17, accent, false).rectTransform; r.localEulerAngles = new Vector3(0,0,90 - i * 45); }
+            Color accent=FrameColor(p.frame);
+            var card=Ui.Box(parent,x,y,492,530,accent,true,"ShowcaseCard").rectTransform;
+            Ui.Box(card,3,3,486,524,Ui.Background);
+            Ui.Label(card,"SCRAP GUARD / MY GUARDIAN",24,13,444,24,14,accent,TextAnchor.MiddleCenter);
+            Ui.Label(card,p.name,24,43,444,43,30,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,"〈 "+Social.Titles[p.title]+" 〉",24,90,444,30,20,accent,TextAnchor.MiddleCenter);
+            var stage=WorkshopStage.Draw(card,18,129,456,272,accent);
             if(p.frame==4)
             {
-                var orbit=CombatRing.Create(card,166,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(246,-216);
-                for(int n=0;n<6;n++)Ui.Disc(card,240+Mathf.Cos(n*Mathf.PI/3)*83,210+Mathf.Sin(n*Mathf.PI/3)*83,12,Ui.Hex("C89BFF"));
+                var orbit=CombatRing.Create(stage,230,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(228,-132);
             }
-            CharacterArt.Draw(card,140,130,212,180,p.hero,p.skin,p.outfit);
-            Ui.Label(card,StylePresentation.Look(p.outfit,p.skin),32,306,428,27,19,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
-            Ui.Label(card, "Lv." + p.heroLevel + "  " + Catalog.HeroNames[p.hero], 32, 337, 428, 28, 19, Ui.Ink, TextAnchor.MiddleCenter);
-            Ui.Label(card, "공격 " + p.attack + "   ·   체력 " + p.health, 32, 367, 428, 23, 14, Ui.Muted, TextAnchor.MiddleCenter);
-            for (int i = 0; i < p.items.Count && i < 3; i++)
-            {
-                var item = p.items[i]; Color rarity = item.rarity == 2 ? Ui.Gold : item.rarity == 1 ? Ui.Blue : Ui.Muted;
-                float ix = 32 + i * 145;
-                Ui.Box(card, ix, 399, 138, 64, Ui.Raised);
-                Ui.Box(card, ix + 9, 408, 3, 46, rarity, false);
-                Ui.Label(card, Catalog.Items[item.definition].Name, ix + 19, 402, 114, 28, 15, rarity);
-                Ui.Label(card, new[] { "일반", "고급", "희귀" }[item.rarity] + "  +" + (item.level - 1), ix + 19, 432, 111, 25, 13, Ui.Muted);
-            }
-            Ui.Label(card, "정복 " + p.stages + "/" + Campaign.Count + "     처치 " + p.kills.ToString("N0") + "     출석 " + p.attendance + "일", 32, 468, 428, 28, 14, Ui.Ink, TextAnchor.MiddleCenter);
-            string status = p.local ? "로컬 체험 기록" : (p.test?"테스트 진행 · 공개 ID ":"서버 기록 · 공개 ID ") + p.id;
-            Ui.Label(card, status, 32, 499, 428, 22, 11, Ui.Muted, TextAnchor.MiddleCenter);
+            var art=CharacterArt.Draw(stage,80,4,296,253,p.hero,p.skin,p.outfit);
+            art.gameObject.AddComponent<ShowroomMotion>();
+            Ui.Label(card,StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
+            Ui.Label(card,"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,"작전 정복 "+p.stages+" / "+Campaign.Count,24,478,444,29,22,accent,TextAnchor.MiddleCenter);
+            string status=p.local?"로컬 체험 기록":(p.test?"테스트 · 공개 ID ":"공개 ID ")+p.id;
+            Ui.Label(card,status,24,508,444,18,12,Ui.Muted,TextAnchor.MiddleCenter);
             return card;
+        }
+        void ProfileEquipment(PublicProfile p)
+        {
+            var card=Dialog("전시 장비와 성장 기록",p.name+" · 전시 장비는 출격 장비와 다를 수 있어요.",770);
+            Ui.Label(card,"공격 "+p.attack+"   체력 "+p.health,24,136,444,42,25,Ui.Mint,TextAnchor.MiddleCenter);
+            for(int i=0;i<p.items.Count&&i<3;i++)
+            {
+                var item=p.items[i];float y=197+i*125;
+                var row=Ui.Box(card,24,y,444,110,Ui.Background).transform;
+                ItemIcon(row,new Item{definition=item.definition,rarity=item.rarity,level=item.level},12,13,84);
+                Ui.Label(row,Catalog.Items[item.definition].Name,112,16,316,34,23);
+                Ui.Label(row,Catalog.RarityNames[item.rarity]+" · Lv."+item.level+" · "+InventoryArt.Slot(Catalog.Items[item.definition].Slot),112,62,316,30,19,Rarity(item.rarity));
+            }
+            Ui.Label(card,"정복 "+p.stages+" / "+Campaign.Count+"  ·  처치 "+p.kills.ToString("N0")+"\n누적 출석 "+p.attendance+"일",24,589,444,69,21,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Button(card,"트로피 전시대",24,679,444,65,()=>TrophyRoom(p),Ui.Gold,true,21);
         }
         void CustomizeProfile()
         {
@@ -199,16 +203,17 @@ namespace ScrapGuard
         void PublicPanel(PublicProfile p)
         {
             Track("profile_view","public");
-            var card = Dialog("수호대 기록", "공개 ID " + p.id + " · 응원 " + p.likes, 870);
-            var preview = DrawProfile(card, p, 24, 130); preview.localScale = Vector3.one * (444f / 492f);
-            Ui.Button(preview,"확대 감상",355,258,105,31,()=>GuardianGallery(p,()=>PublicPanel(p)),Ui.Raised,true,13);
-            bool other = p.id != cloud.Session.playerId;
-            Ui.Button(card, p.liked ? "응원 취소" : "멋져요! 응원하기", 24, 627, 444, 56,
-                () => StartCoroutine(SocialAction(p.id, "like", new GameCommand { enabled = !p.liked }, () => StartCoroutine(LoadPublic(p.id)))), null, other, 18);
-            Ui.Button(card,"트로피 전시대",24,698,142,50,()=>TrophyRoom(p),Ui.Gold,true,14);
-            Ui.Button(card, "신고", 175, 698, 142, 50, () => ReportPanel(p.id), Ui.Raised, other, 16);
-            Ui.Button(card, "차단", 326, 698, 142, 50, () => BlockPanel(p.id), Ui.Raised, other, 16);
-            Ui.Button(card, "광장으로", 24, 778, 444, 54, () => StartCoroutine(LoadGallery("")), Ui.Raised, true, 16);
+            var card=Dialog("수호대 기록","공개 ID "+p.id+" · 응원 "+p.likes,900);
+            var body=Ui.Scroll(card,24,130,444,744,815);
+            var preview=DrawProfile(body,p,0,0);preview.localScale=Vector3.one*(444f/492f);
+            Ui.Button(body,"확대 감상 · 움직임과 공격 연출",0,493,444,70,()=>GuardianGallery(p,()=>PublicPanel(p)),Ui.Gold,true,21);
+            bool other=p.id!=cloud.Session.playerId;
+            Ui.Button(body,p.liked?"응원 취소":"멋져요! 응원하기",0,575,444,70,
+                ()=>StartCoroutine(SocialAction(p.id,"like",new GameCommand{enabled=!p.liked},()=>StartCoroutine(LoadPublic(p.id)))),null,other,21);
+            Ui.Button(body,"전시 장비 · 기록 · 트로피",0,657,444,64,()=>ProfileEquipment(p),Ui.Raised,true,20);
+            Ui.Button(body,"신고",0,733,140,70,()=>ReportPanel(p.id),Ui.Raised,other,20);
+            Ui.Button(body,"차단",152,733,140,70,()=>BlockPanel(p.id),Ui.Raised,other,20);
+            Ui.Button(body,"광장으로",304,733,140,70,()=>StartCoroutine(LoadGallery("")),Ui.Raised,true,19);
         }
         IEnumerator SocialAction(string id, string action, GameCommand command, Action after)
         {
@@ -234,6 +239,10 @@ namespace ScrapGuard
         {
             if (exportingCard || card == null) yield break;
             exportingCard = true; toastRoot.gameObject.SetActive(false);
+            // Export a full-size copy outside scrolling masks, even when the share action is below the fold.
+            var exportRoot=Ui.Rect(Root,"Share capture",0,0,540,960);
+            Ui.Box(exportRoot,0,-menuExtra/2,540,MenuHeight,Ui.Background,false).raycastTarget=true;
+            var copy=Instantiate(card,exportRoot,false);copy.anchoredPosition=new Vector2(24,-215);card=copy;
             yield return new WaitForEndOfFrame();
             Texture2D screenshot = null, crop = null;
             try
@@ -253,7 +262,7 @@ namespace ScrapGuard
                 Debug.Log("SHOWCASE_EXPORTED " + lastSharedPath);
             }
             catch (Exception ex) { Toast("카드 저장 또는 공유를 시작하지 못했어요."); Debug.LogWarning("Share: " + ex.GetType().Name); }
-            finally { if (screenshot != null) Destroy(screenshot); if (crop != null) Destroy(crop); exportingCard = false; }
+            finally { if (screenshot != null) Destroy(screenshot); if (crop != null) Destroy(crop); exportingCard = false; Destroy(exportRoot.gameObject); }
         }
     }
 }

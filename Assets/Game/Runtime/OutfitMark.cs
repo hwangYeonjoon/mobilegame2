@@ -7,7 +7,8 @@ namespace ScrapGuard
     // Small, bounded meshes: silhouettes and projectiles remain distinct without particle spam.
     public sealed class OutfitMark : MaskableGraphic
     {
-        int outfit;bool projectile;
+        int outfit;bool projectile,compact;
+        public bool Compact { get { return compact; } set { if(compact!=value){compact=value;SetVerticesDirty();} } }
         public int Outfit { get { return outfit; } }
         public static OutfitMark Attach(Image actor,int id)
         {
@@ -49,6 +50,7 @@ namespace ScrapGuard
                 }
                 return;
             }
+            if(compact){CompactSilhouette(vh,tint);return;}
             // Keep ornamentation at the shoulders/back, leaving the face and weapon readable.
             if(outfit==1)
             {
@@ -103,6 +105,25 @@ namespace ScrapGuard
                     Line(vh,tint,.5f+side*.42f,.55f,.5f+side*.43f,.29f,.008f);
                 }
         }
+        void CompactSilhouette(VertexHelper vh,Color tint)
+        {
+            // Fewer, thicker strokes at battle size; face/core/weapon stay unobscured.
+            if(outfit==1){Line(vh,tint,.76f,.60f,.76f,.87f,.017f);Line(vh,tint,.86f,.58f,.86f,.80f,.014f);}
+            if(outfit==2)Poly(vh,Ui.Hex("DB705C"),.66f,.69f,.95f,.58f,.83f,.43f,.89f,.59f);
+            if(outfit==3||outfit==4)for(int side=-1;side<=1;side+=2)
+            {
+                float x=.5f+side*.2f,xx=.5f+side*.43f;
+                Line(vh,tint,x,.53f,xx,.83f,.015f);
+                Line(vh,tint,xx,.83f,.5f+side*(outfit==3?.32f:.45f),.42f,.012f);
+            }
+            if(outfit==5)for(int side=-1;side<=1;side+=2)
+            {float x=.5f+side*.32f;Line(vh,tint,x,.45f,x,.87f,.015f);Poly(vh,tint,x,.86f,x+side*.14f,.84f,x+side*.14f,.72f,x,.74f);}
+            if(outfit==6){Oval(vh,tint,.5f,.57f,.42f,.35f,.012f);Line(vh,tint,.06f,.48f,.06f,.72f,.025f);Line(vh,tint,.94f,.48f,.94f,.72f,.025f);}
+            if(outfit==7)for(int i=0;i<2;i++){float y=.66f-i*.17f;Line(vh,tint,.69f,y,.96f,y-.08f,.018f);Line(vh,tint,.96f,y-.08f,.81f,y-.19f,.016f);}
+            if(outfit==8)for(int i=0;i<6;i++){float a=i*Mathf.PI/3;Line(vh,tint,.5f+Mathf.Cos(a)*.32f,.58f+Mathf.Sin(a)*.29f,.5f+Mathf.Cos(a)*.43f,.58f+Mathf.Sin(a)*.39f,.018f);}
+            if(outfit==9)for(int side=-1;side<=1;side+=2){float x=.5f+side*.36f;Line(vh,tint,x,.52f,x,.8f,.014f);Oval(vh,tint,x,.83f,.04f,.04f,.014f);}
+            if(outfit==10)for(int side=-1;side<=1;side+=2)Poly(vh,tint,.5f+side*.20f,.66f,.5f+side*.44f,.57f,.5f+side*.44f,.27f,.5f+side*.39f,.52f);
+        }
         void Oval(VertexHelper vh,Color c,float x,float y,float rx,float ry,float width)
         {
             for(int i=0;i<16;i++){float a=i*Mathf.PI/8,b=(i+1)*Mathf.PI/8;Line(vh,c,x+Mathf.Cos(a)*rx,y+Mathf.Sin(a)*ry,x+Mathf.Cos(b)*rx,y+Mathf.Sin(b)*ry,width);}
@@ -131,6 +152,7 @@ namespace ScrapGuard
             if(Mark==null)return;
             var source=(RectTransform)transform;var target=Mark.rectTransform;
             target.anchorMin=source.anchorMin;target.anchorMax=source.anchorMax;target.pivot=source.pivot;
+            Mark.Compact=source.rect.height*Mathf.Abs(source.lossyScale.y)<100;
             target.sizeDelta=source.sizeDelta;target.anchoredPosition=source.anchoredPosition;target.localScale=source.localScale;target.localRotation=source.localRotation;
             // The sprite owns the foreground; ornaments never paint over its face or equipment.
             if(target.GetSiblingIndex()!=source.GetSiblingIndex()-1)

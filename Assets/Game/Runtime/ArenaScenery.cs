@@ -44,6 +44,7 @@ namespace ScrapGuard
         readonly List<Vector2> bubbleOrigins=new List<Vector2>();
         readonly List<RectTransform> belts=new List<RectTransform>();
         readonly List<Vector2> beltOrigins=new List<Vector2>();
+        readonly List<RectTransform> dust=new List<RectTransform>();
         int region;
         public static ArenaScenery Build(Transform parent,int stage,bool challenge)
         {
@@ -64,6 +65,17 @@ namespace ScrapGuard
             {
                 Ui.Box(root,side==0?4:528,199+i*76,8,44,Ui.Hex("17222D"),false);
                 scene.lamps.Add(Ui.Box(root,side==0?7:531,205+i*76,2,26,accent,false));
+            }
+            // Peripheral depth stays under actors and danger warnings; only 12 ambient motes.
+            for(int side=0;side<2;side++)
+            {
+                Ui.Box(root,side==0?0:524,177,16,655,new Color(.02f,.03f,.05f,.6f),false);
+                Ui.Box(root,side==0?16:521,177,3,655,new Color(accent.r,accent.g,accent.b,.18f),false);
+            }
+            for(int i=0;i<12;i++)
+            {
+                var mote=Ui.Disc(root,24+i*43,220+i%4*135,2+i%2,new Color(accent.r,accent.g,accent.b,.18f));
+                scene.dust.Add(mote.rectTransform);
             }
             if(challenge)
             {
@@ -102,6 +114,8 @@ namespace ScrapGuard
             }
             foreach(var b in Campaign.Blocks(definition))
             {
+                // Cast shadow is decorative; the tagged rectangle below remains the exact collision footprint.
+                Ui.Box(root,b.X+7,b.Y+9,b.W,b.H,new Color(0,0,0,.22f),true,"Machinery cast shadow");
                 var block=Ui.Rect(root,"Solid machinery "+region,b.X,b.Y,b.W,b.H);
                 var tag=block.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=b;tag.Solid=true;tag.Region=region;
                 Ui.Box(block,0,0,b.W,b.H,Ui.Hex("17212A"),false);
@@ -133,6 +147,7 @@ namespace ScrapGuard
         {
             for(int i=0;i<lamps.Count;i++){var c=Accents[region];c.a=.5f+.2f*Mathf.Sin(elapsed*2+i*.6f);lamps[i].color=c;}
             for(int i=0;i<lights.Count;i++){var c=Accents[region];c.a=.12f+.025f*Mathf.Sin(elapsed*.8f+i*2);lights[i].color=c;}
+            for(int i=0;i<dust.Count;i++)dust[i].anchoredPosition=new Vector2(25+i*43+Mathf.Sin(elapsed*.3f+i)*6,-(198+(i*71+elapsed*(2+i%3))%600));
             foreach(var rotor in rotors)rotor.localEulerAngles=new Vector3(0,0,elapsed*120);
             for(int i=0;i<bubbles.Count;i++)bubbles[i].anchoredPosition=bubbleOrigins[i]+Vector2.up*Mathf.Sin(elapsed*1.5f+i)*4;
             for(int i=0;i<belts.Count;i++)belts[i].anchoredPosition=beltOrigins[i]+Vector2.up*(elapsed*16%64);

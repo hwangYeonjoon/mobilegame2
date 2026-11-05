@@ -36,6 +36,7 @@ namespace ScrapGuard
             visual.shadow=Ui.Disc(root,-15,-1,30,new Color(0,0,0,.35f));
             visual.body=Ui.Box(root,0,0,60,60,Color.white,false);visual.body.preserveAspect=true;
             visual.body.rectTransform.pivot=new Vector2(.5f,.5f);
+            var outline=visual.body.gameObject.AddComponent<Outline>();outline.effectColor=new Color(.025f,.045f,.07f,.9f);outline.effectDistance=new Vector2(1.25f,-1.25f);
             visual.mark=Ui.Label(root,"",-22,-45,44,24,18,Ui.Gold,TextAnchor.MiddleCenter);
             return root;
         }

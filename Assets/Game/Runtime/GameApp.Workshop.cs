@@ -12,15 +12,19 @@ namespace ScrapGuard
         void ModBook()
         {
             var card=Dialog("고철 개조 도감","전투 중 두 스킬을 조합하면 자동으로 개조됩니다.\n개조는 이번 전투에만 적용돼요.",820);
-            var list=Ui.Scroll(card,24,140,444,600,Workshop.ModNames.Length*163);
+            var list=Ui.Scroll(card,24,140,444,580,Workshop.ModNames.Length*205);
             for(int i=0;i<Workshop.ModNames.Length;i++)
             {
-                float y=i*163;var row=Ui.Box(list,0,y,444,151,Ui.Background).transform;
-                Ui.Label(row,Workshop.ModNames[i],17,9,410,34,22,Ui.Mint);
-                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+" Lv.3 + "+Catalog.SkillNames[Workshop.SubSkills[i]]+" Lv.2",17,48,410,30,15,Ui.Gold);
-                Ui.Label(row,Workshop.ModDetails[i],17,87,410,51,16,Ui.Muted);
+                var row=Ui.Box(list,0,i*205,444,191,Ui.Background).transform;
+                Ui.Label(row,Workshop.ModNames[i],16,8,412,34,24,Ui.Mint);
+                InventoryArt.Draw(row,InventoryArt.Skill(Workshop.MainSkills[i]),12,49,52);
+                InventoryArt.Draw(row,InventoryArt.Skill(Workshop.SubSkills[i]),232,49,52);
+                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+"\nLv.3",70,48,142,55,18,Ui.Gold);
+                Ui.Label(row,"+",210,54,22,42,23,Ui.Muted);
+                Ui.Label(row,Catalog.SkillNames[Workshop.SubSkills[i]]+"\nLv.2",290,48,142,55,18,Ui.Gold);
+                Ui.Label(row,Workshop.ModDetails[i],16,117,412,62,19,Ui.Muted);
             }
-            Ui.Button(card,"현장 개조 · 대원 전용 효과",24,759,444,38,FieldEngineeringGuide,Ui.Mint,true,16);
+            Ui.Button(card,"현장 개조 · 대원 전용 효과",24,740,444,60,FieldEngineeringGuide,Ui.Mint,true,20);
         }
         string ModHint(int skill)
         {

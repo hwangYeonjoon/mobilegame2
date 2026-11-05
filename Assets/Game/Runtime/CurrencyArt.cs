@@ -27,9 +27,9 @@ namespace ScrapGuard
         public static Text Balance(Transform parent, int kind, float x, float y, float width)
         {
             var panel = Ui.Box(parent, x, y, width, 52, Ui.Panel).transform;
-            Draw(panel, kind, 6, 7, 38);
-            Ui.Label(panel, Names[kind], 49, 3, width-54, 19, 11, Ui.Muted);
-            return Ui.Label(panel, "0", 49, 20, width-54, 28, 17, Tint(kind));
+            Draw(panel, kind, 3, 4, 44);
+            Ui.Label(panel, Names[kind], 53, 2, width-58, 20, 13, Ui.Muted);
+            return Ui.Label(panel, "0", 53, 22, width-58, 28, 21, Tint(kind));
         }
     }
 }

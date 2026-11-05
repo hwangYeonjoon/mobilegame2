@@ -25,6 +25,8 @@ namespace ScrapGuard
         readonly List<BattleEffect> frameBattleEffects=new List<BattleEffect>();
         Image hpFill, xpFill, bossFill, bossBackdrop;
         Text hpText, timeText, killText, levelText, bossText, skillText;
+        readonly Image[] skillHudIcons=new Image[8];
+        readonly Text[] skillHudLevels=new Text[8];
         RectTransform playerLocator;
         Text dangerHint;
         bool battlePaused, choicesShown, resultShown, dragging;
@@ -99,7 +101,14 @@ namespace ScrapGuard
             Ui.Box(screen, 24, 153, 492, 7, Ui.Raised);
             xpFill = Ui.Box(screen, 24, 153, 0, 7, Ui.Blue);
             levelText = Ui.Label(screen, "Lv.1", 24, 832, 100, 28, 17, Ui.Mint);
-            skillText = Ui.Label(screen, "", 130, 832, 386, 40, 12, Ui.Muted, TextAnchor.MiddleRight);
+            for(int i=0;i<8;i++)
+            {
+                float x=128+i*49;
+                Ui.Box(screen,x,831,45,41,Ui.Panel);
+                skillHudIcons[i]=InventoryArt.Draw(screen,InventoryArt.Skill(i),x,829,36);
+                skillHudLevels[i]=Ui.Label(screen,"",x+28,850,17,23,17,Ui.Ink,TextAnchor.MiddleCenter);
+            }
+            skillText=Ui.Label(screen,"",188,862,145,22,12,Ui.Muted,TextAnchor.MiddleCenter);
             guideBackdrop=Ui.Box(screen,32,178,476,53,new Color(.035f,.055f,.08f,.92f));
             guideHint=Ui.Label(screen,"",44,182,452,45,15,Ui.Ink,TextAnchor.MiddleCenter);
             bossBackdrop=Ui.Box(screen,72,183,396,49,new Color(.035f,.055f,.08f,.78f),true);
@@ -193,7 +202,12 @@ namespace ScrapGuard
             xpFill.rectTransform.sizeDelta = new Vector2(492 * Mathf.Clamp01((float)combat.Xp / combat.NeededXp), 7);
             timeText.text = TimeLabel(combat.Elapsed) + " / " + TimeLabel(combat.Duration);
             killText.text = combat.Challenge ? combat.CoreScore.ToString("N0")+"점" : "처치 " + combat.Kills; levelText.text = "Lv." + combat.Level;
-            skillText.text = (combat.FieldModule>0?FieldEngineering.Name(combat.FieldModule,combat.Hero)+"\n":"")+"탄막 " + combat.Skills[0] + "  ·  톱날 " + combat.Skills[1] + "  ·  코일 " + combat.Skills[2] + "  ·  드론 " + combat.Skills[3];
+            skillText.text=combat.FieldModule>0?FieldEngineering.Name(combat.FieldModule,combat.Hero):"";
+            for(int i=0;i<8;i++)
+            {
+                skillHudIcons[i].color=combat.Skills[i]>0?Color.white:new Color(.45f,.5f,.55f,.45f);
+                skillHudLevels[i].text=combat.Skills[i]>0?combat.Skills[i].ToString():"–";
+            }
             alive.Clear(); Enemy boss = null;
             foreach (var e in combat.Enemies)
             {
@@ -344,14 +358,19 @@ namespace ScrapGuard
         void ShowChoices()
         {
             choicesShown = true; dragging = false;
-            var card = Dialog("한 단계 더 강하게", "Lv." + (combat.Level + 1) + " · 이번 전투에 적용할 스킬을 선택하세요.", 604);
-            for (int i = 0; i < combat.Choices.Length; i++)
+            var card=Dialog("한 단계 더 강하게","Lv."+(combat.Level+1)+" · 이번 전투에 적용할 스킬을 선택하세요.",862);
+            for(int i=0;i<combat.Choices.Length;i++)
             {
-                int skill = combat.Choices[i]; float y = 140 + i * 142;
-                var row = Ui.Box(card, 24, y, 444, 126, Ui.Raised).transform;
-                Ui.Label(row, Catalog.SkillNames[skill] + "  " + combat.Skills[skill] + " → " + (combat.Skills[skill] + 1), 15, 10, 300, 38, 21, skill < 4 ? Ui.Mint : Ui.Gold);
-                Ui.Label(row, Catalog.SkillDescriptions[skill]+ModHint(skill), 15, 49, 300, 73, 13, Ui.Muted);
-                Ui.Button(row, "선택", 331, 38, 98, 54, () => { ChooseBattleSkill(skill); }, null, true, 17);
+                int skill=combat.Choices[i];float y=140+i*234;
+                var row=Ui.Button(card,"선택",24,y,444,220,()=>ChooseBattleSkill(skill),Ui.Raised).transform;
+                row.GetComponentInChildren<Text>().text="";
+                InventoryArt.Draw(row,InventoryArt.Skill(skill),12,14,78);
+                Ui.Label(row,Catalog.SkillNames[skill],106,15,320,34,25,skill<4?Ui.Mint:Ui.Gold);
+                Ui.Label(row,combat.Skills[skill]==0?"새 스킬  →  Lv.1":"Lv."+combat.Skills[skill]+"  →  Lv."+(combat.Skills[skill]+1),106,56,320,31,21);
+                Ui.Label(row,Catalog.SkillDescriptions[skill],16,101,412,43,19,Ui.Ink);
+                Ui.Label(row,ModHint(skill).Trim(),16,151,308,57,17,Ui.Muted);
+                Ui.Box(row,334,164,94,42,Ui.Mint);
+                Ui.Label(row,"선택",334,164,94,42,20,Ui.Background,TextAnchor.MiddleCenter);
             }
             // A skill selection cannot be dismissed without making a selection.
             card.GetChild(2).gameObject.SetActive(false);

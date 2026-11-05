@@ -72,6 +72,7 @@ namespace ScrapGuard
             Rect safe = Screen.safeArea; float scale = Mathf.Min(safe.width / 540, safe.height / 960);
             Root.localScale = Vector3.one * scale;
             Root.anchoredPosition = safe.center - new Vector2(Screen.width / 2f, Screen.height / 2f);
+            FitMenu(scale);
         }
         void Update()
         {
@@ -87,6 +88,7 @@ namespace ScrapGuard
             }
             if (toastTime > 0) { toastTime -= Time.unscaledDeltaTime; if (toastTime <= 0) toastRoot.gameObject.SetActive(false); }
             if (combat != null) UpdateBattle();
+            if(menuLayoutDirty&&combat==null&&modal.childCount==0){menuLayoutDirty=false;Show(page);}
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             {
                 if (demoRewardPending || networkBusy) return;
@@ -124,22 +126,23 @@ namespace ScrapGuard
         }
         public void Show(string target)
         {
+            FitScreen();menuLayoutDirty=false;
             Track("screen",target);
             page = target; if (!Online) Store.Economy.RefreshDay(); Ui.Clear(screen); CloseModal();
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
-            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 380, 40, 30);
-            Ui.Button(screen, "설정", 444, 43, 72, 45, Settings, Ui.Raised, true, 16);
+            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 396, 40, 30);
+            Ui.Button(screen, "설정", 432, 34, 84, 60, Settings, Ui.Raised, true, 16);
             for(int i=0;i<3;i++)walletAmounts[i]=CurrencyArt.Balance(screen,i,24+i*166,104,160);
             RefreshWallet();
             switch (target) { case "gear": Gear(); break; case "heroes": Heroes(); break; case "shop": Shop(); break; case "showcase": Showcase(); break; case "weekly": WeeklyHub(); break; default: Home(); break; }
             string[] names = { "상점", "장비", "출격", "대원", "전시실" }, pages = { "shop", "gear", "home", "heroes", "showcase" };
-            Ui.Box(screen, 16, 864, 508, 74, Ui.Panel);
+            Ui.Box(screen, 16, MenuHeight-98, 508, 80, Ui.Panel);
             for (int i = 0; i < 5; i++)
             {
                 string p = pages[i]; bool active = p == page;
-                Ui.Button(screen, names[i], 24 + i * 100, 874, 92, 54, () => Show(p), active ? Ui.Mint : Ui.Panel, true, 18);
+                Ui.Button(screen, names[i], 24 + i * 100, MenuHeight-94, 92, 72, () => Show(p), active ? Ui.Mint : Ui.Panel, true, 19);
             }
-            Ui.Label(screen, Online ? "서버 계정 · 실제 결제 준비 중" : "로컬 체험 · 서버 계정과 별도 저장", 0, 938, 540, 20, 11, Ui.Muted, TextAnchor.MiddleCenter);
+            Ui.Label(screen, Online ? "서버에 저장됨" : "로컬 체험 · 기기에 저장됨", 0, MenuHeight-20, 540, 20, 12, Ui.Muted, TextAnchor.MiddleCenter);
         }
         void RefreshWallet()
         {
@@ -147,41 +150,43 @@ namespace ScrapGuard
             for(int i=0;i<3;i++)if(walletAmounts[i]!=null)
             {
                 walletAmounts[i].text=amounts[i].ToString("N0");
-                walletAmounts[i].resizeTextForBestFit=true;walletAmounts[i].resizeTextMinSize=11;walletAmounts[i].resizeTextMaxSize=17;
+                walletAmounts[i].resizeTextForBestFit=true;walletAmounts[i].resizeTextMinSize=14;walletAmounts[i].resizeTextMaxSize=21;
             }
         }
         void Home()
         {
-            var heroPanel = Ui.Box(screen, 24, 178, 492, 303, Ui.Panel).transform;
-            Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",16,10,276,38,GuidePanel,Ui.Raised,true,15);
-            Ui.Button(heroPanel,State.collectionTarget<0?"개조 · 수집":"수집 목표 확인",308,10,164,38,()=>RegionCollection(State.collectionTarget<0?Campaign.Get(selectedStage).Region:State.collectionTarget),Ui.Raised,true,15);
-            for (int i = 0; i < 6; i++) Ui.Box(heroPanel, 20, 66 + i * 32, 452, 1, new Color(.3f, .45f, .5f, .13f), false);
-            Ui.Disc(heroPanel, 150, 57, 196, new Color(.2f, .9f, .7f, .05f));
-            Ui.Robot(heroPanel, 180, 65, 1.7f, State.selectedHero, skin: State.selectedSkin, outfit: Outfits.Active(State,State.selectedHero));
-            Ui.Label(heroPanel, Catalog.HeroNames[State.selectedHero], 20, 226, 450, 35, 25, Ui.Ink, TextAnchor.MiddleCenter);
-            Ui.Label(heroPanel, "Lv." + State.heroes[State.selectedHero].level + "    공격 " + Catalog.Attack(State) + "    체력 " + Catalog.Health(State), 20, 262, 450, 25, 15, Ui.Muted, TextAnchor.MiddleCenter);
-            Ui.Button(screen, "출석  " + (Store.Economy.CanAttend ? "받기" : "완료"), 24, 497, 236, 53, Attendance, Ui.Raised, true, 18);
-            Ui.Button(screen, "오늘의 임무  " + Math.Min(3, State.dailyRuns) + "/3", 276, 497, 240, 53, Missions, Ui.Raised, true, 18);
-            Ui.Label(screen, Campaign.Regions[Campaign.Get(selectedStage).Region]+" · "+State.clearedStages.Count+"/"+Campaign.Count, 24, 565, 300, 28, 17, Ui.Muted);
-            Ui.Button(screen,"전체 지도",374,558,142,38,()=>CampaignMap(),Ui.Raised,true,15);
-            var stage = Ui.Box(screen, 24, 602, 492, 114, Ui.Panel).transform;
-            Ui.Button(stage, "‹", 12, 29, 45, 53, () => { selectedStage = Math.Max(0, selectedStage - 1); Show("home"); }, Ui.Raised, selectedStage > 0, 26);
-            Ui.Label(stage, (selectedStage + 1).ToString("D2") + "   " + Catalog.StageNames[selectedStage], 68, 18, 357, 40, 22);
-            Ui.Label(stage, Catalog.StageDescriptions[selectedStage], 68, 62, 357, 30, 14, Ui.Muted);
-            Ui.Button(stage, "›", 435, 29, 45, 53, () => { selectedStage = Math.Min(State.unlockedStage, selectedStage + 1); Show("home"); }, Ui.Raised, selectedStage < State.unlockedStage, 26);
-            Ui.Button(screen, "출격하기  →", 24, 736, 492, 59, CampaignLaunch, null, true, 23);
-            Ui.Button(screen,"특수 던전 · 코어 균열",24,808,238,40,() => Show("weekly"),Ui.Raised,true,15);
-            Ui.Button(screen,"길드 · 지원 대원",278,808,238,40,OpenGuild,Ui.Raised,true,16);
-
+            float roomHeight=MenuBottom-502,roomExtra=roomHeight-300;
+            var body=Ui.Scroll(screen,24,178,492,MenuBottom-346,roomHeight+156);
+            var heroPanel=Ui.Box(body,0,0,492,roomHeight,Ui.Panel).rectTransform;
+            WorkshopStage.Draw(heroPanel,0,0,492,roomHeight-74,Ui.Mint);
+            Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",14,10,268,58,GuidePanel,Ui.Raised,true,19);
+            Ui.Button(heroPanel,State.collectionTarget<0?"개조 · 수집":"수집 목표",296,10,182,58,()=>RegionCollection(State.collectionTarget<0?Campaign.Get(selectedStage).Region:State.collectionTarget),Ui.Raised,true,19);
+            float artHeight=157+roomExtra;
+            var art=CharacterArt.Draw(heroPanel,109,70,274,artHeight,State.selectedHero,State.selectedSkin,Outfits.Active(State,State.selectedHero));
+            art.rectTransform.pivot=new Vector2(.5f,0);
+            art.rectTransform.anchoredPosition=new Vector2(246,-70-artHeight+24);
+            art.gameObject.AddComponent<ShowroomMotion>();
+            Ui.Label(heroPanel,Catalog.HeroNames[State.selectedHero],20,roomHeight-72,452,35,26,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(heroPanel,"Lv."+State.heroes[State.selectedHero].level+"   공격 "+Catalog.Attack(State)+"   체력 "+Catalog.Health(State),20,roomHeight-35,452,29,19,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(body,"출석  "+(Store.Economy.CanAttend?"받기":"완료"),0,roomHeight+16,238,64,Attendance,Ui.Raised,true,21);
+            Ui.Button(body,"오늘의 임무  "+Math.Min(3,State.dailyRuns)+"/3",254,roomHeight+16,238,64,Missions,Ui.Raised,true,21);
+            Ui.Label(body,Campaign.Regions[Campaign.Get(selectedStage).Region]+" · "+State.clearedStages.Count+"/"+Campaign.Count,0,roomHeight+102,310,43,19,Ui.Muted);
+            Ui.Button(body,"전체 지도",326,roomHeight+96,166,60,()=>CampaignMap(),Ui.Raised,true,20);
+            Ui.Button(screen,"‹",24,MenuBottom-156,72,72,()=>{selectedStage=Math.Max(0,selectedStage-1);Show("home");},Ui.Raised,selectedStage>0,30);
+            var launch=Ui.Button(screen,"출격하기  →",108,MenuBottom-156,324,72,CampaignLaunch,null,true,21);
+            launch.GetComponentInChildren<Text>().text=(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage]+"\n출격하기  →";
+            Ui.Button(screen,"›",444,MenuBottom-156,72,72,()=>{selectedStage=Math.Min(State.unlockedStage,selectedStage+1);Show("home");},Ui.Raised,selectedStage<State.unlockedStage,30);
+            Ui.Button(screen,"특수 던전 · 코어 균열",24,MenuBottom-72,238,72,()=>Show("weekly"),Ui.Raised,true,19);
+            Ui.Button(screen,"길드 · 지원 대원",278,MenuBottom-72,238,72,OpenGuild,Ui.Raised,true,20);
         }
         RectTransform Dialog(string title, string subtitle, float height = 500)
         {
             CloseModal();
-            var shade = Ui.Box(modal, 0, 0, 540, 960, new Color(0, 0, 0, .78f), false); shade.raycastTarget = true;
+            var shade = Ui.Box(modal, 0, -menuExtra/2, 540, MenuHeight, new Color(0, 0, 0, .78f), false); shade.raycastTarget = true;
             var card = Ui.Box(modal, 24, (960 - height) / 2, 492, height, Ui.Panel).rectTransform;
-            Ui.Label(card, title, 24, 21, 390, 43, 25);
+            Ui.Label(card, title, 24, 21, 340, 43, 25);
             Ui.Label(card, subtitle, 24, 70, 444, 54, 15, Ui.Muted);
-            Ui.Button(card, "닫기", 390, 24, 78, 38, () => { if (combat != null && combat.Ended) ShowResult(); else CloseModal(); }, Ui.Raised, true, 14);
+            Ui.Button(card, "닫기", 390, 10, 78, 60, () => { if (combat != null && combat.Ended) ShowResult(); else CloseModal(); }, Ui.Raised, true, 17);
             return card;
         }
         void CloseModal() { if (!demoRewardPending) Ui.Clear(modal); }

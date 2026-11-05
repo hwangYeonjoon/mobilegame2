@@ -24,7 +24,7 @@ namespace ScrapGuard
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-smokeOutput") smokeOutput = args[i + 1];
             Directory.CreateDirectory(smokeOutput);
             Application.logMessageReceived += (message, stack, type) => { if (type == LogType.Exception || type == LogType.Error || type == LogType.Assert) smokeErrors.Add(message); };
-            StartCoroutine(Array.IndexOf(args,"-shopPolishSmoke")>=0 ? ShopPolishSmokeRoutine() : Array.IndexOf(args,"-liveOpsSmoke")>=0 ? LiveOpsSmokeRoutine() : Array.IndexOf(args,"-serviceSmoke")>=0 ? ServiceSmokeRoutine() : Array.IndexOf(args,"-styleValueSmoke")>=0 ? StyleValueSmokeRoutine() : Array.IndexOf(args,"-updateSmoke")>=0 ? UpdateSmokeRoutine() : Array.IndexOf(args,"-retentionSmoke")>=0 ? RetentionSmokeRoutine() : Array.IndexOf(args,"-engineeringSmoke")>=0 ? EngineeringSmokeRoutine() : Array.IndexOf(args,"-commerceSmoke")>=0 ? CommerceSmokeRoutine() : Array.IndexOf(args,"-experienceSmoke")>=0 ? ExperienceSmokeRoutine() : Array.IndexOf(args,"-artSmoke")>=0 ? ArtSmokeRoutine() : Array.IndexOf(args,"-outfitSmoke")>=0 ? OutfitSmokeRoutine() : Array.IndexOf(args,"-expansionSmoke")>=0 ? ExpansionSmokeRoutine() : Array.IndexOf(args,"-workshopSmoke")>=0 ? WorkshopSmokeRoutine() : Array.IndexOf(args,"-campaignSmoke")>=0 ? CampaignSmokeRoutine() : Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
+            StartCoroutine(Array.IndexOf(args,"-uiCompleteSmoke")>=0 ? UiCompleteSmokeRoutine() : Array.IndexOf(args,"-shopPolishSmoke")>=0 ? ShopPolishSmokeRoutine() : Array.IndexOf(args,"-liveOpsSmoke")>=0 ? LiveOpsSmokeRoutine() : Array.IndexOf(args,"-serviceSmoke")>=0 ? ServiceSmokeRoutine() : Array.IndexOf(args,"-styleValueSmoke")>=0 ? StyleValueSmokeRoutine() : Array.IndexOf(args,"-updateSmoke")>=0 ? UpdateSmokeRoutine() : Array.IndexOf(args,"-retentionSmoke")>=0 ? RetentionSmokeRoutine() : Array.IndexOf(args,"-engineeringSmoke")>=0 ? EngineeringSmokeRoutine() : Array.IndexOf(args,"-commerceSmoke")>=0 ? CommerceSmokeRoutine() : Array.IndexOf(args,"-experienceSmoke")>=0 ? ExperienceSmokeRoutine() : Array.IndexOf(args,"-artSmoke")>=0 ? ArtSmokeRoutine() : Array.IndexOf(args,"-outfitSmoke")>=0 ? OutfitSmokeRoutine() : Array.IndexOf(args,"-expansionSmoke")>=0 ? ExpansionSmokeRoutine() : Array.IndexOf(args,"-workshopSmoke")>=0 ? WorkshopSmokeRoutine() : Array.IndexOf(args,"-campaignSmoke")>=0 ? CampaignSmokeRoutine() : Array.IndexOf(args, "-cloudSmoke") >= 0 ? CloudSmokeRoutine() : Array.IndexOf(args,"-endgameSmoke")>=0 ? EndgameSmokeRoutine() : SmokeRoutine());
         }
         void UpdateSmoke() { }
         V2 SmokeMovement()
@@ -59,8 +59,10 @@ namespace ScrapGuard
                 var rect = (RectTransform)button.transform;
                 Vector2 point = RectTransformUtility.WorldToScreenPoint(null, rect.TransformPoint(rect.rect.center));
                 // Scrolled-out rows are intentionally not hittable.
-                var mask = button.GetComponentInParent<RectMask2D>();
-                if (mask != null && !RectTransformUtility.RectangleContainsScreenPoint(mask.rectTransform, point)) continue;
+                bool clipped=false;
+                foreach(var mask in button.GetComponentsInParent<RectMask2D>())
+                    if(mask.isActiveAndEnabled&&!RectTransformUtility.RectangleContainsScreenPoint(mask.rectTransform,point)){clipped=true;break;}
+                if(clipped)continue;
                 var hits = new List<RaycastResult>();
                 EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = point }, hits);
                 if (hits.Count == 0 || (hits[0].gameObject != button.gameObject && !hits[0].gameObject.transform.IsChildOf(button.transform)))

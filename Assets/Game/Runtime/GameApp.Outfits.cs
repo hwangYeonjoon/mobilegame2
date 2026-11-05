@@ -16,19 +16,19 @@ namespace ScrapGuard
             var stage=Ui.Box(card,24,144,444,361,Ui.Background);stage.raycastTarget=true;stage.gameObject.AddComponent<RectMask2D>();
             Ui.Label(stage.transform,"외형 체험 · 드래그로 이동",14,8,416,28,14,Ui.Muted,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<OutfitPreview>();preview.Initialize(id);
-            Button size=null;size=Ui.Button(stage.transform,"전투 크기로 보기",121,311,202,36,()=>{preview.ToggleSize();size.GetComponentInChildren<Text>().text=preview.BattleSize?"크게 보기":"전투 크기로 보기";},Ui.Raised,true,14);
-            Ui.Button(card,"사격",24,519,140,45,preview.Fire,Ui.Raised,true,17);
-            Ui.Button(card,"필살기",176,519,140,45,preview.Ultimate,Ui.Gold,true,17);
-            Ui.Button(card,"지원 등장",328,519,140,45,preview.Support,Ui.Raised,true,17);
-            Ui.Label(card,Outfits.Details[id]+"\n"+OutfitVisuals.Description(id),24,580,444,62,16,Ui.Ink,TextAnchor.MiddleCenter);
+            Button size=null;size=Ui.Button(stage.transform,"전투 크기로 보기",101,293,242,60,()=>{preview.ToggleSize();size.GetComponentInChildren<Text>().text=preview.BattleSize?"크게 보기":"전투 크기로 보기";},Ui.Raised,true,18);
+            Ui.Button(card,"사격",24,519,140,64,preview.Fire,Ui.Raised,true,17);
+            Ui.Button(card,"필살기",176,519,140,64,preview.Ultimate,Ui.Gold,true,17);
+            Ui.Button(card,"지원 등장",328,519,140,64,preview.Support,Ui.Raised,true,17);
+            Ui.Label(card,Outfits.Details[id]+"\n"+OutfitVisuals.Description(id),24,591,444,56,17,Ui.Ink,TextAnchor.MiddleCenter);
             Button comparison=null;
-            comparison=Ui.Button(card,"기본 외형과 비교",24,653,444,43,()=>{preview.Compare();comparison.name=preview.BaseLook?(id==1?"중장비 의상으로 돌아가기":Outfits.Label(id)+"로 돌아가기"):"기본 외형과 비교";comparison.GetComponentInChildren<Text>().text=comparison.name;},Ui.Raised,true,16);
+            comparison=Ui.Button(card,"기본 외형과 비교",24,658,444,60,()=>{preview.Compare();comparison.name=preview.BaseLook?(id==1?"중장비 의상으로 돌아가기":Outfits.Label(id)+"로 돌아가기"):"기본 외형과 비교";comparison.GetComponentInChildren<Text>().text=comparison.name;},Ui.Raised,true,16);
             bool owned=Outfits.Owned(State,id),equipped=Outfits.Active(State,Outfits.Hero(id))==id;
             bool heroOwned=State.heroes[Outfits.Hero(id)].unlocked;
-            Ui.Button(card,owned?(equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착"):!OutfitForSale(id)?OutfitSaleLabel(id):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,727,444,57,
+            Ui.Button(card,owned?(equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착"):!OutfitForSale(id)?OutfitSaleLabel(id):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,732,444,64,
                 ()=>{if(owned)Change(new GameCommand(equipped?"outfit_clear":"outfit_equip"){skin=id,hero=Outfits.Hero(id)},()=>OutfitRoom(id));else if(!heroOwned){CloseModal();Show("heroes");}else OutfitPurchase(id);},Ui.Gold,owned||OutfitForSale(id),18);
-            Ui.Button(card,owned?"의상 컬렉션 · 대원별 장착 확인":State.outfitTarget==id?"수집 목표 해제":"수집 목표로 저장 · 자동 구매 없음",24,805,444,39,
-                ()=>{if(owned)OutfitCollection();else Change(new GameCommand("outfit_target"){skin=State.outfitTarget==id?0:id},()=>OutfitRoom(id));},Ui.Raised,true,15);
+            Ui.Button(card,owned?"의상 컬렉션 · 대원별 장착 확인":State.outfitTarget==id?"수집 목표 해제":"수집 목표로 저장 · 자동 구매 없음",24,809,444,55,
+                ()=>{if(owned)OutfitCollection();else Change(new GameCommand("outfit_target"){skin=State.outfitTarget==id?0:id},()=>OutfitRoom(id));},Ui.Raised,true,17);
         }
         void OutfitPurchase(){OutfitPurchase(1);}
         void OutfitPurchase(int id)

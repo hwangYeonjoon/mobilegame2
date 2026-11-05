@@ -41,6 +41,7 @@ namespace ScrapGuard
             playerArt.sprite=CharacterArt.Get(combat.Hero,State.selectedSkin,outfit,combat.UltimateFlash>0?3:combat.ShotFlash>0?2:moving>.1f && Mathf.Sin(combat.Elapsed*11)>0?1:0);
             playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : outfit>0?Color.white:CharacterArt.Tint(State.selectedSkin);
             muzzle.color=outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
+            playerShadow.sizeDelta=new Vector2(40-Mathf.Abs(stride)*4,13-Mathf.Abs(stride));
             playerShadow.anchoredPosition = new Vector2(combat.Position.x-20,-combat.Position.y-12);
             shieldRing.gameObject.SetActive(combat.Shield>0);
             shieldRing.anchoredPosition = new Vector2(combat.Position.x,-combat.Position.y);

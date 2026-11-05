@@ -1,41 +1,59 @@
 using System;
+using System.Collections.Generic;
 using ScrapGuard.Core;
 using UnityEngine;
 namespace ScrapGuard
 {
     public partial class GameApp
     {
+        int outfitHeroFilter=-1,outfitOwnedFilter;
+        List<int> FilteredOutfits(int collection)
+        {
+            var ids=new List<int>();
+            for(int i=1;i<=Outfits.Count;i++)
+            {
+                if(collection>=0&&Outfits.Collection(i)!=collection)continue;
+                if(outfitHeroFilter>=0&&Outfits.Hero(i)!=outfitHeroFilter)continue;
+                if(outfitOwnedFilter>0&&!Outfits.Owned(State,i))continue;
+                if(outfitOwnedFilter==2&&!State.heroes[Outfits.Hero(i)].unlocked)continue;
+                ids.Add(i);
+            }
+            return ids;
+        }
         void OutfitCollection(){OutfitCollection(-1);}
         void OutfitCollection(int collection)
         {
             int owned=0;for(int i=1;i<=Outfits.Count;i++)if(Outfits.Owned(State,i))owned++;
-            string goal=Outfits.Valid(State.outfitTarget)?"수집 목표: "+Outfits.Label(State.outfitTarget):"마음에 드는 의상을 체험하고 수집 목표로 저장하세요.";
-            var card=Dialog("대원 의상 컬렉션", "보유 "+owned+" / "+Outfits.Count+" · 대원별 장착을 따로 기억해요.\n"+goal,890);
+            var card=Dialog("대원 의상 컬렉션","보유 "+owned+" / "+Outfits.Count+" · 의상마다 동작과 연출 포함\n능력치 변화 없음 · 무료 보석 사용 가능",900);
             RefreshOutfitCatalog(()=>{if(card!=null)OutfitCollection(collection);});
-            float tabWidth=444f/(Outfits.Collections.Length+1);
-            for(int tab=-1;tab<Outfits.Collections.Length;tab++)
+            Ui.Button(card,"시리즈: "+(collection<0?"전체":Outfits.Collections[collection]),24,140,444,60,
+                ()=>OutfitCollection(collection+1>=Outfits.Collections.Length?-1:collection+1),Ui.Raised,true,19);
+            Ui.Button(card,outfitHeroFilter<0?"대원: 전체":Catalog.HeroNames[outfitHeroFilter],24,214,218,64,
+                ()=>{outfitHeroFilter=outfitHeroFilter+1>=HeroCatalog.Count?-1:outfitHeroFilter+1;OutfitCollection(collection);},Ui.Raised,true,18);
+            string[] ownership={"전체 의상","보유 의상","장착 가능"};
+            Ui.Button(card,ownership[outfitOwnedFilter],254,214,214,64,
+                ()=>{outfitOwnedFilter=(outfitOwnedFilter+1)%3;OutfitCollection(collection);},outfitOwnedFilter>0?Ui.Mint:Ui.Raised,true,20);
+            var ids=FilteredOutfits(collection);
+            Ui.Label(card,ids.Count+"종 표시 · 조건 버튼을 눌러 변경",24,290,444,29,18,Ui.Muted);
+            var list=Ui.Scroll(card,24,332,444,462,Math.Max(462,((ids.Count+1)/2)*292));
+            if(ids.Count==0)
             {
-                int choice=tab;
-                Ui.Button(card,tab<0?"전체":Outfits.Collections[tab],24+(tab+1)*tabWidth,145,tabWidth-6,38,()=>OutfitCollection(choice),collection==tab?Ui.Gold:Ui.Raised,true,13);
+                Ui.Label(list,"이 조건에 맞는 의상이 없어요.\n다른 대원이나 전체 의상을 선택해 보세요.",12,90,420,85,20,Ui.Muted,TextAnchor.MiddleCenter);
+                Ui.Button(list,"필터 초기화",72,210,300,72,()=>{outfitHeroFilter=-1;outfitOwnedFilter=0;OutfitCollection(-1);},Ui.Mint,true,21);
             }
-            int count=0;for(int i=1;i<=Outfits.Count;i++)if(collection<0||Outfits.Collection(i)==collection)count++;
-            var list=Ui.Scroll(card,24,195,444,572,count*212);int index=0;
-            for(int i=1;i<=Outfits.Count;i++)
+            for(int n=0;n<ids.Count;n++)
             {
-                int id=i,hero=Outfits.Hero(i);bool has=Outfits.Owned(State,i),unlocked=State.heroes[hero].unlocked;
-                if(collection>=0&&Outfits.Collection(i)!=collection)continue;
-                var row=Ui.Box(list,0,index++*212,444,198,Ui.Background).transform;
-                CharacterArt.Draw(row,8,22,128,150,hero,0,id);
-                Ui.Label(row,Outfits.Label(i),148,12,280,35,23,OutfitVisuals.Accent(i));
-                Ui.Label(row,Outfits.HeroName(i)+" 전용 · 대원 별도",148,52,280,27,15,Ui.Muted);
-                string state=has?(Outfits.Active(State,hero)==id?"장착 중":"보유 · 장착 가능"):OutfitSaleLabel(id);
-                Ui.Label(row,state,148,83,280,26,14,has?Ui.Mint:Ui.Gold);
-                int stage=HeroCatalog.All[hero].RecruitStage;
-                string detail=!unlocked?(stage>=0?"작전 "+(stage+1).ToString("D2")+" 완료 후 대원 무료 모집":"대원 모집 후 의상 구매 가능"):State.outfitTarget==id?"수집 목표 · 부족 보석 "+Math.Max(0,Outfits.Price-State.gems):"능력치 변화 없음 · 동작과 연출 포함";
-                Ui.Label(row,detail,148,115,280,32,12,Ui.Muted);
-                Ui.Button(row,"체험 · "+Outfits.HeroName(i),148,151,280,35,()=>OutfitRoom(id),Ui.Raised,true,16);
+                int id=ids[n],hero=Outfits.Hero(id);bool has=Outfits.Owned(State,id),unlocked=State.heroes[hero].unlocked;
+                var row=Ui.Button(list,"의상 체험 · "+id,n%2*228,n/2*292,216,280,()=>OutfitRoom(id),Ui.Background).transform;
+                // The full card is the touch target; children remain non-blocking.
+                row.GetComponentInChildren<UnityEngine.UI.Text>().text="";
+                CharacterArt.Draw(row,20,8,176,157,hero,0,id);
+                Ui.Label(row,Outfits.Label(id),10,169,196,42,21,OutfitVisuals.Accent(id),TextAnchor.MiddleCenter);
+                Ui.Label(row,Outfits.HeroName(id)+" 전용",10,215,196,26,17,Ui.Muted,TextAnchor.MiddleCenter);
+                string status=has?(Outfits.Active(State,hero)==id?"장착 중":unlocked?"보유 · 장착 가능":"보유 · 대원 모집 필요"):!unlocked?"대원 모집 후 구매":OutfitSaleLabel(id);
+                Ui.Label(row,status,10,247,196,26,17,has?Ui.Mint:Ui.Gold,TextAnchor.MiddleCenter);
             }
-            Ui.Label(card,"의상 "+Outfits.Count+"종 · 각 ◆ "+Outfits.Price+"\n전용 사격·필살기·지원 등장 포함 · 무료 보석 사용 가능",24,791,444,59,14,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,"필터 초기화 · 전체 보기",24,815,444,64,()=>{outfitHeroFilter=-1;outfitOwnedFilter=0;OutfitCollection(-1);},Ui.Raised,true,20);
         }
     }
 }
