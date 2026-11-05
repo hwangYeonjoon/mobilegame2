@@ -1,5 +1,21 @@
 # 서버와 안드로이드 출시 계획
 
+## 최신 운영 상태: 2026-11-05 초대 없는 시작·RTDN
+
+이 절은 아래의 이전 시점 기록보다 우선한다.
+
+- 앱 **0.19.3 / code 22**: 첫 화면의 `서버에 저장하며 시작`으로 초대코드 입력 없이 게스트 계정을 만든다. Google 연결은 선택이며 기존 계정 복구와 로컬 체험도 제공한다. 기존 로컬 진행은 별도로 보관하고 서버로 자동 이관하지 않는다. 기존 로컬 이용자에게는 전환 안내를 먼저 표시한다.
+- 가입 요청 전에 복구 비밀값과 미완료 가입 상태를 저장한다. 응답 실패·앱 재시작 시 같은 값으로 멱등 가입을 재시도한다. 이미 연결했던 계정은 bootstrap으로 복구한다. PlayMode HTTP 회귀 검증에서 실패 → 재시작 → 동일 계정 재시도 → 재연결 및 로컬 저장 보존을 확인했다.
+- 운영 Lightsail에 `PUBLIC_REGISTRATION=true`, `REGISTRATION_ENABLED=true`와 서버 이미지 `scrapguard-api:0.19.3`을 적용했다. 기존 비공개 초대코드는 롤백용으로 유지한다. 가입 중단 스위치와 요청 제한은 유지한다. 배포 전 DB/키 백업을 검증했다. 실제 HTTPS에서 초대 없이 신규 가입·중복 요청·인증 복구를 확인하고 검증용 임시 계정만 삭제했다.
+- 서버 검사 **326개**, Unity 기존 서비스 검사 **3개**, 신규 가입 PlayMode 회귀 검사 **1개** 통과. macOS 첫 화면 실행·버튼 검증 오류 **0개**와 캡처를 확인했다. 서명 Android AAB 생성 완료. Play 트랙의 code 22 업로드·게시 여부는 별도 콘솔 확인이 필요하며 빌드 성공을 배포 완료로 간주하지 않는다.
+- **RTDN 연결 완료**: 주제 `projects/scrapguard-prod/topics/scrapguard-play-rtdn`, 구독 `projects/scrapguard-prod/subscriptions/scrapguard-play-rtdn-push`. Google Play 공식 알림 계정에 해당 주제의 Pub/Sub Publisher만 부여했다(사용자 실행 직전 승인).
+- 푸시 인증 계정 `scrapguard-rtdn-push@scrapguard-prod.iam.gserviceaccount.com`은 사용자 관리 키·프로젝트 역할·Play 구매 접근 권한 없이 생성했다. HTTPS 대상과 OIDC audience는 모두 `https://api.scrapguard.win/v1/commerce/rtdn`. 지수 백오프 10~600초, 확인 기한 30초, 미확인 메시지 보관 7일, 구독 만료 없음, 페이로드 래핑 유지.
+- Play에서 실시간 알림과 **정기 결제·무효화된 구매·모든 일회성 제품**을 저장했다. **2026-11-05 15:57:15 KST** Play 테스트 알림이 운영 서버의 OIDC 검증을 통과해 `refund_inbox`에 `testNotification / ignored` 1건으로 저장된 것을 읽기 전용 조회로 확인했다. 테스트 메시지는 재화를 변경하지 않으므로 ignored가 정상이다. 실제 주문의 RTDN 환불 회수는 후속 구매·환불 검증 대상이다. 기존 주기 환불 조회도 정상 유지한다.
+- 실결제·수익 광고는 아직 `COMMERCE_MODE=license_test`, `ADS_MODE=test`다. 비공개 테스트에서도 라이선스 테스터가 아닌 구매자는 실제로 과금될 수 있으므로 Google 구매창의 테스트 수단을 확인해야 한다. [공식 결제 테스트 안내](https://developer.android.com/google/play/billing/test?hl=ko)
+- 실결제 전환 전 한국 판매자 정보의 실제 적용 요건을 해결해야 한다. 이전 `없음` 제출이나 비공개 테스트 승인을 판매 요건 충족으로 간주하지 않는다. 수익 광고는 AdMob 스토어 연결·앱 준비 상태 확인 후 전환한다. [국가별 배포 요건](https://support.google.com/googleplay/android-developer/answer/6223646?hl=ko), [AdMob 앱 준비 상태](https://support.google.com/admob/answer/10564477?hl=ko)
+- **사용자 결정: 룬테스트 종료 후 앱 업데이트 배포.** 현재 Alpha의 code 21 / 0.19.2와 테스터 목록·참여 상태를 유지한다. code 22는 업로드·심사 제출·배포하지 않았다. 콘솔에서 빈 임시 출시(`/releases/2/prepare`) 작성 화면만 열었다. 서명 AAB SHA-256: `d111d014c42a0a43fce9f87c2122fb7ca38d127c49da3f073a933291db590635`. 서버 최소 버전은 올리지 않는다.
+- AdMob 실조회: 계정은 승인됐지만 고철 수호대 앱은 **검토 필요 / 광고 게재 제한 / 스토어 미연결**. 정확한 패키지명 검색 결과가 없어 스토어 연결을 완료하지 못했다. 실제 수익 광고 전환은 보류한다. 콘솔에서 제공한 게시자 인증 문구를 `https://api.scrapguard.win/app-ads.txt`에 배포하고 HTTP 응답 내용을 검증했다. 이는 AdMob 크롤링·앱 승인 완료와는 다르다. 스토어 공개 후 개발자 웹사이트와 연결·크롤링 상태를 확인한다.
+
 ## 확정한 앱·프로젝트 식별자
 
 | 항목 | 값 | 상태 |

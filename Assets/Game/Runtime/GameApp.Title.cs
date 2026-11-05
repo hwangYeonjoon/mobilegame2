@@ -30,14 +30,36 @@ namespace ScrapGuard
                 Ui.Box(titleScreen,73+i*136,734,122,43,Ui.Panel);
                 Ui.Label(titleScreen,pillars[i],73+i*136,734,122,43,17,Ui.Mint,TextAnchor.MiddleCenter);
             }
-            Ui.Button(titleScreen,"정비소로 들어가기",40,825,460,66,DismissTitleScreen,Ui.Mint,true,22);
-            Ui.Label(titleScreen,"한 손으로 시작하는 생존 · 수집 · 성장",24,910,492,25,13,Ui.Muted,TextAnchor.MiddleCenter);
+            bool quickStart = !Online && !cloud.Session.localPlaySelected;
+            Ui.Button(titleScreen,quickStart?"서버에 저장하며 시작":"정비소로 들어가기",40,803,460,60,StartFromTitle,Ui.Mint,true,22);
+            if(quickStart)
+            {
+                Ui.Label(titleScreen,"초대코드 없이 시작 · Google 연결은 나중에",24,868,492,24,13,Ui.Muted,TextAnchor.MiddleCenter);
+                Ui.Button(titleScreen,"로컬 체험",40,904,220,40,()=>{cloud.Disconnect();DismissTitleScreen();},Ui.Raised,true,15);
+                Ui.Button(titleScreen,"기존 계정 복구",280,904,220,40,()=>{HideTitleScreen();AccountPanel();},Ui.Raised,true,15);
+            }
+            else Ui.Label(titleScreen,"한 손으로 시작하는 생존 · 수집 · 성장",24,910,492,25,13,Ui.Muted,TextAnchor.MiddleCenter);
+        }
+        void StartFromTitle()
+        {
+            if(networkBusy)return;
+            if(Online || cloud.Session.localPlaySelected){DismissTitleScreen();return;}
+            // Returning local players should know that their old progress stays local.
+            if(localStore.State.guideIntroSeen || localStore.State.totalRuns>0)
+            {HideTitleScreen();QuickAccountPanel();return;}
+            StartQuickAccount();
         }
         void DismissTitleScreen()
         {
+            if(titleScreen==null || networkBusy)return;
+            HideTitleScreen();
+            if(!Online)cloud.Disconnect();
+            if(!smokeActive && (!Online || cloudReady) && !networkBusy && !State.guideIntroSeen)Change(new ScrapGuard.Core.GameCommand("guide_seen"),GuidePanel);
+        }
+        void HideTitleScreen()
+        {
             if(titleScreen==null)return;
             titleScreen.gameObject.SetActive(false);Destroy(titleScreen.gameObject);titleScreen=null;
-            if(!smokeActive && (!Online || cloudReady) && !networkBusy && !State.guideIntroSeen)Change(new ScrapGuard.Core.GameCommand("guide_seen"),GuidePanel);
         }
     }
 }

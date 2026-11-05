@@ -13,6 +13,7 @@ namespace ScrapGuard
     {
         public string endpoint = "https://api.scrapguard.win", secret = "", playerId = "";
         public bool enabled;
+        public bool guestRegistrationPending, localPlaySelected;
         public string secretCipher;
         public long revision;
     }
@@ -68,6 +69,7 @@ namespace ScrapGuard
             if (!ValidEndpoint(endpoint)) { done(new ServerReply { message = "HTTPS 주소 또는 로컬 테스트 주소를 입력해 주세요." }); yield break; }
             if (Pending != null && (endpoint != Session.endpoint || secret != Session.secret)) { done(new ServerReply { message = "미확인 거래를 먼저 동기화해 주세요." }); yield break; }
             Session.endpoint = endpoint; Session.secret = secret;
+            Session.guestRegistrationPending = create;
             if (!Persist(SaveSession)) { done(StorageFailure()); yield break; }
             bool releaseReady=false;yield return CheckRelease(endpoint,ok=>releaseReady=ok);
             if(!releaseReady || UpdateBlocked){done(UpdateFailure());yield break;}
@@ -75,9 +77,17 @@ namespace ScrapGuard
             yield return Request(path, create ? "POST" : "GET", create ? JsonUtility.ToJson(new GuestRequest { secret = secret, inviteCode = inviteCode }) : null, (body,status) =>
             {
                 var reply = Parse(body, status);
-                if (reply.success && !Persist(() => { Accept(reply); Session.enabled = true; SaveSession(); })) reply = StorageFailure();
+                if (reply.success && !Persist(() => { Accept(reply); Session.enabled = true; Session.guestRegistrationPending = false; Session.localPlaySelected = false; SaveSession(); })) reply = StorageFailure();
                 done(reply);
             });
+        }
+        // Persist the recovery secret before the first request. A lost response or restart
+        // retries the same idempotent registration instead of creating another account.
+        public IEnumerator StartGuest(Action<ServerReply> done)
+        {
+            bool create = Session.guestRegistrationPending || string.IsNullOrEmpty(Session.secret);
+            string secret = string.IsNullOrEmpty(Session.secret) ? NewSecret() : Session.secret;
+            yield return Connect(Session.endpoint, secret, create, done);
         }
         public IEnumerator Execute(GameCommand command, Action<ServerReply> done)
         {
@@ -114,10 +124,10 @@ namespace ScrapGuard
         public IEnumerator GoogleFinish(GoogleLoginRequest request,Action<ServerReply> done)
         {
             if(Pending!=null){done(new ServerReply{message="미확인 거래를 먼저 동기화해 주세요."});yield break;}
-            if(!request.link){Session.secret=request.secret;Session.enabled=false;if(!Persist(SaveSession)){done(StorageFailure());yield break;}}
+            if(!request.link){Session.secret=request.secret;Session.enabled=false;Session.guestRegistrationPending=false;if(!Persist(SaveSession)){done(StorageFailure());yield break;}}
             yield return Request("/v1/auth/google/finish","POST",JsonUtility.ToJson(request),(body,status)=>{
                 var reply=Parse(body,status);
-                if(reply.success&&!Persist(()=>{Accept(reply);Session.enabled=true;SaveSession();}))reply=StorageFailure();
+                if(reply.success&&!Persist(()=>{Accept(reply);Session.enabled=true;Session.guestRegistrationPending=false;Session.localPlaySelected=false;SaveSession();}))reply=StorageFailure();
                 done(reply);
             });
         }
@@ -185,7 +195,7 @@ namespace ScrapGuard
                 done(req.downloadHandler.text, req.responseCode);
             }
         }
-        public void Disconnect() { Session.enabled = false; SaveSession(); }
+        public void Disconnect() { Session.enabled = false; Session.localPlaySelected = true; SaveSession(); }
         public void Forget()
         {
             Session = new CloudSession(); Pending = null; Latest = null; Content=null; Release=null;ReleaseEndpoint=null;ReleaseNotice=false; SaveSession();

@@ -93,7 +93,11 @@ try
     Fails(()=>operations.CheckRegistration(null),403,"invitation required");
     Fails(()=>operations.CheckRegistration("wrong"),403,"wrong invitation rejected");
     operations.CheckRegistration("server-tests-invite-code");Check(true,"valid invitation accepted");
+    config["PUBLIC_REGISTRATION"]="true";
+    new ServerOperations(config).CheckRegistration(null);Check(true,"public guest registration does not require the retained invite");
     config["REGISTRATION_ENABLED"]="false";
+    Fails(()=>new ServerOperations(config).CheckRegistration(null),503,"public signup still respects registration shutdown");
+    config["PUBLIC_REGISTRATION"]="false";
     Fails(()=>new ServerOperations(config).CheckRegistration("server-tests-invite-code"),503,"registration can close");
     config["MAINTENANCE_MODE"]="true";Check(new ServerOperations(config).Maintenance,"maintenance flag parsed");
     var proxy=new ForwardedHeadersOptions();ServerOperations.ConfigureProxy(proxy,"172.31.248.2");

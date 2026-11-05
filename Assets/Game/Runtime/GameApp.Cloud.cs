@@ -64,9 +64,49 @@ namespace ScrapGuard
         void AccountPanel()
         {
             if(adBusy){Toast("광고 보상 확인을 마친 뒤 계정을 변경해 주세요.");return;}
-            var card = Dialog("계정과 저장", Online ? "서버 계정 · ID " + cloud.Session.playerId : "로컬 체험과 서버 계정은 별도로 성장합니다.", 770);
             if (!Online)
             {
+                QuickAccountPanel();
+                return;
+            }
+            OnlineAccountPanel(Dialog("계정과 저장", "서버 계정 · ID " + cloud.Session.playerId, 770));
+        }
+        void QuickAccountPanel()
+        {
+            var card=Dialog("수호대 저장과 복구","Google 로그인 없이도 서버에 저장할 수 있어요.",650);
+            Ui.Label(card,"새 수호대는 서버에 안전하게 저장됩니다.\n초대코드나 복구 코드를 입력할 필요가 없어요.\n\n기존 로컬 체험 기록은 그대로 보관되지만\n새 서버 계정으로 옮겨지지는 않아요.",24,140,444,155,17,Ui.Muted);
+            Ui.Button(card,"서버에 저장하며 시작 / 이어하기",24,320,444,58,StartQuickAccount,Ui.Mint,true,18);
+            Ui.Button(card,"Google 계정으로 복구",24,397,444,50,()=>GoogleRecoveryPanel(cloud.Session.endpoint),Ui.Raised,true,17);
+            Ui.Button(card,"복구 코드 · 연결 설정",24,463,444,50,ManualAccountPanel,Ui.Raised,true,17);
+            Ui.Button(card,"로컬 체험 계속하기",24,542,444,50,()=>{cloud.Disconnect();CloseModal();},Ui.Raised,true,17);
+        }
+        void StartQuickAccount()
+        {
+            if(networkBusy)return;
+            HideTitleScreen();CloseModal();StartCoroutine(QuickAccount());
+        }
+        IEnumerator QuickAccount()
+        {
+            SetNetworkBusy(true);ServerReply reply=null;
+            // The automatic launch-time version check may still be finishing.
+            while(checkingRelease || cloud.Busy)yield return null;
+            yield return cloud.StartGuest(r=>reply=r);
+            if(reply!=null && reply.success)ApplyRemote(reply);
+            SetNetworkBusy(false);Show("home");
+            if(reply==null || !reply.success)
+            {
+                var card=Dialog("연결을 완료하지 못했어요",reply?.message??"인터넷 연결을 확인해 주세요.",440);
+                Ui.Label(card,"같은 계정으로 다시 연결합니다.\n진행 중인 가입 정보와 기존 기록은 보관돼요.",24,140,444,75,17,Ui.Muted);
+                Ui.Button(card,"다시 연결",24,235,444,55,StartQuickAccount);
+                Ui.Button(card,"로컬 체험으로 돌아가기",24,313,444,50,()=>{cloud.Disconnect();CloseModal();},Ui.Raised);
+                yield break;
+            }
+            Toast("수호대가 연결됐어요. 진행 상황이 서버에 저장됩니다.");
+            if(!State.guideIntroSeen)Change(new GameCommand("guide_seen"),GuidePanel);
+        }
+        void ManualAccountPanel()
+        {
+                var card=Dialog("복구 코드 · 연결 설정","기존 계정 복구 또는 별도 테스트 서버 연결",770);
                 Ui.Label(card, "서버 주소", 24, 132, 444, 28, 15, Ui.Muted);
                 var endpoint = Ui.Input(card, cloud.Session.endpoint, "https://게임서버주소", 24, 166, 444, 200);
                 Ui.Label(card, "복구 코드 (새 계정은 비워 두세요)", 24, 236, 444, 28, 15, Ui.Muted);
@@ -75,10 +115,11 @@ namespace ScrapGuard
                 Ui.Label(card,"베타 초대 코드 (새 계정 생성 시)",24,334,444,28,15,Ui.Muted);
                 var invite = Ui.Input(card,"","초대 서버에서만 필요해요",24,370,444,80);
                 Ui.Button(card, "서버 계정 연결 / 복구", 24, 446, 444, 57, () => StartCoroutine(ConnectAccount(endpoint.text, secret.text, invite.text)));
-                Ui.Label(card, "처음 연결하면 새 수호대가 시작돼요.\n고철 수호대 서버 주소가 기본으로 입력돼요.\n테스트 참여자는 안내받은 초대 코드를 입력해 주세요.\n기존 로컬 재화는 서버로 옮겨지지 않아요.\n\n복구 코드는 다른 사람에게 알려주지 마세요.", 24, 526, 444, 166, 15, Ui.Muted);
+                Ui.Label(card, "복구 코드로 기존 수호대를 이어갈 수 있어요.\n별도 초대 서버에서만 초대코드를 입력하세요.\n기존 로컬 재화는 서버로 옮겨지지 않아요.\n\n복구 코드는 다른 사람에게 알려주지 마세요.", 24, 526, 444, 166, 15, Ui.Muted);
                 Ui.Button(card,"Google 계정으로 복구",24,704,444,42,()=>GoogleRecoveryPanel(endpoint.text),Ui.Raised,true,16);
-                return;
-            }
+        }
+        void OnlineAccountPanel(RectTransform card)
+        {
             Ui.Label(card, cloudReady ? "연결됨 · 서버 저장 사용" : "연결 확인 필요 · 저장된 화면만 표시 중", 24, 137, 444, 40, 17, cloudReady ? Ui.Mint : Ui.Gold);
             Ui.Button(card, cloud.Pending == null ? "최신 상태 동기화" : "미확인 요청 다시 동기화", 24, 191, 444, 53, () => StartCoroutine(ReconnectCloud()), Ui.Raised);
             Ui.Button(card, "내 공개 ID 복사", 24, 258, 444, 53, () => { GUIUtility.systemCopyBuffer = cloud.Session.playerId; Toast("공개 ID를 복사했어요."); }, Ui.Raised);
@@ -93,7 +134,7 @@ namespace ScrapGuard
         {
             if (networkBusy) yield break;
             bool create = string.IsNullOrWhiteSpace(secret);
-            if (create) secret = CloudClient.NewSecret();
+            if (create) secret = cloud.Session.guestRegistrationPending && endpoint.Trim().TrimEnd('/')==cloud.Session.endpoint && !string.IsNullOrEmpty(cloud.Session.secret) ? cloud.Session.secret : CloudClient.NewSecret();
             SetNetworkBusy(true); ServerReply reply = null;
             yield return cloud.Connect(endpoint, secret.Trim(), create, value => reply = value, inviteCode.Trim());
             if (reply.success) ApplyRemote(reply);

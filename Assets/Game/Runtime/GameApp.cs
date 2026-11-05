@@ -80,7 +80,8 @@ namespace ScrapGuard
             MeasureFrame();
             if (titleScreen != null && titleScreen.gameObject.activeSelf)
             {
-                if (Keyboard.current != null && (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.escapeKey.wasPressedThisFrame)) DismissTitleScreen();
+                if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame) StartFromTitle();
+                else if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) DismissTitleScreen();
                 return;
             }
             if (toastTime > 0) { toastTime -= Time.unscaledDeltaTime; if (toastTime <= 0) toastRoot.gameObject.SetActive(false); }

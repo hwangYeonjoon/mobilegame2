@@ -29,6 +29,7 @@ services:
       GOOGLE_WEB_CLIENT_ID: ${GOOGLE_WEB_CLIENT_ID:-}
       TRUSTED_PROXY_IPS: 172.31.248.2
       REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      PUBLIC_REGISTRATION: ${PUBLIC_REGISTRATION:-false}
       BETA_INVITE_CODE: ${BETA_INVITE_CODE:?Set a private beta invite code}
       MAINTENANCE_MODE: ${MAINTENANCE_MODE:-false}
       Logging__LogLevel__Microsoft.AspNetCore: Warning

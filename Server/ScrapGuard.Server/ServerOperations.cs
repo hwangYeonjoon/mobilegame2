@@ -16,6 +16,7 @@ public sealed class ServerOperations
         Maintenance = config.GetValue("MAINTENANCE_MODE",false);
         RegistrationEnabled = config.GetValue("REGISTRATION_ENABLED",true);
         string invite = config["BETA_INVITE_CODE"] ?? "";
+        if (config.GetValue("PUBLIC_REGISTRATION",false)) return;
         if (invite.Length > 0)
         {
             if (invite.Length < 16 || invite.Length > 80 || invite.StartsWith("replace-",StringComparison.Ordinal))

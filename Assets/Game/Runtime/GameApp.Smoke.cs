@@ -70,7 +70,7 @@ namespace ScrapGuard
         IEnumerator SmokeRoutine()
         {
             yield return Capture("00-title");
-            ClickVisibleButton("정비소로 들어가기");
+            ClickVisibleButton(!Online && !cloud.Session.localPlaySelected?"로컬 체험":"정비소로 들어가기");
             if (titleScreen != null) smokeErrors.Add("Title screen did not dismiss");
             if (Array.IndexOf(Environment.GetCommandLineArgs(),"-titleSmoke") >= 0)
             {
