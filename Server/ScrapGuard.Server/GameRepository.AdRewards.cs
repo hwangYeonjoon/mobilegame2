@@ -73,7 +73,8 @@ public sealed partial class GameRepository
     public void CompleteAd(VerifiedAd ad,AdPolicy policy)
     {
         if(!policy.Enabled)throw new ApiFault(503,"광고 보상 확인이 중지됐어요.");
-        if(ad.Unit!=policy.UnitId&&ad.Unit!=policy.CallbackUnit||ad.Amount!=1||ad.Reward!="reward")throw new ApiFault(400,"광고 단위 또는 보상 설정이 일치하지 않아요.");
+        if(ad.Unit!=policy.UnitId&&ad.Unit!=policy.CallbackUnit)throw new ApiFault(400,"광고 단위 설정이 일치하지 않아요.");
+        if(ad.Amount!=1||ad.Reward!="reward")throw new ApiFault(400,"광고 보상 수량 또는 이름이 일치하지 않아요.");
         lock(gate)
         {
             using var db=Open();using var tx=db.BeginTransaction();string owner,status,unit,created,expires;bool test;

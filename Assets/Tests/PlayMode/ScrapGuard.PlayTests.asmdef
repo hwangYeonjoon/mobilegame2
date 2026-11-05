@@ -1,0 +1,1 @@
+{"name":"ScrapGuard.PlayTests","rootNamespace":"ScrapGuard.Tests","references":["ScrapGuard.Runtime"],"overrideReferences":true,"precompiledReferences":["GoogleMobileAds.Common.dll","nunit.framework.dll"],"optionalUnityReferences":["TestAssemblies"]}

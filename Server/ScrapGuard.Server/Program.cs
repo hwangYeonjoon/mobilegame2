@@ -65,7 +65,12 @@ app.Use(async (ctx, next) =>
         }
         await next(ctx);
     }
-    catch (ApiFault ex) { ctx.Response.StatusCode = ex.Status; await ctx.Response.WriteAsJsonAsync(ex.Reply ?? new ServerReply { success = false, message = ex.Message }); }
+    catch (ApiFault ex)
+    {
+        // Keep callback diagnostics without logging signed URLs, account IDs or credentials.
+        if(ctx.Request.Path=="/v1/ads/ssv")app.Logger.LogWarning("AdMob SSV rejected ({Status}): {Reason}",ex.Status,ex.Message);
+        ctx.Response.StatusCode = ex.Status; await ctx.Response.WriteAsJsonAsync(ex.Reply ?? new ServerReply { success = false, message = ex.Message });
+    }
     catch (BadHttpRequestException) { ctx.Response.StatusCode = 400; await ctx.Response.WriteAsJsonAsync(new ServerReply { message = "요청 형식이 올바르지 않아요." }); }
 });
 string Token(HttpContext ctx)
@@ -99,7 +104,13 @@ app.MapPost("/v1/ads/claims", (HttpContext ctx,GameCommand body,GameRepository r
 app.MapGet("/v1/ads/claims", (HttpContext ctx,GameRepository repo)=>new { claims=repo.RecentAds(Token(ctx)) });
 app.MapGet("/v1/ads/claims/{id}", (HttpContext ctx,string id,GameRepository repo)=>repo.AdClaimStatus(Token(ctx),id));
 app.MapDelete("/v1/ads/claims/{id}", (HttpContext ctx,string id,GameRepository repo)=>repo.AdClaimStatus(Token(ctx),id,true));
-app.MapGet("/v1/ads/ssv",async(HttpContext ctx,GameRepository repo,AdPolicy p,AdMobVerifier verifier)=>{if(!p.Enabled)throw new ApiFault(503,"광고 확인이 중지되어 있어요.");repo.CompleteAd(await verifier.Verify(ctx.Request.QueryString.Value,ctx.RequestAborted),p);return Results.Ok();});
+app.MapGet("/v1/ads/ssv",async(HttpContext ctx,GameRepository repo,AdPolicy p,AdMobVerifier verifier)=>{
+    if(!p.Enabled)throw new ApiFault(503,"광고 확인이 중지되어 있어요.");
+    var ad=await verifier.Verify(ctx.Request.QueryString.Value,ctx.RequestAborted);
+    if(p.Mode=="test")app.Logger.LogInformation("Verified test SSV configuration: unit={Unit}, amount={Amount}, reward={Reward}",ad.Unit,ad.Amount,ad.Reward);
+    if(p.IsConsoleProbe(ad,DateTimeOffset.UtcNow))return Results.Ok(new{configurationVerified=true,rewardGranted=false});
+    repo.CompleteAd(ad,p);return Results.Ok();
+});
 app.MapGet("/v1/profiles", (HttpContext ctx, GameRepository repo, string after = "") => repo.Gallery(Token(ctx), after));
 app.MapGet("/v1/profiles/{id}", (HttpContext ctx, string id, GameRepository repo) => repo.GetProfile(Token(ctx), id));
 app.MapPost("/v1/profiles/{id}/like", (HttpContext ctx, string id, GameCommand body, GameRepository repo) => repo.Like(Token(ctx), id.ToUpperInvariant(), body.enabled));

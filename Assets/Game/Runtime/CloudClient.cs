@@ -11,7 +11,7 @@ namespace ScrapGuard
 {
     [Serializable] public class CloudSession
     {
-        public string endpoint = "http://127.0.0.1:5187", secret = "", playerId = "";
+        public string endpoint = "https://api.scrapguard.win", secret = "", playerId = "";
         public bool enabled;
         public string secretCipher;
         public long revision;

@@ -73,17 +73,23 @@ namespace ScrapGuard.Editor
             string aliasPass=System.Environment.GetEnvironmentVariable("SCRAP_KEY_PASSWORD");
             if(string.IsNullOrWhiteSpace(key)||!File.Exists(key)||string.IsNullOrWhiteSpace(alias)||string.IsNullOrEmpty(storePass)||string.IsNullOrEmpty(aliasPass))
                 throw new BuildFailedException("Set the four SCRAP signing environment variables locally. No signing secret is stored in the repository.");
-            Configure();EditorUserBuildSettings.buildAppBundle=true;
+            if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android,BuildTarget.Android))
+                throw new BuildFailedException("Android build support is unavailable. Check the editor module and licensing initialization, then restart the build.");
+            Configure();
+            bool oldBundle=EditorUserBuildSettings.buildAppBundle,oldExport=EditorUserBuildSettings.exportAsGoogleAndroidProject;
+            EditorUserBuildSettings.buildAppBundle=true;EditorUserBuildSettings.exportAsGoogleAndroidProject=false;
             bool oldCustom=PlayerSettings.Android.useCustomKeystore;string oldName=PlayerSettings.Android.keystoreName,oldAlias=PlayerSettings.Android.keyaliasName;
             try
             {
                 PlayerSettings.Android.useCustomKeystore=true;PlayerSettings.Android.keystoreName=Path.GetFullPath(key);PlayerSettings.Android.keyaliasName=alias;
                 PlayerSettings.Android.keystorePass=storePass;PlayerSettings.Android.keyaliasPass=aliasPass;InternalTestBuild=true;
                 Build(BuildTarget.Android,"Builds/Android/ScrapGuard-internal-test.aab",BuildOptions.None);
+                if(!File.Exists("Builds/Android/ScrapGuard-internal-test.aab"))
+                    throw new BuildFailedException("Unity did not produce the internal-test AAB. Check the Android build log even if the report says Success.");
             }
             finally
             {
-                InternalTestBuild=false;EditorUserBuildSettings.buildAppBundle=false;
+                InternalTestBuild=false;EditorUserBuildSettings.buildAppBundle=oldBundle;EditorUserBuildSettings.exportAsGoogleAndroidProject=oldExport;
                 PlayerSettings.Android.keystorePass=PlayerSettings.Android.keyaliasPass="";
                 PlayerSettings.Android.useCustomKeystore=oldCustom;PlayerSettings.Android.keystoreName=oldName;PlayerSettings.Android.keyaliasName=oldAlias;
                 AssetDatabase.SaveAssets();

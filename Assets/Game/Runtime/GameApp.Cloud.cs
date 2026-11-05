@@ -75,7 +75,7 @@ namespace ScrapGuard
                 Ui.Label(card,"베타 초대 코드 (새 계정 생성 시)",24,334,444,28,15,Ui.Muted);
                 var invite = Ui.Input(card,"","초대 서버에서만 필요해요",24,370,444,80);
                 Ui.Button(card, "서버 계정 연결 / 복구", 24, 446, 444, 57, () => StartCoroutine(ConnectAccount(endpoint.text, secret.text, invite.text)));
-                Ui.Label(card, "처음 연결하면 새 수호대가 시작돼요.\n서버 주소는 운영자가 제공해야 합니다.\n기존 로컬 재화는 서버로 옮겨지지 않아요.\n\n개발 테스트: PC는 127.0.0.1:5187\nAndroid는 adb reverse 후 같은 주소 사용", 24, 526, 444, 166, 15, Ui.Muted);
+                Ui.Label(card, "처음 연결하면 새 수호대가 시작돼요.\n고철 수호대 서버 주소가 기본으로 입력돼요.\n테스트 참여자는 안내받은 초대 코드를 입력해 주세요.\n기존 로컬 재화는 서버로 옮겨지지 않아요.\n\n복구 코드는 다른 사람에게 알려주지 마세요.", 24, 526, 444, 166, 15, Ui.Muted);
                 Ui.Button(card,"Google 계정으로 복구",24,704,444,42,()=>GoogleRecoveryPanel(endpoint.text),Ui.Raised,true,16);
                 return;
             }

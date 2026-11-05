@@ -5,7 +5,7 @@ namespace ScrapGuard.Tests
     {
         [Test] public void UnconfiguredBuildDoesNotRequestAdvertising()
         {
-            var settings=ServiceSettings.Load();
+            var settings=new ServiceSettings();
             Assert.IsFalse(settings.adsEnabled);Assert.IsFalse(settings.productionAds);
             Assert.IsFalse(new RewardedAds(settings).Available);
         }

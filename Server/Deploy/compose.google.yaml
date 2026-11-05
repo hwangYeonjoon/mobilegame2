@@ -1,0 +1,13 @@
+# Opt-in Google Play credentials mount. Keep the host JSON outside the checkout.
+# docker compose -f compose.yaml -f compose.google.yaml ...
+services:
+  api:
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/google-play.json
+    volumes:
+      - type: bind
+        source: ${GOOGLE_PLAY_CREDENTIALS_FILE:?Set the absolute path to the Google Play service-account JSON}
+        target: /run/secrets/google-play.json
+        read_only: true
+        bind:
+          create_host_path: false

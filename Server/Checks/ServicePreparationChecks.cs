@@ -35,6 +35,13 @@ static class ServicePreparationChecks
         var disabledSales=new CommercePolicy(Config(("COMMERCE_MODE","production"),("PLAY_PACKAGE_NAME","game"),("COMMERCE_RELEASE_READY","true")));
         check(repo.Commerce(key,disabledSales).enabled&&!repo.Commerce(key,disabledSales).salesEnabled,"sales pause retains receipt restoration availability");
         var off=new AdPolicy(Config());
+        var consolePolicy=new AdPolicy(Config(("ADS_MODE","test"),("ADMOB_REWARDED_UNIT_ID","ca-app-pub-6176006174123307/7008464653")));
+        var consoleProbe=new VerifiedAd("configuration-check","scrapguard-ssv-probe","1234567890","probe",now.ToUnixTimeMilliseconds(),"reward",1);
+        check(consolePolicy.IsConsoleProbe(consoleProbe,now),"signed console placeholder can verify configuration without granting rewards");
+        check(!off.IsConsoleProbe(consoleProbe,now)&&!consolePolicy.IsConsoleProbe(consoleProbe with{Claim="real-claim"},now),"console probes require test mode and explicit non-game identifiers");
+        check(!consolePolicy.IsConsoleProbe(consoleProbe with{Timestamp=now.AddMinutes(-6).ToUnixTimeMilliseconds()},now),"stale console probes are rejected");
+        var liveAds=new AdPolicy(Config(("ADS_MODE","production"),("ADS_RELEASE_READY","true"),("ADMOB_REWARDED_UNIT_ID","ca-app-pub-6176006174123307/7008464653")));
+        check(!liveAds.IsConsoleProbe(consoleProbe,now),"production cannot accept console placeholder probes");
         GameCommand Request(string p="parts")=>new("ad_request"){value=p};
         Fails(()=>repo.CreateAdClaim(key,Request(),off),503,"unconfigured ads cannot create reward claims");
         BadConfig(()=>new AdPolicy(Config(("ADS_MODE","production"),("ADMOB_REWARDED_UNIT_ID",AdPolicy.TestUnit))),"production ads cannot use sample units");

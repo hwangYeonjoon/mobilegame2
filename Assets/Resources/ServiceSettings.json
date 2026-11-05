@@ -1,10 +1,10 @@
 {
-  "adsEnabled": false,
-  "adMobAppId": "ca-app-pub-3940256099942544~3347511713",
-  "rewardedUnitId": "ca-app-pub-3940256099942544/5224354917",
+  "adsEnabled": true,
+  "adMobAppId": "ca-app-pub-6176006174123307~8500016434",
+  "rewardedUnitId": "ca-app-pub-6176006174123307/7008464653",
   "testDeviceIds": [],
-  "privacyUrl": "",
-  "supportUrl": "",
-  "deletionUrl": "",
+  "privacyUrl": "https://api.scrapguard.win/privacy",
+  "supportUrl": "https://api.scrapguard.win/support",
+  "deletionUrl": "https://api.scrapguard.win/delete-account",
   "productionAds": false
 }

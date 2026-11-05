@@ -1,0 +1,10 @@
+[Unit]
+Description=Scrap Guard verified database snapshot
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/scrapguard/Server/Deploy
+ExecStart=/bin/sh /opt/scrapguard/Server/Deploy/backup.sh
+UMask=0077

@@ -11,6 +11,12 @@ public sealed class AdPolicy
     public string UnitId {get;}
     public string CallbackUnit => UnitId.Split('/').Last();
     public const string TestUnit = "ca-app-pub-3940256099942544/5224354917";
+    // The AdMob console sends this placeholder unit even when editing a real unit.
+    // A signed, explicitly named configuration probe never grants a game reward.
+    public bool IsConsoleProbe(VerifiedAd ad,DateTimeOffset now) =>
+        Mode=="test"&&ad.Unit=="1234567890"&&ad.User=="scrapguard-ssv-probe"&&ad.Claim=="configuration-check"
+        &&ad.Amount==1&&ad.Reward=="reward"
+        &&ad.Timestamp>=now.AddMinutes(-5).ToUnixTimeMilliseconds()&&ad.Timestamp<=now.AddMinutes(1).ToUnixTimeMilliseconds();
     public AdPolicy(IConfiguration c)
     {
         Mode=c["ADS_MODE"]??"disabled";UnitId=c["ADMOB_REWARDED_UNIT_ID"]??"";
