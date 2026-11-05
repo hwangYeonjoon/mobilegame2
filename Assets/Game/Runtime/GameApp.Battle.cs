@@ -25,6 +25,8 @@ namespace ScrapGuard
         readonly List<BattleEffect> frameBattleEffects=new List<BattleEffect>();
         Image hpFill, xpFill, bossFill, bossBackdrop;
         Text hpText, timeText, killText, levelText, bossText, skillText;
+        RectTransform playerLocator;
+        Text dangerHint;
         bool battlePaused, choicesShown, resultShown, dragging;
         Vector2 dragStart;
         class FloatingEffect { public RectTransform root; public float life, total; public bool text; }
@@ -85,6 +87,7 @@ namespace ScrapGuard
             effectLayer = Ui.Rect(arena, "Effects", 0, 0, 540, 960);
             particles=CombatParticles.Create(effectLayer);
             hazardLayer.SetAsLastSibling();
+            playerLocator=CombatRing.Create(arena,58,Ui.Mint,.055f);
             SetupCombatEffects();turretArt=twinTurretArt=null;magnetField=null;
             Ui.Label(screen, combat.Challenge ? FieldEngineering.TrialTitle(mode) : "작전 " + (stage + 1).ToString("D2") + "  /  " + Catalog.StageNames[stage], 24, 20, 406, 28, 16, Ui.Mint);
             Ui.Button(screen, "Ⅱ", 451, 23, 65, 50, PauseBattle, Ui.Raised, true, 22);
@@ -97,7 +100,8 @@ namespace ScrapGuard
             xpFill = Ui.Box(screen, 24, 153, 0, 7, Ui.Blue);
             levelText = Ui.Label(screen, "Lv.1", 24, 832, 100, 28, 17, Ui.Mint);
             skillText = Ui.Label(screen, "", 130, 832, 386, 40, 12, Ui.Muted, TextAnchor.MiddleRight);
-            guideHint=Ui.Label(screen,"",40,190,460,40,14,Ui.Ink,TextAnchor.MiddleCenter);
+            guideBackdrop=Ui.Box(screen,32,178,476,53,new Color(.035f,.055f,.08f,.92f));
+            guideHint=Ui.Label(screen,"",44,182,452,45,15,Ui.Ink,TextAnchor.MiddleCenter);
             bossBackdrop=Ui.Box(screen,72,183,396,49,new Color(.035f,.055f,.08f,.78f),true);
             bossText = Ui.Label(screen, "", 80, 187, 380, 34, 14, Ui.Red, TextAnchor.MiddleCenter);
             bossFill = Ui.Box(screen, 80, 221, 0, 7, Ui.Red);
@@ -108,6 +112,8 @@ namespace ScrapGuard
             ultimateLabel = ultimateButton.GetComponentInChildren<Text>();
             Ui.Box(screen,351,934,158,4,Ui.Background,false);
             ultimateFill = Ui.Box(screen,351,934,79,4,Ui.Mint,false);
+            dangerHint=Ui.Label(screen,"",24,804,492,27,15,Ui.Gold,TextAnchor.MiddleCenter);
+            var dangerShadow=dangerHint.gameObject.AddComponent<Shadow>();dangerShadow.effectColor=Ui.Background;dangerShadow.effectDistance=new Vector2(1,-1);
             SetupSupportButton();SetupFieldTask();SetupBattleFeedback();
             RenderBattle();
         }
@@ -264,6 +270,15 @@ namespace ScrapGuard
                 var text=view.GetComponentInChildren<Text>();text.rectTransform.sizeDelta=new Vector2(width,height);
             }
             Recycle(hazardViews, hazardPool);
+            bool inDanger=false;
+            foreach(var hazard in combat.Hazards)
+            {
+                var delta=combat.Position-hazard.position;
+                if(hazard.width>0?Mathf.Abs(delta.x)<=hazard.width/2&&Mathf.Abs(delta.y)<=hazard.height/2:delta.Length<=hazard.radius){inDanger=true;break;}
+            }
+            playerLocator.anchoredPosition=new Vector2(combat.Position.x,-combat.Position.y);
+            playerLocator.GetComponent<Graphic>().color=inDanger?Ui.Gold: new Color(.65f,1,.9f,.65f);
+            dangerHint.text=inDanger?"!  위험 예고 · 표시된 영역 밖으로 이동하세요":"";
             foreach (var effect in combat.Effects)
             {
                 EventFeedback(effect);
@@ -383,9 +398,20 @@ namespace ScrapGuard
             var card = Dialog(won ? "구역 정리 완료!" : "다음 작전을 준비해요", Catalog.StageNames[combat.Stage] + " · 다음 작전을 준비하세요.", 745);
             Ui.Label(card, won ? "작전 성공" : "정비하고 다시 도전해요", 24, 134, 444, 40, 20, won ? Ui.Mint : Ui.Gold, TextAnchor.MiddleCenter);
             Ui.Label(card, TimeLabel(receipt != null ? receipt.seconds : combat.Elapsed) + " 생존    " + (receipt != null ? receipt.kills : combat.Kills) + "마리 처치    Lv." + combat.Level, 24, 184, 444, 40, 17, Ui.Muted, TextAnchor.MiddleCenter);
-            Ui.Box(card, 24, 249, 444, 92, Ui.Raised);
-            Ui.Label(card, receipt == null ? "보상 저장 완료" : "골드 +" + receipt.gold + "   부품 +" + receipt.parts + (receipt.blueprints>0 ? "\n지역 설계도 +"+receipt.blueprints : "") + (receipt.gems > 0 ? " · 최초 보석 +" + receipt.gems : ""), 39, 258, 414, 74, 19, Ui.Gold, TextAnchor.MiddleCenter);
-            foreach(var text in card.GetComponentsInChildren<Text>())if(text.text.StartsWith("골드 +"))text.gameObject.AddComponent<RewardReveal>().Initialize(text);
+            Ui.Box(card, 24, 249, 444, 82, Ui.Raised);
+            if(receipt==null)Ui.Label(card,"보상 저장 완료",39,258,414,65,19,Ui.Gold,TextAnchor.MiddleCenter);
+            else
+            {
+                int[] rewards={receipt.gold,receipt.gems,receipt.parts};
+                for(int i=0;i<3;i++)
+                {
+                    CurrencyArt.Draw(card,i,30+i*146,259,44);
+                    Ui.Label(card,CurrencyArt.Names[i],80+i*146,253,91,24,12,Ui.Muted);
+                    var amount=Ui.Label(card,"+"+rewards[i].ToString("N0"),80+i*146,278,91,30,19,CurrencyArt.Tint(i));
+                    amount.gameObject.AddComponent<RewardReveal>().Initialize(amount);
+                }
+                if(receipt.blueprints>0)Ui.Label(card,"지역 설계도 +"+receipt.blueprints,36,309,420,20,12,Ui.Blue,TextAnchor.MiddleCenter);
+            }
             if(receipt!=null && receipt.report!=null && receipt.report.taskCompleted)
                 Ui.Label(card,"현장 임무 보상 포함 · 골드 +"+(receipt.report.taskChoice==2?400:200)+" / 부품 +"+(receipt.report.taskChoice==2?4:2),24,334,444,25,12,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(card,"전투 분석 · 조합 확인",24,360,444,51,BattleAnalysis,Ui.Mint,true,18);

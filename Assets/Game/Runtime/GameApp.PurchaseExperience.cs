@@ -46,8 +46,9 @@ namespace ScrapGuard
             int hero=Outfits.Hero(id);bool equipped=Outfits.Active(State,hero)==id;
             var card=Dialog(equipped?"장착 완료 · 출격 준비":"새 의상을 수집했어요",Outfits.Label(id)+" · "+Outfits.HeroName(id)+" 전용\n보유 내역에 저장됐어요. 언제든 다시 장착할 수 있어요.",880);
             var stage=Ui.Box(card,24,142,444,361,Ui.Background);stage.gameObject.AddComponent<RectMask2D>();
-            Ui.Label(stage.transform,"COLLECTION UNLOCKED",16,14,412,26,13,OutfitVisuals.Accent(id),TextAnchor.MiddleCenter);
+            Ui.Label(stage.transform,equipped?"수집 완료  →  장착 완료  →  전시하기":"수집 완료  →  장착하고 출격해 보세요",16,14,412,26,14,OutfitVisuals.Accent(id),TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<OutfitPreview>();preview.Initialize(id);preview.Ultimate();
+            Button size=null;size=Ui.Button(stage.transform,"전투 크기로 보기",121,311,202,38,()=>{preview.ToggleSize();size.GetComponentInChildren<Text>().text=preview.BattleSize?"크게 보기":"전투 크기로 보기";},Ui.Raised,true,14);
             Ui.Label(card,"전용 실루엣 · 사격 · 필살기 · 지원 등장\n외형과 연출이 바뀌며 능력치는 그대로예요.",24,521,444,61,17,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Button(card,"사격",24,600,140,43,preview.Fire,Ui.Raised,true,16);
             Ui.Button(card,"필살기",176,600,140,43,preview.Ultimate,Ui.Gold,true,16);
@@ -56,9 +57,17 @@ namespace ScrapGuard
                 if(equipped)Change(new GameCommand("customize"){hero=hero,title=State.showcaseTitle,frame=State.showcaseFrame,skin=State.selectedSkin},()=>Show("showcase"));
                 else Change(new GameCommand("outfit_equip"){skin=id},()=>{if(Outfits.Active(State,hero)==id)OutfitAcquired(id);else OutfitRoom(id);});
             },Ui.Mint,true,18);
-            Ui.Button(card,"출격 대원 선택",24,737,214,45,()=>{CloseModal();Show("heroes");},Ui.Raised,true,16);
+            Ui.Button(card,"이 모습으로 출격 준비",24,737,214,45,()=>PrepareOutfitHero(id),Ui.Raised,true,16);
             Ui.Button(card,"계속 감상하기",254,737,214,45,()=>OutfitRoom(id),Ui.Raised,true,16);
             Ui.Label(card,equipped?"출격 대원은 대원 메뉴에서 선택할 수 있어요.":"장착할 대원과 전시할 대표 대원을 직접 선택해 주세요.",24,804,444,38,13,Ui.Muted,TextAnchor.MiddleCenter);
+        }
+        void PrepareOutfitHero(int id)
+        {
+            int hero=Outfits.Hero(id);
+            if(!Outfits.Owned(State,id)||!State.heroes[hero].unlocked){OutfitRoom(id);return;}
+            System.Action select=()=>Change(new GameCommand("hero_select"){hero=hero},confirmed:()=>Show("home"));
+            if(Outfits.Active(State,hero)==id)select();
+            else Change(new GameCommand("outfit_equip"){skin=id},confirmed:select);
         }
         void UpgradeItemWithFeedback(string id)
         {

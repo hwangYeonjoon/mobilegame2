@@ -62,7 +62,7 @@ namespace ScrapGuard
         {
             if (ultimateButton == null) return;
             ultimateButton.interactable = combat.CanUltimate && !battlePaused;
-            ultimateButton.image.color = combat.CanUltimate ? Ui.Mint : Ui.Raised;
+            ultimateButton.image.color = combat.CanUltimate ? Color.Lerp(Ui.Mint,Ui.Ink,.12f+.12f*Mathf.Sin(Time.unscaledTime*3)) : Ui.Raised;
             ultimateLabel.color = combat.CanUltimate ? Ui.Background : Ui.Muted;
             ultimateLabel.text = Combat.UltimateNames[combat.Hero]+"\n"+(combat.CanUltimate ? "필살기 발동" : combat.UltimateCooldown>0 ? Mathf.CeilToInt(combat.UltimateCooldown)+"초 · "+(int)combat.UltimateCharge+"%" : "충전 "+(int)combat.UltimateCharge+"%");
             ultimateFill.rectTransform.sizeDelta = new Vector2(158*combat.UltimateCharge/100,4);

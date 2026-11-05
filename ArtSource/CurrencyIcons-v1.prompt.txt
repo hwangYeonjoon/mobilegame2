@@ -1,0 +1,6 @@
+Tool: built-in image_gen (transparent_background=true)
+Output: Assets/Resources/Art/CurrencyIcons-v1.png
+Usage: three equal horizontal atlas cells; gold / gems / parts. Preserve the generated alpha channel.
+
+Prompt:
+Use case: stylized-concept. Asset type: production mobile game currency icon sprite atlas for Scrap Guard, a friendly scrap-robot survivor game with dark navy UI. Create ONE wide horizontal atlas, transparent RGBA background, exactly THREE separated icons evenly centered in equal square cells left, center, right. Cell 1: a rich chunky golden coin with embossed hexagonal bolt emblem and two stacked coins behind, warm amber sides and bright gold rim. Cell 2: one luminous mint cyan faceted power crystal with a small dark steel collar at its base, distinct pointed diamond silhouette. Cell 3: a chunky brushed steel six-tooth gear with orange copper hex bolt center, distinct mechanical parts silhouette. Premium polished hand-painted 3D cartoon game inventory art, crisp dark navy outlines, restrained specular highlights, easy to identify at 32 pixels. All three same optical size with 18 percent padding within each cell, no overlap, centered on identical baseline, three quarter perspective. No text, no numbers, no badges, no background plates, no cast shadows outside individual icons, no extra objects. Wide 3:1 canvas. True transparent background.

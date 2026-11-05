@@ -34,11 +34,12 @@ namespace ScrapGuard
         void OutfitPurchase(int id)
         {
             if(!OutfitForSale(id)){OutfitRoom(id);return;}
-            var card=Dialog("의상을 구매할까요?",Outfits.Label(id)+" 1종 · "+Outfits.HeroName(id)+" 전용 · 대원 별도",490);
-            Ui.Label(card,"보석 600개 차감\n이동·사격·필살기 자세와 전용 연출 포함\n능력치 보너스 없음 · 구매 후 별도 장착",24,128,444,104,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Button(card,"보석 600개로 구매",24,255,444,55,()=>PurchaseOutfit(id),Ui.Gold,OutfitForSale(id) && State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
-            Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,323,444,43,()=>GemSources(Outfits.Price,()=>OutfitPurchase(id)),Ui.Raised,true,16);
-            Ui.Button(card,"체험으로 돌아가기",24,393,444,43,()=>OutfitRoom(id),Ui.Raised,true,16);
+            var card=Dialog("의상을 구매할까요?",Outfits.Label(id)+" 1종 · "+Outfits.HeroName(id)+" 전용 · 대원 별도",650);
+            Ui.Label(card,"이동·사격·필살기·지원 등장 연출 포함\n능력치 보너스 없음 · 구매 후 장착할 수 있어요.",24,128,444,68,17,Ui.Ink,TextAnchor.MiddleCenter);
+            PurchaseBalance(card,1,Outfits.Price,State.gems,210);
+            Ui.Button(card,"보석 600개로 구매",24,378,444,55,()=>PurchaseOutfit(id),Ui.Gold,OutfitForSale(id) && State.gems>=Outfits.Price && State.gemDebt==0 && State.heroes[Outfits.Hero(id)].unlocked,19);
+            Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,451,444,48,()=>GemSources(Outfits.Price,()=>OutfitPurchase(id)),Ui.Raised,true,16);
+            Ui.Button(card,"체험으로 돌아가기",24,526,444,48,()=>OutfitRoom(id),Ui.Raised,true,16);
         }
     }
     // Standalone presentation: deliberately holds no GameState, Economy, replay or network object.

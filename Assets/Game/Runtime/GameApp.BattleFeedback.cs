@@ -67,12 +67,12 @@ namespace ScrapGuard
     }
     public sealed class RewardReveal : MonoBehaviour
     {
-        float started;Text label;string full;
-        public void Initialize(Text text){label=text;full=text.text;started=Time.unscaledTime;}
+        float started;Text label;string full;Color tint;
+        public void Initialize(Text text){label=text;full=text.text;tint=text.color;started=Time.unscaledTime;}
         void Update()
         {
             if(label==null)return;
-            float t=Mathf.Clamp01((Time.unscaledTime-started)/.35f);label.color=Color.Lerp(new Color(1,1,1,0),Ui.Gold,t);
+            float t=Mathf.Clamp01((Time.unscaledTime-started)/.35f);label.color=new Color(tint.r,tint.g,tint.b,tint.a*t);
             label.rectTransform.localScale=Vector3.one*Mathf.Lerp(.9f,1,t);
             if(t>=1){label.text=full;enabled=false;}
         }

@@ -46,12 +46,14 @@ namespace ScrapGuard
         {
             Track("offer_view",offer.Id);
             var card=Dialog(offer.Name,"구성 안내 · 실제 가격은 Play 상점에서 확인해요.",650);
-            Ui.Label(card,offer.ProposedWon.ToString("N0")+"원",24,140,444,62,36,Ui.Gold,TextAnchor.MiddleCenter);
+            if(offer.Gems>0)CurrencyArt.Draw(card,1,56,130,86);
+            else Ui.Label(card,"AD\nSKIP",56,138,86,76,27,Ui.Gold,TextAnchor.MiddleCenter);
+            Ui.Label(card,offer.Gems>0?offer.Gems.ToString("N0")+" 보석":"영구 광고 스킵",160,141,286,61,30,Ui.Mint,TextAnchor.MiddleCenter);
             string benefit=offer.Gems>0?"보석 "+offer.Gems.ToString("N0")+"개 확정 지급\n무료 보석과 사용 효력이 같아요.\n캐릭터·의상·장비·부품을 선택해 구매해요.":"광고 연결 후 제공할 영구 권리 · 계정 복원 지원\n결과 추가 골드 하루 3회 + 부품 하루 2회\n보상 횟수를 늘리지 않고 광고 시청만 생략해요.";
             Ui.Label(card,benefit,24,227,444,120,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(card,"표시 금액은 제안가이며 청구 금액이 아닙니다.\n실제 결제 전 Google Play 가격을 확인해 주세요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,"Google Play에 연결하면 판매 중인 상품과\n실제 결제 가격을 확인할 수 있어요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,"Play 상점 · 가격 확인",24,460,444,54,ConnectPlayBilling,Ui.Mint,Online,17);
-            Ui.Button(card,"관심 표시 · 결제 아님",24,532,444,54,()=>{Track("offer_interest",offer.Id);Toast(research.Data.consent?"이 기기의 테스트 기록에 남겼어요.":"관심도 기록은 설정에서 동의한 경우에만 저장돼요.");},Ui.Mint,true,17);
+            Ui.Button(card,"상점으로 돌아가기",24,532,444,54,()=>{shopTab=2;Show("shop");},Ui.Raised,true,17);
         }
         void ConceptRoom(){OutfitCollection();}
         void SkillTrialHub()

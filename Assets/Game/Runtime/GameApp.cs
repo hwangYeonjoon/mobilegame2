@@ -16,7 +16,8 @@ namespace ScrapGuard
         public GameState State { get { return Store.State; } }
         public RectTransform Root { get; private set; }
         RectTransform screen, modal, toastRoot;
-        Text wallet, toastLabel;
+        Text toastLabel;
+        readonly Text[] walletAmounts = new Text[3];
         float toastTime;
         string page = "home";
         int selectedStage;
@@ -128,8 +129,8 @@ namespace ScrapGuard
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
             Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 380, 40, 30);
             Ui.Button(screen, "설정", 444, 43, 72, 45, Settings, Ui.Raised, true, 16);
-            Ui.Box(screen, 24, 104, 492, 52, Ui.Panel);
-            wallet = Ui.Label(screen, "", 40, 106, 460, 48, 16, Ui.Gold); RefreshWallet();
+            for(int i=0;i<3;i++)walletAmounts[i]=CurrencyArt.Balance(screen,i,24+i*166,104,160);
+            RefreshWallet();
             switch (target) { case "gear": Gear(); break; case "heroes": Heroes(); break; case "shop": Shop(); break; case "showcase": Showcase(); break; case "weekly": WeeklyHub(); break; default: Home(); break; }
             string[] names = { "상점", "장비", "출격", "대원", "전시실" }, pages = { "shop", "gear", "home", "heroes", "showcase" };
             Ui.Box(screen, 16, 864, 508, 74, Ui.Panel);
@@ -142,7 +143,12 @@ namespace ScrapGuard
         }
         void RefreshWallet()
         {
-            if (wallet != null) wallet.text = "골드 " + State.gold.ToString("N0") + "     ◆ " + State.gems.ToString("N0") + "     부품 " + State.parts;
+            int[] amounts={State.gold,State.gems,State.parts};
+            for(int i=0;i<3;i++)if(walletAmounts[i]!=null)
+            {
+                walletAmounts[i].text=amounts[i].ToString("N0");
+                walletAmounts[i].resizeTextForBestFit=true;walletAmounts[i].resizeTextMinSize=11;walletAmounts[i].resizeTextMaxSize=17;
+            }
         }
         void Home()
         {

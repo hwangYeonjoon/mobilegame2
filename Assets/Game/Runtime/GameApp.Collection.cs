@@ -114,54 +114,109 @@ namespace ScrapGuard
             Ui.Label(card, "골드 " + (hero.level * 500).ToString("N0") + " · 부품 " + hero.level * 3, 24, 255, 444, 40, 18, Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Button(card, hero.level == 30 ? "최대 레벨" : "레벨업", 24, 343, 444, 59, UpgradeHeroWithFeedback, null, hero.level < 30);
         }
-        bool shopSupplies;
+        int shopTab;
+        bool shopSupplies { get { return shopTab==1; } set { shopTab=value?1:0; } }
+        bool shopGear;
+        readonly float[] shopOffsets=new float[4];
         void Shop()
         {
-            Ui.Button(screen,"스타일 컬렉션",24,176,238,46,() => { shopSupplies = false; Show("shop"); },shopSupplies ? Ui.Raised : Ui.Mint,true,17);
-            Ui.Button(screen,"보급 · 장비",278,176,238,46,() => { shopSupplies = true; Show("shop"); },shopSupplies ? Ui.Mint : Ui.Raised,true,17);
-            if (!shopSupplies) { StyleShop(); return; }
-            var list = Ui.Scroll(screen, 24, 238, 492, 608, 2520);
-            Ui.Label(list, "보급품", 0, 0, 492, 32, 22);
-            ShopRow(list, 45, "공용 부품 ×20", "매일 1회 · 골드로 성장 재료 보충", "2,000 골드", () => ConfirmBuy("parts_gold", "부품 20개", "골드 2,000"), State.dailyPartsPurchases < 1);
-            ShopRow(list, 154, "공용 부품 ×100", "매일 1회 · 확정 수량", "◆ 100", () => ConfirmBuy("parts_gems", "부품 100개", "보석 100"), State.dailyGemPartsPurchases < 1);
-            ShopRow(list, 263, "추가 보급 부품 ×10", "선택 보상 · 오늘 " + State.dailyRewardParts + "/2회", State.demoAdSkip || State.adSkip ? "스킵 수령" : Online ? "광고 보상" : "체험 안내", () => RequestReward("parts"), State.dailyRewardParts < 2);
-            Ui.Label(list, "확정 장비 · 일반", 0, 391, 492, 36, 22);
-            Ui.Label(list, "하루 총 2개 · 구매 " + State.dailyItemPurchases + "/2", 0, 427, 492, 27, 14, Ui.Muted);
-            int[] sale = { 1, 2, 3, 4, 5, 7, 8, 10, 11 };
-            for (int i = 0; i < sale.Length; i++)
+            string[] tabs={"의상 · 스타일","성장 · 장비","보석 · 광고"};
+            for(int i=0;i<3;i++)
             {
-                int definition = sale[i];
-                ShopRow(list, 465 + i * 109, Catalog.Items[definition].Name, Catalog.Items[definition].Description, "3,000 골드",
-                    () => ConfirmBuy("normal:" + definition, Catalog.Items[definition].Name, "골드 3,000"), State.dailyItemPurchases < 2);
+                int tab=i;
+                Ui.Button(screen,tabs[i],24+i*166,176,160,46,()=>{shopTab=tab;Show("shop");},shopTab==i?Ui.Mint:Ui.Raised,true,16);
             }
-            Ui.Label(list, "희귀 장비 · 확정 구매", 0, 1460, 492, 38, 22);
-            ShopRow(list, 1508, "희귀 충격 발사기", "능력치 ×1.35 · 장비별 영구 1회", "◆ 600", () => ConfirmBuy("rare:2", "희귀 충격 발사기", "보석 600"), !State.purchasedRare.Contains(2) && !State.items.Exists(i => i.definition == 2 && i.rarity == 2));
-            Ui.Label(list, "Google Play 상품 미리보기", 0, 1636, 330, 38, 22);
-            Ui.Button(list,"보석 내역",356,1635,136,38,GemWalletPanel,Ui.Raised,true,14);
-            Ui.Label(list, "상품 구성 · 실제 구매 가능 여부와 가격은 Play 상점에서 확인해요.", 0, 1677, 492, 38, 13, Ui.Muted);
+            if(shopTab==0){StyleShop();return;}
+            if(shopTab==2){CurrencyShop();return;}
+            Ui.Button(screen,"성장 재료",24,238,238,43,()=>{shopGear=false;Show("shop");},shopGear?Ui.Raised:Ui.Mint,true,16);
+            Ui.Button(screen,"확정 장비",278,238,238,43,()=>{shopGear=true;Show("shop");},shopGear?Ui.Mint:Ui.Raised,true,16);
+            if(!shopGear)
+            {
+                var panel=Ui.Box(screen,24,297,492,145,Ui.Panel).transform;
+                CurrencyArt.Draw(panel,2,16,22,98);
+                Ui.Label(panel,"다음 작전을 위한 정비",130,20,338,36,23);
+                Ui.Label(panel,"골드와 부품으로 장비·대원을 강화해요.\n구매한 재료는 보유량에 바로 더해져요.",130,65,338,57,16,Ui.Muted);
+                var list=ShopScroll(458,386,386,0);
+                ShopRow(list,0,"공용 부품 ×20","매일 1회 · 골드로 성장 재료 보충","2,000 골드",()=>ConfirmBuy("parts_gold","부품 20개","골드 2,000"),State.dailyPartsPurchases<1);
+                ShopRow(list,110,"공용 부품 ×100","매일 1회 · 확정 수량","100 보석",()=>ConfirmBuy("parts_gems","부품 100개","보석 100"),State.dailyGemPartsPurchases<1);
+                Ui.Button(list,"장비 강화로 이동",0,230,238,53,()=>Show("gear"),Ui.Raised,true,17);
+                Ui.Button(list,"대원 성장으로 이동",254,230,238,53,()=>Show("heroes"),Ui.Raised,true,17);
+                Ui.Label(list,"무료 부품은 보석 · 광고 탭에서 받을 수 있어요.",0,305,492,43,15,Ui.Muted,TextAnchor.MiddleCenter);
+                return;
+            }
+            var gearList=ShopScroll(297,547,1304,1);
+            Ui.Label(gearList,"일반 장비 · 하루 총 2개",0,0,330,35,22);
+            Ui.Label(gearList,"오늘 "+State.dailyItemPurchases+" / 2",340,0,152,35,16,Ui.Muted,TextAnchor.MiddleRight);
+            int[] sale={1,2,3,4,5,7,8,10,11};
+            for(int i=0;i<sale.Length;i++)
+            {
+                int definition=sale[i];
+                ShopRow(gearList,48+i*109,Catalog.Items[definition].Name,Catalog.Items[definition].Description,"3,000 골드",
+                    ()=>ConfirmBuy("normal:"+definition,Catalog.Items[definition].Name,"골드 3,000"),State.dailyItemPurchases<2);
+            }
+            Ui.Label(gearList,"희귀 장비 · 확정 구매",0,1040,492,35,22);
+            ShopRow(gearList,1086,"희귀 충격 발사기","능력치 ×1.35 · 장비별 영구 1회","600 보석",()=>ConfirmBuy("rare:2","희귀 충격 발사기","보석 600"),!State.purchasedRare.Contains(2)&&!State.items.Exists(i=>i.definition==2&&i.rarity==2));
+            Ui.Button(gearList,"보유 장비 확인 · 판매",0,1210,492,53,()=>Show("gear"),Ui.Raised,true,17);
+        }
+        RectTransform ShopScroll(float y,float height,float contentHeight,int slot)
+        {
+            var list=Ui.Scroll(screen,24,y,492,height,contentHeight);
+            list.anchoredPosition=new Vector2(0,Mathf.Clamp(shopOffsets[slot],0,Mathf.Max(0,contentHeight-height)));
+            list.parent.GetComponent<UnityEngine.UI.ScrollRect>().onValueChanged.AddListener(_=>{if(list!=null&&list.gameObject.activeInHierarchy)shopOffsets[slot]=list.anchoredPosition.y;});
+            return list;
+        }
+        void CurrencyShop()
+        {
+            var list=ShopScroll(238,606,1120,2);
+            var free=Ui.Box(list,0,0,492,146,Ui.Panel).transform;
+            CurrencyArt.Draw(free,2,12,24,90);
+            Ui.Label(free,"무료 보급 · 부품 10개",116,16,355,34,22);
+            Ui.Label(free,"오늘 "+State.dailyRewardParts+" / 2회 · 선택 보상",116,52,355,27,15,Ui.Muted);
+            Ui.Button(free,State.dailyRewardParts>=2?"오늘 수령 완료":State.demoAdSkip||State.adSkip?"광고 없이 받기":Online?"광고 보고 받기":"보상 체험 안내",116,91,352,42,()=>RequestReward("parts"),Ui.Mint,State.dailyRewardParts<2,17);
+            Ui.Button(list,"무료 보석 획득처",0,161,238,46,()=>GemSources(0,()=>{shopTab=2;Show("shop");}),Ui.Raised,true,16);
+            Ui.Button(list,"보석 잔액 · 내역",254,161,238,46,GemWalletPanel,Ui.Raised,true,16);
+            Ui.Label(list,"보석 충전 · 상품 구성",0,227,492,38,24);
+            Ui.Label(list,"실제 가격과 판매 여부는 Google Play에서 확인해요.",0,266,492,30,14,Ui.Muted);
             for(int i=0;i<CommerceCatalog.Offers.Length;i++)
             {
-                var offer=CommerceCatalog.Offers[i];
-                ShopRow(list,1730+i*109,offer.Name,"테스트 제안가 "+offer.ProposedWon.ToString("N0")+"원", "혜택 보기",()=>StoreOfferPanel(offer));
+                var offer=CommerceCatalog.Offers[i];float y=310+i*130;
+                var row=Ui.Box(list,0,y,492,116,Ui.Panel).transform;
+                if(offer.Gems>0)CurrencyArt.Draw(row,1,12,19,78);
+                else Ui.Label(row,"AD\nSKIP",12,22,78,70,22,Ui.Gold,TextAnchor.MiddleCenter);
+                Ui.Label(row,offer.Name,104,12,360,32,22);
+                Ui.Label(row,offer.Gems>0?"확정 수량 · 원하는 상품에 사용":"보상 횟수 유지 · 광고 시청만 생략",104,46,360,26,14,Ui.Muted);
+                Ui.Button(row,"구성 · 가격 확인",270,72,204,40,()=>StoreOfferPanel(offer),Ui.Raised,true,15);
             }
-            Ui.Button(list,"의상 컬렉션 · 수집 목표와 대원별 장착",0,2300,492,55,ConceptRoom,Ui.Mint,true,18);
-            Ui.Label(list,"무료 보상과 보석 상품의 구매 효력은 같아요.\n장비 판매는 장비 → 관리에서 진행하세요.\n보석을 현금으로 환전할 수 없습니다.",0,2380,492,105,16,Ui.Muted);
+            Ui.Button(list,"Google Play 연결 · 구매 복원",0,979,492,53,ConnectPlayBilling,Ui.Mint,Online,17);
+            Ui.Label(list,"무료·유료 보석의 구매 효력은 같아요.\n보석은 현금으로 환전할 수 없어요.",0,1046,492,59,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void ShopRow(Transform parent, float y, string title, string description, string action, Action clicked, bool enabled = true)
         {
             var row = Ui.Box(parent, 0, y, 492, 98, Ui.Panel).transform;
             Ui.Label(row, title, 16, 12, 310, 37, 20);
-            Ui.Label(row, description, 16, 52, 307, 34, 13, Ui.Muted);
+            Ui.Label(row, description, 16, 52, 307, 34, 15, Ui.Muted);
             Ui.Button(row, enabled ? action : "완료", 338, 22, 138, 53, clicked, Ui.Raised, enabled, 15);
         }
         void ConfirmBuy(string offer, string name, string price)
         {
-            var card = Dialog("구매 확인", "확정 구성 · 화면에 표시된 재화만 사용합니다.", 470);
+            var card = Dialog("구매 확인", "확정 구성 · 화면에 표시된 재화만 사용합니다.", 600);
             Ui.Label(card, name, 24, 128, 444, 45, 25, Ui.Ink, TextAnchor.MiddleCenter);
-            Ui.Label(card, price, 24, 182, 444, 40, 21, Ui.Gold, TextAnchor.MiddleCenter);
             int gems=offer=="hero"?1200:offer=="parts_gems"?100:offer.StartsWith("rare:")?600:0;
-            Ui.Button(card, "구매하기", 24, 269, 444, 62, () => PurchaseSupply(offer,name),null,gems==0 || State.gems>=gems && State.gemDebt==0);
-            if(gems>0)Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,365,444,51,()=>GemSources(gems,()=>ConfirmBuy(offer,name,price)),Ui.Raised,true,16);
+            int cost=gems>0?gems:offer=="parts_gold"?2000:3000;
+            int balance=gems>0?State.gems:State.gold;
+            PurchaseBalance(card,gems>0?1:0,cost,balance,190);
+            bool enough=balance>=cost&&(gems==0||State.gemDebt==0);
+            Ui.Button(card, enough?"구매하기":gems>0&&State.gemDebt>0?"환불 조정 내역을 확인해 주세요":"재화가 부족해요", 24, 360, 444, 57, () => PurchaseSupply(offer,name),null,enough);
+            if(gems>0)Ui.Button(card,"무료 보석 획득처 · 부족분 확인",24,434,444,48,()=>GemSources(gems,()=>ConfirmBuy(offer,name,price)),Ui.Raised,true,16);
+            Ui.Button(card,"취소 · 상점으로",24,505,444,48,()=>Show("shop"),Ui.Raised,true,17);
+        }
+        void PurchaseBalance(Transform card,int kind,int cost,int balance,float y)
+        {
+            var panel=Ui.Box(card,24,y,444,139,Ui.Background).transform;
+            CurrencyArt.Draw(panel,kind,18,24,82);
+            Ui.Label(panel,CurrencyArt.Names[kind]+" "+cost.ToString("N0")+"개 사용",116,16,310,32,23,CurrencyArt.Tint(kind));
+            Ui.Label(panel,"현재 보유  "+balance.ToString("N0"),116,57,310,26,17,Ui.Muted);
+            Ui.Label(panel,balance>=cost?"구매 후  "+(balance-cost).ToString("N0"):"부족한 수량  "+(cost-balance).ToString("N0"),116,95,310,27,18,balance>=cost?Ui.Ink:Ui.Red);
         }
     }
 }
