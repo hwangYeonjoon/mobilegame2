@@ -12,7 +12,7 @@ Downloaded directly from https://opengameart.org/sites/default/files/ with the a
 
 Sound effects by **Kenney**, **CC0 1.0**.
 Creator license pages: https://kenney.nl/assets/impact-sounds and https://kenney.nl/assets/sci-fi-sounds and https://kenney.nl/assets/rpg-audio
-Downloaded byte-preserving copies from the public mirror https://github.com/GeorgeQLe/assets-sfx-combat at commit 9662dc1bed3b06ae753045915f9accfac044c7ce, under assets/kenney/PACK/Audio/.
+Official creator ZIP distributions downloaded and verified on 2026-11-06. OriginalSfx files were replaced from these official archives; all 12 matched the previous copies byte for byte. Exact URLs, archive hashes and per-file comparisons are in official-provenance.json. Unmodified creator license files are in OfficialLicenses/. Runtime WAV files therefore need no sample replacement.
 
 | File | Pack | Original |
 | --- | --- | --- |
@@ -32,3 +32,5 @@ Downloaded byte-preserving copies from the public mirror https://github.com/Geor
 License: https://creativecommons.org/publicdomain/zero/1.0/
 Legal text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
 Attribution is included in the game audio options. Music files are renamed, not remixed. Effect originals are preserved in OriginalSfx/. Runtime effects are mono 44.1 kHz PCM WAV converted with FFmpeg and gain 0.6 to leave mixing headroom; no samples are synthesized. SHA-256 and byte sizes are in manifest.json. No payment or paid asset account was used. The previous generated SalvageDrive loop is retained as historical source and no longer selected for gameplay.
+
+0.23 import update: music uses Vorbis quality 0.25 and 32,000 Hz, stereo streaming. Source OGG files and their hashes remain unchanged. The build-size audit reimports the previous quality 0.5 / preserved sample rate for a baseline signed AAB, then restores optimized import settings. Both archives use the existing internal-test signing path, not a relaxed production build guard; neither is uploaded automatically.

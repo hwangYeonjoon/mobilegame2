@@ -27,6 +27,11 @@ if len(ready) != 1:
     (a.output / 'status.json').write_text(json.dumps({'status': 'not_tested', 'reason': 'Exactly one authorized Android device is required.'}, indent=2))
     raise SystemExit('No result: connect exactly one authorized Android device, run a battle, then retry.')
 emulator = run('shell', 'getprop', 'ro.kernel.qemu').strip() == '1'
+initial = subprocess.run([a.adb, 'shell', 'pidof', a.package], capture_output=True, timeout=30)
+if initial.returncode != 0:
+    (a.output / 'status.json').write_text(json.dumps({'status': 'app_not_running', 'emulator': emulator, 'samples': [], 'reason': 'Launch the requested package and start a battle before collecting evidence.'}, indent=2))
+    raise SystemExit('No performance result: requested app is not running.')
+
 start = time.monotonic()
 samples = []
 for index in range(a.samples):
@@ -44,7 +49,7 @@ for index in range(a.samples):
     print(f'Sample {index+1}/{a.samples} collected; emulator={emulator}', flush=True)
     if index+1 < a.samples:
         time.sleep(max(0, (index+1)*a.interval-(time.monotonic()-start)))
-status = {'status': 'emulator_only' if emulator else 'evidence_collected', 'emulator': emulator,
+status = {'status': 'incomplete_app_stopped' if not all(s['app_running'] for s in samples) else 'emulator_only' if emulator else 'evidence_collected', 'emulator': emulator,
           'model': run('shell', 'getprop', 'ro.product.model').strip(), 'samples': samples,
           'android_sdk': run('shell', 'getprop', 'ro.build.version.sdk').strip(),
           'limits': 'Manual review required. Unity GL frames may not be covered by gfxinfo; compare in-game frame samples. Touch, pause/resume, heat and sustained gameplay still need observation.'}

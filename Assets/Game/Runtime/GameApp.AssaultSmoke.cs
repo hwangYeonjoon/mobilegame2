@@ -69,6 +69,11 @@ namespace ScrapGuard
             if(Resources.Load<Texture2D>("Art/ContinuousFloor-v1")?.wrapMode!=TextureWrapMode.Mirror)smokeErrors.Add("Floor is not seam-safe mirrored texture");
             foreach(string music in new[]{"Factory","Overdrive","Boss"})if(Resources.Load<AudioClip>("Audio/Licensed/"+music)==null)smokeErrors.Add("Missing music "+music);
             for(int i=0;i<12;i++)if(CombatSoundBank.Get(i)==null)smokeErrors.Add("Missing licensed sound "+i);
+            combat.Elapsed=combat.Duration-32;combat.Choosing=false;combat.Tick(.05f,new V2());RenderBattle();yield return Capture("11c-boss-warning");
+            combat.Elapsed=combat.Duration-30;combat.Choosing=false;combat.Tick(.05f,new V2());RenderBattle();yield return Capture("11d-boss-arena");
+            if(!combat.BossArenaActive||!InBattleView(combat.Enemies.Find(e=>e.finalBoss).position,0))smokeErrors.Add("Boss arena failed to keep boss in view");
+            if(bossText.transform.parent!=bossBackdrop.transform||bossFill.transform.parent!=bossBackdrop.transform)smokeErrors.Add("Boss HUD escaped its panel");
+            if(ultimateLabel.text.Contains("\n"))smokeErrors.Add("Ultimate button overflow risk");
             DrawReviveChoice();yield return Capture("12-revive-choice");CloseModal();
             if(Resources.Load<AudioClip>("Audio/Licensed/Factory")==null)smokeErrors.Add("Missing combat music asset");
             combat=null;Show("home");yield return Capture("13-home-return");

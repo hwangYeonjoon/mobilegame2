@@ -63,7 +63,7 @@ namespace ScrapGuard
             battlePaused = choicesShown = resultShown = dragging = false;reviveDeclined=revivePrompt=false;
             CloseModal(); Ui.Clear(screen); enemyViews.Clear(); bulletViews.Clear(); pickupViews.Clear(); hazardViews.Clear(); floating.Clear(); saws.Clear();
             enemyPool.Clear(); bulletPool.Clear(); pickupPool.Clear(); hazardPool.Clear();
-            var viewport=Ui.Rect(screen,"Battle viewport",0,-menuExtra/2,540,MenuHeight);
+            var viewport=Ui.Rect(screen,"Battle viewport",0,-menuExtra/2,540,MenuHeight-176);
             viewport.gameObject.AddComponent<RectMask2D>();
             arena = Ui.Rect(viewport, "Arena", 0, menuExtra/2, 540, 960);
             scenery=ArenaScenery.Build(arena,stage,combat.Challenge);
@@ -93,7 +93,7 @@ namespace ScrapGuard
             playerLocator=CombatRing.Create(arena,58,Ui.Mint,.055f);
             SetupCombatEffects();SetupBattleClarity();turretArt=twinTurretArt=null;magnetField=null;
             Ui.Box(screen,12,12,516,76,new Color(.02f,.04f,.06f,.8f),true);
-            Ui.Box(screen,12,824,516,132,new Color(.02f,.04f,.06f,.85f),true);
+            Ui.Box(screen,0,824,540,136,new Color(.02f,.04f,.06f,1),false);
             Ui.Button(screen, "Ⅱ", 451, 23, 65, 50, PauseBattle, Ui.Raised, true, 22);
             timeText = Ui.Label(screen, "00:00", 24, 17, 350, 34, 27);
             killText = Ui.Label(screen, "처치 0", 24, 828, 135, 24, 14, Ui.Muted, TextAnchor.MiddleRight);
@@ -114,15 +114,15 @@ namespace ScrapGuard
             guideBackdrop=Ui.Box(screen,32,123,476,43,new Color(.035f,.055f,.08f,.92f));
             guideHint=Ui.Label(screen,"",44,125,452,39,15,Ui.Ink,TextAnchor.MiddleCenter);
             bossBackdrop=Ui.Box(screen,72,92,396,38,new Color(.035f,.055f,.08f,.78f),true);
-            bossText = Ui.Label(screen, "", 80, 125, 380, 34, 14, Ui.Red, TextAnchor.MiddleCenter);
-            bossFill = Ui.Box(screen, 80, 160, 0, 7, Ui.Red);
+            bossText = Ui.Label(bossBackdrop.transform, "", 8, 2, 380, 25, 14, Ui.Red, TextAnchor.MiddleCenter);
+            bossFill = Ui.Box(bossBackdrop.transform, 8, 30, 0, 5, Ui.Red);
             joystick = Ui.Disc(screen, 64, 846, 95, new Color(.5f, .8f, .8f, .12f)).rectTransform;
             stick = Ui.Disc(joystick, 30, 30, 35, new Color(.6f, 1, .8f, .35f)).rectTransform;
 
             ultimateButton = Ui.Button(screen,"",345,899,171,49,TriggerUltimate,Ui.Raised,true,17);
             ultimateLabel = ultimateButton.GetComponentInChildren<Text>();
-            Ui.Box(screen,351,934,158,4,Ui.Background,false);
-            ultimateFill = Ui.Box(screen,348,950,79,4,Ui.Mint,false);
+            Ui.Box(screen,351,943,158,3,Ui.Background,false);
+            ultimateFill = Ui.Box(screen,351,943,79,3,Ui.Mint,false);
             dangerHint=Ui.Label(screen,"",24,804,492,27,15,Ui.Gold,TextAnchor.MiddleCenter);
             var dangerShadow=dangerHint.gameObject.AddComponent<Shadow>();dangerShadow.effectColor=Ui.Background;dangerShadow.effectDistance=new Vector2(1,-1);
             SetupSupportButton();SetupFieldTask();SetupBattleFeedback();SetupOperationPresentation();SetupAssaultPresentation();
@@ -198,7 +198,7 @@ namespace ScrapGuard
         void RenderBattle()
         {
             float presentationDelta=Mathf.Max(0,combat.Elapsed-presentationTime);presentationTime=combat.Elapsed;
-            UpdateVisualBudget();scenery.Render(combat.Elapsed);particles.Advance(presentationDelta);
+            UpdateVisualBudget();scenery.Render(combat.Elapsed,combat.BossArenaActive);particles.Advance(presentationDelta);
             RenderPlayerMotion();
             drone.gameObject.SetActive(combat.Skills[3] > 0 || combat.Hero==0);
             drone.anchoredPosition = new Vector2(combat.DronePosition.x - 10, -(combat.DronePosition.y - 14));
@@ -306,8 +306,8 @@ namespace ScrapGuard
                 warning.sprite=h.width>0?null:Ui.Circle;warning.type=Image.Type.Simple;
                 warning.color = new Color(1, .18f, .12f, .10f + .10f * Mathf.Abs(Mathf.Sin(h.delay * 12)));
                 var boundary=view.GetComponentInChildren<WarningShape>();boundary.rectTransform.sizeDelta=new Vector2(width,height);boundary.SetCircle(h.width<=0);
-                boundary.color=Color.Lerp(Ui.Hex("FF735B"),Ui.Hex("FFF0B0"),.3f*Mathf.Abs(Mathf.Sin(h.delay*12)));
-                var text=view.GetComponentInChildren<Text>();text.rectTransform.sizeDelta=new Vector2(width,height);
+                boundary.color=h.delay<.65f?Ui.Hex("FFF0B0"):Ui.Hex("FF735B");
+                var text=view.GetComponentInChildren<Text>();text.rectTransform.sizeDelta=new Vector2(width,height);text.text=h.delay<.65f?"!":Mathf.CeilToInt(h.delay).ToString();
             }
             Recycle(hazardViews, hazardPool);
             bool inDanger=false;
@@ -345,7 +345,7 @@ namespace ScrapGuard
                 else
                 {
                     visual=TakeEffect(0);visual.sizeDelta=Vector2.one*Mathf.Max(8,effect.radius*2);
-                    var ring=visual.GetComponent<CombatRing>();ring.color=effect.kind>=11?new Color(.65f,1,.95f,.95f):effect.kind==4?new Color(.4f,.86f,1,.65f):new Color(1,.72f,.3f,.5f);
+                    var ring=visual.GetComponent<CombatRing>();ring.color=effect.kind>=11?new Color(.65f,1,.95f,combat.FinalBossActive?.18f:.6f):effect.kind==4?new Color(.4f,.86f,1,combat.FinalBossActive?.1f:.3f):new Color(1,.72f,.3f,.25f);
                     ring.Thickness=effect.kind==4?.022f:.04f;ring.SetVerticesDirty();
                     visual.anchoredPosition=new Vector2(effect.position.x,-effect.position.y);
                 }
@@ -355,7 +355,7 @@ namespace ScrapGuard
             RenderModEffects();
             RenderUltimateHud();
             RenderGuideHint();
-            RenderSupport();RenderFieldTask();RenderBattleFeedback();RenderOperationPresentation();RenderAssaultPresentation();RenderUnifiedNotice();
+            RenderSupport();RenderFieldTask();RenderBattleFeedback();RenderOperationPresentation();RenderAssaultPresentation();RenderUnifiedNotice();hazardLayer.SetAsLastSibling();
             for (int i = floating.Count - 1; i >= 0; i--)
             {
                 var f = floating[i]; f.life -= presentationDelta;

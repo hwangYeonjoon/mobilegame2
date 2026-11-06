@@ -1,0 +1,98 @@
+{
+  "verified": "2026-11-06",
+  "packs": [
+    {
+      "pack": "impact-sounds",
+      "url": "https://kenney.nl/media/pages/assets/impact-sounds/87b4ddecda-1677589768/kenney_impact-sounds.zip",
+      "archive_sha256": "029d734af1582474edf3a694d1b0cebc97c1c152f2f39fa34d4c2bafc5de77f8",
+      "files": [
+        {
+          "original": "impactMetal_light_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Hit.ogg",
+          "same_as_previous": true,
+          "sha256": "33b5e6e37c6e9d54e07bf5a89b12c76e879f40c1ea83cdd82714df1d6f9fec6d"
+        },
+        {
+          "original": "impactMetal_heavy_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Break.ogg",
+          "same_as_previous": true,
+          "sha256": "e07045693e4a2b3d165c424e3dab4c781d9ff8880a386880ac89a51315d7f831"
+        },
+        {
+          "original": "impactMetal_medium_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Repair.ogg",
+          "same_as_previous": true,
+          "sha256": "a96f879fec0864a8938e0c745b6996a6c5679c16a234ce31a01cc995e8401003"
+        }
+      ]
+    },
+    {
+      "pack": "sci-fi-sounds",
+      "url": "https://kenney.nl/media/pages/assets/sci-fi-sounds/6b296f9ecf-1677589334/kenney_sci-fi-sounds.zip",
+      "archive_sha256": "119340f351a5098ad814f78719438c0da355a9ce8a4c8a3af6a8d48aa3d49e04",
+      "files": [
+        {
+          "original": "forceField_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Growth.ogg",
+          "same_as_previous": true,
+          "sha256": "c2916f2a062c8ddd1aca2826d134fe90847037db31342726ffb0f9097afe339c"
+        },
+        {
+          "original": "laserSmall_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Shot.ogg",
+          "same_as_previous": true,
+          "sha256": "72b589eadd41781257ac859e4f4d030222e623390e4a1a83f6d05329a6e026f1"
+        },
+        {
+          "original": "laserLarge_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Heavy.ogg",
+          "same_as_previous": true,
+          "sha256": "a56d95794cd732d6c2d66ce488c14cf557fe526c282897c9a77675c2bd9b77e6"
+        },
+        {
+          "original": "explosionCrunch_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Ultimate.ogg",
+          "same_as_previous": true,
+          "sha256": "4b597d658d0ae101f0a030fbeea5fc3a4292ab85f017470a8254a8e7959cbd69"
+        },
+        {
+          "original": "engineCircular_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Assembly.ogg",
+          "same_as_previous": true,
+          "sha256": "8ab85f9fa85e9e692287f98acb36b9ac3ba15313b007c039055e286b736f4e3a"
+        },
+        {
+          "original": "forceField_001.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Shield.ogg",
+          "same_as_previous": true,
+          "sha256": "5574e69dd04e5f59322c5ddffde5978f077b09170ae5e29cec0bd9901828cd90"
+        },
+        {
+          "original": "laserRetro_000.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Arc.ogg",
+          "same_as_previous": true,
+          "sha256": "2a203a007d24cc7e607eb8bec1d86bedba7f551911217ce2c4c1f31393aed32c"
+        },
+        {
+          "original": "laserSmall_002.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Frost.ogg",
+          "same_as_previous": true,
+          "sha256": "e70139466c3e801358c9041ee17db7ff82c0e9a9cdf44647ad0ea6b9f8458f63"
+        }
+      ]
+    },
+    {
+      "pack": "rpg-audio",
+      "url": "https://kenney.nl/media/pages/assets/rpg-audio/8e99002d76-1677590336/kenney_rpg-audio.zip",
+      "archive_sha256": "6dbeaf8544da958d8f2adcb4a4a4b76c1ade34a05f8ab9edccd327da7375f38b",
+      "files": [
+        {
+          "original": "handleCoins.ogg",
+          "stored": "ArtSource/Audio/OriginalSfx/Pickup.ogg",
+          "same_as_previous": true,
+          "sha256": "8a91f969e932df709df80ee124d86a51389eed9b67f22e5e716bc2bbf60d8dab"
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ class Program
 {
     static int Main(string[] args)
     {
+        if (args.Length==2 && args[0]=="--balance-audit") return BalanceAudit.Run(args[1]);
         if (args.Length==2 && args[0]=="--case") { CoreSpecification.Run(args[1]);Console.WriteLine("PASS "+args[1]);return 0; }
         if (args.Length==2 && args[0]=="--verify-replay") return VerifyRuntimeReplay(args[1]);
         if (Array.IndexOf(args, "--simulate") >= 0) return Simulate();

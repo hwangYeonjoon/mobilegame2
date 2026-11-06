@@ -17,8 +17,13 @@ KEYS = ('SCRAP_KEYSTORE_PATH', 'SCRAP_KEY_ALIAS',
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='Check local inputs without building')
+    audio = parser.add_mutually_exclusive_group()
+    audio.add_argument('--audio-baseline', action='store_true', help='Measure the previous music import settings using the same signed build')
+    audio.add_argument('--audio-optimized', action='store_true', help='Reimport optimized music and measure the same signed build')
     args = parser.parse_args()
     env = os.environ.copy()
+    if args.audio_baseline or args.audio_optimized:
+        env.pop("SCRAP_AUDIO_BASELINE", None)
     credentials = ROOT / 'UserSettings/Signing/credentials.json'
     if not all(env.get(key) for key in KEYS) and credentials.exists():
         if os.name == 'posix' and credentials.stat().st_mode & 0o077:
@@ -46,8 +51,11 @@ def main():
     result = subprocess.call([unity, 'run', str(ROOT), '--no-tail', '--timeout', '1800',
                             '--log-file', str(log), '--', '-nographics', '-buildTarget',
                             'Android', '-executeMethod',
-                            'ScrapGuard.Editor.ProjectBuilder.BuildAndroidBundle'],
+                            ('ScrapGuard.Editor.BuildFootprint.BuildBaseline' if args.audio_baseline else 'ScrapGuard.Editor.BuildFootprint.BuildOptimized' if args.audio_optimized else 'ScrapGuard.Editor.ProjectBuilder.BuildAndroidBundle')],
                            cwd=ROOT, env=env)
+    if args.audio_baseline or args.audio_optimized:
+        if log.exists():
+            shutil.copy2(log, log.with_name("audio-" + ("baseline" if args.audio_baseline else "optimized") + "-build.log"))
     if result:
         return result
     bundle = ROOT / 'Builds/Android/ScrapGuard-internal-test.aab'
@@ -62,6 +70,10 @@ def main():
                 raise SystemExit('Output contains a corrupt ZIP entry.')
     except zipfile.BadZipFile:
         raise SystemExit('Output is not a valid Android App Bundle ZIP.') from None
+    if args.audio_baseline or args.audio_optimized:
+        snapshot = bundle.with_name('ScrapGuard-size-' + ('baseline' if args.audio_baseline else 'optimized') + '.aab')
+        shutil.copy2(bundle, snapshot)
+        print('Size comparison AAB saved:', snapshot)
     print('Internal-test AAB created:', bundle)
     return 0
 

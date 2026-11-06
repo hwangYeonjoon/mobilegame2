@@ -11,6 +11,7 @@ namespace ScrapGuard
         [Serializable] sealed class NaturalRunEvidence
         {
             public string kind="automated_fresh_loadout_not_human",clip;
+            public float hazardDamageReceived;public float machineActiveSeconds,machineDamage,damageDealt,damageReceived,healingReceived,minimumHp,firstEvolutionSeconds;public int hazardHits;
             public int seed,kills,peakEnemies,bestThreeSecondKills,machines,frames;
             public float seconds,firstMachine=-1,hp;
             public bool won;
@@ -78,10 +79,11 @@ namespace ScrapGuard
                 }
                 if(!combat.Ended)combat.Abandon();
                 evidence.kills=combat.Kills;evidence.seconds=combat.Elapsed;evidence.machines=combat.MachinesBuilt;evidence.hp=combat.Hp;evidence.won=combat.Won;
+                evidence.hazardDamageReceived=combat.HazardDamageReceived;evidence.machineActiveSeconds=combat.MachineActiveSeconds;evidence.machineDamage=combat.MachineDamage;evidence.damageDealt=combat.DamageDealt;evidence.damageReceived=combat.DamageReceived;evidence.healingReceived=combat.HealingReceived;evidence.minimumHp=combat.MinimumHp;evidence.hazardHits=combat.HazardHits;evidence.firstEvolutionSeconds=combat.FirstEvolutionSeconds;
                 File.WriteAllText(Path.Combine(folder,"evidence.json"),JsonUtility.ToJson(evidence,true));
                 var probe=new AssaultReplayProbe{state=snapshot,steps=recorder.Steps,id=combat.RunId,mode=combat.Mode,stage=0,seed=seed,kills=combat.Kills,machines=combat.MachinesBuilt,waves=combat.WaveNumber,hp=combat.Hp,seconds=combat.Elapsed,won=combat.Won};
                 File.WriteAllText(Path.Combine(smokeOutput,"runtime-replay-natural-"+seed+".json"),JsonUtility.ToJson(probe));
-                yield return Capture("run-"+runIndex+"-end");combat=null;Show("home");
+                RenderBattle();yield return Capture("run-"+runIndex+"-end");combat=null;Show("home");
             }
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Natural combat capture errors: "+smokeErrors.Count+"\nAutomated fresh-loadout runs, not human or real-device performance evidence.\n"+string.Join("\n",smokeErrors));
             Application.Quit(smokeErrors.Count==0?0:1);

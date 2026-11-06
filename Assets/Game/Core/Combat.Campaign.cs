@@ -11,6 +11,7 @@ namespace ScrapGuard.Core
         int terrainPulse;
         public bool IsBlocked(V2 position, float radius=14)
         {
+            if(BossArenaActive)return false;
             foreach(var block in Blocks)if(block.Contains(position,radius))return true;
             return false;
         }
@@ -23,15 +24,15 @@ namespace ScrapGuard.Core
         void MovePlayer(float dt,V2 move)
         {
             V2 target=(move.Length>1?move.Normal:move)*baseSpeed*(1+Skills[11]*.035f);
-            bool ice=false;foreach(var zone in Zones)if(Definition.Region==3 && zone.Contains(Position))ice=true;
+            bool ice=false;if(!BossArenaActive)foreach(var zone in Zones)if(Definition.Region==3 && zone.Contains(Position))ice=true;
             velocity=ice?velocity+(target-velocity)*Math.Min(1,dt*3):target;
             V2 drift=new V2();
-            if(!Challenge && Definition.Region==4)for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position))drift.y=i%2==0?-55:55;
+            if(!Challenge && !BossArenaActive && Definition.Region==4)for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position))drift.y=i%2==0?-55:55;
             Position=Slide(Position,(velocity+drift)*dt,14);
         }
         void UpdateTerrain(float dt)
         {
-            if(Challenge)return;
+            if(Challenge||BossArenaActive)return;
             poisonTimer-=dt;
             if(Definition.Region==2 && poisonTimer<=0)
             {
@@ -131,7 +132,7 @@ namespace ScrapGuard.Core
             if(e.slowTime>0)speed*=e.finalBoss?.85f:.7f;
             var before=e.position;
             e.position=Slide(e.position,direction*(speed*dt),Math.Min(e.Radius,20));
-            if(speed>0 && V2.Distance(before,e.position)<speed*dt*.2f)
+            if(!BossArenaActive && speed>0 && V2.Distance(before,e.position)<speed*dt*.2f)
             {
                 foreach(var block in Blocks)if(block.Contains(before+direction*24,Math.Min(e.Radius,20)))
                 {

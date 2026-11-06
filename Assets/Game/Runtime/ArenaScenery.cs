@@ -45,7 +45,7 @@ namespace ScrapGuard
         readonly List<RectTransform> belts=new List<RectTransform>();
         readonly List<Vector2> beltOrigins=new List<Vector2>();
         readonly List<RectTransform> dust=new List<RectTransform>();
-        int region;
+        int region; bool cleared;readonly List<GameObject> geometry=new List<GameObject>();
         public static ArenaScenery Build(Transform parent,int stage,bool challenge)
         {
             var root=Ui.Rect(parent,"Regional scenery",0,0,540,960);
@@ -88,7 +88,7 @@ namespace ScrapGuard
             foreach(var z in Campaign.WorldGeometry(Campaign.Zones(definition)))
             {
                 var zone=Ui.Rect(root,"Terrain region "+region,z.X,z.Y,z.W,z.H);
-                var tag=zone.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=z;tag.Region=region;
+                var tag=zone.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=z;tag.Region=region;scene.geometry.Add(zone.gameObject);
                 zone.gameObject.AddComponent<RectMask2D>();
                 // Long strips repeat along their length instead of stretching rails and grating.
                 bool horizontal=z.W>z.H*2;
@@ -117,9 +117,9 @@ namespace ScrapGuard
             foreach(var b in Campaign.WorldGeometry(Campaign.Blocks(definition)))
             {
                 // Cast shadow is decorative; the tagged rectangle below remains the exact collision footprint.
-                Ui.Box(root,b.X+7,b.Y+9,b.W,b.H,new Color(0,0,0,.22f),true,"Machinery cast shadow");
+                scene.geometry.Add(Ui.Box(root,b.X+7,b.Y+9,b.W,b.H,new Color(0,0,0,.22f),true,"Machinery cast shadow").gameObject);
                 var block=Ui.Rect(root,"Solid machinery "+region,b.X,b.Y,b.W,b.H);
-                var tag=block.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=b;tag.Solid=true;tag.Region=region;
+                var tag=block.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=b;tag.Solid=true;tag.Region=region;scene.geometry.Add(block.gameObject);
                 Ui.Box(block,0,0,b.W,b.H,Ui.Hex("17212A"),false);
                 Ui.Box(block,0,b.H-3,b.W,3,new Color(accent.r,accent.g,accent.b,.7f),false);
                 bool landmark=b.W>=120;
@@ -142,11 +142,11 @@ namespace ScrapGuard
                     scene.rotors.Add(fan);
                 }
             }
-            Ui.Label(root,Campaign.Regions[region]+"  /  "+definition.Objective,16,801,508,23,12,new Color(accent.r,accent.g,accent.b,.8f),TextAnchor.MiddleCenter);
             return scene;
         }
-        public void Render(float elapsed)
+        public void Render(float elapsed,bool clearGeometry=false)
         {
+            if(cleared!=clearGeometry){cleared=clearGeometry;foreach(var item in geometry)item.SetActive(!cleared);}
             for(int i=0;i<lamps.Count;i++){var c=Accents[region];c.a=.5f+.2f*Mathf.Sin(elapsed*2+i*.6f);lamps[i].color=c;}
             for(int i=0;i<lights.Count;i++){var c=Accents[region];c.a=.12f+.025f*Mathf.Sin(elapsed*.8f+i*2);lights[i].color=c;}
             for(int i=0;i<dust.Count;i++)dust[i].anchoredPosition=new Vector2(25+i*43+Mathf.Sin(elapsed*.3f+i)*6,-(198+(i*71+elapsed*(2+i%3))%600));

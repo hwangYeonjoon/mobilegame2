@@ -15,7 +15,7 @@ namespace ScrapGuard.Core
         public int ConditionPulses { get; private set; }
         void UpdateOperationCondition(float dt)
         {
-            if(Condition==0)return;
+            if(Condition==0||BossArenaActive)return;
             if(!conditionAnnounced){conditionAnnounced=true;Effects.Add(new BattleEffect{position=Position,kind=7,text=OperationConditions.Names[Condition]});}
             if(Condition!=2)return;
             conditionTimer-=dt;if(conditionTimer>0)return;

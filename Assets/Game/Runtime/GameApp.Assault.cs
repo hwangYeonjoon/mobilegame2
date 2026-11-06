@@ -5,7 +5,7 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        RectTransform machineActor,machineRotor,escapeArrow;
+        RectTransform machineActor,machineRotor,escapeArrow,bossFence;
         Text salvageText,objectiveBearing;
         Button machineButton; Image machineFill; RectTransform machineAura;
         readonly RectTransform[] wingDrones=new RectTransform[2];
@@ -16,14 +16,15 @@ namespace ScrapGuard
         Vector2 BattleCameraOffset()
         {
             if(combat.Challenge)return new Vector2(0,-menuExtra/2);
+            if(combat.BossArenaActive)return new Vector2(270-combat.BossArenaCenter.x,combat.BossArenaCenter.y-480-menuExtra/2);
             float x=Mathf.Clamp(combat.Position.x-270,combat.WorldLeft,combat.WorldRight-540);
-            float y=Mathf.Clamp(combat.Position.y-510-menuExtra/2,combat.WorldTop,combat.WorldBottom-MenuHeight);
+            float y=Mathf.Clamp(combat.Position.y-510-menuExtra/2,combat.WorldTop-160,combat.WorldBottom-(MenuHeight-176));
             return new Vector2(-x,y);
         }
         bool InBattleView(V2 p,float margin=85)
         {
             var camera=BattleCameraOffset();float x=p.x+camera.x,y=p.y-camera.y;
-            return x>=-margin&&x<=540+margin&&y>=-margin&&y<=MenuHeight+margin;
+            return x>=-margin&&x<=540+margin&&y>=-margin&&y<=MenuHeight-176+margin;
         }
         string BattleBearing(V2 point)
         {
@@ -33,6 +34,9 @@ namespace ScrapGuard
         void SetupAssaultPresentation()
         {
             trackedMachines=trackedWaves=trackedEvolution=trackedSkillEvolutions=0;
+            bossFence=Ui.Rect(arena,"Boss arena fence",0,0,470,600);
+            Ui.Box(bossFence,0,0,470,4,Ui.Blue,false);Ui.Box(bossFence,0,596,470,4,Ui.Blue,false);
+            Ui.Box(bossFence,0,0,4,600,Ui.Blue,false);Ui.Box(bossFence,466,0,4,600,Ui.Blue,false);
             machineActor=Ui.Rect(identityLayer,"Salvage assembly",0,0,0,0);
             machineActor.SetAsFirstSibling();
             machineAura=CombatRing.Create(machineActor,230,new Color(.6f,1,.8f,.55f),.018f);
@@ -68,8 +72,10 @@ namespace ScrapGuard
             // One message lane. Immediate threats override goals and celebrations.
             string message="";
             if(playerInDanger)message="위험 구역 밖으로 이동!";
+            else if(combat.BossArenaWarning>0)message="보스 결전 "+Mathf.CeilToInt(combat.BossArenaWarning)+"초 · 주변 전투 구역 고정";
             else if(combat.WaveWarning>0)message="포위 접근 · "+BattleBearing(combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150)+" 열린 방향으로";
             else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
+            else if(combat.BossArenaActive)message="";
             else if(guideHint.gameObject.activeSelf)message=guideHint.text;
             else if(objectiveBearing.text.Length>0)message=objectiveBearing.text;
             else if(combat.CanActivateMachine)message="합체 준비 완료 · 아래 버튼으로 원하는 순간 발동";
@@ -81,14 +87,17 @@ namespace ScrapGuard
             combatNotice.rectTransform.anchoredPosition=new Vector2(35,(bossBackdrop.gameObject.activeSelf?-135:-94)+menuExtra/2);
             combatNotice.rectTransform.sizeDelta=new Vector2(470,42);combatNotice.fontSize=17;
             combatNotice.color=playerInDanger?Ui.Gold:combat.WaveWarning>0?Ui.Mint:Ui.Ink;
-            if(playerInDanger||combat.WaveWarning>0)streakLabel.text="";
+            if(playerInDanger||combat.WaveWarning>0||combat.BossArenaActive)streakLabel.text="";
         }
         void RenderAssaultPresentation()
         {
             machineActor.gameObject.SetActive(combat.MachineTime>0);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
-            float unfold=Mathf.Clamp01((12-combat.MachineTime)*2);
+            float unfold=Mathf.Clamp01((10-combat.MachineTime)*2);
             machineActor.localScale=Vector3.one*Mathf.Lerp(.35f,1,unfold);
+            bossFence.gameObject.SetActive(combat.BossArenaActive);
+            bossFence.anchoredPosition=new Vector2(combat.BossArenaCenter.x-235,-combat.BossArenaCenter.y+300);
+            machineAura.GetComponent<CombatRing>().color=new Color(.6f,1,.8f,combat.FinalBossActive?.1f:.3f);
             machineAura.localScale=Vector3.one*(1+.04f*Mathf.Sin(combat.Elapsed*5));
             machineRotor.localEulerAngles=new Vector3(0,0,-combat.Elapsed*260);
             escapeArrow.gameObject.SetActive(combat.WaveWarning>0);
@@ -104,7 +113,7 @@ namespace ScrapGuard
                 if(i<combat.Mines.Count){var p=combat.Mines[i].position;mineActors[i].anchoredPosition=new Vector2(p.x,-p.y);}
             }
             machineButton.interactable=combat.CanActivateMachine&&!battlePaused&&!networkBusy;
-            salvageText.text=combat.MachineTime>0?"합체 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?"고철 합체":"고철 합체 · E"):"고철 "+combat.Salvage+"/"+combat.MachineCost;
+            salvageText.text=combat.MachineTime>0?"합체 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.MachineRecovery>0?"합체 준비 "+Mathf.CeilToInt(combat.MachineRecovery)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?"고철 합체":"고철 합체 · E"):"고철 "+combat.Salvage+"/"+combat.MachineCost;
             machineButton.image.color=combat.CanActivateMachine?Ui.Mint:Ui.Raised;
             salvageText.color=combat.CanActivateMachine?Ui.Background:Ui.Ink;
             machineFill.rectTransform.sizeDelta=new Vector2(155*Mathf.Clamp01(combat.Salvage/(float)combat.MachineCost),3);
