@@ -25,6 +25,9 @@ namespace ScrapGuard.Tests
             var c=new Combat(GameState.New(),0,"machine");
             c.Pickups.Add(new Pickup{id=9000,position=c.Position,xp=40});c.Tick(.05f,new V2());
             if(c.Choosing)c.Choose(c.Choices[0]);c.Tick(.05f,new V2());
+            if(c.Choosing)c.Choose(c.Choices[0]);
+            Check(c.MachinesBuilt==0&&c.CanActivateMachine,"salvage waits for player input");
+            Check(c.ActivateMachine()&&!c.ActivateMachine(),"activation consumes once");
             Check(c.MachinesBuilt==1&&c.Salvage==0&&c.MachineTime>11,"collected salvage is spent once on the machine");
             var target=new Enemy{id=9999,hp=10000,maxHp=10000,position=c.Position+new V2(75,0)};c.Enemies.Add(target);
             for(int i=0;i<20;i++){if(c.Choosing)c.Choose(c.Choices[0]);c.Tick(.05f,new V2());}
@@ -54,6 +57,7 @@ namespace ScrapGuard.Tests
             for(int i=0;i<6000&&!c.Ended;i++)
             {
                 if(c.Choosing){int skill=c.Choices[0];foreach(int candidate in c.Choices)if(candidate>=8){skill=candidate;break;}c.Choose(skill);recorder.Choose(skill);}
+                if(c.CanActivateMachine){c.ActivateMachine();recorder.Machine();}
                 if(c.CanUltimate){c.UseUltimate();recorder.Ultimate();}
                 var target=new V2(270+(float)Math.Cos(c.Elapsed*.06f)*500,490+(float)Math.Sin(c.Elapsed*.06f)*650);
                 c.Tick(ReplayRecorder.Step,recorder.Move((target-c.Position).Normal));
@@ -105,6 +109,47 @@ namespace ScrapGuard.Tests
             c.Bullets.Add(new Bullet{id=9999,position=new V2(-82,1000),velocity=new V2(),damage=80,life=1});
             c.Tick(.05f,new V2());Check(target.hp==920,"negative grid boundary hit preserved");
             Check(!c.Bullets.Exists(b=>b.id==9999),"non-piercing bullet removed after its hit");
+        }
+        public static void CrowdSpacingAndSharedQueries()
+        {
+            var c=new Combat(GameState.New(),4,"spacing",71,false,SkillTrial.Mode);
+            c.Position=new V2(270,690);var a=new Enemy{id=10000,hp=100000,maxHp=100000,position=new V2(260,320)};
+            var b=new Enemy{id=10001,hp=100000,maxHp=100000,position=new V2(262,320)};c.Enemies.Add(a);c.Enemies.Add(b);
+            float before=V2.Distance(a.position,b.position);
+            for(int i=0;i<12;i++)c.Tick(ReplayRecorder.Step,new V2());
+            Check(V2.Distance(a.position,b.position)>before+10,"crowd neighbors separate without randomness");
+            c.Enemies.Clear();c.Bullets.Clear();c.Enemies.Add(new Enemy{id=20000,hp=10000,maxHp=10000,position=new V2(260,320)});
+            for(int i=0;i<100;i++)c.Bullets.Add(new Bullet{id=30000+i,position=new V2(190,320),damage=1,life=1});
+            c.Tick(ReplayRecorder.Step,new V2());Check(c.CandidateBuilds<5,"100 bullets in the same cells share ordered candidate lists");
+        }
+        public static void AttackEvolutionMechanics()
+        {
+            int[] attacks={1,2,3,8,9,10},supports={7,6,5,4,11,7};
+            for(int n=0;n<attacks.Length;n++)
+            {
+                var c=new Combat(GameState.New(),0,"evo",71);int skill=attacks[n];c.Skills[skill]=5;c.Skills[supports[n]]=2;
+                Check(!c.SkillEvolved(skill),"evolution requires its support investment");c.Skills[supports[n]]=3;
+                Check(c.SkillEvolved(skill),"every attack has its own evolution");
+                c.Enemies.Add(new Enemy{id=10000,hp=100000,maxHp=100000,position=c.Position+new V2(130,0)});c.Tick(.05f,new V2());
+                if(skill==1)Check(Math.Abs(V2.Distance(c.SawPosition(0),c.Position)-105)<.1f,"evolved saw changes orbit");
+                if(skill==2)Check(c.Enemies.Exists(e=>e.freezeTime>0),"evolved coil freezes nearby mobs");
+                if(skill==3)Check(c.Bullets.FindAll(x=>x.drone).Count==3,"drone evolution deploys three guns");
+                if(skill==8)Check(c.Effects.FindAll(e=>e.kind==11).Count==3,"mortar evolution paints three impact areas");
+                if(skill==9)Check(c.Bullets.FindAll(x=>x.returning&&x.visual==4).Count==4,"blade evolution creates identifiable returning projectiles");
+            }
+            var mines=new Combat(GameState.New(),4,"chain",71,false,SkillTrial.Mode);mines.Skills[10]=5;mines.Skills[7]=3;
+            var first=new Combat.ScrapMine{position=new V2(100,320),arm=0};var second=new Combat.ScrapMine{position=new V2(220,320),arm=0};
+            mines.Mines.Add(first);mines.Mines.Add(second);mines.Enemies.Add(new Enemy{id=9000,position=first.position,hp=10000,maxHp=10000});
+            mines.Tick(.05f,new V2());mines.Tick(.05f,new V2());Check(!mines.Mines.Contains(first)&&!mines.Mines.Contains(second),"linked mine explodes without direct enemy proximity");
+        }
+        public static void MachineInputGuards()
+        {
+            var state=GameState.New();var c=new Combat(state,0,"manual");Check(!c.ActivateMachine(),"cannot activate before collecting scrap");
+            bool rejected=false;try{ReplayRecorder.Verify(state,0,"manual",1,new System.Collections.Generic.List<ReplayStep>{new ReplayStep{machine=true}},1);}catch(ArgumentException){rejected=true;}
+            Check(rejected,"forged early activation rejected by server simulation");
+            rejected=false;try{ReplayRecorder.Verify(state,0,"manual",1,new System.Collections.Generic.List<ReplayStep>{new ReplayStep{machine=true,frames=1}},1);}catch(ArgumentException){rejected=true;}
+            Check(rejected,"mixed activation and movement rejected");
+            var ranked=new Combat(state,4,"rank",1,false,SkillTrial.Mode);Check(!ranked.ActivateMachine(),"manual assembly is excluded from fixed challenge");
         }
     }
 }

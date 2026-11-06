@@ -50,7 +50,7 @@ namespace ScrapGuard
             if(distance>.001f)movedAt=time;
             bool moving=initialized && time-movedAt<.12f && enemy.freezeTime<=0;
             Pose=enemy.windup>0?1:enemy.attackFlash>0||enemy.dash>0?2:moving && (int)(time*9+enemy.id)%2==1?3:0;
-            float size=enemy.Radius*(boss?4.1f:3.9f);
+            float size=enemy.Radius*(boss?4.1f:enemy.kind==2?3.4f:2.7f);
             body.sprite=BattleArt.Role(enemy.core?7:boss?region:(int)enemy.role,Pose,boss);
             body.rectTransform.sizeDelta=new Vector2(size,size);
             float bounce=moving?Mathf.Abs(Mathf.Sin(time*10+enemy.id))*2:0;
@@ -60,7 +60,7 @@ namespace ScrapGuard
             JustHit=enemy.flash>lastFlash+.005f;lastFlash=enemy.flash;
             bool rage=boss && !enemy.core && enemy.hp<enemy.maxHp*.5f;
             JustRaged=rage&&!raging;raging=rage;
-            body.color=enemy.flash>0?new Color(1,.65f,.52f):enemy.freezeTime>0?Ui.Hex("7CEAFF"):enemy.slowTime>0?Ui.Hex("BAEFFF"):rage?new Color(1,.87f,.81f):Color.white;
+            body.color=enemy.flash>0?new Color(1,1,.9f):enemy.freezeTime>0?Ui.Hex("7CEAFF"):enemy.slowTime>0?Ui.Hex("BAEFFF"):rage?new Color(1,.87f,.81f):new Color(.82f,.86f,.9f);
             shadow.rectTransform.sizeDelta=new Vector2(enemy.Radius*2,enemy.Radius*.58f);
             shadow.rectTransform.anchoredPosition=new Vector2(-enemy.Radius,enemy.Radius*.12f);
             shadow.color=new Color(0,0,0,enemy.windup>0?.5f:.32f);
@@ -92,18 +92,21 @@ namespace ScrapGuard
             bool styled=Outfits.Valid(outfit)&&!bullet.mod&&!bullet.drone;
             signature.Configure(styled?outfit:0,true);
             signature.color=bullet.chilling?Ui.Hex("91EAFF"):OutfitVisuals.Accent(outfit);
-            trail.enabled=!styled&&!compact;core.enabled=head.enabled=!styled;
+            trail.enabled=!styled&&(!compact||bullet.visual>0);core.enabled=head.enabled=true;
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
             var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
-            float length=bullet.pierce>0?35:bullet.mod?30:15+level*2;
+            float length=bullet.visual>0?48:bullet.pierce>0?35:bullet.mod?30:15+level*2;
             trail.rectTransform.sizeDelta=new Vector2(length,bullet.blast?7:4);
             trail.rectTransform.anchoredPosition=new Vector2(-length,bullet.blast?3.5f:2);
-            trail.color=new Color(tint.r,tint.g,tint.b,.38f);head.color=tint;
-            head.rectTransform.sizeDelta=Vector2.one*(bullet.blast?11:bullet.pierce>0?7:6);
+            trail.color=new Color(tint.r,tint.g,tint.b,.7f);head.color=Color.Lerp(tint,Color.white,.65f);
+            head.rectTransform.sizeDelta=Vector2.one*(bullet.visual>0?13:bullet.blast?11:bullet.pierce>0?9:8);
             head.rectTransform.anchoredPosition=new Vector2(-4,bullet.blast?5.5f:3);
             core.rectTransform.sizeDelta=new Vector2(bullet.pierce>0?18:9,2);
-            core.color=new Color(1,1,1,.9f);
+            core.color=Color.white;
+            if(bullet.visual==4){head.rectTransform.sizeDelta=new Vector2(22,7);root.localEulerAngles=new Vector3(0,0,time*550);}
+            else if(bullet.visual==1)core.rectTransform.sizeDelta=new Vector2(30,5);
+            else if(bullet.visual==2)head.rectTransform.sizeDelta=new Vector2(15,11);
         }
     }
 

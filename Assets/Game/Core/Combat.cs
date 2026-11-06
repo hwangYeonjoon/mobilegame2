@@ -19,6 +19,7 @@ namespace ScrapGuard.Core
     }
     public class Enemy
     {
+        internal int spatialIndex;
         public int id, kind, chillStacks;
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
@@ -30,6 +31,7 @@ namespace ScrapGuard.Core
     }
     public class Bullet
     {
+        public int visual; public bool returning; public float age;
         public int id;
         public V2 position, velocity;
         public float damage, life;
@@ -41,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 13;
+        public const int RulesVersion = 14;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -171,6 +173,7 @@ namespace ScrapGuard.Core
             UpdateHazards(dt);
             if (Ended) return;
             UpdateEnemies(dt);
+            SeparateEnemies(dt);
             if (Ended) return;
             UpdateMods(dt);
             UpdateEngineering(dt);
@@ -265,18 +268,20 @@ namespace ScrapGuard.Core
             }
             if (Skills[1] > 0 && sawTimer <= 0)
             {
-                sawTimer = .24f;
+                sawTimer = SkillEvolved(1)?.18f:.24f;
                 for (int n = 0; n < 1 + Skills[1]; n++)
                 {
                     var p = SawPosition(n);
-                    foreach (var e in Enemies) if (e.hp > 0 && V2.Distance(p, e.position) < e.Radius + 18) Hit(e, Damage * .45f);
+                    foreach (var e in Enemies) if (e.hp > 0 && V2.Distance(p, e.position) < e.Radius + (SkillEvolved(1)?28:18)) Hit(e, Damage * (SkillEvolved(1)?.7f:.45f));
                 }
             }
             if (Skills[2] > 0 && coilTimer <= 0)
             {
                 coilTimer = (2.7f - Skills[2] * .18f)*(hero==3?.8f:1);
-                float radius = 90 + Skills[2] * 13+(HasMod(5)?40:0);
+                float radius = 90 + Skills[2] * 13+(HasMod(5)?40:0)+(SkillEvolved(2)?65:0);
                 if(HasMod(5))foreach(var enemy in Enemies)if(!enemy.core && V2.Distance(enemy.position,Position)<radius)enemy.slowTime=Math.Max(enemy.slowTime,1.8f);
+                if(SkillEvolved(2))
+                { foreach(var e in Enemies)if(e.hp>0&&V2.Distance(Position,e.position)<radius){Hit(e,Damage*1.1f);if(!e.core&&!e.finalBoss)e.freezeTime=Math.Max(e.freezeTime,.6f);} Effects.Add(new BattleEffect{position=Position,kind=12,radius=radius}); }
                 if(HasMod(1))ChainLightning();
                 else
                 {
@@ -289,9 +294,10 @@ namespace ScrapGuard.Core
                 droneTimer = 1.1f - Skills[3] * .1f;
                 var p = DronePosition;
                 Shoot(p, (float)Math.Atan2(target.position.y - p.y, target.position.x - p.x), true);
+                if(SkillEvolved(3))foreach(int side in new[]{-1,1}){var wing=Position+new V2(side*75,-40);Shoot(wing,(float)Math.Atan2(target.position.y-wing.y,target.position.x-wing.x),true);}
             }
         }
-        public V2 SawPosition(int n) { return Position + V2.Angle(Elapsed * 2.8f + n * (float)(Math.PI * 2) / (1 + Skills[1])) * 65; }
+        public V2 SawPosition(int n) { return Position + V2.Angle(Elapsed * 2.8f + n * (float)(Math.PI * 2) / (1 + Skills[1])) * (SkillEvolved(1)?105:65); }
         public V2 DronePosition { get { return Position + new V2((float)Math.Sin(Elapsed * 2) * 35, -55); } }
         void Shoot(V2 origin, float angle, bool drone)
         {
@@ -301,7 +307,7 @@ namespace ScrapGuard.Core
             float critical = hero == 1 ? .10f : .05f; if (module == 11) critical += .05f;
             float damage = Damage * multiplier * (random.NextDouble() < critical ? 1.5f : 1);
             Bullets.Add(new Bullet { id = nextId++, position = origin, velocity = V2.Angle(angle) * (drone ? 450 : 390),
-                damage = damage, life = weapon == 3 && !drone ? .45f : 1.7f, pierce = !drone && WeaponEvolution==1 ? (weapon==2?8:3) : weapon == 2 || Skills[0] == 5 ? 2 : 0,
+                visual=drone?(SkillEvolved(3)?3:0):WeaponEvolution, damage = damage, life = weapon == 3 && !drone ? .45f : 1.7f, pierce = !drone && WeaponEvolution==1 ? (weapon==2?8:3) : weapon == 2 || Skills[0] == 5 ? 2 : 0,
                 blast = (weapon == 5 || HasMod(3) || WeaponEvolution==1 && weapon==1) && !drone, drone = drone, chilling = hero==4 && !drone });
         }
         void UpdateBullets(float dt)
@@ -309,7 +315,9 @@ namespace ScrapGuard.Core
             IndexEnemies();
             for (int i = Bullets.Count - 1; i >= 0; i--)
             {
-                var b = Bullets[i]; b.position += b.velocity * dt; b.life -= dt;
+                var b = Bullets[i]; b.age+=dt;
+                if(b.returning&&b.age>.65f)b.velocity=(Position-b.position).Normal*330;
+                b.position += b.velocity * dt; b.life -= dt;
                 foreach (var e in BulletCandidates(b.position))
                 {
                     if (e.hp <= 0 || e.id == b.lastHit || V2.Distance(e.position, b.position) > e.Radius + 6) continue;
@@ -344,7 +352,7 @@ namespace ScrapGuard.Core
             int xp = e.kind >= 2 ? 20 : 2;
             if (Pickups.Count < 220) Pickups.Add(new Pickup { id = nextId++, position = e.position, xp = xp });
             else Pickups[random.Next(Pickups.Count)].xp += xp;
-            if (Kills % 35 == 0) Pickups.Add(new Pickup { id = nextId++, position = e.position + new V2(10, 0), heal = true });
+            if (Kills % 35 == 0 && Pickups.Count<230) Pickups.Add(new Pickup { id = nextId++, position = e.position + new V2(10, 0), heal = true });
             Effects.Add(new BattleEffect { position = e.position, kind = 5, radius = e.Radius });
             if (e.finalBoss) { Ended = true; Won = true; }
             Enemies.RemoveAt(index);

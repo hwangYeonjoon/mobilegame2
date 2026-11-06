@@ -1,0 +1,80 @@
+{
+  "retrieved": "2026-11-06",
+  "files": [
+    {
+      "file": "Assets/Resources/Audio/Licensed/Arc.wav",
+      "sha256": "4e2026cc05af3b06f8d7db8a5091fde97ae087aaadc3f80cbe298b4ee39736ca",
+      "bytes": 20842
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Assembly.wav",
+      "sha256": "8194739d38d431858951573a9e37af113f07aa2c3e82cdad53aef8f86c54f642",
+      "bytes": 441078
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Boss.ogg",
+      "sha256": "4021eaa200b2611f6ee004e0c7896f3c2f9f0815a903b5a36d16296c696ce22a",
+      "bytes": 4500064
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Break.wav",
+      "sha256": "98794105fc3bf0a9cf4bd99cbff69960f6f7984dc6215bfd51e5b1c00c46b059",
+      "bytes": 14610
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Factory.ogg",
+      "sha256": "3365dd3d25697a54e843678d75f49732cd0bc88bfd3ccb574b39f0ed65fa7291",
+      "bytes": 7322355
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Frost.wav",
+      "sha256": "69c94f498bdd0cf89ba0c48541fdb8c0d8a3c2bf50b9f05448e18fbc57b5fd40",
+      "bytes": 30442
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Growth.wav",
+      "sha256": "697b15df3456804ec3626914e454740f52a697a0c81f54139095469985248432",
+      "bytes": 84222
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Heavy.wav",
+      "sha256": "dc85184fb54767a30da48ed8c93d635c66eec3537e512ce29581607eadd99eab",
+      "bytes": 59758
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Hit.wav",
+      "sha256": "a1137c46a576034182caa50323de570dc40ab60464d986d7c53df31155a4b329",
+      "bytes": 32974
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Overdrive.ogg",
+      "sha256": "c2023138579f6fb99b238fffc562d927a9712db04fdbd4a0a6ab6e8bf64d988a",
+      "bytes": 15136131
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Pickup.wav",
+      "sha256": "558e769bb9c301543ecc53ca511be8754db5d7e20aa2566420e5c7dff2dcbdf0",
+      "bytes": 74654
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Repair.wav",
+      "sha256": "353ba28780a743551f31df83db32d16a2a30dc7e8c6cb2f61d0a46fd36aed6d2",
+      "bytes": 23792
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Shield.wav",
+      "sha256": "c075f7a5a50c7d2163a934d58bd31cb24abccc7894dcacddf5324ae9da75762d",
+      "bytes": 84170
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Shot.wav",
+      "sha256": "539f7f223391c58991b4a5e7d6b753566501e1b25b067869f69aed8e139b0f85",
+      "bytes": 20920
+    },
+    {
+      "file": "Assets/Resources/Audio/Licensed/Ultimate.wav",
+      "sha256": "07c0f1ba77679af0dabce069a0f568a314712009b8d772e86196cfe9781915cc",
+      "bytes": 68650
+    }
+  ]
+}

@@ -108,7 +108,7 @@ namespace ScrapGuard
         {
             supportButton=null;supportArt=null;
             if(combat.Support==null)return;
-            supportButton=Ui.Button(screen,"",183,876,146,66,TriggerSupport,Ui.Blue,true,15);supportText=supportButton.GetComponentInChildren<Text>();
+            supportButton=Ui.Button(screen,"",345,833,171,55,TriggerSupport,Ui.Blue,true,15);supportText=supportButton.GetComponentInChildren<Text>();
             var support=combat.Support;
             supportArt=CharacterArt.Draw(identityLayer,0,0,80,88,support.hero,support.showIdentity?support.skin:0,support.showIdentity?support.outfit:0).rectTransform;
         }
@@ -122,7 +122,7 @@ namespace ScrapGuard
         {
             if(supportButton==null)return;
             supportButton.interactable=combat.CanSupport;
-            supportText.text=combat.SupportUsed?"지원 완료":combat.Elapsed<8?"지원 준비\n"+Mathf.CeilToInt(8-combat.Elapsed)+"초":SupportNames[combat.Support.hero]+"\n호출 · Q";
+            supportText.text=combat.SupportUsed?"지원 완료":combat.Elapsed<8?"지원 준비\n"+Mathf.CeilToInt(8-combat.Elapsed)+"초":SupportNames[combat.Support.hero]+(Application.isMobilePlatform?"\n지원 호출":"\n호출 · Q");
             supportArt.gameObject.SetActive(combat.SupportTime>0);
             if(combat.SupportTime<=0)return;
             var support=combat.Support;bool firing=combat.Elapsed%.36f<.16f;

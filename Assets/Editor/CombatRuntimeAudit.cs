@@ -22,7 +22,8 @@ namespace ScrapGuard.Editor
                 for(int frame=0;frame<6000&&!c.Ended;frame++)
                 {
                     if(c.Choosing){int skill=c.Choices[0];foreach(int candidate in c.Choices)if(candidate>=8){skill=candidate;break;}c.Choose(skill);input.Choose(skill);}
-                    if(c.CanUltimate){c.UseUltimate();input.Ultimate();if(c.Ended)break;}
+                    if(c.CanActivateMachine){c.ActivateMachine();input.Machine();}
+                if(c.CanUltimate){c.UseUltimate();input.Ultimate();if(c.Ended)break;}
                     var target=new V2(270+Mathf.Cos(c.Elapsed*.06f)*450,490+Mathf.Sin(c.Elapsed*.06f)*600);
                     c.Tick(ReplayRecorder.Step,input.Move((target-c.Position).Normal));
                 }

@@ -7,8 +7,12 @@ namespace ScrapGuard
     {
         RectTransform machineActor,machineRotor,escapeArrow;
         Text salvageText,objectiveBearing;
+        Button machineButton; Image machineFill; RectTransform machineAura;
+        readonly RectTransform[] wingDrones=new RectTransform[2];
+        readonly LightningArc[] mineLinks=new LightningArc[12];
+        bool playerInDanger;
         readonly RectTransform[] mineActors=new RectTransform[12];
-        int trackedMachines,trackedWaves,trackedEvolution;
+        int trackedMachines,trackedWaves,trackedEvolution,trackedSkillEvolutions;
         Vector2 BattleCameraOffset()
         {
             if(combat.Challenge)return new Vector2(0,-menuExtra/2);
@@ -28,30 +32,64 @@ namespace ScrapGuard
         }
         void SetupAssaultPresentation()
         {
-            trackedMachines=trackedWaves=trackedEvolution=0;
-            machineActor=Ui.Rect(pickupLayer,"Salvage assembly",0,0,0,0);
-            var chassis=Ui.Box(machineActor,-70,-106,140,140,Color.white,false);
+            trackedMachines=trackedWaves=trackedEvolution=trackedSkillEvolutions=0;
+            machineActor=Ui.Rect(identityLayer,"Salvage assembly",0,0,0,0);
+            machineActor.SetAsFirstSibling();
+            machineAura=CombatRing.Create(machineActor,230,new Color(.6f,1,.8f,.55f),.018f);
+            var chassis=Ui.Box(machineActor,-140,-150,280,280,Color.white,false);
             chassis.sprite=ArenaArt.Cell("SalvageMachine-v1",1,1,0,0);chassis.preserveAspect=true;
             machineRotor=CombatRing.Create(machineActor,22,new Color(.4f,1,.8f,.7f),.06f);
             machineRotor.anchoredPosition=new Vector2(0,26);
-            Ui.Label(machineActor,"고철 합체",-75,-135,150,29,18,Ui.Gold,TextAnchor.MiddleCenter);
+
             escapeArrow=Ui.Label(hazardLayer,"↑",0,0,52,58,46,Ui.Mint,TextAnchor.MiddleCenter).rectTransform;
             escapeArrow.pivot=new Vector2(.5f,.5f);
             for(int i=0;i<mineActors.Length;i++)
             {
                 mineActors[i]=CombatRing.Create(pickupLayer,28,Ui.Gold,.16f);
                 Ui.Label(mineActors[i],"+",-10,-12,20,24,18,Ui.Gold,TextAnchor.MiddleCenter);
+                mineLinks[i]=Ui.Rect(pickupLayer,"Mine link",0,0,540,960).gameObject.AddComponent<LightningArc>();mineLinks[i].raycastTarget=false;mineLinks[i].color=new Color(.4f,1,.8f,.65f);
             }
-            salvageText=Ui.Label(screen,"",24,173,492,25,16,Ui.Mint,TextAnchor.MiddleCenter);
+            machineButton=Ui.Button(screen,"",180,899,155,49,TriggerMachine,Ui.Mint,false,16);
+            salvageText=machineButton.GetComponentInChildren<Text>();machineFill=Ui.Box(machineButton.transform,0,48,0,3,Ui.Gold,false);
+            machineButton.gameObject.SetActive(!combat.Challenge);
+            for(int i=0;i<2;i++)wingDrones[i]=Ui.Robot(identityLayer,0,0,.24f,0);
+            var outline=playerArt.gameObject.GetComponent<Outline>();if(outline==null)outline=playerArt.gameObject.AddComponent<Outline>();
+            outline.effectColor=new Color(.55f,1,.9f,.95f);outline.effectDistance=new Vector2(2,-2);
             objectiveBearing=Ui.Label(screen,"",24,718,492,27,16,Ui.Blue,TextAnchor.MiddleCenter);
             StartBattleMusic();
+        }
+        void TriggerMachine()
+        {
+            if(combat==null||battlePaused||networkBusy||!combat.ActivateMachine())return;
+            recorder.Machine();Track("combat_hook","manual_machine",combat.Stage,combat.Elapsed);dragging=false;RenderBattle();
+        }
+        void RenderUnifiedNotice()
+        {
+            // One message lane. Immediate threats override goals and celebrations.
+            string message="";
+            if(playerInDanger)message="위험 구역 밖으로 이동!";
+            else if(combat.WaveWarning>0)message="포위 접근 · "+BattleBearing(combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150)+" 열린 방향으로";
+            else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
+            else if(guideHint.gameObject.activeSelf)message=guideHint.text;
+            else if(objectiveBearing.text.Length>0)message=objectiveBearing.text;
+            else if(combat.CanActivateMachine)message="합체 준비 완료 · 아래 버튼으로 원하는 순간 발동";
+            else if(combat.TaskActive&&combat.Elapsed%12<3)message=combat.TaskInstruction;
+            guideHint.gameObject.SetActive(false);guideBackdrop.gameObject.SetActive(false);
+            if(taskHud!=null)taskHud.gameObject.SetActive(false);
+            objectiveBearing.gameObject.SetActive(false);dangerHint.gameObject.SetActive(false);
+            combatNotice.gameObject.SetActive(message.Length>0);combatNotice.text=message;
+            combatNotice.rectTransform.anchoredPosition=new Vector2(35,(bossBackdrop.gameObject.activeSelf?-135:-94)+menuExtra/2);
+            combatNotice.rectTransform.sizeDelta=new Vector2(470,42);combatNotice.fontSize=17;
+            combatNotice.color=playerInDanger?Ui.Gold:combat.WaveWarning>0?Ui.Mint:Ui.Ink;
+            if(playerInDanger||combat.WaveWarning>0)streakLabel.text="";
         }
         void RenderAssaultPresentation()
         {
             machineActor.gameObject.SetActive(combat.MachineTime>0);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
             float unfold=Mathf.Clamp01((12-combat.MachineTime)*2);
-            machineActor.localScale=Vector3.one*Mathf.Lerp(.2f,1,unfold);
+            machineActor.localScale=Vector3.one*Mathf.Lerp(.35f,1,unfold);
+            machineAura.localScale=Vector3.one*(1+.04f*Mathf.Sin(combat.Elapsed*5));
             machineRotor.localEulerAngles=new Vector3(0,0,-combat.Elapsed*260);
             escapeArrow.gameObject.SetActive(combat.WaveWarning>0);
             var exit=combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150;
@@ -59,10 +97,18 @@ namespace ScrapGuard
             escapeArrow.localEulerAngles=new Vector3(0,0,-combat.EscapeAngle*Mathf.Rad2Deg-90);
             for(int i=0;i<mineActors.Length;i++)
             {
-                mineActors[i].gameObject.SetActive(i<combat.Mines.Count);
+                mineActors[i].gameObject.SetActive(i<combat.Mines.Count);mineActors[i].GetComponent<Graphic>().color=combat.SkillEvolved(10)?Ui.Hex("9AFFD9"):Ui.Gold;mineActors[i].localScale=Vector3.one*(combat.SkillEvolved(10)?1.4f:1);
+                mineLinks[i].gameObject.SetActive(false);
+                if(combat.SkillEvolved(10)&&i+1<combat.Mines.Count&&V2.Distance(combat.Mines[i].position,combat.Mines[i+1].position)<190)
+                {mineLinks[i].gameObject.SetActive(true);var from=combat.Mines[i].position;var to=combat.Mines[i+1].position;mineLinks[i].From=new Vector2(from.x,-from.y);mineLinks[i].To=new Vector2(to.x,-to.y);mineLinks[i].SetVerticesDirty();}
                 if(i<combat.Mines.Count){var p=combat.Mines[i].position;mineActors[i].anchoredPosition=new Vector2(p.x,-p.y);}
             }
-            salvageText.text=combat.Challenge?"":combat.MachineTime>0?"고철 합체 가동 · "+Mathf.CeilToInt(combat.MachineTime)+"초": "고철 "+combat.Salvage+" / "+combat.MachineCost+" · 모으면 자동 합체";
+            machineButton.interactable=combat.CanActivateMachine&&!battlePaused&&!networkBusy;
+            salvageText.text=combat.MachineTime>0?"합체 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?"고철 합체":"고철 합체 · E"):"고철 "+combat.Salvage+"/"+combat.MachineCost;
+            machineButton.image.color=combat.CanActivateMachine?Ui.Mint:Ui.Raised;
+            salvageText.color=combat.CanActivateMachine?Ui.Background:Ui.Ink;
+            machineFill.rectTransform.sizeDelta=new Vector2(155*Mathf.Clamp01(combat.Salvage/(float)combat.MachineCost),3);
+            for(int i=0;i<2;i++){wingDrones[i].gameObject.SetActive(combat.SkillEvolved(3));wingDrones[i].anchoredPosition=new Vector2(combat.Position.x+(i==0?-75:75)-10,-combat.Position.y+54);}
             objectiveBearing.text="";
             if(combat.TaskActive&&!InBattleView(combat.TaskPosition,0))
             {
@@ -70,9 +116,12 @@ namespace ScrapGuard
                 string direction=BattleBearing(combat.TaskPosition);
                 objectiveBearing.text=direction+" 현장 임무 · "+Mathf.RoundToInt(delta.Length)+"m";
             }
-            if(combat.MachinesBuilt>trackedMachines){Track("combat_hook","machine",combat.MachinesBuilt,combat.Elapsed);PulseHaptics(35);trackedMachines=combat.MachinesBuilt;}
+            if(combat.MachinesBuilt>trackedMachines){FeedbackSound(CombatSoundBank.Get(11));
+                var burst=CombatRing.Create(identityLayer,320,Ui.Mint,.018f);burst.anchoredPosition=new Vector2(combat.Position.x,-combat.Position.y);burst.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.65f,.3f,1.2f);
+                Track("combat_hook","machine",combat.MachinesBuilt,combat.Elapsed);PulseHaptics(35);trackedMachines=combat.MachinesBuilt;}
             if(combat.WaveNumber>trackedWaves){Track("combat_pacing","wave",combat.WaveNumber,combat.Elapsed);trackedWaves=combat.WaveNumber;}
             if(combat.WeaponEvolution!=trackedEvolution){Track("combat_build","evolution",combat.WeaponEvolution,combat.Elapsed);trackedEvolution=combat.WeaponEvolution;}
+            if(combat.EvolutionMask!=trackedSkillEvolutions){Track("combat_build","attack_evolutions",combat.EvolutionMask,combat.Elapsed);trackedSkillEvolutions=combat.EvolutionMask;}
             UpdateBattleMusic();
         }
     }

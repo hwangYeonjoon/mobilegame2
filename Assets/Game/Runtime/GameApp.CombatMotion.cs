@@ -73,17 +73,8 @@ namespace ScrapGuard
             PulseHaptics(40);
             if (State.sound && audioSource != null)
             {
-                if (ultimateClip == null)
-                {
-                    const int sampleRate=22050;var samples=new float[11025];float phase=0;
-                    for(int i=0;i<samples.Length;i++)
-                    {
-                        float t=i/(float)samples.Length;phase+=Mathf.PI*2*Mathf.Lerp(180,46,t)/sampleRate;
-                        samples[i]=(Mathf.Sin(phase)+.18f*Mathf.Sin(phase*4))*.24f*(1-t)*Mathf.Min(1,t*40);
-                    }
-                    ultimateClip=AudioClip.Create("Core discharge",samples.Length,1,sampleRate,false);ultimateClip.SetData(samples,0);
-                }
-                audioSource.PlayOneShot(ultimateClip);
+                if(ultimateClip==null)ultimateClip=CombatSoundBank.Get(9);
+                audioSource.PlayOneShot(ultimateClip,.65f);
             }
             var origin = new Vector2(combat.UltimateOrigin.x,-combat.UltimateOrigin.y);
             if(Outfits.Active(State,combat.Hero)>0)OutfitVisuals.Special(effectLayer,origin,240,Outfits.Active(State,combat.Hero));

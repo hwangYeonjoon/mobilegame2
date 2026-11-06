@@ -12,7 +12,7 @@ namespace ScrapGuard
         void ModBook()
         {
             var card=Dialog("고철 개조 도감","전투 중 두 스킬을 조합하면 자동으로 개조됩니다.\n개조는 이번 전투에만 적용돼요.",820);
-            var list=Ui.Scroll(card,24,140,444,580,Workshop.ModNames.Length*205);
+            var list=Ui.Scroll(card,24,140,444,580,(Workshop.ModNames.Length+6)*205);
             for(int i=0;i<Workshop.ModNames.Length;i++)
             {
                 var row=Ui.Box(list,0,i*205,444,191,Ui.Background).transform;
@@ -24,10 +24,19 @@ namespace ScrapGuard
                 Ui.Label(row,Catalog.SkillNames[Workshop.SubSkills[i]]+"\nLv."+Workshop.SubLevels[i],290,48,142,55,18,Ui.Gold);
                 Ui.Label(row,Workshop.ModDetails[i],16,117,412,62,19,Ui.Muted);
             }
+            int rowIndex=Workshop.ModNames.Length;
+            foreach(int skill in new[]{1,2,3,8,9,10})
+            {
+                var row=Ui.Box(list,0,rowIndex++*205,444,191,Ui.Background).transform;
+                InventoryArt.Draw(row,InventoryArt.Skill(skill),16,18,60);
+                Ui.Label(row,Combat.EvolutionTitle(skill),90,22,338,38,25,Ui.Mint);
+                Ui.Label(row,Combat.EvolutionRecipe(skill),16,92,412,72,20,Ui.Ink);
+            }
             Ui.Button(card,"현장 개조 · 대원 전용 효과",24,740,444,60,FieldEngineeringGuide,Ui.Mint,true,20);
         }
         string ModHint(int skill)
         {
+            string recipe=Combat.EvolutionRecipe(skill);if(recipe.Length>0)return Combat.EvolutionTitle(skill)+"\n"+recipe;
             string hints="";int shown=0;
             for(int i=0;i<Workshop.ModNames.Length && shown<2;i++)if(Workshop.MainSkills[i]==skill || Workshop.SubSkills[i]==skill)
             {
@@ -95,7 +104,8 @@ namespace ScrapGuard
             Ui.Label(card,"받은 체력 피해 · 보호막 흡수 제외",24,325,444,28,15,Ui.Muted);
             var list=Ui.Scroll(card,24,363,444,147,Math.Max(147,damage.Split('\n').Length*29));Ui.Label(list,damage.Length==0?"체력 피해 없음":damage,12,0,420,Math.Max(147,damage.Split('\n').Length*29),17);
             string mods=report.fieldModule>0?FieldEngineering.Name(report.fieldModule,report.hero)+" (현장 장착)\n":"";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
-            Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 개조 도감에서 스킬별 조건을 확인하세요.":mods),24,534,444,101,14,Ui.Mint);
+            for(int i=0;i<12;i++)if((report.skillEvolutions&(1<<i))!=0)mods+=Combat.EvolutionTitle(i)+"\n";
+            var builds=Ui.Scroll(card,24,534,444,101,Mathf.Max(101,(mods.Split('\n').Length+1)*23));Ui.Label(builds,"개조 · 진화\n"+(mods.Length==0?"없음 · 도감에서 조건을 확인하세요.":mods),0,0,424,Mathf.Max(101,(mods.Split('\n').Length+1)*23),14,Ui.Mint);
             string skills="";for(int i=0;i<report.skills.Length;i++)if(report.skills[i]>0)skills+=(skills.Length>0?" · ":"")+Catalog.SkillNames[i]+" "+report.skills[i];
             Ui.Label(card,skills,24,643,444,68,13,Ui.Muted);
             Ui.Label(card,"고철 합체 "+report.machines+"회 · 웨이브 "+report.waves+" · "+(report.evolution==0?"진화 미완성":report.evolution==1?"중장 진화":"분산 진화")+(report.revived?" · 긴급 수리 사용":""),24,716,444,30,13,Ui.Mint);

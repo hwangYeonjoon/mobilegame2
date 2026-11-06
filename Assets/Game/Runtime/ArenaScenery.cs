@@ -52,8 +52,10 @@ namespace ScrapGuard
             var scene=root.gameObject.AddComponent<ArenaScenery>();
             scene.region=challenge?7:Campaign.Get(stage).Region;
             int region=scene.region;var accent=Accents[region];
-            for(int x=challenge?0:-1;x< (challenge?1:2);x++)for(int y=challenge?0:-1;y<(challenge?1:2);y++)
-            {var tile=Ui.Box(root,x*540,177+y*655,540,655,Color.white,false);tile.sprite=ArenaArt.Floor(region);}
+            float floorX=challenge?0:-540,floorY=challenge?164:-480,floorW=challenge?540:1620,floorH=challenge?652:1960;
+            var floor=Ui.Rect(root,"Continuous floor",floorX,floorY,floorW,floorH).gameObject.AddComponent<RawImage>();
+            floor.texture=Resources.Load<Texture2D>("Art/ContinuousFloor-v1");floor.raycastTarget=false;
+            floor.uvRect=new Rect(0,0,floorW/420,floorH/420);floor.color=Color.Lerp(Color.white,Accents[region],.4f);
             // Quiet floor beneath actors; props and warning lines retain their contrast.
             Ui.Box(root,challenge?0:-540,challenge?177:-480,challenge?540:1620,challenge?655:1960,new Color(.025f,.04f,.06f,.24f),false);
             for(int side=0;side<2;side++)

@@ -22,7 +22,8 @@ namespace ScrapGuard
                 for(int frame=0;frame<6000&&!run.Ended;frame++)
                 {
                     if(run.Choosing){int skill=run.Choices[0];foreach(int candidate in run.Choices)if(candidate>=8){skill=candidate;break;}run.Choose(skill);input.Choose(skill);}
-                    if(run.CanUltimate){run.UseUltimate();input.Ultimate();if(run.Ended)break;}
+                    if(run.CanActivateMachine){run.ActivateMachine();input.Machine();}
+                if(run.CanUltimate){run.UseUltimate();input.Ultimate();if(run.Ended)break;}
                     var target=new V2(270+Mathf.Cos(run.Elapsed*.06f)*450,490+Mathf.Sin(run.Elapsed*.06f)*600);
                     run.Tick(ReplayRecorder.Step,input.Move((target-run.Position).Normal));
                     if(frame%120==0)yield return null;
@@ -56,16 +57,24 @@ namespace ScrapGuard
             RenderBattle();yield return Capture("07-horde-210");
             combat.Pickups.Add(new Pickup{id=30000,xp=40,position=combat.Position});
             for(int i=0;i<20;i++){if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.Tick(.05f,new V2());}
+            if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.ActivateMachine();combat.Tick(.5f,new V2());
             combat.Hazards.Clear();RenderBattle();yield return Capture("08-salvage-machine");
             if(combat.MachinesBuilt<1)smokeErrors.Add("Machine assembly did not trigger from collected salvage");
             combat.Skills[8]=combat.Skills[9]=combat.Skills[10]=5;combat.Tick(.05f,new V2());RenderBattle();yield return Capture("09-new-arsenal");
             combat.Choosing=true;combat.Skills[8]=combat.Skills[9]=2;combat.Choices=new[]{8,9,11};ShowChoices();yield return Capture("10-new-skill-choices");CloseModal();combat.Choosing=false;
             combat.Skills[0]=5;combat.Skills[4]=3;combat.Tick(.05f,new V2());RenderBattle();yield return Capture("11-evolution");
+            for(int i=0;i<combat.Skills.Length;i++)combat.Skills[i]=5;
+            combat.Tick(.05f,new V2());RenderBattle();yield return Capture("11b-all-attack-evolutions");
+            if(combat.EvolutionMask!=((1<<1)|(1<<2)|(1<<3)|(1<<8)|(1<<9)|(1<<10)))smokeErrors.Add("Missing attack evolution");
+            if(Resources.Load<Texture2D>("Art/ContinuousFloor-v1")?.wrapMode!=TextureWrapMode.Mirror)smokeErrors.Add("Floor is not seam-safe mirrored texture");
+            foreach(string music in new[]{"Factory","Overdrive","Boss"})if(Resources.Load<AudioClip>("Audio/Licensed/"+music)==null)smokeErrors.Add("Missing music "+music);
+            for(int i=0;i<12;i++)if(CombatSoundBank.Get(i)==null)smokeErrors.Add("Missing licensed sound "+i);
             DrawReviveChoice();yield return Capture("12-revive-choice");CloseModal();
-            if(Resources.Load<AudioClip>("Audio/SalvageDrive")==null)smokeErrors.Add("Missing combat music asset");
+            if(Resources.Load<AudioClip>("Audio/Licensed/Factory")==null)smokeErrors.Add("Missing combat music asset");
             combat=null;Show("home");yield return Capture("13-home-return");
             yield return AssaultReplayCapture();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Assault UI errors: "+smokeErrors.Count+"\n"+Screen.width+"x"+Screen.height+"\n"+string.Join("\n",smokeErrors));
+            if(smokeWithNatural){smokeOutput=Path.Combine(smokeOutput,"Natural");Directory.CreateDirectory(smokeOutput);yield return NaturalCombatRoutine();yield break;}
             Debug.Log("ASSAULT_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);
         }
     }

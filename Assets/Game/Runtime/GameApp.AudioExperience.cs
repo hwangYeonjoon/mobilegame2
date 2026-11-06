@@ -3,20 +3,34 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        AudioSource musicSource;
+        AudioSource musicSource,musicTail;
+        readonly AudioClip[] battleMusic=new AudioClip[3];int musicIndex=-1;
         float nextHaptic;
         void StartBattleMusic()
         {
-            if(musicSource==null){musicSource=gameObject.AddComponent<AudioSource>();musicSource.loop=true;musicSource.playOnAwake=false;musicSource.clip=Resources.Load<AudioClip>("Audio/SalvageDrive");}
-            UpdateBattleMusic();
+            if(musicSource==null)
+            {
+                musicSource=gameObject.AddComponent<AudioSource>();musicTail=gameObject.AddComponent<AudioSource>();
+                foreach(var source in new[]{musicSource,musicTail}){source.loop=true;source.playOnAwake=false;source.volume=0;}
+                string[] names={"Factory","Overdrive","Boss"};for(int i=0;i<3;i++)battleMusic[i]=Resources.Load<AudioClip>("Audio/Licensed/"+names[i]);
+            }
+            musicIndex=-1;UpdateBattleMusic();
         }
         void UpdateBattleMusic()
         {
             if(musicSource==null)return;
             bool playing=combat!=null&&!combat.Ended&&!battlePaused&&!combat.Choosing&&!adBusy&&PlayerPrefs.GetInt("scrapguard.music",1)==1;
-            musicSource.volume=.28f;
-            if(playing&&!musicSource.isPlaying){musicSource.UnPause();if(!musicSource.isPlaying)musicSource.Play();}
-            if(!playing&&musicSource.isPlaying)musicSource.Pause();
+            if(!playing){if(musicSource.isPlaying)musicSource.Pause();if(musicTail.isPlaying)musicTail.Pause();return;}
+            int next=combat.FinalBossActive||combat.Challenge?2:combat.MachineTime>0?1:combat.Definition.Region%2;
+            if(next!=musicIndex)
+            {
+                var previous=musicSource;musicSource=musicTail;musicTail=previous;
+                musicSource.Stop();musicSource.clip=battleMusic[next];musicSource.volume=0;musicSource.Play();musicIndex=next;
+            }
+            if(!musicSource.isPlaying){musicSource.UnPause();if(!musicSource.isPlaying)musicSource.Play();}
+            musicSource.volume=Mathf.MoveTowards(musicSource.volume,.22f,Time.unscaledDeltaTime*.18f);
+            musicTail.volume=Mathf.MoveTowards(musicTail.volume,0,Time.unscaledDeltaTime*.18f);
+            if(musicTail.volume<=0)musicTail.Stop();else if(!musicTail.isPlaying)musicTail.UnPause();
         }
         void PulseHaptics(int milliseconds)
         {
@@ -39,11 +53,15 @@ namespace ScrapGuard
         }
         void AudioOptions()
         {
-            var card=Dialog("소리 · 진동","효과음은 계정에, 음악과 진동은 이 기기에 저장돼요.",520);
+            bool fromBattle=combat!=null&&!combat.Ended;if(fromBattle)battlePaused=true;
+            var card=Dialog("소리 · 진동","효과음은 계정에, 음악·진동·합체 설정은 이 기기에 저장돼요.",720);
+            if(fromBattle){var close=card.GetChild(2).GetComponent<UnityEngine.UI.Button>();close.onClick.RemoveAllListeners();close.onClick.AddListener(PauseBattle);}
             Ui.Button(card,State.sound?"효과음 켜짐":"효과음 꺼짐",24,142,444,64,()=>Change(new ScrapGuard.Core.GameCommand("sound"){enabled=!State.sound},AudioOptions),Ui.Raised);
             Ui.Button(card,PlayerPrefs.GetInt("scrapguard.music",1)==1?"배경음악 켜짐":"배경음악 꺼짐",24,226,444,64,()=>{PlayerPrefs.SetInt("scrapguard.music",1-PlayerPrefs.GetInt("scrapguard.music",1));PlayerPrefs.Save();UpdateBattleMusic();AudioOptions();},Ui.Raised);
             Ui.Button(card,PlayerPrefs.GetInt("scrapguard.haptics",1)==1?"진동 켜짐":"진동 꺼짐",24,310,444,64,()=>{PlayerPrefs.SetInt("scrapguard.haptics",1-PlayerPrefs.GetInt("scrapguard.haptics",1));PlayerPrefs.Save();PulseHaptics(25);AudioOptions();},Ui.Raised);
-            Ui.Label(card,"피격·성장·필살기·고철 합체에 짧은 진동을 사용해요.\n진동 지원 Android 기기에서 동작합니다.",24,402,444,70,17,Ui.Muted);
+            Ui.Button(card,PlayerPrefs.GetInt("scrapguard.machine.auto",0)==1?"고철 합체 · 자동 발동":"고철 합체 · 직접 발동",24,402,444,64,()=>{PlayerPrefs.SetInt("scrapguard.machine.auto",1-PlayerPrefs.GetInt("scrapguard.machine.auto",0));PlayerPrefs.Save();AudioOptions();},Ui.Raised,true,20);
+            Ui.Label(card,"피격·성장·필살기·고철 합체에 짧은 진동을 사용해요.\n진동 지원 Android 기기에서 동작합니다.",24,488,444,70,17,Ui.Muted);
+            Ui.Label(card,"음악: Alexander Ehlers · 효과음: Kenney (CC0)\n일반 지역·합체·보스전에 따라 음악이 전환됩니다.",24,588,444,70,16,Ui.Muted);
         }
     }
 }

@@ -17,6 +17,13 @@ namespace ScrapGuard.Core
         public int Salvage { get; private set; }
         public int MachinesBuilt { get; private set; }
         public float MachineTime { get; private set; }
+        public bool CanActivateMachine {get{return !Challenge&&!Ended&&!Choosing&&MachineTime<=0&&Salvage>=MachineCost;}}
+        public bool ActivateMachine()
+        {
+            if(!CanActivateMachine)return false;
+            Salvage-=MachineCost;MachinesBuilt++;MachineTime=12;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,95),20),24);
+            Effects.Add(new BattleEffect{position=Position,kind=10,text="고철 합체 · 분쇄 모드!"});return true;
+        }
         public V2 MachinePosition { get; private set; }
         public int MachineCost { get { return MachinesBuilt==0?40:120; } }
         public int WeaponEvolution { get; private set; }
@@ -24,7 +31,7 @@ namespace ScrapGuard.Core
         static readonly string[] EvolutionWeapons={"리벳", "산탄", "관통", "화염", "저격", "유탄"};
         float nextWave=22,machineShot,mortarTimer,bladeTimer,mineTimer;
         int bossPattern;
-        public sealed class ScrapMine { public V2 position; public float life=8,arm=.6f; }
+        public sealed class ScrapMine { public V2 position; public float life=8,arm=.6f; public bool chained; }
         public readonly List<ScrapMine> Mines=new List<ScrapMine>();
         V2 ClampWorld(V2 p,float margin)
         { return new V2(Math.Max(WorldLeft+margin,Math.Min(WorldRight-margin,p.x)),Math.Max(WorldTop+margin,Math.Min(WorldBottom-margin,p.y))); }
@@ -58,11 +65,6 @@ namespace ScrapGuard.Core
                 Effects.Add(new BattleEffect{position=Position,kind=10,text=WaveNumber%2==0?"포위 접근 · 빈 방향으로 탈출!":"고철 군집 접근 · 기계 조립 준비!"});
             }
             MachineTime=Math.Max(0,MachineTime-dt);
-            if(MachineTime<=0 && Salvage>=MachineCost)
-            {
-                Salvage-=MachineCost;MachinesBuilt++;MachineTime=12;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,85),20),24);
-                Effects.Add(new BattleEffect{position=Position,kind=10,text="고철 합체! · 이동식 분쇄 기계 가동"});
-            }
             if(MachineTime<=0)return;
             V2 follow=ClampWorld(Position+new V2(0,85),24);
             MachinePosition=Slide(MachinePosition,(follow-MachinePosition).Normal*Math.Min(V2.Distance(follow,MachinePosition),100*dt),20);
@@ -117,8 +119,23 @@ namespace ScrapGuard.Core
                 Effects.Add(new BattleEffect{position=Position,kind=10,text="봉쇄 포격 · 열린 틈으로 이동"});
             }
         }
+        int announcedEvolutions;
+        public bool SkillEvolved(int skill)
+        {
+            if(skill<0||skill>=Skills.Length||Skills[skill]<5)return false;
+            int support=skill==1?7:skill==2?6:skill==3?5:skill==8?4:skill==9?11:skill==10?7:-1;
+            return support>=0&&Skills[support]>=3;
+        }
+        public int EvolutionMask {get{int mask=0;foreach(int skill in new[]{1,2,3,8,9,10})if(SkillEvolved(skill))mask|=1<<skill;return mask;}}
+        public static string EvolutionTitle(int skill)
+        {switch(skill){case 1:return "행성 절단륜";case 2:return "극저온 폭풍";case 3:return "삼각 드론 편대";case 8:return "융단 포격";case 9:return "귀환 절단기";case 10:return "연쇄 지뢰망";default:return "주무기 진화";}}
+        public static string EvolutionRecipe(int skill)
+        {switch(skill){case 1:return "톱날 5 + 자력 3 · 넓은 궤도";case 2:return "코일 5 + 수리 3 · 광역 동결";case 3:return "드론 5 + 장전 3 · 3기 편대";case 8:return "박격포 5 + 고밀도 3 · 3연 포격";case 9:return "절단기 5 + 회수 엔진 3 · 귀환 궤도";case 10:return "지뢰 5 + 자력 3 · 연결 폭발";default:return "";}}
         void ResolveEvolution()
         {
+            int now=EvolutionMask,unlocked=now&~announcedEvolutions;
+            foreach(int skill in new[]{1,2,3,8,9,10})if((unlocked&(1<<skill))!=0)Effects.Add(new BattleEffect{position=Position,kind=7,text=EvolutionTitle(skill)+" 진화!"});
+            announcedEvolutions=now;
             if(WeaponEvolution!=0||Skills[0]<5)return;
             if(Skills[4]>=3)WeaponEvolution=1;
             else if(Skills[5]>=3)WeaponEvolution=2;
@@ -133,26 +150,29 @@ namespace ScrapGuard.Core
                 if(target!=null)
                 {
                     mortarTimer=3.2f-Skills[8]*.3f;float radius=65+Skills[8]*10;var center=target.position;
-                    Effects.Add(new BattleEffect{position=center,kind=2,radius=radius});
-                    foreach(var e in Enemies)if(e.hp>0&&V2.Distance(e.position,center)<radius)Hit(e,Damage*(1+Skills[8]*.3f));
+                    int shells=SkillEvolved(8)?3:1;
+                    for(int shell=0;shell<shells;shell++)
+                    {var impact=center+new V2((shell-(shells-1)*.5f)*95,0);Effects.Add(new BattleEffect{position=impact,kind=SkillEvolved(8)?11:2,radius=radius});
+                    foreach(var e in Enemies)if(e.hp>0&&V2.Distance(e.position,impact)<radius)Hit(e,Damage*(1+Skills[8]*.3f)/ (shells>1?1.5f:1));}
                 }
             }
             if(Skills[9]>0&&bladeTimer<=0)
             {
                 bladeTimer=2.5f-Skills[9]*.2f;
-                for(int i=0;i<4;i++)Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=V2.Angle(Facing+i*(float)Math.PI/2)*260,damage=Damage*.8f,life=1.3f,pierce=2+Skills[9],mod=true});
+                for(int i=0;i<4;i++)Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=V2.Angle(Facing+i*(float)Math.PI/2)*260,damage=Damage*(SkillEvolved(9)?1.1f:.8f),life=SkillEvolved(9)?2.4f:1.3f,pierce=2+Skills[9],mod=true,returning=SkillEvolved(9),visual=SkillEvolved(9)?4:0});
             }
             if(Skills[10]>0&&mineTimer<=0&&Mines.Count<12){mineTimer=3-Skills[10]*.3f;Mines.Add(new ScrapMine{position=Position});}
             for(int i=Mines.Count-1;i>=0;i--)
             {
                 var mine=Mines[i];mine.arm-=dt;mine.life-=dt;
-                bool trigger=false;
+                bool trigger=mine.chained;
                 if(mine.arm<=0)foreach(var e in Enemies)if(e.hp>0&&V2.Distance(e.position,mine.position)<45){trigger=true;break;}
                 if(trigger)
                 {
                     float radius=85+Skills[10]*6;
+                    if(SkillEvolved(10))foreach(var linked in Mines)if(linked!=mine&&linked.arm<=0&&V2.Distance(linked.position,mine.position)<190)linked.chained=true;
                     foreach(var e in Enemies)if(e.hp>0&&V2.Distance(e.position,mine.position)<radius)Hit(e,Damage*(1.5f+Skills[10]*.4f));
-                    Effects.Add(new BattleEffect{position=mine.position,kind=2,radius=radius});
+                    Effects.Add(new BattleEffect{position=mine.position,kind=SkillEvolved(10)?13:2,radius=radius});
                 }
                 if(trigger||mine.life<=0)Mines.RemoveAt(i);
             }

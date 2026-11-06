@@ -20,7 +20,7 @@ namespace ScrapGuard
             taskHud=Ui.Box(screen,24,123,492,43,new Color(.03f,.06f,.09f,.85f)).rectTransform;
             taskLabel=Ui.Label(taskHud,"",10,2,472,34,14,Ui.Ink,TextAnchor.MiddleCenter);
             taskFill=Ui.Box(taskHud,10,39,0,3,Ui.Blue,false);
-            taskChoiceButton=Ui.Button(screen,"접근해서 회수 방법 선택",120,757,300,49,OpenFieldChoice,Ui.Blue,false,16);
+            taskChoiceButton=Ui.Button(screen,"접근해서 회수 방법 선택",180,833,155,55,OpenFieldChoice,Ui.Blue,false,14);
         }
         void RenderFieldTask()
         {
@@ -36,7 +36,7 @@ namespace ScrapGuard
             {
                 taskChoiceButton.gameObject.SetActive(combat.CanAssemble || combat.Task==FieldTask.Salvage && combat.TaskActive && combat.TaskChoice==0);
                 taskChoiceButton.interactable=combat.CanChooseTask || combat.CanAssemble;
-                taskChoiceButton.GetComponentInChildren<Text>().text=combat.CanAssemble?"부품 확보 · 현장 개조 선택":combat.CanChooseTask?"회수 방법 선택":"회수 장치의 푸른 원으로 이동";
+                taskChoiceButton.GetComponentInChildren<Text>().text=combat.CanAssemble?"현장 개조":combat.CanChooseTask?"회수 선택":"장치에 접근";
             }
         }
         void OpenFieldChoice()

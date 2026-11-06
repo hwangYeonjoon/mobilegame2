@@ -9,7 +9,7 @@ namespace ScrapGuard.Core
         public float[] damage = new float[13];
         public int cause, mods, task, taskChoice, fieldModule, hero;
         public bool taskCompleted, revived;
-        public int machines, waves, evolution;
+        public int machines, waves, evolution, skillEvolutions;
         public int[] skills = new int[12];
         public float bossRemaining = -1;
     }

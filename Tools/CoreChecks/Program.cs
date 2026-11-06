@@ -32,7 +32,10 @@ class Program
         var trace=new Combat(data.state,data.stage,data.id,data.seed,false,data.mode);int at=0;
         foreach(var step in data.steps)
         {
-            if(step.skill>=0&&!trace.Choose(step.skill)){Console.WriteLine("DIVERGED step="+at+" time="+trace.Elapsed+" level="+trace.Level+" xp="+trace.Xp+" requested="+step.skill+" choosing="+trace.Choosing+" offered="+string.Join(",",trace.Choices)+" pos="+trace.Position.x+","+trace.Position.y+" kills="+trace.Kills);return 1;}
+            if(step.machine){if(!trace.ActivateMachine())throw new Exception("Invalid machine input");}
+            else if(step.encounter!=0){if(!trace.ChooseTask(step.encounter))throw new Exception("Invalid encounter");}
+            else if(step.assembly!=0){if(!trace.Assemble(step.assembly))throw new Exception("Invalid assembly");}
+            else if(step.skill>=0&&!trace.Choose(step.skill)){Console.WriteLine("DIVERGED step="+at+" time="+trace.Elapsed+" level="+trace.Level+" xp="+trace.Xp+" requested="+step.skill+" choosing="+trace.Choosing+" offered="+string.Join(",",trace.Choices)+" pos="+trace.Position.x+","+trace.Position.y+" kills="+trace.Kills);return 1;}
             else if(step.ultimate)trace.UseUltimate();
             else if(step.skill<0)for(int i=0;i<step.frames;i++)trace.Tick(ReplayRecorder.Step,new V2(step.x/100f,step.y/100f));
             at++;
