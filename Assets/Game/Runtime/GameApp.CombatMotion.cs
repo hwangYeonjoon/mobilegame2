@@ -51,8 +51,8 @@ namespace ScrapGuard
             muzzle.rectTransform.anchoredPosition = new Vector2(point.x,-point.y);
             muzzle.rectTransform.localScale = Vector3.one*(.5f+recoil*.7f);
             muzzle.rectTransform.localEulerAngles = new Vector3(0,0,-combat.Facing*Mathf.Rad2Deg);
-            arena.anchoredPosition = visualBudget.Compact?Vector2.zero:combat.UltimateFlash>.3f
-                ? new Vector2(Mathf.Sin(combat.Elapsed*95)*2,Mathf.Cos(combat.Elapsed*80)*2) : combat.HurtFlash>0?new Vector2(Mathf.Sin(combat.Elapsed*85),0):Vector2.zero;
+            arena.anchoredPosition = BattleCameraOffset()+(visualBudget.Compact?Vector2.zero:combat.UltimateFlash>.3f
+                ? new Vector2(Mathf.Sin(combat.Elapsed*95)*2,Mathf.Cos(combat.Elapsed*80)*2) : combat.HurtFlash>0?new Vector2(Mathf.Sin(combat.Elapsed*85),0):Vector2.zero);
             if (combat.UltimateUses != renderedUltimate)
             {
                 renderedUltimate = combat.UltimateUses;
@@ -70,6 +70,7 @@ namespace ScrapGuard
         }
         void ShowUltimateEffect()
         {
+            PulseHaptics(40);
             if (State.sound && audioSource != null)
             {
                 if (ultimateClip == null)
@@ -125,7 +126,7 @@ namespace ScrapGuard
                     spark.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.55f,.7f,1.7f);
                 }
             }
-            var label=Ui.Label(effectLayer,Combat.UltimateNames[combat.Hero],80,266,380,50,30,color,TextAnchor.MiddleCenter);
+            var label=Ui.Label(effectLayer,Combat.UltimateNames[combat.Hero],combat.Position.x-190,combat.Position.y-180,380,50,30,color,TextAnchor.MiddleCenter);
             label.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(1.1f,1,1);
         }
     }

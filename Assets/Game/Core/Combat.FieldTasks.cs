@@ -73,14 +73,8 @@ namespace ScrapGuard.Core
             // A deterministic early progression floor; collecting drops can reach it sooner.
             if(Stage==0 && Level==1 && Elapsed>=8)Xp=Math.Max(Xp,NeededXp);
             if(Stage==0 && Level==2 && Elapsed>=24)Xp=Math.Max(Xp,NeededXp);
-            int wave=(int)(Elapsed/22);
-            if(wave>lastPacingWave && wave<=7)
-            {
-                lastPacingWave=wave;
-                Effects.Add(new BattleEffect{position=new V2(270,310),kind=7,text=wave%2==1?"고철 무리 접근":"재정비 구간 · 경험치를 회수하세요"});
-                if(wave%2==1)for(int i=0;i<3 && Enemies.Count<150;i++)Spawn(0,false);
-            }
+
         }
-        int lastPacingWave;
+
     }
 }

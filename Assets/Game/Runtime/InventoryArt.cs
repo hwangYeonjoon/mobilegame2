@@ -10,7 +10,7 @@ namespace ScrapGuard
         public static string Rank(int tier) { return new[]{"I","II","III"}[Mathf.Clamp(tier,0,2)]; }
         public static string Slot(int slot) { return new[]{"무기","갑옷","모듈"}[Mathf.Clamp(slot,0,2)]; }
         public static Sprite Equipment(int id) { return ArenaArt.Cell("EquipmentIcons-v1",4,3,id%4,id/4); }
-        public static Sprite Skill(int id) { return ArenaArt.Cell("SkillIcons-v1",4,2,id%4,id/4); }
+        public static Sprite Skill(int id) { return id>=8?Equipment(new[]{5,1,2,9}[Mathf.Clamp(id-8,0,3)]):ArenaArt.Cell("SkillIcons-v1",4,2,id%4,id/4); }
         static Texture2D packAtlas;
         static readonly Sprite[] packs=new Sprite[5];
         public static Sprite Pack(int id)

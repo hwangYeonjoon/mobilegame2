@@ -65,17 +65,20 @@ namespace ScrapGuard.Editor
         }
         public static void BuildAndroidSoakQA(){BuildAndroidQA(true);}
         public static void BuildAndroidPolishQA(){BuildAndroidQA(false);}
-        static void BuildAndroidQA(bool soak)
+        public static void BuildAndroidAssaultQA(){BuildAndroidQA(false,true);}
+        static void BuildAndroidQA(bool soak,bool assault=false)
         {
             Configure();EditorUserBuildSettings.buildAppBundle=false;
             string previous=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),previousName=PlayerSettings.productName;
+            const string dependencyPath="ProjectSettings/AndroidResolverDependencies.xml";
+            byte[] previousDependencies=File.Exists(dependencyPath)?File.ReadAllBytes(dependencyPath):null;
             try
             {
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,ScrapGuard.Core.AppRelease.Package+".qa");
                 PlayerSettings.productName="고철 수호대 QA";
-                Build(BuildTarget.Android,"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
+                Build(BuildTarget.Android,"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
             }
-            finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();}
+            finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();if(previousDependencies!=null)File.WriteAllBytes(dependencyPath,previousDependencies);}
         }
         public static bool InternalTestBuild {get;private set;}
         [MenuItem("Scrap Guard/Build signed internal-test AAB")]

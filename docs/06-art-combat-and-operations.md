@@ -177,3 +177,60 @@ python3 Tools/deploy_checks.py
 ```
 
 로컬 Compose는 `127.0.0.1:5190`만 열고 운영용 볼륨과 분리된다. 검증 종료 후 테스트 컨테이너는 정지했으며 볼륨과 백업은 보존했다. `local-integration-test-invite-03`은 이 테스트 스택 전용 공개 테스트 코드이며 운영에 사용하지 않는다.
+
+
+## 0.21 전투 구조 확장 — 배포 전 개발본
+
+일반 작전은 중앙 임무 배치를 유지하면서 바닥·장애물·지역 지형을 3×3으로 확장했다. 전장의 범위는 x=-540..1080, y=-480..1480이고 플레이어 중심으로 화면이 이동한다. `Campaign.WorldGeometry`를 시뮬레이션과 표시가 함께 사용한다. 기존 42개 작전과 7지역을 재사용하며, 42개의 새로운 수작업 맵을 제작했다는 의미는 아니다. 순위 도전은 기존 제한 전장을 유지한다.
+
+전투 표시 영역은 안전 영역 전체이고 상단 정보와 하단 조작부가 겹쳐 표시된다. 초보 안내는 첫 18초까지만 표시하며 지속 개조 설명은 전투 화면에서 걷어냈다. 실제 획득한 스킬만 하단에 표시한다. 홈은 큰 출격 버튼, 성장 버튼, 활동 메뉴를 중심으로 구성했다.
+
+군집은 일반 출현 2~6마리와 별도 웨이브로 구성한다. 첫 웨이브는 22초에 예고되며 2.4초 뒤 접근한다. 포위에는 약 80도 탈출 구간을 둔다. 작은 적의 체력을 낮춰 처치와 회수를 늘렸으며 정예/보스는 강한 목표로 남는다. 보스는 단일 포격, 시간차 교차 포격, 탈출 틈이 있는 원형 봉쇄를 순환하고 반 체력 이하에서 추가 포격을 사용한다. 기존 지역별 역할 행동도 유지한다.
+
+신규 스킬: 곡사 박격포(목표 주변 폭발), 십자 절단기(네 방향 관통), 지뢰 살포기(지연 무장 후 접근 감지), 회수 엔진(회수량 2배와 레벨별 이동 속도). 리벳 Lv.5 뒤 고밀도 Lv.3을 먼저 달성하면 중장, 장전 Lv.3을 먼저 달성하면 분산 진화가 잠긴다. 이후 반대 스킬을 키워도 바뀌지 않는다. 동일 선택 순간 양쪽 조건을 충족한 외부 fixture에는 중장을 우선한다.
+
+핵심 특징은 `처치 → 고철 회수 → 대형 기계 합체 → 군집 정리`다. 고철은 실제 수집한 경험치에서 산출하는 이번 전투 전용 자원이며 상점 부품/골드를 지급하지 않는다. 첫 합체는 40, 이후 120을 소비하고 12초 작동한다. 현장 자력 개조는 범위, 수리 개조는 회복, 포탑/레일 개조는 관통 사격을 더한다. 위험 경고는 항상 아군 기계와 효과보다 위에 표시한다.
+
+새 합체 외형은 내장 image_gen으로 생성한 `Assets/Resources/Art/SalvageMachine-v1.png`이며 투명 원본을 보존한다. 최종 프롬프트와 제작 방식은 `ArtSource/SalvageMachine-v1.prompt.txt`에 기록했다. 음악 `Assets/Resources/Audio/SalvageDrive.wav`는 `Tools/generate_combat_music.py`로 직접 합성한 약 34초 원본 루프이며 외부 음원 샘플을 사용하지 않는다. 효과음/음악/진동을 각각 설정할 수 있다. Android 진동은 [VibrationEffect](https://developer.android.com/reference/android/os/VibrationEffect)의 짧은 펄스로 피격, 성장, 필살기, 합체에 연결한다.
+
+탄환은 80단위 공간 격자에서 인접 적만 조회하고 ID 순서를 유지해 충돌 순서가 바뀌지 않게 했다. 화면 밖 적/탄환/경험치의 시각 객체는 재사용한다. 이는 성능 개선 구조이며 저사양 Android에서 60fps를 보장한다는 의미는 아니다.
+
+사람 테스트 준비: 실제 터치로 첫 3분 이동·회수·합체를 이해하는지, 포위 틈을 인식하는지, 소리/진동이 피로하지 않은지, 재도전을 원하는지 관찰한다. Android 실기기에서 20분 이상 프레임·발열·메모리·전화/백그라운드 복귀를 확인한다. 사람 검증 결과는 아직 없다. 기록 동의와 내보내기를 거친 데이터만 버전·플랫폼별로 집계하며 재플레이 의향 응답을 실제 재방문율로 표현하지 않는다.
+
+## 0.21 검증과 배포 조건
+
+2026-11-06 개발본 검사 결과:
+
+| 검사 | 결과 | 로컬 증거 |
+| --- | --- | --- |
+| 코어 규칙 | 92/92 통과 | `TestResults/assault-core-final.txt` |
+| 서버 | 344개 통과, 부활 SSV·중복·다른 출격·종료 후 지급 차단 포함 | `TestResults/assault-server-final.txt` |
+| Unity EditMode | 127/127 통과 | `TestResults/assault-tests-final.xml` |
+| 선택 동의 기록 집계 | Python 2개 통과, 중복 제거·QA 제외·버전 구분 | `Tools/test_playtest_report.py` |
+| Editor → .NET 리플레이 | 15/15 일치, 5개 작전/모드 × 3개 시드 | `TestResults/assault-cross-runtime.json` |
+| macOS Player → .NET 리플레이 | 2/2 일치 | `TestResults/assault-macos-runtime.json` |
+| Android IL2CPP → .NET 리플레이 | 2/2 일치 | `TestResults/assault-android-runtime.json` |
+| macOS 화면 | 360×640, 360×800 각각 14장, 실행 오류 0 | `TestResults/AssaultCommitShort`, `TestResults/AssaultCommitTall` |
+| Android 가상 기기 화면 | API 35, 540×1200, 14장, 실행 오류 0 | `TestResults/AssaultCommitAndroid/report.txt` |
+| Android QA 패키지 | 0.21.0/code 24, ARM64, v2 서명, ZIP/ELF 16KB 정렬 6개 통과 | `TestResults/apk-24-qa-verification.json` |
+
+재현 명령:
+
+```sh
+dotnet run --project Tools/CoreChecks/CoreChecks.csproj
+dotnet run --project Server/Checks/Checks.csproj
+python3 -m unittest discover -s Tools -p test_playtest_report.py
+unity test . --mode EditMode --output TestResults/assault-tests-final.xml --timeout 240
+unity run . --timeout 240 -- -buildTarget StandaloneOSX -executeMethod ScrapGuard.Editor.CombatRuntimeAudit.CaptureAndBuildMac
+python3 Tools/verify_runtime_replays.py TestResults/RuntimeAuditFinal --output TestResults/assault-cross-runtime.json
+unity run . --timeout 900 -- -buildTarget Android -executeMethod ScrapGuard.Editor.ProjectBuilder.BuildAndroidAssaultQA
+python3 Tools/verify_apk.py --qa
+```
+
+QA Android는 `.qa` 별도 패키지와 별도 저장을 사용하고 계정·광고·결제를 연결하지 않는다. 시작하면 화면 검사와 전투 기록 2개를 `Android/data/io.github.hwangyeonjoon.scrapguard.qa/files/AssaultUI`에 생성한다. 이를 가져와 `Tools/verify_runtime_replays.py`에 전달하면 IL2CPP 결과를 서버와 비교한다. QA 빌드 후 패키지·상품 이름과 Android 의존성 설정을 원래 값으로 복구한다. 결과 파일과 빌드는 Git에 넣지 않으며 다른 PC에서는 재생성한다.
+
+이번 Android 검사는 SwiftShader 가상 기기의 설치 응답 지연 후 데이터를 유지한 재부팅과 `wm size 540x1200`으로 진행했다. 완료 후 원래 1080×2400 해상도로 복구했다. 검증 APK SHA-256은 `6c77f37a546b04d73b992abb0ef70aaa10dee345876f9300d7d7ffe8b5ca9166`, 크기는 157,922,146바이트다. 실제 손 조작·원래 해상도의 연속 플레이·물리 기기 성능·발열 검증은 포함하지 않는다.
+
+실행 중 Mono와 .NET의 부동소수점 차이로 발생한 리플레이 불일치를 수정했다. 좌표는 1/4096, 적 피격 피해는 1/256 단위로 정규화하고 피해 숫자 표시가 전투 난수를 소비하지 않도록 했다. 위 비교는 실제 생성된 입력 기록에 대한 검사이며 모든 작전·플랫폼의 일치를 보장하지 않는다. 화면의 210마리 군집과 부활 선택 화면은 명시적인 QA fixture이므로 자연 플레이 성능이나 실제 광고 성공 사례로 집계하지 않는다.
+
+배포 전 남은 조건은 Android 실기기 장시간 성능·터치·진동·복귀 검사, 실제 AdMob 부활 SSV와 지연 재확인, 새 앱/서버 동시 전환 검증이다. 전투 규칙 13을 적용하는 배포에서는 최소 앱 빌드 24를 함께 지정해야 한다. 진행 중인 구 규칙 작전과 강제 업데이트 안내를 사전 확인하고 운영 DB 백업 후 배포한다. 이번 변경으로 운영 서버나 Play 테스트 트랙을 갱신하지 않았다. 사람 테스트는 첫 합체 도달·스테이지 난이도·재도전 의향을 확인하며 시즌 패스와 신규 현금 상품은 별도 후속 작업이다.

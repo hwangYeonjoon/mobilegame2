@@ -11,10 +11,10 @@ namespace ScrapGuard.Tests
             Check(!c.HasMod(0),"requires both components");c.Skills[7]=2;
             var e=new Enemy {id=999,position=c.Position+new V2(120,0),hp=10000,maxHp=10000};c.Enemies.Add(e);
             c.Tick(.05f,new V2());Check(V2.Distance(e.position,c.Position)<120,"magnet saw pulls target");
-            c=new Combat(GameState.New(),0,"turret");c.Skills[0]=3;c.Skills[5]=2;
+            c=new Combat(GameState.New(),0,"turret");c.Skills[0]=3;c.Skills[5]=3;
             c.Enemies.Add(new Enemy {id=999,position=c.Position+new V2(180,0),hp=10000,maxHp=10000});c.Tick(.05f,new V2());
             Check(c.Bullets.Exists(b=>b.mod && b.pierce==1),"turret creates separate piercing fire");
-            c=new Combat(GameState.New(),0,"chain");c.Skills[2]=3;c.Skills[3]=2;
+            c=new Combat(GameState.New(),0,"chain");c.Skills[2]=4;c.Skills[3]=1;
             for(int i=0;i<3;i++)c.Enemies.Add(new Enemy {id=990+i,position=c.Position+new V2(0,-110-i*60),hp=10000,maxHp=10000});
             c.Tick(.05f,new V2());Check(c.Effects.FindAll(f=>f.kind==8).Count==3,"chain visits three distinct targets once");
             Check(c.Enemies.FindAll(x=>x.id>=990 && x.hp<10000).Count==3,"chain damages distinct targets");
@@ -27,11 +27,12 @@ namespace ScrapGuard.Tests
             {
                 if(c.Choosing)
                 {
-                    int choice=c.Choices[0];foreach(int skill in new[]{0,5,1,7,2,3,4,6})if(Array.IndexOf(c.Choices,skill)>=0){choice=skill;break;}
+                    int choice=c.Choices[0];foreach(int skill in new[]{1,7,0,5,2,3,4,6})if(Array.IndexOf(c.Choices,skill)>=0){choice=skill;break;}
                     r.Choose(choice);c.Choose(choice);
                 }
-                if(c.CanUltimate){r.Ultimate();c.UseUltimate();}
+                if(c.CanUltimate){r.Ultimate();c.UseUltimate();if(c.Ended)break;}
                 var target=new V2(270+(float)Math.Cos(c.Elapsed*.4f)*160,490+(float)Math.Sin(c.Elapsed*.4f)*210);
+                if(c.Pickups.Count>0){float near=float.MaxValue;foreach(var pickup in c.Pickups){float d=V2.Distance(pickup.position,c.Position);if(d<near){near=d;target=pickup.position;}}}
                 c.Tick(ReplayRecorder.Step,r.Move((target-c.Position).Normal));
             }
             if(!c.Ended)c.Abandon();var verified=ReplayRecorder.Verify(s,0,"mods",41,r.Steps,500);

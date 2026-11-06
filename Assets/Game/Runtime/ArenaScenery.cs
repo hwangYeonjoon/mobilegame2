@@ -52,22 +52,22 @@ namespace ScrapGuard
             var scene=root.gameObject.AddComponent<ArenaScenery>();
             scene.region=challenge?7:Campaign.Get(stage).Region;
             int region=scene.region;var accent=Accents[region];
-            var floor=Ui.Box(root,0,177,540,655,Color.white,false);
-            floor.sprite=ArenaArt.Floor(region);
+            for(int x=challenge?0:-1;x< (challenge?1:2);x++)for(int y=challenge?0:-1;y<(challenge?1:2);y++)
+            {var tile=Ui.Box(root,x*540,177+y*655,540,655,Color.white,false);tile.sprite=ArenaArt.Floor(region);}
             // Quiet floor beneath actors; props and warning lines retain their contrast.
-            Ui.Box(root,0,177,540,655,new Color(.025f,.04f,.06f,.24f),false);
+            Ui.Box(root,challenge?0:-540,challenge?177:-480,challenge?540:1620,challenge?655:1960,new Color(.025f,.04f,.06f,.24f),false);
             for(int side=0;side<2;side++)
             {
                 var glow=Ui.Rect(root,"Facility light",side==0?-100:360,side==0?230:560,280,300).gameObject.AddComponent<AmbientLight>();
                 glow.raycastTarget=false;glow.color=new Color(accent.r,accent.g,accent.b,.16f);scene.lights.Add(glow);
             }
-            for(int side=0;side<2;side++)for(int i=0;i<8;i++)
+            if(challenge)for(int side=0;side<2;side++)for(int i=0;i<8;i++)
             {
                 Ui.Box(root,side==0?4:528,199+i*76,8,44,Ui.Hex("17222D"),false);
                 scene.lamps.Add(Ui.Box(root,side==0?7:531,205+i*76,2,26,accent,false));
             }
-            // Peripheral depth stays under actors and danger warnings; only 12 ambient motes.
-            for(int side=0;side<2;side++)
+            // Campaign has a continuous floor instead of an internal box wall.
+            if(challenge)for(int side=0;side<2;side++)
             {
                 Ui.Box(root,side==0?0:524,177,16,655,new Color(.02f,.03f,.05f,.6f),false);
                 Ui.Box(root,side==0?16:521,177,3,655,new Color(accent.r,accent.g,accent.b,.18f),false);
@@ -83,7 +83,7 @@ namespace ScrapGuard
                 ring.anchoredPosition=new Vector2(270,-330);return scene;
             }
             var definition=Campaign.Get(stage);
-            foreach(var z in Campaign.Zones(definition))
+            foreach(var z in Campaign.WorldGeometry(Campaign.Zones(definition)))
             {
                 var zone=Ui.Rect(root,"Terrain region "+region,z.X,z.Y,z.W,z.H);
                 var tag=zone.gameObject.AddComponent<ArenaGeometryTag>();tag.Bounds=z;tag.Region=region;
@@ -112,7 +112,7 @@ namespace ScrapGuard
                     scene.belts.Add(arrow);scene.beltOrigins.Add(arrow.anchoredPosition);
                 }
             }
-            foreach(var b in Campaign.Blocks(definition))
+            foreach(var b in Campaign.WorldGeometry(Campaign.Blocks(definition)))
             {
                 // Cast shadow is decorative; the tagged rectangle below remains the exact collision footprint.
                 Ui.Box(root,b.X+7,b.Y+9,b.W,b.H,new Color(0,0,0,.22f),true,"Machinery cast shadow");

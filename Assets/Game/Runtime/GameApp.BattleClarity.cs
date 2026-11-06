@@ -8,7 +8,7 @@ namespace ScrapGuard
         BattleVisualBudget visualBudget;
         CanvasGroup effectOpacity;
         RectTransform identityLayer;
-        readonly int[] displayedSkills={-1,-1,-1,-1,-1,-1,-1,-1};
+        readonly int[] displayedSkills={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
         int battleOutfit,displayedHp=-1,displayedMaxHp=-1,displayedKills=-1,displayedSeconds=-1;
         bool displayedShield;
         readonly System.Collections.Generic.Stack<RectTransform> textEffects=new System.Collections.Generic.Stack<RectTransform>();
@@ -20,7 +20,7 @@ namespace ScrapGuard
             effectOpacity=effectLayer.gameObject.AddComponent<CanvasGroup>();effectOpacity.blocksRaycasts=false;
             battleOutfit=Outfits.Active(State,combat.Hero);
             displayedHp=displayedMaxHp=displayedKills=displayedSeconds=-1;
-            for(int i=0;i<8;i++)displayedSkills[i]=-1;
+            for(int i=0;i<12;i++)displayedSkills[i]=-1;
             textEffects.Clear();ringEffects.Clear();arcEffects.Clear();
             // Player stays visible above friendly VFX; every danger boundary remains above the player.
             identityLayer=Ui.Rect(arena,"Identity actors",0,0,540,960);
@@ -28,7 +28,7 @@ namespace ScrapGuard
             hazardLayer.SetAsLastSibling();playerLocator.SetAsLastSibling();
             for(int frame=0;frame<6;frame++)GuardianMotion.Frame(combat.Hero,State.selectedSkin,frame);
             string look=StylePresentation.Look(battleOutfit,State.selectedSkin);
-            Ui.Label(screen,Catalog.HeroNames[combat.Hero]+" · "+look,24,88,492,22,14,battleOutfit>0?OutfitVisuals.Accent(battleOutfit):Ui.Mint);
+            // Identity is visible on the actor; avoid a permanent second HUD row.
         }
         void UpdateVisualBudget()
         {

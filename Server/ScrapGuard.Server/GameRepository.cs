@@ -162,19 +162,20 @@ public sealed partial class GameRepository
                 if (a.State.activeRun != command.id || a.RunSnapshot == null || a.RunStarted == null) throw new ApiFault(400, "진행 중인 서버 작전을 찾을 수 없어요.");
                 if (a.RunRules != Combat.RulesVersion || command.rulesVersion != Combat.RulesVersion) throw new ApiFault(409,"이전 버전의 작전이에요. 계정 화면에서 중단 작전을 종료해 주세요.");
                 Combat simulation;
-                try { simulation = ReplayRecorder.Verify(Decode<GameState>(a.RunSnapshot), a.State.activeStage, command.id, a.RunSeed, command.replay, (clock() - DateTimeOffset.Parse(a.RunStarted)).TotalSeconds, a.State.activeMode, a.RunSupport==null?null:Decode<SupportSnapshot>(a.RunSupport)); }
+                try { simulation = ReplayRecorder.Verify(Decode<GameState>(a.RunSnapshot), a.State.activeStage, command.id, a.RunSeed, command.replay, (clock() - DateTimeOffset.Parse(a.RunStarted)).TotalSeconds, a.State.activeMode, a.RunSupport==null?null:Decode<SupportSnapshot>(a.RunSupport),HasRunRevive(db,tx,a.Id,command.id)); }
                 catch (ArgumentException ex) { throw new ApiFault(400, ex.Message); }
                 RecordWeekly(db,tx,a,simulation);
                 RecordSupport(db,tx,a,simulation);
                 RecordRestoration(db,tx,a,simulation);
                 result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
+                Execute(db,tx,"UPDATE ad_claims SET status='canceled' WHERE owner=$owner AND result_id=$run AND placement='revive' AND status='pending'",("$owner",a.Id),("$run",command.id));
                 a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }
             else
             {
                 // No client supplied wallet, score, entitlement or arbitrary reward is accepted.
                 result = command.type!=null && command.type.StartsWith("guild_",StringComparison.Ordinal) ? GuildCommand(db,tx,a,command) : CommandDispatcher.Apply(e, command, false);
-                if (command.type == "battle_cancel") a.RunSnapshot = a.RunStarted = a.RunSupport = null;
+                if (command.type == "battle_cancel") { Execute(db,tx,"UPDATE ad_claims SET status='canceled' WHERE owner=$owner AND placement='revive' AND status='pending'",("$owner",a.Id));a.RunSnapshot = a.RunStarted = a.RunSupport = null; }
             }
             if (!result.Success) throw new ApiFault(400, result.Message);
             AllocatePaidSpend(db,tx,a.Id,paidBefore-a.State.paidGems);

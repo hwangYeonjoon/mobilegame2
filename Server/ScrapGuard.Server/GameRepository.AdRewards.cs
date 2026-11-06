@@ -21,15 +21,20 @@ public sealed partial class GameRepository
         ExpireAds(db,tx,owner);
         using var q=Sql(db,tx,"SELECT COUNT(*) FROM ad_claims WHERE owner=$owner AND placement=$p AND status='pending'",("$owner",owner),("$p",placement));return (long)q.ExecuteScalar()>0;
     }
+    bool HasRunRevive(SqliteConnection db,SqliteTransaction tx,string owner,string run)
+    {
+        using var q=Sql(db,tx,"SELECT COUNT(*) FROM ad_claims WHERE owner=$owner AND result_id=$run AND placement='revive' AND status='granted'",("$owner",owner),("$run",run));
+        return (long)q.ExecuteScalar()>0;
+    }
     AdClaim ReadAd(SqliteConnection db,SqliteTransaction tx,Account a,string id)
     {
-        using var q=Sql(db,tx,"SELECT placement,status,gold,parts,unit,expires,test FROM ad_claims WHERE id=$id AND owner=$owner",("$id",id),("$owner",a.Id));
+        using var q=Sql(db,tx,"SELECT placement,status,gold,parts,unit,expires,test,result_id FROM ad_claims WHERE id=$id AND owner=$owner",("$id",id),("$owner",a.Id));
         using var r=q.ExecuteReader();if(!r.Read())throw new ApiFault(404,"광고 보상 요청을 찾을 수 없어요.");
-        return new AdClaim{id=id,userId=a.Id,placement=r.GetString(0),status=r.GetString(1),gold=r.GetInt32(2),parts=r.GetInt32(3),unitId=r.GetString(4),expires=r.GetString(5),test=r.GetInt32(6)!=0,reply=Reply(a)};
+        return new AdClaim{id=id,userId=a.Id,placement=r.GetString(0),status=r.GetString(1),gold=r.GetInt32(2),parts=r.GetInt32(3),unitId=r.GetString(4),expires=r.GetString(5),test=r.GetInt32(6)!=0,runId=r.GetString(7),reply=Reply(a)};
     }
     public AdClaim CreateAdClaim(string token,GameCommand request,AdPolicy policy)
     {
-        if(request==null||!System.Text.RegularExpressions.Regex.IsMatch(request.requestId??"","^[a-f0-9]{32}$")||request.value is not ("parts" or "result"))throw new ApiFault(400,"올바른 보상 요청이 필요해요.");
+        if(request==null||!System.Text.RegularExpressions.Regex.IsMatch(request.requestId??"","^[a-f0-9]{32}$")||request.value is not ("parts" or "result" or "revive"))throw new ApiFault(400,"올바른 보상 요청이 필요해요.");
         lock(gate)
         {
             using var db=Open();using var tx=db.BeginTransaction();var a=Load(db,tx,token);new Economy(a.State,clock).RefreshDay();ExpireAds(db,tx,a.Id);
@@ -37,14 +42,19 @@ public sealed partial class GameRepository
             using(var r=q.ExecuteReader())if(r.Read())
             {string id=r.GetString(0);if(r.GetString(1)!=request.value)throw new ApiFault(409,"요청 내용이 변경됐어요.");r.Close();var existing=ReadAd(db,tx,a,id);tx.Commit();return existing;}
             if(!policy.Enabled&&!a.State.adSkip)throw new ApiFault(503,"현재 광고 보상을 이용할 수 없어요.");
-            if(!string.IsNullOrEmpty(a.State.activeRun))throw new ApiFault(409,"출격을 마친 뒤 보상을 받아 주세요.");
+            if(request.value=="revive")
+            {
+                if(string.IsNullOrEmpty(a.State.activeRun)||Endgame.IsChallenge(a.State.activeMode)||a.RunRules!=Combat.RulesVersion)throw new ApiFault(409,"진행 중인 일반 작전에서만 부활할 수 있어요.");
+                if(HasRunRevive(db,tx,a.Id,a.State.activeRun))throw new ApiFault(409,"이 작전의 부활 권리는 이미 지급했어요. 보상 내역에서 확인해 주세요.");
+            }
+            else if(!string.IsNullOrEmpty(a.State.activeRun))throw new ApiFault(409,"출격을 마친 뒤 보상을 받아 주세요.");
             // One outstanding placement per account prevents parallel devices reserving the same result.
             if(HasAdReservation(db,tx,a.Id,request.value))throw new ApiFault(409,"확인 중인 광고 보상이 있어요. 보상 내역에서 확인해 주세요.");
-            var probe=Decode<GameState>(Encode(a.State));var valid=new Economy(probe,clock).ClaimDemoReward(request.value,"probe");
+            var probe=Decode<GameState>(Encode(a.State));var valid=request.value=="revive"?CommandResult.Ok("긴급 수리"):new Economy(probe,clock).ClaimDemoReward(request.value,"probe");
             if(!valid.Success)throw new ApiFault(400,valid.Message);
             string claim=Guid.NewGuid().ToString("N");int gold=probe.gold-a.State.gold,parts=probe.parts-a.State.parts;
             Execute(db,tx,"INSERT INTO ad_claims(id,owner,request_id,placement,service_date,result_id,gold,parts,status,unit,test,created,expires) VALUES($id,$owner,$req,$p,$day,$result,$gold,$parts,'pending',$unit,$test,$created,$expires)",
-                ("$id",claim),("$owner",a.Id),("$req",request.requestId),("$p",request.value),("$day",a.State.serviceDate),("$result",request.value=="result"?a.State.lastResultId:""),("$gold",gold),("$parts",parts),("$unit",policy.UnitId),("$test",policy.Mode=="test"?1:0),("$created",clock().ToString("O")),("$expires",clock().AddMinutes(20).ToString("O")));
+                ("$id",claim),("$owner",a.Id),("$req",request.requestId),("$p",request.value),("$day",a.State.serviceDate),("$result",request.value=="revive"?a.State.activeRun:request.value=="result"?a.State.lastResultId:""),("$gold",gold),("$parts",parts),("$unit",policy.UnitId),("$test",policy.Mode=="test"?1:0),("$created",clock().ToString("O")),("$expires",clock().AddMinutes(20).ToString("O")));
             if(a.State.adSkip)GrantAd(db,tx,a,claim,"skip:"+claim,false);
             var result=ReadAd(db,tx,a,claim);tx.Commit();return result;
         }
@@ -56,7 +66,11 @@ public sealed partial class GameRepository
         using(var r=q.ExecuteReader()){r.Read();placement=r.GetString(0);day=r.GetString(1);result=r.GetString(2);gold=r.GetInt32(3);parts=r.GetInt32(4);}
         new Economy(a.State,clock).RefreshDay();
         if(day!=a.State.serviceDate)throw new ApiFault(409,"보상 일자가 지났어요.");
-        if(placement=="parts") {if(a.State.dailyRewardParts>=2)throw new ApiFault(409,"오늘 부품 보상을 모두 받았어요.");a.State.dailyRewardParts++;}
+        if(placement=="revive")
+        {
+            if(a.State.activeRun!=result||Endgame.IsChallenge(a.State.activeMode)||HasRunRevive(db,tx,a.Id,result))throw new ApiFault(409,"종료됐거나 이미 부활 권리를 받은 작전이에요.");
+        }
+        else if(placement=="parts") {if(a.State.dailyRewardParts>=2)throw new ApiFault(409,"오늘 부품 보상을 모두 받았어요.");a.State.dailyRewardParts++;}
         else
         {
             if(a.State.dailyRewardGold>=3)throw new ApiFault(409,"오늘 전투 추가 보상을 모두 받았어요.");
@@ -64,7 +78,7 @@ public sealed partial class GameRepository
         }
         if(test)a.State.testProgress=true;
         a.State.gold=checked(a.State.gold+gold);a.State.parts=checked(a.State.parts+parts);a.Revision++;
-        a.State.receipts.Add(new Receipt{id=id,kind="verified_ad",gold=gold,parts=parts});
+        a.State.receipts.Add(new Receipt{id=id,kind=placement=="revive"?"verified_revive":"verified_ad",gold=gold,parts=parts});
         Execute(db,tx,"UPDATE accounts SET state=$state,revision=$revision WHERE id=$id",("$state",Encode(a.State)),("$revision",a.Revision),("$id",a.Id));
         Execute(db,tx,"UPDATE ad_claims SET status='granted',transaction_id=$transaction WHERE id=$id",("$transaction",transaction),("$id",id));
         foreach(var item in new[]{("gold",gold,a.State.gold),("parts",parts,a.State.parts)})if(item.Item2!=0)

@@ -1,5 +1,6 @@
 """Verify development APK packaging using Unity's Android SDK."""
 from pathlib import Path
+import argparse
 import hashlib
 import json
 import os
@@ -9,7 +10,17 @@ import subprocess
 import zipfile
 
 root = Path(__file__).resolve().parents[1]
-apk = root / 'Builds/Android/ScrapGuard-prototype.apk'
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--qa', action='store_true', help='Verify the isolated QA package')
+parser.add_argument('--apk', type=Path)
+parser.add_argument('--output', type=Path)
+args = parser.parse_args()
+release = (root / 'Assets/Game/Core/AppRelease.cs').read_text()
+version = re.search(r'Version="([^"]+)"', release).group(1)
+build = int(re.search(r'Build=(\d+)', release).group(1))
+package = re.search(r'Package="([^"]+)"', release).group(1) + ('.qa' if args.qa else '')
+app_id = re.search(r'adMobAndroidAppId:\s*(\S+)', (root / 'Assets/GoogleMobileAds/Resources/GoogleMobileAdsSettings.asset').read_text()).group(1)
+apk = args.apk or root / ('Builds/Android/ScrapGuard-qa.apk' if args.qa else 'Builds/Android/ScrapGuard-prototype.apk')
 android = Path(os.environ.get('SCRAP_ANDROID_PLAYER', '/Users/kd-server/Unity/Editors/6000.3.7f1/6000.3.7f1/PlaybackEngines/AndroidPlayer'))
 bin_dir = android / 'SDK/build-tools/36.0.0'
 env = dict(os.environ, JAVA_HOME=str(android / 'OpenJDK'))
@@ -21,16 +32,17 @@ def run(args):
     return result.stdout
 
 badging = run([bin_dir / 'aapt', 'dump', 'badging', apk])
-assert "package: name='io.github.hwangyeonjoon.scrapguard'" in badging
-assert "versionName='0.19.0'" in badging and "versionCode='19'" in badging
+assert f"package: name='{package}'" in badging
+assert f"versionName='{version}'" in badging and f"versionCode='{build}'" in badging
 assert "sdkVersion:'26'" in badging and "targetSdkVersion:'36'" in badging
 assert "native-code: 'arm64-v8a'" in badging
 manifest = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'AndroidManifest.xml'])
 assert 'androidx.core.content.FileProvider' in manifest
-assert 'io.github.hwangyeonjoon.scrapguard.showcase' in manifest
+assert package + '.showcase' in manifest
 assert 'android.permission.INTERNET' in manifest
+assert 'android.permission.VIBRATE' in manifest
 assert 'com.google.android.gms.ads.APPLICATION_ID' in manifest
-assert 'ca-app-pub-3940256099942544~3347511713' in manifest
+assert app_id in manifest
 assert 'android.permission.WRITE_EXTERNAL_STORAGE' not in manifest
 assert re.search(r'allowBackup[^\n]*0x0', manifest)
 paths = run([bin_dir / 'aapt', 'dump', 'xmltree', apk, 'res/xml/showcase_paths.xml'])
@@ -60,10 +72,12 @@ with zipfile.ZipFile(apk) as archive:
         libraries.append({'name': name, 'load_alignments': load_alignments})
 assert libraries
 report = {'apk': str(apk), 'bytes': apk.stat().st_size, 'sha256': hashlib.sha256(apk.read_bytes()).hexdigest(),
-          'package': 'io.github.hwangyeonjoon.scrapguard', 'version': '0.19.0', 'versionCode': 19, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
+          'package': package, 'version': version, 'versionCode': build, 'minSdk': 26, 'targetSdk': 36, 'abi': 'arm64-v8a',
           'v2_signature': True, 'zip_16kb': True, 'file_provider': True, 'backup_disabled': True,
           'libraries': libraries, 'device_execution': 'not tested'}
-(result_dir / 'apk-019-verification.json').write_text(json.dumps(report, indent=2) + '\n')
-(result_dir / 'apk-019-manifest.txt').write_text(manifest + '\n' + paths)
+output = args.output or result_dir / f'apk-{build}{"-qa" if args.qa else ""}-verification.json'
+output.parent.mkdir(parents=True, exist_ok=True)
+output.write_text(json.dumps(report, indent=2) + '\n')
+output.with_suffix('.manifest.txt').write_text(manifest + '\n' + paths)
 print(json.dumps({key:value for key,value in report.items() if key != 'libraries'}, indent=2))
 print('ELF libraries checked:', len(libraries))

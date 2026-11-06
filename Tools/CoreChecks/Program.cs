@@ -6,6 +6,8 @@ class Program
 {
     static int Main(string[] args)
     {
+        if (args.Length==2 && args[0]=="--case") { CoreSpecification.Run(args[1]);Console.WriteLine("PASS "+args[1]);return 0; }
+        if (args.Length==2 && args[0]=="--verify-replay") return VerifyRuntimeReplay(args[1]);
         if (Array.IndexOf(args, "--simulate") >= 0) return Simulate();
         if (Array.IndexOf(args, "--campaign") >= 0) return CampaignSimulation();
         int failures = 0;
@@ -16,6 +18,29 @@ class Program
         }
         Console.WriteLine((CoreSpecification.Names.Length - failures) + "/" + CoreSpecification.Names.Length + " passed");
         return failures == 0 ? 0 : 1;
+    }
+    #pragma warning disable CS0649 // Deserialized diagnostic fields.
+    sealed class RuntimeProbe
+    {
+        public GameState state;public System.Collections.Generic.List<ReplayStep> steps;
+        public string id,mode;public int stage,seed,kills,machines,waves;public float hp,seconds;public bool won;
+    }
+    #pragma warning restore CS0649
+    static int VerifyRuntimeReplay(string path)
+    {
+        var data=System.Text.Json.JsonSerializer.Deserialize<RuntimeProbe>(System.IO.File.ReadAllText(path),new System.Text.Json.JsonSerializerOptions{IncludeFields=true});
+        var trace=new Combat(data.state,data.stage,data.id,data.seed,false,data.mode);int at=0;
+        foreach(var step in data.steps)
+        {
+            if(step.skill>=0&&!trace.Choose(step.skill)){Console.WriteLine("DIVERGED step="+at+" time="+trace.Elapsed+" level="+trace.Level+" xp="+trace.Xp+" requested="+step.skill+" choosing="+trace.Choosing+" offered="+string.Join(",",trace.Choices)+" pos="+trace.Position.x+","+trace.Position.y+" kills="+trace.Kills);return 1;}
+            else if(step.ultimate)trace.UseUltimate();
+            else if(step.skill<0)for(int i=0;i<step.frames;i++)trace.Tick(ReplayRecorder.Step,new V2(step.x/100f,step.y/100f));
+            at++;
+        }
+        var result=ReplayRecorder.Verify(data.state,data.stage,data.id,data.seed,data.steps,600,data.mode);
+        bool match=result.Kills==data.kills && result.MachinesBuilt==data.machines && result.WaveNumber==data.waves && result.Won==data.won && Math.Abs(result.Hp-data.hp)<.02f;
+        Console.WriteLine("Unity -> .NET replay: "+(match?"PASS":"FAIL")+" kills="+result.Kills+"/"+data.kills+" machines="+result.MachinesBuilt+"/"+data.machines+" hp="+result.Hp+"/"+data.hp);
+        return match?0:1;
     }
     static int Simulate()
     {

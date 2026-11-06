@@ -15,9 +15,9 @@ namespace ScrapGuard
         {
             nextHitAudio=nextBreakAudio=nextPickupAudio=0;lastStreakKill=-10;streak=0;
             lastFeedbackLevel=1;lastFeedbackXp=0;noticeUntil=nextGrowthAudio=0;battleNotices.Clear();
-            combatNotice=Ui.Label(screen,"",55,338,430,51,17,Ui.Mint,TextAnchor.MiddleCenter);
+            combatNotice=Ui.Label(screen,"",55,237,430,45,17,Ui.Mint,TextAnchor.MiddleCenter);
             var shadow=combatNotice.gameObject.AddComponent<Shadow>();shadow.effectColor=new Color(0,0,0,.85f);shadow.effectDistance=new Vector2(1,-1);
-            streakLabel=Ui.Label(screen,"",24,303,492,30,16,Ui.Gold,TextAnchor.MiddleCenter);
+            streakLabel=Ui.Label(screen,"",24,204,492,30,16,Ui.Gold,TextAnchor.MiddleCenter);
             if(hitSound!=null)return;
             hitSound=CombatSoundBank.Get(0);breakSound=CombatSoundBank.Get(1);
             pickupSound=CombatSoundBank.Get(2);growthSound=CombatSoundBank.Get(3);
@@ -29,6 +29,7 @@ namespace ScrapGuard
         }
         void EventFeedback(BattleEffect effect)
         {
+            if(effect.kind==1)PulseHaptics(20);
             if(effect.kind==5)
             {
                 streak=combat.Elapsed-lastStreakKill<2.5f?streak+1:1;lastStreakKill=combat.Elapsed;

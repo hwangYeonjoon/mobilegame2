@@ -8,8 +8,9 @@ namespace ScrapGuard.Core
     {
         public float[] damage = new float[13];
         public int cause, mods, task, taskChoice, fieldModule, hero;
-        public bool taskCompleted;
-        public int[] skills = new int[8];
+        public bool taskCompleted, revived;
+        public int machines, waves, evolution;
+        public int[] skills = new int[12];
         public float bossRemaining = -1;
     }
     [Serializable] public sealed class RegionProgress
@@ -21,12 +22,13 @@ namespace ScrapGuard.Core
         public const int BlueprintCost=8;
         public static readonly string[] ModNames={"자력 분쇄기","연쇄 전격 드론","회전 리벳 포탑","파열 리벳","수리 드론","냉각 자력장"};
         public static readonly int[] MainSkills={1,2,0,0,3,2}, SubSkills={7,3,5,4,6,7};
+        public static readonly int[] MainLevels={3,4,3,5,2,4}, SubLevels={2,1,3,2,3,2};
         public static readonly string[] ModDetails={"톱날이 주변 적을 끌어당겨 분쇄", "드론에서 적 사이로 전격이 연쇄", "플레이어 주위를 돌며 자동 사격하는 포탑","기본 탄환 적중 시 주변에 폭발 피해","10초마다 체력 3% 수리 · 체력 8% 보호막 보충","코일 범위 +40 · 범위 내 적 1.8초 둔화"};
         public static readonly string[] CauseNames={"피해 없음","접촉","돌진","포격","자폭","오염 지대","철로 포격","레이저","보스 공격","시간 초과","작전 중단","전기 격자","용광로 분출"};
         public static readonly string[] Advice={"스킬 조합을 완성해 다음 작전에 도전하세요.","적에게 둘러싸이기 전에 빈 공간으로 이동하세요.","돌진 준비 표시가 보이면 옆으로 피하세요.","포격 예고 원 밖으로 이동한 뒤 공격하세요.","자폭 준비 중인 적에게서 거리를 벌리세요.","초록색 오염 지대 밖에서 적을 유인하세요.","붉게 표시된 철로를 벗어나세요.","레이저가 예고된 가로 띠 밖으로 이동하세요.","보스 예고 범위를 먼저 피하고 공격하세요.","공격 스킬 조합을 완성해 보스 화력을 높여 보세요.","다음 출격에서 진행을 이어가세요.","전기 격자 예고가 뜨면 옆 통로로 이동하세요.","용광로 분출이 예고된 통로를 벗어나세요."};
         public static int ModMask(int[] skills)
         {
-            int mask=0;for(int i=0;i<ModNames.Length;i++)if(skills[MainSkills[i]]>=3 && skills[SubSkills[i]]>=2)mask|=1<<i;return mask;
+            int mask=0;for(int i=0;i<ModNames.Length;i++)if(skills[MainSkills[i]]>=MainLevels[i] && skills[SubSkills[i]]>=SubLevels[i])mask|=1<<i;return mask;
         }
         public static int MainCause(BattleReport report)
         {

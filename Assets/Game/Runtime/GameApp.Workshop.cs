@@ -19,9 +19,9 @@ namespace ScrapGuard
                 Ui.Label(row,Workshop.ModNames[i],16,8,412,34,24,Ui.Mint);
                 InventoryArt.Draw(row,InventoryArt.Skill(Workshop.MainSkills[i]),12,49,52);
                 InventoryArt.Draw(row,InventoryArt.Skill(Workshop.SubSkills[i]),232,49,52);
-                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+"\nLv.3",70,48,142,55,18,Ui.Gold);
+                Ui.Label(row,Catalog.SkillNames[Workshop.MainSkills[i]]+"\nLv."+Workshop.MainLevels[i],70,48,142,55,18,Ui.Gold);
                 Ui.Label(row,"+",210,54,22,42,23,Ui.Muted);
-                Ui.Label(row,Catalog.SkillNames[Workshop.SubSkills[i]]+"\nLv.2",290,48,142,55,18,Ui.Gold);
+                Ui.Label(row,Catalog.SkillNames[Workshop.SubSkills[i]]+"\nLv."+Workshop.SubLevels[i],290,48,142,55,18,Ui.Gold);
                 Ui.Label(row,Workshop.ModDetails[i],16,117,412,62,19,Ui.Muted);
             }
             Ui.Button(card,"현장 개조 · 대원 전용 효과",24,740,444,60,FieldEngineeringGuide,Ui.Mint,true,20);
@@ -33,8 +33,9 @@ namespace ScrapGuard
             {
                 int main=combat.Skills[Workshop.MainSkills[i]]+(Workshop.MainSkills[i]==skill?1:0);
                 int sub=combat.Skills[Workshop.SubSkills[i]]+(Workshop.SubSkills[i]==skill?1:0);
-                hints+="\n"+Workshop.ModNames[i]+(main>=3 && sub>=2?" 완성!":" · "+Math.Min(main,3)+"/3 + "+Math.Min(sub,2)+"/2");shown++;
+                hints+="\n"+Workshop.ModNames[i]+(main>=Workshop.MainLevels[i] && sub>=Workshop.SubLevels[i]?" 완성!":" · "+Math.Min(main,Workshop.MainLevels[i])+"/"+Workshop.MainLevels[i]+" + "+Math.Min(sub,Workshop.SubLevels[i])+"/"+Workshop.SubLevels[i]);shown++;
             }
+            if((skill==0||skill==4||skill==5)&&combat.Skills[0]>=3)return "리벳 5 + 고밀도 3 → 중장\n리벳 5 + 장전 3 → 분산 (먼저 완성한 쪽)";
             return hints;
         }
         void RegionCollection(int region)
@@ -94,9 +95,10 @@ namespace ScrapGuard
             Ui.Label(card,"받은 체력 피해 · 보호막 흡수 제외",24,325,444,28,15,Ui.Muted);
             var list=Ui.Scroll(card,24,363,444,147,Math.Max(147,damage.Split('\n').Length*29));Ui.Label(list,damage.Length==0?"체력 피해 없음":damage,12,0,420,Math.Max(147,damage.Split('\n').Length*29),17);
             string mods=report.fieldModule>0?FieldEngineering.Name(report.fieldModule,report.hero)+" (현장 장착)\n":"";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
-            Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 공격 Lv.3 + 보조 Lv.2를 노려 보세요.":mods),24,534,444,101,14,Ui.Mint);
+            Ui.Label(card,"완성 개조\n"+(mods.Length==0?"없음 · 개조 도감에서 스킬별 조건을 확인하세요.":mods),24,534,444,101,14,Ui.Mint);
             string skills="";for(int i=0;i<report.skills.Length;i++)if(report.skills[i]>0)skills+=(skills.Length>0?" · ":"")+Catalog.SkillNames[i]+" "+report.skills[i];
-            Ui.Label(card,skills,24,650,444,79,14,Ui.Muted);
+            Ui.Label(card,skills,24,643,444,68,13,Ui.Muted);
+            Ui.Label(card,"고철 합체 "+report.machines+"회 · 웨이브 "+report.waves+" · "+(report.evolution==0?"진화 미완성":report.evolution==1?"중장 진화":"분산 진화")+(report.revived?" · 긴급 수리 사용":""),24,716,444,30,13,Ui.Mint);
             Ui.Button(card,"결과로 돌아가기",24,760,444,53,ShowResult,Ui.Raised,true,18);
         }
         void RenderModEffects()

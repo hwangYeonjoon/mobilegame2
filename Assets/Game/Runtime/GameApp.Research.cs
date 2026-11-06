@@ -9,6 +9,8 @@ namespace ScrapGuard
     {
         PlaytestJournal research;
         int frameSamples,slowFrames;double frameSeconds;
+        readonly int[] frameHistogram=new int[251];
+        int peakEnemies;string ratedRun;
         void SetupResearch(string profile)
         {
             research=new PlaytestJournal(Path.Combine(Path.GetDirectoryName(profile),"playtest-journal.json"));
@@ -21,6 +23,25 @@ namespace ScrapGuard
             if(combat==null||combat.Ended||battlePaused||combat.Choosing)return;
             float delta=Time.unscaledDeltaTime;if(delta<=0)return;
             frameSamples++;frameSeconds+=delta;if(delta>1f/30+.001f)slowFrames++;
+            frameHistogram[Mathf.Clamp(Mathf.CeilToInt(delta*1000),0,250)]++;
+            peakEnemies=Mathf.Max(peakEnemies,combat.Enemies.Count);
+        }
+        void RecordCombatQuality()
+        {
+            int total=0,p95=0;for(int i=0;i<frameHistogram.Length;i++){total+=frameHistogram[i];if(total>=frameSamples*.95f){p95=i;break;}}
+            Track("performance","frame_p95_ms",frameSamples,p95);
+            Track("combat_outcome","machines",combat.MachinesBuilt,combat.Elapsed);
+            Track("combat_outcome","peak_enemies",peakEnemies,combat.Elapsed);
+            Track("combat_outcome","death_cause",combat.Report().cause,combat.Elapsed);
+        }
+        void CombatOpinion()
+        {
+            var card=Dialog("이번 출격은 어땠나요?","선택 응답 · 보상이나 진행에 영향을 주지 않아요.",560);
+            bool consent=research!=null&&research.Data.consent;
+            Ui.Label(card,consent?"답변은 기기에만 저장하며 직접 내보낼 수 있어요.":"답변을 저장하려면 플레이 테스트 기록에 동의해 주세요.",24,140,444,66,18,Ui.Muted);
+            string[] labels={"다시 해보고 싶어요","조금 더 해봐야 알겠어요","다시 할 이유가 부족해요"};
+            for(int i=0;i<3;i++){int score=3-i;Ui.Button(card,labels[i],24,229+i*77,444,61,()=>{Track("feedback","replay_interest",score,combat.Stage);ratedRun=combat.RunId;ShowResult();},Ui.Raised,consent,20);}
+            Ui.Button(card,consent?"건너뛰기":"기록 동의 설정",24,477,444,50,()=>{if(consent)ShowResult();else ResearchPanel();},Ui.Panel,true,18);
         }
         void ResearchPanel()
         {
@@ -48,7 +69,7 @@ namespace ScrapGuard
             var card=Dialog(offer.Name,"구성 안내 · 실제 가격은 Play 상점에서 확인해요.",650);
             InventoryArt.Draw(card,InventoryArt.Pack(Array.IndexOf(CommerceCatalog.Offers,offer)),42,126,108);
             Ui.Label(card,offer.Gems>0?offer.Gems.ToString("N0")+" 보석":"영구 광고 스킵",160,141,286,61,30,Ui.Mint,TextAnchor.MiddleCenter);
-            string benefit=offer.Gems>0?"보석 "+offer.Gems.ToString("N0")+"개 확정 지급\n무료 보석과 사용 효력이 같아요.\n캐릭터·의상·장비·부품을 선택해 구매해요.":"영구 광고 스킵 권리 · 계정 복원 지원\n결과 추가 골드 하루 3회 + 부품 하루 2회\n보상 횟수를 늘리지 않고 광고 시청만 생략해요.";
+            string benefit=offer.Gems>0?"보석 "+offer.Gems.ToString("N0")+"개 확정 지급\n무료 보석과 사용 효력이 같아요.\n캐릭터·의상·장비·부품을 선택해 구매해요.":"영구 광고 스킵 권리 · 계정 복원 지원\n결과 추가 골드 하루 3회 + 부품 하루 2회\n일반 작전 긴급 수리 작전당 1회\n보상 횟수를 늘리지 않고 광고 시청만 생략해요.";
             Ui.Label(card,benefit,24,227,444,120,18,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"Google Play에 연결하면 판매 중인 상품과\n실제 결제 가격을 확인할 수 있어요.",24,376,444,64,15,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,"Play 상점 · 가격 확인",24,460,444,54,ConnectPlayBilling,Ui.Mint,Online,17);

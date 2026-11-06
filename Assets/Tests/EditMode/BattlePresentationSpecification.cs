@@ -17,11 +17,11 @@ namespace ScrapGuard.Tests
                 {
                     var scenery=ArenaScenery.Build(root.transform,stage,false);var definition=Campaign.Get(stage);
                     var tags=scenery.GetComponentsInChildren<ArenaGeometryTag>();
-                    Assert.That(tags.Length,Is.EqualTo(Campaign.Blocks(definition).Length+Campaign.Zones(definition).Length));
+                    Assert.That(tags.Length,Is.EqualTo(Campaign.WorldGeometry(Campaign.Blocks(definition)).Length+Campaign.WorldGeometry(Campaign.Zones(definition)).Length));
                     int solids=0,zones=0;
                     foreach(var tag in tags)
                     {
-                        var expected=tag.Solid?Campaign.Blocks(definition)[solids++]:Campaign.Zones(definition)[zones++];
+                        var expected=tag.Solid?Campaign.WorldGeometry(Campaign.Blocks(definition))[solids++]:Campaign.WorldGeometry(Campaign.Zones(definition))[zones++];
                         Assert.That(tag.Bounds,Is.EqualTo(expected));
                         var rect=(RectTransform)tag.transform;
                         Assert.That(rect.anchoredPosition,Is.EqualTo(new Vector2(expected.X,-expected.Y)));

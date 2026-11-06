@@ -22,11 +22,11 @@ namespace ScrapGuard.Core
         }
         void MovePlayer(float dt,V2 move)
         {
-            V2 target=(move.Length>1?move.Normal:move)*baseSpeed;
+            V2 target=(move.Length>1?move.Normal:move)*baseSpeed*(1+Skills[11]*.035f);
             bool ice=false;foreach(var zone in Zones)if(Definition.Region==3 && zone.Contains(Position))ice=true;
             velocity=ice?velocity+(target-velocity)*Math.Min(1,dt*3):target;
             V2 drift=new V2();
-            if(!Challenge && Definition.Region==4)for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position))drift.y=i==0?-55:55;
+            if(!Challenge && Definition.Region==4)for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position))drift.y=i%2==0?-55:55;
             Position=Slide(Position,(velocity+drift)*dt,14);
         }
         void UpdateTerrain(float dt)
@@ -122,7 +122,7 @@ namespace ScrapGuard.Core
             else if(e.role==EnemyRole.Summoner && e.cooldown<=0)
             {
                 e.cooldown=e.finalBoss?5:9;e.attackFlash=.5f;
-                if(Enemies.Count<145)
+                if(Enemies.Count<EnemyLimit-5)
                 {
                     var p=e.position+new V2(0,55);
                     if(!IsBlocked(p))Enemies.Add(new Enemy {id=nextId++,kind=1,role=EnemyRole.Pursuer,position=p,hp=90*Definition.Difficulty,maxHp=90*Definition.Difficulty,speed=68});
@@ -139,7 +139,7 @@ namespace ScrapGuard.Core
                     e.position=Slide(before,detour*(speed*dt),Math.Min(e.Radius,20));break;
                 }
             }
-            e.position.x=Math.Max(15,Math.Min(525,e.position.x));e.position.y=Math.Max(180,Math.Min(810,e.position.y));
+            e.position=ClampWorld(e.position,15);
         }
     }
 }

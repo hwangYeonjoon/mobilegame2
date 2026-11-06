@@ -135,6 +135,7 @@ try
     WardrobeChecks.Run(folder,Check);
     ReleaseChecks.Run(Check);
     ServicePreparationChecks.Run(folder,Check);
+    ReviveChecks.Run(folder,Check);
     LiveOpsChecks.Run(folder,Check);
     RefundChecks.Run(folder,Check);
     Console.WriteLine(count + " checks passed");

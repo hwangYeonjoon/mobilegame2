@@ -30,7 +30,7 @@ namespace ScrapGuard
         void RenderGuideHint()
         {
             if(guideHint==null)return;
-            bool show=combat.Stage==0 && !combat.Challenge && (!State.guideMoved || !State.guideUltimate) && !bossBackdrop.gameObject.activeSelf;
+            bool show=combat.Stage==0 && combat.Elapsed<18 && !combat.Challenge && (!State.guideMoved || !State.guideUltimate) && !bossBackdrop.gameObject.activeSelf;
             guideHint.gameObject.SetActive(show);
             guideBackdrop.gameObject.SetActive(show);
             if(!show)return;

@@ -75,12 +75,12 @@ namespace ScrapGuard.Tests
         public static void ExpandedModMechanics()
         {
             var all=new[]{5,5,5,5,5,5,5,5};Check(Workshop.ModMask(all)==63,"six distinct mods");
-            var c=new Combat(GameState.New(),5,"blast");c.Skills[0]=3;c.Skills[4]=2;c.Enemies.Add(new Enemy{id=99,position=c.Position+new V2(150,0),hp=10000});c.Tick(.05f,new V2());
+            var c=new Combat(GameState.New(),5,"blast");c.Skills[0]=5;c.Skills[4]=2;c.Enemies.Add(new Enemy{id=99,position=c.Position+new V2(150,0),hp=10000});c.Tick(.05f,new V2());
             Check(c.HasMod(3) && c.Bullets.Exists(b=>b.blast),"rupture conversion changes projectile behavior");
-            c=new Combat(GameState.New(),5,"repair");c.Skills[3]=3;c.Skills[6]=2;c.Hp=c.MaxHp*.5f;c.Tick(.05f,new V2());
+            c=new Combat(GameState.New(),5,"repair");c.Skills[3]=2;c.Skills[6]=3;c.Hp=c.MaxHp*.5f;c.Tick(.05f,new V2());
             float health=c.Hp;Check(c.HasMod(4) && health>c.MaxHp*.5f && c.Shield>0,"repair drone repairs and shields");
             c.Tick(.05f,new V2());Check(c.Hp==health,"repair pulse has a cooldown");
-            c=new Combat(GameState.New(),5,"cold");c.Skills[2]=3;c.Skills[7]=2;
+            c=new Combat(GameState.New(),5,"cold");c.Skills[2]=4;c.Skills[7]=2;
             var enemy=new Enemy{id=99,position=c.Position+new V2(160,0),hp=10000};c.Enemies.Add(enemy);c.Tick(.05f,new V2());
             Check(c.HasMod(5) && enemy.slowTime>0 && enemy.hp<10000,"cold coil expands range and slows");
         }

@@ -37,12 +37,12 @@ namespace ScrapGuard.Tests
             Check(c.DistanceMoved>=120 && !e.State.guideMoved,"movement stays uncommitted during battle");
             Check(!e.FinishCampaign(c).Success && !e.State.guideMoved,"unfinished run cannot advance guide");
             for(int i=0;i<25;i++){c.Enemies.Add(new Enemy{id=900+i,hp=0,maxHp=1});c.Tick(.001f,new V2());}
-            Check(c.UseUltimate(),"ultimate exercised");c.Skills[0]=3;c.Skills[5]=2;c.Abandon();
+            Check(c.UseUltimate(),"ultimate exercised");c.Skills[0]=3;c.Skills[5]=3;c.Abandon();
             Check(e.FinishCampaign(c).Success && e.State.guideMoved && e.State.guideUltimate && e.State.guideMod,"settled simulation advances guide");
             Check(!e.FinishCampaign(c).Success,"duplicate settlement rejected");
             var old=GameState.New();old.guideVersion=0;old.totalRuns=4;old.items[0].level=3;old.gems=73;new Economy(old,()=>Now);
             Check(old.guideIntroSeen && old.guideUpgrade && !old.guideMoved && old.gems==73,"legacy saves not forced or credited with unobserved actions");
-            var edge=new Combat(GameState.New(),0,"edge");edge.Position=new V2(514,490);for(int i=0;i<10;i++)edge.Tick(.05f,new V2(1,0));
+            var edge=new Combat(GameState.New(),0,"edge");edge.Position=new V2(edge.WorldRight-26,490);for(int i=0;i<10;i++)edge.Tick(.05f,new V2(1,0));
             Check(edge.DistanceMoved==0,"pushing boundary is not actual movement");
         }
     }

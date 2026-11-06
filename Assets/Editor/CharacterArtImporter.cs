@@ -13,9 +13,9 @@ namespace ScrapGuard.Editor
             importer.alphaIsTransparency = true; importer.mipmapEnabled = false;
             importer.npotScale = TextureImporterNPOTScale.None; importer.isReadable = false;
             importer.filterMode = FilterMode.Bilinear; importer.wrapMode = TextureWrapMode.Clamp;
-            importer.maxTextureSize = 2048; importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.maxTextureSize = assetPath.Contains("SalvageMachine")?512:2048; importer.textureCompression = TextureImporterCompression.Uncompressed;
             var android = importer.GetPlatformTextureSettings("Android");
-            android.overridden = true; android.maxTextureSize = 2048;
+            android.overridden = true; android.maxTextureSize = importer.maxTextureSize;
             android.format = TextureImporterFormat.ETC2_RGBA8; importer.SetPlatformTextureSettings(android);
         }
     }

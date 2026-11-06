@@ -12,6 +12,9 @@ namespace ScrapGuard.Editor
             const string ns = "http://schemas.android.com/apk/res/android";
             string manifest = Path.Combine(path, "src/main/AndroidManifest.xml");
             var xml = new XmlDocument(); xml.Load(manifest); var app = xml.SelectSingleNode("/manifest/application");
+            bool vibrate=false;
+            foreach(XmlElement permission in xml.SelectNodes("/manifest/uses-permission"))if(permission.GetAttribute("name",ns)=="android.permission.VIBRATE")vibrate=true;
+            if(!vibrate){var permission=xml.CreateElement("uses-permission");permission.SetAttribute("name",ns,"android.permission.VIBRATE");xml.DocumentElement.AppendChild(permission);}
             // Do not allow Android's automatic backup to copy bearer credentials and cached balances.
             ((XmlElement)app).SetAttribute("allowBackup", ns, "false");
             foreach (XmlNode existing in app.SelectNodes("provider"))

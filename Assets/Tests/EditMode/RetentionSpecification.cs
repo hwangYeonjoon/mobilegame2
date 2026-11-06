@@ -70,7 +70,7 @@ namespace ScrapGuard.Tests
                 c.Abandon();var copy=ReplayRecorder.Verify(s,7,"conditions",seed,r.Steps,45);
                 Check(c.FieldModule>0 && c.Hp==copy.Hp && c.Kills==copy.Kills && c.EngineeringPulses==copy.EngineeringPulses && c.ConditionPulses==copy.ConditionPulses,"new module and condition replay "+seed);
                 Check(c.Condition==seed/3,"three independent seeded conditions");
-                if(c.Condition==2)Check(c.ConditionPulses>=4,"electrical warning emits periodically");
+                if(c.Condition==2)Check(c.ConditionPulses>=(int)((c.Elapsed-.1f)/8),"electrical warning emits periodically");
                 Check(new Combat(s,0,"intro",seed).Condition==0 && new Combat(s,7,"fair",seed,false,SkillTrial.Mode).Condition==0,"intro and ranked trial exclude conditions");
             }
             var warning=new Combat(GameState.New(),7,"warning",6);warning.Elapsed=8;

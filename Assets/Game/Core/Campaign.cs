@@ -29,6 +29,13 @@ namespace ScrapGuard.Core
         public static readonly StageDefinition[] Stages = Build();
         public static int Count { get { return Stages.Length; } }
         public static StageDefinition Get(int id) { if(id<0 || id>=Count)throw new ArgumentOutOfRangeException("id");return Stages[id]; }
+        public static MapRect[] WorldGeometry(MapRect[] source)
+        {
+            var result=new List<MapRect>();result.AddRange(source);
+            for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++)if(x!=0||y!=0)
+                foreach(var r in source)result.Add(new MapRect(r.X+x*540,r.Y+y*655,r.W,r.H));
+            return result.ToArray();
+        }
         static StageDefinition[] Build()
         {
             string[][] names = {

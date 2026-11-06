@@ -6,8 +6,9 @@ namespace ScrapGuard.Core
     public struct V2
     {
         public float x, y;
-        public V2(float x, float y) { this.x = x; this.y = y; }
-        public float Length { get { return (float)Math.Sqrt(x * x + y * y); } }
+        // Canonical sub-pixel coordinates prevent Mono, IL2CPP and .NET rounding drift.
+        public V2(float x, float y) { this.x = (float)(Math.Round(x*4096d)/4096d); this.y = (float)(Math.Round(y*4096d)/4096d); }
+        public float Length { get { return (float)Math.Sqrt((double)x * x + (double)y * y); } }
         public V2 Normal { get { float d = Length; return d > .001f ? this / d : new V2(); } }
         public static V2 operator +(V2 a, V2 b) { return new V2(a.x + b.x, a.y + b.y); }
         public static V2 operator -(V2 a, V2 b) { return new V2(a.x - b.x, a.y - b.y); }
@@ -40,7 +41,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 12;
+        public const int RulesVersion = 13;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -78,7 +79,7 @@ namespace ScrapGuard.Core
         public readonly List<Pickup> Pickups = new List<Pickup>();
         public readonly List<Hazard> Hazards = new List<Hazard>();
         public readonly List<BattleEffect> Effects = new List<BattleEffect>();
-        public readonly int[] Skills = new int[8];
+        public readonly int[] Skills = new int[12];
         public V2 Position = new V2(270, 510);
         public float Hp, MaxHp, Shield, Elapsed, Facing;
         public int Kills, Level = 1, Xp;
@@ -97,8 +98,8 @@ namespace ScrapGuard.Core
             Definition=Campaign.Get(stage);
             Condition=OperationConditions.Select(Definition.Region,seed,Challenge);
             FieldVariant=Definition.Region==0?0:(int)((uint)seed%3);
-            Blocks=Challenge?new MapRect[0]:Campaign.Blocks(Definition);
-            Zones=Challenge?new MapRect[0]:Campaign.Zones(Definition);
+            Blocks=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Blocks(Definition));
+            Zones=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Zones(Definition));
             if(Mode==SkillTrial.Mode)state=SkillTrial.Loadout();
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
@@ -130,10 +131,10 @@ namespace ScrapGuard.Core
             ultimateGuard = Math.Max(0,ultimateGuard-dt);
             var beforeMove=Position;
             MovePlayer(dt,movement);
-            Position.x = Math.Max(26, Math.Min(514, Position.x)); Position.y = Math.Max(190, Math.Min(790, Position.y));
+            Position = ClampWorld(Position,26);
             if(movement.Length>0)DistanceMoved+=V2.Distance(beforeMove,Position);
             if (movement.Length > .1f) Facing = (float)Math.Atan2(movement.y, movement.x);
-            contactTimer -= dt;
+            contactTimer -= dt; reviveGuard=Math.Max(0,reviveGuard-dt);
             if (hero == 2 && ultimateGuard <= 0)
             {
                 shieldTimer += dt;
@@ -146,7 +147,8 @@ namespace ScrapGuard.Core
                 spawnTimer = Math.Max(.25f, (Challenge?.85f:Definition.SpawnInterval) - Elapsed / Duration * (Challenge?.58f:.48f));
                 if(!Challenge && Definition.Region==0)spawnTimer*=(int)(Elapsed/22)%2==0?1.2f:.72f;
                 if(RiskActive)spawnTimer*=.75f;
-                if (Enemies.Count < 150) Spawn(random.NextDouble() < (Challenge?.36:.25 + Definition.Region * .07) ? 1 : 0, false);
+                int group=Challenge?1:Math.Min(6,2+(int)(Elapsed/45)+Definition.Region/2);
+                for(int n=0;n<group && Enemies.Count<EnemyLimit;n++) Spawn(random.NextDouble() < (Challenge?.36:.18 + Definition.Region * .035) ? 1 : 0, false);
             }
             if (!eliteSpawned && Elapsed > Duration * .46f) { eliteSpawned = true; Spawn(2, false); }
             if (!bossSpawned && (Challenge || Definition.Mission==Mission.Eliminate) && Elapsed >= Duration - 30) { bossSpawned = true; Spawn(3, true); }
@@ -156,11 +158,12 @@ namespace ScrapGuard.Core
                 bossTimer -= dt;
                 if (bossTimer <= 0)
                 {
-                    bossTimer = 3.2f;
-                    Hazards.Add(new Hazard { id = nextId++, position = Position, radius = 65, delay = 1.4f });
+                    bossTimer = Challenge?3.2f:4.5f;
+                    BossPattern();
                 }
             }
             if(!Challenge && Definition.Mission==Mission.Survive && Elapsed>=Duration) { Ended=true;Won=Hp>0;return; }
+            UpdateAssault(dt);
             FirstRegionPacing(dt);
             UpdateFieldTask(dt);
             UpdateOperationCondition(dt);
@@ -174,31 +177,23 @@ namespace ScrapGuard.Core
             UpdateBuild(dt);
             UpdateIdentity(dt);
             UpdateWeapons(dt);
+            UpdateArsenal(dt);
             UpdateSupport(dt);
             UpdateBullets(dt);
             Collect(dt);
         }
         void Spawn(int kind, bool final)
         {
-            int side = random.Next(4);
-            V2 p = side == 0 ? new V2(15, 200 + random.Next(570)) : side == 1 ? new V2(525, 200 + random.Next(570)) :
-                side == 2 ? new V2(30 + random.Next(480), 175) : new V2(30 + random.Next(480), 810);
-            if (V2.Distance(p, Position) < 95) p = new V2(540 - p.x, 980 - p.y);
-            if(!Challenge && Stage==0 && Elapsed<22 && kind<2)
-            {
-                var early=Position+V2.Angle((float)random.NextDouble()*(float)Math.PI*2)*155;
-                early.x=Math.Max(30,Math.Min(510,early.x));early.y=Math.Max(195,Math.Min(785,early.y));
-                if(!IsBlocked(early,18) && V2.Distance(early,Position)>105)p=early;
-            }
+            V2 p=SpawnPoint(kind>=2?360:330);
             float difficulty = (Challenge?2.12f:Definition.Difficulty) + Elapsed / Duration * .55f;
-            float hp = (kind == 3 ? 7000 : kind == 2 ? 1800 : kind == 1 ? 110 : 150) * difficulty;
+            float hp = (kind == 3 ? 7000 : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
             var role=Challenge?EnemyRole.Pursuer:Definition.Enemies[random.Next(Definition.Enemies.Length)];
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
             if(final)role=BossRole();
             Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
                 speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
-            if (kind >= 2) Effects.Add(new BattleEffect { position = new V2(270, 300), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
+            if (kind >= 2) Effects.Add(new BattleEffect { position = Position+new V2(0,-140), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
         }
         void UpdateHazards(float dt)
         {
@@ -230,7 +225,7 @@ namespace ScrapGuard.Core
         }
         void Hurt(float damage,DamageCause cause=DamageCause.Contact)
         {
-            if (Ended || UltimateFlash > .15f) return;
+            if (Ended || UltimateFlash > .15f || reviveGuard>0) return;
             HurtFlash = .22f;
             if(RiskActive)damage*=1.2f;
             if(PoweredSafety)damage*=.7f;
@@ -249,7 +244,7 @@ namespace ScrapGuard.Core
             foreach (var e in Enemies)
             {
                 if (e.hp <= 0) continue;
-                float d = V2.Distance(origin, e.position);
+                var offset=origin-e.position; float d = (float)((double)offset.x*offset.x+(double)offset.y*offset.y);
                 if (d < distance) { distance = d; target = e; }
             }
             return target;
@@ -264,7 +259,7 @@ namespace ScrapGuard.Core
                 shotTimer = speed * Math.Max(.35f, 1 - Skills[5] * .12f);
                 float angle = (float)Math.Atan2(target.position.y - Position.y, target.position.x - Position.x);
                 Facing = angle; ShotFlash = .11f;
-                int count = 1 + Skills[0] / 2 + (weapon == 1 ? 2 : 0);
+                int count = 1 + Skills[0] / 2 + (weapon == 1 ? 2 : 0)+(WeaponEvolution==2?2:0);
                 for (int i = 0; i < count; i++) Shoot(Position, angle + (i - (count - 1) * .5f) * .16f, false);
                 IdentityVolley();
             }
@@ -301,19 +296,21 @@ namespace ScrapGuard.Core
         void Shoot(V2 origin, float angle, bool drone)
         {
             float multiplier = drone ? (hero == 0 ? 1.15f : 1) * (module == 10 ? 1.2f : 1) : weapon == 4 ? 1.7f : weapon == 5 ? 2.5f : weapon == 3 ? .5f : 1;
-            if (!drone && Skills[0] == 5 && Skills[4] >= 3) multiplier *= 1.4f;
+            if (!drone && WeaponEvolution==1) multiplier *= weapon==4?2.2f:1.6f;
+            if (!drone && WeaponEvolution==2) multiplier *= .7f;
             float critical = hero == 1 ? .10f : .05f; if (module == 11) critical += .05f;
             float damage = Damage * multiplier * (random.NextDouble() < critical ? 1.5f : 1);
             Bullets.Add(new Bullet { id = nextId++, position = origin, velocity = V2.Angle(angle) * (drone ? 450 : 390),
-                damage = damage, life = weapon == 3 && !drone ? .45f : 1.7f, pierce = weapon == 2 || Skills[0] == 5 ? 2 : 0,
-                blast = (weapon == 5 || HasMod(3)) && !drone, drone = drone, chilling = hero==4 && !drone });
+                damage = damage, life = weapon == 3 && !drone ? .45f : 1.7f, pierce = !drone && WeaponEvolution==1 ? (weapon==2?8:3) : weapon == 2 || Skills[0] == 5 ? 2 : 0,
+                blast = (weapon == 5 || HasMod(3) || WeaponEvolution==1 && weapon==1) && !drone, drone = drone, chilling = hero==4 && !drone });
         }
         void UpdateBullets(float dt)
         {
+            IndexEnemies();
             for (int i = Bullets.Count - 1; i >= 0; i--)
             {
                 var b = Bullets[i]; b.position += b.velocity * dt; b.life -= dt;
-                foreach (var e in Enemies)
+                foreach (var e in BulletCandidates(b.position))
                 {
                     if (e.hp <= 0 || e.id == b.lastHit || V2.Distance(e.position, b.position) > e.Radius + 6) continue;
                     Hit(e, b.damage); b.lastHit = e.id;
@@ -325,7 +322,7 @@ namespace ScrapGuard.Core
                     }
                     if (b.pierce-- <= 0) { b.life = 0; break; }
                 }
-                if (b.life <= 0 || b.position.x < -40 || b.position.x > 580 || b.position.y < 140 || b.position.y > 850) Bullets.RemoveAt(i);
+                if (b.life <= 0 || b.position.x < WorldLeft-60 || b.position.x > WorldRight+60 || b.position.y < WorldTop-60 || b.position.y > WorldBottom+60) Bullets.RemoveAt(i);
             }
         }
         void Hit(Enemy e, float damage)
@@ -336,8 +333,9 @@ namespace ScrapGuard.Core
                 CoreScore+=Math.Max(0,(int)Math.Min(Math.Max(0,e.hp),damage));
             }
             if(e.role==EnemyRole.Shield && !e.core && V2.Distance(Position,e.position)>125)damage*=.45f;
+            damage=(float)(Math.Round(damage*256d)/256d);
             e.hp -= damage; e.flash = .08f;
-            if (e.kind >= 2 || random.NextDouble() < .15)
+            if (e.kind >= 2 || (e.id+Kills)%7==0)
                 Effects.Add(new BattleEffect { position = e.position, text = ((int)damage).ToString(), kind = 0 });
         }
         void Kill(int index)
@@ -360,7 +358,7 @@ namespace ScrapGuard.Core
                 if (d < radius) p.position += (Position - p.position).Normal * (300 * dt);
                 if (d > 18) continue;
                 if (p.heal) { Hp = Math.Min(MaxHp, Hp + MaxHp * .15f); Effects.Add(new BattleEffect { position = Position, kind = 6, text = "수리 +15%" }); }
-                else Xp += p.xp;
+                else { Xp += p.xp; if(!Challenge)Salvage+=p.xp*(Skills[11]>0?2:1); }
                 Pickups.RemoveAt(i);
             }
             if (Xp >= NeededXp && !Ended) OfferSkills();
@@ -379,7 +377,7 @@ namespace ScrapGuard.Core
             if (!Choosing || Array.IndexOf(Choices, skill) < 0 || Skills[skill] >= 5) return false;
             Xp -= NeededXp; Level++; Skills[skill]++;
             if (skill == 6) { MaxHp *= 1.15f; Hp = Math.Min(MaxHp, Hp + MaxHp * .35f); }
-            Choosing = false; return true;
+            Choosing = false; ResolveEvolution(); return true;
         }
         public bool UseUltimate()
         {

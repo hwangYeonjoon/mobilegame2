@@ -31,7 +31,7 @@ namespace ScrapGuard.Core
     [Serializable] public class ReplayStep
     {
         public int x, y, frames, encounter, assembly, skill = -1;
-        public bool ultimate, support;
+        public bool ultimate, support, revive;
     }
     public static class CommandDispatcher
     {
@@ -103,37 +103,40 @@ namespace ScrapGuard.Core
             int x = (int)Math.Round(Math.Max(-1, Math.Min(1, move.x)) * 100);
             int y = (int)Math.Round(Math.Max(-1, Math.Min(1, move.y)) * 100);
             var last = Steps.Count > 0 ? Steps[Steps.Count - 1] : null;
-            if (last != null && !last.ultimate && !last.support && last.encounter==0 && last.assembly==0 && last.skill == -1 && last.x == x && last.y == y && last.frames < 120) last.frames++;
+            if (last != null && !last.revive && !last.ultimate && !last.support && last.encounter==0 && last.assembly==0 && last.skill == -1 && last.x == x && last.y == y && last.frames < 120) last.frames++;
             else Steps.Add(new ReplayStep { x = x, y = y, frames = 1, skill = -1 });
             return new V2(x / 100f, y / 100f);
         }
+        public void Revive(){Steps.Add(new ReplayStep{revive=true});}
         public void Assemble(int module){Steps.Add(new ReplayStep{assembly=module});}
         public void Encounter(int choice){Steps.Add(new ReplayStep{encounter=choice});}
         public void Support() { Steps.Add(new ReplayStep { support = true }); }
         public void Ultimate() { Steps.Add(new ReplayStep { ultimate = true }); }
         public void Choose(int skill) { Steps.Add(new ReplayStep { skill = skill }); }
-        public static Combat Verify(GameState snapshot, int stage, string id, int seed, List<ReplayStep> steps, double elapsedSeconds, string mode = "", SupportSnapshot support = null)
+        public static Combat Verify(GameState snapshot, int stage, string id, int seed, List<ReplayStep> steps, double elapsedSeconds, string mode = "", SupportSnapshot support = null, bool reviveAllowed = false)
         {
             if (steps == null || steps.Count > 18000) throw new ArgumentException("전투 기록 크기가 올바르지 않아요.");
             int frames = 0;
             foreach (var step in steps)
             {
-                if (step == null || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 7 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
+                if (step == null || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 11 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
                     throw new ArgumentException("전투 입력이 올바르지 않아요.");
+                if(step.revive && (step.assembly!=0 || step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 부활 입력이에요.");
                 if(step.assembly!=0 && (step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 개조 선택이에요.");
                 if(step.encounter!=0 && (step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 현장 선택이에요.");
                 if (step.support && (step.ultimate || step.skill != -1 || step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 지원 호출이에요.");
                 if (step.ultimate && (step.skill != -1 || step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 필살기 입력이에요.");
                 if (step.skill >= 0 && (step.frames != 0 || step.x != 0 || step.y != 0)) throw new ArgumentException("잘못된 스킬 입력이에요.");
-                if (!step.ultimate && !step.support && step.encounter==0 && step.assembly==0 && step.skill == -1 && step.frames < 1) throw new ArgumentException("비어 있는 전투 입력이에요.");
+                if (!step.revive && !step.ultimate && !step.support && step.encounter==0 && step.assembly==0 && step.skill == -1 && step.frames < 1) throw new ArgumentException("비어 있는 전투 입력이에요.");
                 frames += step.frames;
             }
             if (frames > 18000 || frames * Step > elapsedSeconds + 2) throw new ArgumentException("실제 경과 시간보다 긴 전투 기록이에요.");
             var combat = new Combat(snapshot, stage, id, seed, false, mode, support);
             foreach (var step in steps)
             {
-                if (combat.Ended) throw new ArgumentException("종료된 전투 뒤에 입력이 있어요.");
-                if(step.assembly!=0){if(!combat.Assemble(step.assembly))throw new ArgumentException("장착할 수 없는 현장 개조예요.");}
+                if (combat.Ended && !step.revive) throw new ArgumentException("종료된 전투 뒤에 입력이 있어요.");
+                if(step.revive){if(!reviveAllowed || !combat.Revive())throw new ArgumentException("확인된 부활 권리가 없거나 부활할 수 없는 상태예요.");}
+                else if(step.assembly!=0){if(!combat.Assemble(step.assembly))throw new ArgumentException("장착할 수 없는 현장 개조예요.");}
                 else if(step.encounter!=0){if(!combat.ChooseTask(step.encounter))throw new ArgumentException("선택할 수 없는 현장 임무예요.");}
                 else if (step.support) { if (!combat.UseSupport()) throw new ArgumentException("사용할 수 없는 지원 호출이에요."); }
                 else if (step.ultimate) { if (!combat.UseUltimate()) throw new ArgumentException("충전되지 않은 필살기 입력이에요."); }

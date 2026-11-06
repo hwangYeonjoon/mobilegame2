@@ -102,8 +102,8 @@ namespace ScrapGuard.Core
         public static readonly string[] StageNames = Array.ConvertAll(Campaign.Stages, s => s.Name);
         public static readonly string[] StageDescriptions = Array.ConvertAll(Campaign.Stages, s => s.Description);
         public static readonly string[] RarityNames = { "일반", "고급", "희귀" };
-        public static readonly string[] SkillNames = { "리벳 탄막", "회전 톱날", "충격 코일", "지원 드론", "고밀도 탄환", "신속 장전", "응급 수리", "자력 수집" };
-        public static readonly string[] SkillDescriptions = { "탄환 추가 · 정면을 꿰뚫는 화력", "주위를 도는 톱날로 근접 적 공격", "주기적인 전기 충격으로 주변 정리", "드론이 추적탄으로 적을 공격", "모든 공격 피해 20% 증가", "기본 공격 간격 12% 감소", "최대 체력 15% 증가 · 체력 회복", "경험치 수집 반경 증가" };
+        public static readonly string[] SkillNames = { "리벳 탄막", "회전 톱날", "충격 코일", "지원 드론", "고밀도 탄환", "신속 장전", "응급 수리", "자력 수집", "곡사 박격포", "십자 절단기", "지뢰 살포기", "회수 엔진" };
+        public static readonly string[] SkillDescriptions = { "탄환 추가 · 정면을 꿰뚫는 화력", "주위를 도는 톱날로 근접 적 공격", "주기적인 전기 충격으로 주변 정리", "드론이 추적탄으로 적을 공격", "모든 공격 피해 20% 증가", "기본 공격 간격 12% 감소", "최대 체력 15% 증가 · 체력 회복", "경험치 수집 반경 증가", "가장 가까운 적에게 포격 · 폭발 범위 성장", "네 방향 관통 칼날 · 근접 포위 돌파", "지나간 자리에 지뢰 설치 · 추격하는 적 유인", "이동 속도 증가 · 고철 회수량 2배" };
         public static readonly ItemDefinition[] Items = {
             new ItemDefinition(0, 0, "리벳건", "빠르고 정확한 단일 사격", "R"),
             new ItemDefinition(1, 0, "회전 절단기", "가까운 적을 향한 산탄 사격", "S"),

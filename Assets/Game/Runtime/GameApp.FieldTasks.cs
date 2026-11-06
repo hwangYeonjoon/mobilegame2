@@ -17,15 +17,15 @@ namespace ScrapGuard
             var ring=CombatRing.Create(taskActor,210,new Color(.35f,.85f,1,.35f),.012f);ring.anchoredPosition=Vector2.zero;
             var art=Ui.Box(taskActor,-31,-31,62,62,new Color(.7f,.9f,1,.9f),false);art.sprite=combat.Task==FieldTask.Escort||combat.Task==FieldTask.Convoy?ArenaArt.Prop(1):ArenaArt.Landmark(7);art.preserveAspect=true;
             Ui.Label(taskActor,combat.TaskTitle,-90,-67,180,26,15,Ui.Blue,TextAnchor.MiddleCenter);
-            taskHud=Ui.Box(screen,24,178,492,62,new Color(.03f,.06f,.09f,.85f)).rectTransform;
-            taskLabel=Ui.Label(taskHud,"",10,5,472,46,17,Ui.Ink,TextAnchor.MiddleCenter);
-            taskFill=Ui.Box(taskHud,10,55,0,3,Ui.Blue,false);
+            taskHud=Ui.Box(screen,24,123,492,43,new Color(.03f,.06f,.09f,.85f)).rectTransform;
+            taskLabel=Ui.Label(taskHud,"",10,2,472,34,14,Ui.Ink,TextAnchor.MiddleCenter);
+            taskFill=Ui.Box(taskHud,10,39,0,3,Ui.Blue,false);
             taskChoiceButton=Ui.Button(screen,"접근해서 회수 방법 선택",120,757,300,49,OpenFieldChoice,Ui.Blue,false,16);
         }
         void RenderFieldTask()
         {
             if(taskHud==null)return;
-            bool show=combat.Elapsed>=12 && !combat.FinalBossActive && (combat.TaskActive||combat.CanAssemble||combat.FieldModule>0);
+            bool show=combat.Elapsed>=12 && !combat.FinalBossActive && (combat.TaskActive||combat.CanAssemble);
             taskHud.gameObject.SetActive(show);
             if(show){guideHint.gameObject.SetActive(false);guideBackdrop.gameObject.SetActive(false);}
             taskLabel.text=combat.FieldModule>0?combat.BuildInstruction:combat.TaskInstruction;

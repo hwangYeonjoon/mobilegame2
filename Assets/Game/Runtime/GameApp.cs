@@ -39,7 +39,9 @@ namespace ScrapGuard
 #if SCRAP_QA_SOAK
             if(!Application.identifier.EndsWith(".qa",StringComparison.Ordinal))throw new InvalidOperationException("QA soak requires isolated package");
             profile=Path.Combine(Application.persistentDataPath,"qa-profile.json");
-#if SCRAP_QA_UI
+#if SCRAP_QA_ASSAULT
+            args=new[]{"-smoke","-assaultSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"AssaultUI")};
+#elif SCRAP_QA_UI
             args=new[]{"-smoke","-polishSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishUI")};
 #else
             args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
@@ -140,6 +142,7 @@ namespace ScrapGuard
         {
             FitScreen();menuLayoutDirty=false;
             Track("screen",target);
+            UpdateBattleMusic();
             page = target; if (!Online) Store.Economy.RefreshDay(); Ui.Clear(screen); CloseModal();
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
             Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 396, 40, 30);
@@ -167,29 +170,26 @@ namespace ScrapGuard
         }
         void Home()
         {
-            float roomHeight=MenuBottom-502,roomExtra=roomHeight-300;
-            var body=Ui.Scroll(screen,24,178,492,MenuBottom-346,roomHeight+156);
-            var heroPanel=Ui.Box(body,0,0,492,roomHeight,Ui.Panel).rectTransform;
-            WorkshopStage.Draw(heroPanel,0,0,492,roomHeight-74,Ui.Mint);
-            Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",14,10,268,58,GuidePanel,Ui.Raised,true,19);
-            Ui.Button(heroPanel,"성장 · 수집 목표",296,10,182,58,ProgressGoals,Ui.Raised,true,19);
-            float artHeight=157+roomExtra;
-            var art=CharacterArt.Draw(heroPanel,109,70,274,artHeight,State.selectedHero,State.selectedSkin,Outfits.Active(State,State.selectedHero));
-            art.rectTransform.pivot=new Vector2(.5f,0);
-            art.rectTransform.anchoredPosition=new Vector2(246,-70-artHeight+24);
+            float height=MenuBottom-358;
+            var room=Ui.Box(screen,24,178,492,height,Ui.Panel).rectTransform;
+            float displayHeight=Mathf.Min(520,height-40),displayY=(height-displayHeight)/2;
+            WorkshopStage.Draw(room,0,displayY,492,displayHeight,Ui.Mint);
+            var art=CharacterArt.Draw(room,81,displayY+42,330,displayHeight-90,State.selectedHero,State.selectedSkin,Outfits.Active(State,State.selectedHero));
+            art.rectTransform.pivot=new Vector2(.5f,0);art.rectTransform.anchoredPosition=new Vector2(246,-displayY-displayHeight+58);
             art.gameObject.AddComponent<ShowroomMotion>();
-            Ui.Label(heroPanel,Catalog.HeroNames[State.selectedHero],20,roomHeight-72,452,35,26,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(heroPanel,"Lv."+State.heroes[State.selectedHero].level+"   공격 "+Catalog.Attack(State)+"   체력 "+Catalog.Health(State),20,roomHeight-35,452,29,19,Ui.Muted,TextAnchor.MiddleCenter);
-            Ui.Button(body,"출석  "+(Store.Economy.CanAttend?"받기":"완료"),0,roomHeight+16,238,64,Attendance,Ui.Raised,true,21);
-            Ui.Button(body,"오늘의 임무  "+Math.Min(3,State.dailyRuns)+"/3",254,roomHeight+16,238,64,Missions,Ui.Raised,true,21);
-            Ui.Label(body,Campaign.Regions[Campaign.Get(selectedStage).Region]+" · "+State.clearedStages.Count+"/"+Campaign.Count,0,roomHeight+102,310,43,19,Ui.Muted);
-            Ui.Button(body,"전체 지도",326,roomHeight+96,166,60,()=>CampaignMap(),Ui.Raised,true,20);
-            Ui.Button(screen,"‹",24,MenuBottom-156,72,72,()=>{selectedStage=Math.Max(0,selectedStage-1);Show("home");},Ui.Raised,selectedStage>0,30);
-            var launch=Ui.Button(screen,"출격하기  →",108,MenuBottom-156,324,72,CampaignLaunch,null,true,21);
-            launch.GetComponentInChildren<Text>().text=(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage]+"\n출격하기  →";
-            Ui.Button(screen,"›",444,MenuBottom-156,72,72,()=>{selectedStage=Math.Min(State.unlockedStage,selectedStage+1);Show("home");},Ui.Raised,selectedStage<State.unlockedStage,30);
-            Ui.Button(screen,"특수 던전 · 코어 균열",24,MenuBottom-72,238,72,()=>Show("weekly"),Ui.Raised,true,19);
-            Ui.Button(screen,"길드 · 지원 대원",278,MenuBottom-72,238,72,OpenGuild,Ui.Raised,true,20);
+            Ui.Label(room,"부수고 · 회수하고 · 합체하라",18,12,456,28,19,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Label(room,Catalog.HeroNames[State.selectedHero]+"  Lv."+State.heroes[State.selectedHero].level,18,height-51,456,35,25,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(screen,(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage],24,MenuBottom-168,492,32,23,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Button(screen,"출격하기  →",24,MenuBottom-124,310,78,CampaignLaunch,Ui.Mint,true,26);
+            Ui.Button(screen,"성장하기",348,MenuBottom-124,168,78,()=>Show("gear"),Ui.Raised,true,23);
+            Ui.Button(screen,"작전 지도 · 출석 · 더 보기",24,MenuBottom-36,492,35,HomeActivities,Ui.Panel,true,17);
+        }
+        void HomeActivities()
+        {
+            var card=Dialog("정비소 활동","출격과 성장은 홈에서 바로, 다른 활동은 여기서 확인해요.",830);
+            string[] labels={"작전 지도","출석 · "+(Store.Economy.CanAttend?"보상 받기":"수령 완료"),"오늘의 임무 · "+Math.Min(3,State.dailyRuns)+"/3","성장 · 수집 목표","초보 안내","특수 던전 · 코어 균열","길드 · 지원 대원"};
+            Action[] actions={()=>CampaignMap(),Attendance,Missions,ProgressGoals,GuidePanel,()=>Show("weekly"),OpenGuild};
+            for(int i=0;i<labels.Length;i++)Ui.Button(card,labels[i],24,135+i*91,444,70,actions[i],Ui.Raised,true,21);
         }
         RectTransform Dialog(string title, string subtitle, float height = 500)
         {
@@ -230,7 +230,7 @@ namespace ScrapGuard
         void Settings()
         {
             var card = Dialog("설정", Online ? "진행 상황은 연결한 서버에 저장됩니다." : "진행 상황은 이 기기에 저장됩니다.", 880);
-            Ui.Button(card, State.sound ? "효과음 켜짐" : "효과음 꺼짐", 24, 134, 444, 53, () => Change(new GameCommand("sound") { enabled = !State.sound }, Settings), Ui.Raised);
+            Ui.Button(card, "소리 · 음악 · 진동", 24, 134, 444, 53, AudioOptions, Ui.Raised);
             Ui.Button(card,"Play 상점 · 구매 복원",24,202,444,53,ConnectPlayBilling,Ui.Raised,true,17);
             Ui.Button(card, "계정 · 서버 연결", 24, 270, 444, 53, AccountPanel, Ui.Raised);
             Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online && (Debug.isDebugBuild || Application.isEditor));
