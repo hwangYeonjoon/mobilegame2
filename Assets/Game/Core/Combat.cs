@@ -18,7 +18,7 @@ namespace ScrapGuard.Core
     }
     public class Enemy
     {
-        public int id, kind;
+        public int id, kind, chillStacks;
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
         public bool finalBoss, core;
@@ -40,7 +40,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 11;
+        public const int RulesVersion = 12;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -171,6 +171,8 @@ namespace ScrapGuard.Core
             if (Ended) return;
             UpdateMods(dt);
             UpdateEngineering(dt);
+            UpdateBuild(dt);
+            UpdateIdentity(dt);
             UpdateWeapons(dt);
             UpdateSupport(dt);
             UpdateBullets(dt);
@@ -231,8 +233,10 @@ namespace ScrapGuard.Core
             if (Ended || UltimateFlash > .15f) return;
             HurtFlash = .22f;
             if(RiskActive)damage*=1.2f;
+            if(PoweredSafety)damage*=.7f;
             if (armor == 7) damage *= .9f;
             float absorbed = Math.Min(Shield, damage); Shield -= absorbed;
+            IdentityShieldHit(absorbed);
             float actual=Math.Min(Hp,Math.Max(0,damage-absorbed));
             if((int)cause>0 && (int)cause<damageTaken.Length)damageTaken[(int)cause]+=actual;
             Hp -= damage - absorbed;
@@ -262,6 +266,7 @@ namespace ScrapGuard.Core
                 Facing = angle; ShotFlash = .11f;
                 int count = 1 + Skills[0] / 2 + (weapon == 1 ? 2 : 0);
                 for (int i = 0; i < count; i++) Shoot(Position, angle + (i - (count - 1) * .5f) * .16f, false);
+                IdentityVolley();
             }
             if (Skills[1] > 0 && sawTimer <= 0)
             {
@@ -312,7 +317,7 @@ namespace ScrapGuard.Core
                 {
                     if (e.hp <= 0 || e.id == b.lastHit || V2.Distance(e.position, b.position) > e.Radius + 6) continue;
                     Hit(e, b.damage); b.lastHit = e.id;
-                    if(b.chilling && !e.core)e.slowTime=2;
+                    if(b.chilling)IdentityColdHit(e);
                     if (b.blast)
                     {
                         Effects.Add(new BattleEffect { position = b.position, kind = 2, radius = 60 });

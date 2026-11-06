@@ -55,11 +55,11 @@ namespace ScrapGuard.Tests
         }
         public static void FieldTaskDefenseAndEscort()
         {
-            var defense=new Combat(GameState.New(),2,"defense");defense.Elapsed=12;
+            var defense=new Combat(GameState.New(),14,"defense");defense.Elapsed=12;
             for(int i=0;i<370 && !defense.TaskCompleted;i++)
             {defense.Enemies.Clear();defense.Bullets.Clear();defense.Position=defense.TaskPosition;defense.Tick(.05f,new V2());if(defense.Choosing)defense.Choose(defense.Choices[0]);}
             Check(defense.TaskCompleted && defense.TaskIntegrity>0,"holding defense area completes objective");
-            var attacked=new Combat(GameState.New(),2,"under-attack");attacked.Elapsed=12;attacked.Hp=attacked.MaxHp=10000;
+            var attacked=new Combat(GameState.New(),14,"under-attack");attacked.Elapsed=12;attacked.Hp=attacked.MaxHp=10000;
             for(int i=0;i<4;i++)attacked.Enemies.Add(new Enemy{id=990+i,position=attacked.TaskPosition,hp=100000});
             for(int i=0;i<130 && !attacked.TaskFailed;i++)attacked.Tick(.05f,new V2());
             Check(attacked.TaskFailed && !attacked.Ended,"enemies can destroy optional relay without ending main mission");

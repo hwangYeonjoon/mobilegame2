@@ -59,6 +59,8 @@ public sealed partial class GameRepository
         string filter=includeTests?"1=1":"COALESCE(json_extract(a.state,'$.testProgress'),0)=0";
         var owned=new int[Outfits.Count+1];var equipped=new int[Outfits.Count+1];
         foreach(var a in accounts){Social.Normalize(a.State);for(int i=1;i<=Outfits.Count;i++){if(Outfits.Owned(a.State,i))owned[i]++;if(Outfits.Active(a.State,Outfits.Hero(i))==i)equipped[i]++;}}
+        var themes=new List<object>();
+        for(int id=1;id<ShowcaseThemes.Names.Length;id++)themes.Add(new{id,name=ShowcaseThemes.Names[id],earned=id>2,owners=accounts.Count(a=>ShowcaseThemes.Owned(a.State,id)),equipped=accounts.Count(a=>a.State.showcaseTheme==id)});
         var windows=new List<object>();
         foreach(int days in new[]{7,30,90})
         {
@@ -80,7 +82,7 @@ public sealed partial class GameRepository
             windows.Add(new{days,from,until,activeAccounts=active,outfits=rows,gemFlows=flows});
         }
         var started=ReadRows(db,tx,"SELECT started FROM metrics_meta WHERE id=1")[0]["started"];
-        tx.Commit();return new{generatedAt=clock().ToUniversalTime().ToString("O"),captureStarted=started,includeTests,accounts=accounts.Count,windows,content=Content(),refunds=RefundHealth(),notes=new[]{"전환: 동의한 미보유 체험 계정 중 첫 체험 이후 7일 안에 구매한 비율. 최근 체험은 관찰 중이며 연결 실패 시 누락될 수 있음.","보유/장착은 현재 스냅샷. 활동은 기간 중 게임 명령을 실행한 계정(UTC 일자). 과거 구매 이벤트는 소급하지 않음.","보석 원장 단위이며 원화 매출이 아님. play_purchase는 부채 상계 후 지갑 증가, play_refund는 남은 유료 보석 회수. 환불 부채와 현금 환불액을 소비로 해석하지 말 것.","테스트 계정 기본 제외. 계정 삭제 시 관련 통계도 삭제됨."}};
+        tx.Commit();return new{generatedAt=clock().ToUniversalTime().ToString("O"),captureStarted=started,includeTests,accounts=accounts.Count,themes,windows,content=Content(),refunds=RefundHealth(),notes=new[]{"전환: 동의한 미보유 체험 계정 중 첫 체험 이후 7일 안에 구매한 비율. 최근 체험은 관찰 중이며 연결 실패 시 누락될 수 있음.","보유/장착은 현재 스냅샷. 활동은 기간 중 게임 명령을 실행한 계정(UTC 일자). 과거 구매 이벤트는 소급하지 않음.","보석 원장 단위이며 원화 매출이 아님. play_purchase는 부채 상계 후 지갑 증가, play_refund는 남은 유료 보석 회수. 환불 부채와 현금 환불액을 소비로 해석하지 말 것.","테스트 계정 기본 제외. 계정 삭제 시 관련 통계도 삭제됨."}};
     }
 }
 

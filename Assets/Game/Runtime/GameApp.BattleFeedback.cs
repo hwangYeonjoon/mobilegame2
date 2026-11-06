@@ -19,20 +19,8 @@ namespace ScrapGuard
             var shadow=combatNotice.gameObject.AddComponent<Shadow>();shadow.effectColor=new Color(0,0,0,.85f);shadow.effectDistance=new Vector2(1,-1);
             streakLabel=Ui.Label(screen,"",24,303,492,30,16,Ui.Gold,TextAnchor.MiddleCenter);
             if(hitSound!=null)return;
-            hitSound=FeedbackTone("Metal impact",.075f,950,180,.13f);
-            breakSound=FeedbackTone("Scrap break",.12f,180,60,.19f);
-            pickupSound=FeedbackTone("Recovery",.065f,740,1100,.09f);
-            growthSound=FeedbackTone("Assembly complete",.3f,390,950,.15f);
-        }
-        AudioClip FeedbackTone(string name,float seconds,float from,float to,float volume)
-        {
-            const int rate=22050;var samples=new float[(int)(rate*seconds)];float phase=0;
-            for(int i=0;i<samples.Length;i++)
-            {
-                float t=i/(float)samples.Length;phase+=2*Mathf.PI*Mathf.Lerp(from,to,t)/rate;
-                samples[i]=(Mathf.Sin(phase)+.25f*Mathf.Sin(phase*2.71f))*volume*(1-t)*Mathf.Min(1,t*40);
-            }
-            var clip=AudioClip.Create(name,samples.Length,1,rate,false);clip.SetData(samples,0);return clip;
+            hitSound=CombatSoundBank.Get(0);breakSound=CombatSoundBank.Get(1);
+            pickupSound=CombatSoundBank.Get(2);growthSound=CombatSoundBank.Get(3);
         }
         void FeedbackSound(AudioClip clip){if(State.sound && audioSource!=null && clip!=null)audioSource.PlayOneShot(clip);}
         void HitFeedback()

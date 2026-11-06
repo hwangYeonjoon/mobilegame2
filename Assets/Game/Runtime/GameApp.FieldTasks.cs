@@ -15,20 +15,22 @@ namespace ScrapGuard
             if(combat.Task==FieldTask.None)return;
             taskActor=Ui.Rect(pickupLayer,"Field objective",0,0,0,0);
             var ring=CombatRing.Create(taskActor,210,new Color(.35f,.85f,1,.35f),.012f);ring.anchoredPosition=Vector2.zero;
-            var art=Ui.Box(taskActor,-31,-31,62,62,new Color(.7f,.9f,1,.9f),false);art.sprite=combat.Task==FieldTask.Escort?ArenaArt.Prop(1):ArenaArt.Landmark(7);art.preserveAspect=true;
+            var art=Ui.Box(taskActor,-31,-31,62,62,new Color(.7f,.9f,1,.9f),false);art.sprite=combat.Task==FieldTask.Escort||combat.Task==FieldTask.Convoy?ArenaArt.Prop(1):ArenaArt.Landmark(7);art.preserveAspect=true;
             Ui.Label(taskActor,combat.TaskTitle,-90,-67,180,26,15,Ui.Blue,TextAnchor.MiddleCenter);
-            taskHud=Ui.Box(screen,24,237,492,62,new Color(.03f,.06f,.09f,.85f)).rectTransform;
-            taskLabel=Ui.Label(taskHud,"",10,5,472,46,13,Ui.Ink,TextAnchor.MiddleCenter);
+            taskHud=Ui.Box(screen,24,178,492,62,new Color(.03f,.06f,.09f,.85f)).rectTransform;
+            taskLabel=Ui.Label(taskHud,"",10,5,472,46,17,Ui.Ink,TextAnchor.MiddleCenter);
             taskFill=Ui.Box(taskHud,10,55,0,3,Ui.Blue,false);
             taskChoiceButton=Ui.Button(screen,"접근해서 회수 방법 선택",120,757,300,49,OpenFieldChoice,Ui.Blue,false,16);
         }
         void RenderFieldTask()
         {
             if(taskHud==null)return;
-            taskHud.gameObject.SetActive(combat.Elapsed<75 || combat.CanAssemble);
-            taskLabel.text=combat.TaskInstruction;
+            bool show=combat.Elapsed>=12 && !combat.FinalBossActive && (combat.TaskActive||combat.CanAssemble||combat.FieldModule>0);
+            taskHud.gameObject.SetActive(show);
+            if(show){guideHint.gameObject.SetActive(false);guideBackdrop.gameObject.SetActive(false);}
+            taskLabel.text=combat.FieldModule>0?combat.BuildInstruction:combat.TaskInstruction;
             taskFill.rectTransform.sizeDelta=new Vector2(472*combat.TaskProgress,3);
-            taskActor.gameObject.SetActive(combat.TaskActive);
+            taskActor.gameObject.SetActive(combat.TaskActive&&(!combat.SpecialOperation||combat.Task==FieldTask.Convoy));
             var p=combat.TaskPosition;taskActor.anchoredPosition=new Vector2(p.x,-p.y);
             if(taskChoiceButton!=null)
             {
@@ -54,27 +56,28 @@ namespace ScrapGuard
         {
             if(!combat.CanAssemble)return;
             battlePaused=true;dragging=false;
-            var card=Dialog("회수한 부품으로 개조", "한 가지를 골라 지금 장착하세요.\n이번 전투에서만 적용 · 재화 소모 없음",740);
-            for(int i=1;i<=3;i++)
-            {
-                int module=i;float y=143+(i-1)*157;
-                Ui.Label(card,FieldEngineering.Name(i,combat.Hero),24,y,444,35,23,Ui.Mint);
-                Ui.Label(card,FieldEngineering.Detail(i,combat.Hero),24,y+40,444,54,16,Ui.Muted);
-                Ui.Button(card,"장착 · "+FieldEngineering.Name(i,combat.Hero),24,y+100,444,44,()=>SelectFieldModule(module),Ui.Raised,true,16);
-            }
-            Ui.Button(card,"나중에 장착",24,652,444,49,()=>{battlePaused=false;CloseModal();},Ui.Raised,true,16);
+            var card=Dialog("회수한 부품으로 개조", "전투 방식 하나를 선택하세요 · 이번 전투 전용",850);
+            DrawAssemblyChoices(card,true);
+            Ui.Button(card,"나중에 장착",24,750,444,64,()=>{battlePaused=false;CloseModal();},Ui.Raised,true,21);
             card.GetChild(2).gameObject.SetActive(false);
+        }
+        void DrawAssemblyChoices(RectTransform card,bool selectable)
+        {
+            int hero=combat!=null?combat.Hero:State.selectedHero;
+            var list=Ui.Scroll(card,24,140,444,590,4*180);
+            for(int i=1;i<=4;i++)
+            {
+                int module=i;float y=(i-1)*180;
+                Ui.Label(list,FieldEngineering.Name(i,hero),12,y,420,36,24,Ui.Mint);
+                Ui.Label(list,FieldEngineering.Detail(i,hero),12,y+40,420,69,18,Ui.Muted);
+                if(selectable)Ui.Button(list,"장착 · "+FieldEngineering.Name(i,hero),12,y+114,420,58,()=>SelectFieldModule(module),Ui.Raised,true,20);
+            }
         }
         void FieldEngineeringGuide()
         {
-            var card=Dialog("현장 개조 안내","회수·방어·호위 완료 → 부품 확보 → 개조 1개 장착\n재화 소모 없이 이번 전투에서만 사용합니다.",740);
-            for(int i=1;i<=3;i++)
-            {
-                float y=145+(i-1)*153;
-                Ui.Label(card,FieldEngineering.Name(i,State.selectedHero),24,y,444,35,23,Ui.Mint);
-                Ui.Label(card,FieldEngineering.Detail(i,State.selectedHero),24,y+44,444,70,17,Ui.Muted);
-            }
-            Ui.Label(card,"대원마다 전용 개조가 달라져요. 대원 선택 후 확인하세요.\n스킬 조합으로 같은 개조를 완성해도 효과는 중복되지 않아요.",24,614,444,65,15,Ui.Muted);
+            var card=Dialog("현장 개조 안내","거점 사격 · 자력 근접 · 수리 · 이동 관통\n현장 임무를 완료하면 한 가지를 골라 사용해요.",850);
+            DrawAssemblyChoices(card,false);
+            Ui.Label(card,HeroIdentity.Tips[State.selectedHero],24,760,444,52,20,Ui.Gold,TextAnchor.MiddleCenter);
         }
         void SelectFieldModule(int module)
         {

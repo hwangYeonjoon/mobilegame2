@@ -25,10 +25,17 @@ namespace ScrapGuard
             comparison=Ui.Button(card,"기본 외형과 비교",24,658,444,60,()=>{preview.Compare();comparison.name=preview.BaseLook?(id==1?"중장비 의상으로 돌아가기":Outfits.Label(id)+"로 돌아가기"):"기본 외형과 비교";comparison.GetComponentInChildren<Text>().text=comparison.name;},Ui.Raised,true,16);
             bool owned=Outfits.Owned(State,id),equipped=Outfits.Active(State,Outfits.Hero(id))==id;
             bool heroOwned=State.heroes[Outfits.Hero(id)].unlocked;
-            Ui.Button(card,owned?(equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착"):!OutfitForSale(id)?OutfitSaleLabel(id):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,732,444,64,
-                ()=>{if(owned)Change(new GameCommand(equipped?"outfit_clear":"outfit_equip"){skin=id,hero=Outfits.Hero(id)},()=>OutfitRoom(id));else if(!heroOwned){CloseModal();Show("heroes");}else OutfitPurchase(id);},Ui.Gold,owned||OutfitForSale(id),18);
-            Ui.Button(card,owned?"의상 컬렉션 · 대원별 장착 확인":State.outfitTarget==id?"수집 목표 해제":"수집 목표로 저장 · 자동 구매 없음",24,809,444,55,
-                ()=>{if(owned)OutfitCollection();else Change(new GameCommand("outfit_target"){skin=State.outfitTarget==id?0:id},()=>OutfitRoom(id));},Ui.Raised,true,17);
+            Ui.Button(card,owned?"장착하고 이 모습으로 출격":!OutfitForSale(id)?OutfitSaleLabel(id):!heroOwned?"대원을 먼저 모집하세요":"구성 확인하고 구매 · ◆ 600",24,732,444,64,
+                ()=>{if(owned)PrepareOutfitHero(id,true);else if(!heroOwned){CloseModal();Show("heroes");}else OutfitPurchase(id);},Ui.Gold,owned||OutfitForSale(id),18);
+            if(owned)
+            {
+                Ui.Button(card,equipped?"의상 해제 · 기존 도색 표시":"전용 대원에 의상 장착",24,809,214,55,
+                    ()=>Change(new GameCommand(equipped?"outfit_clear":"outfit_equip"){skin=id,hero=Outfits.Hero(id)},()=>OutfitRoom(id)),Ui.Raised,true,16);
+                Ui.Button(card,"의상 컬렉션",254,809,214,55,OutfitCollection,Ui.Raised,true,18);
+            }
+            else Ui.Button(card,State.outfitTarget==id?"수집 목표 해제":"수집 목표로 저장 · 자동 구매 없음",24,809,444,55,
+                ()=>Change(new GameCommand("outfit_target"){skin=State.outfitTarget==id?0:id},()=>OutfitRoom(id)),Ui.Raised,true,17);
+
         }
         void OutfitPurchase(){OutfitPurchase(1);}
         void OutfitPurchase(int id)
@@ -84,8 +91,10 @@ namespace ScrapGuard
             actor.rectTransform.anchoredPosition=new Vector2(position.x-120,-position.y+125);
             int frame=Time.unscaledTime<poseUntil?pose:moving && Vector2.Distance(position,target)>1 && Mathf.Sin(Time.unscaledTime*11)>0?1:0;
             StylePresentation.SetLook(actor,hero,0,BaseLook?0:outfit,frame);
+            bool walking=moving&&Vector2.Distance(position,target)>1;
+            actor.sprite=GuardianMotion.Sample(hero,0,BaseLook?0:outfit,Time.unscaledTime,walking?1:0,frame==2,false,frame==3);
             actor.rectTransform.pivot=new Vector2(.5f,.5f);actor.rectTransform.anchoredPosition=new Vector2(position.x,-position.y);
-            actor.rectTransform.localScale=Vector3.one*(BattleSize?100*StylePresentation.PlayerScale/250:1);
+            actor.rectTransform.localScale=GuardianMotion.PoseScale(Time.unscaledTime,walking?1:0,frame==2,false)*(BattleSize?100*StylePresentation.PlayerScale/250:1);
         }
     }
     public static class OutfitVisuals

@@ -21,8 +21,8 @@ namespace ScrapGuard
             sprites[key]=sprite;return sprite;
         }
         public static Sprite Floor(int region) { return Cell("ArenaFloors-v2",4,2,region%4,region/4); }
-        public static Sprite Landmark(int region){return Cell("Landmarks-v1",4,2,region%4,region/4);}
-        public static Sprite Prop(int region) { return Cell("ArenaProps-v2",4,2,region%4,region/4); }
+        public static Sprite Landmark(int region){return Cell("Landmarks-v2",4,2,region%4,region/4);}
+        public static Sprite Prop(int region) { return Cell("ArenaProps-v3",4,2,region%4,region/4); }
         public static Sprite Surface(int region) { int cell=region-1;return Cell("TerrainDetails-v2",4,2,cell%4,cell/4); }
     }
 

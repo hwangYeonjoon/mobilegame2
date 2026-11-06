@@ -79,7 +79,10 @@ namespace ScrapGuard
             {
                 int hero = i; float y = i * 232; bool unlocked = State.heroes[i].unlocked; bool selected = State.selectedHero == i;
                 var row = Ui.Box(list, 0, y, 492, 215, Ui.Panel).transform;
-                Ui.Robot(row, 22, 48, .95f, i, skin: State.selectedSkin, outfit: Outfits.Active(State,i));
+                var motion=Ui.Button(row,"대원 동작 체험 · "+i,8,10,108,195,()=>HeroMotionRoom(hero),Ui.Panel).transform;
+                motion.GetComponentInChildren<UnityEngine.UI.Text>().text="";
+                Ui.Robot(motion,12,24,.95f,i,skin:State.selectedSkin,outfit:Outfits.Active(State,i));
+                Ui.Label(motion,"동작 체험",0,155,108,32,17,Ui.Mint,TextAnchor.MiddleCenter);
                 Ui.Label(row, Catalog.HeroNames[i] + "  Lv." + State.heroes[i].level, 124, 15, 350, 38, 23);
                 Ui.Label(row, Catalog.HeroRoles[i], 124, 59, 350, 34, 15, i == 0 ? Ui.Mint : i == 1 ? Ui.Gold : Ui.Blue);
                 Ui.Label(row, "기본 공격 " + HeroCatalog.All[i].Attack + " · 체력 " + HeroCatalog.All[i].Health, 124, 98, 350, 29, 14, Ui.Muted);

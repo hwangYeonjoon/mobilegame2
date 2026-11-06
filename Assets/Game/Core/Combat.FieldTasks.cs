@@ -2,26 +2,27 @@ using System;
 
 namespace ScrapGuard.Core
 {
-    public enum FieldTask { None, Salvage, Defense, Escort }
+    public enum FieldTask { None, Salvage, Defense, Escort, SalvageChain, PowerRelay, Convoy }
     public sealed partial class Combat
     {
-        public FieldTask Task { get { return Challenge?FieldTask.None:(Definition.Layout==0 && Stage==0 || Definition.Layout==1 || Definition.Layout==4)?FieldTask.Salvage:Definition.Layout==2?FieldTask.Defense:Definition.Layout==3?FieldTask.Escort:FieldTask.None; } }
-        public V2 TaskPosition { get { return Task==FieldTask.Escort?new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),660-TaskProgress*300):new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),420); } }
+        public FieldTask Task { get { return Challenge?FieldTask.None:Stage==2?FieldTask.SalvageChain:Stage==4?FieldTask.PowerRelay:Stage==8?FieldTask.Convoy:(Definition.Layout==0 && Stage==0 || Definition.Layout==1 || Definition.Layout==4)?FieldTask.Salvage:Definition.Layout==2?FieldTask.Defense:Definition.Layout==3?FieldTask.Escort:FieldTask.None; } }
+        public V2 TaskPosition { get { return Task==FieldTask.SalvageChain||Task==FieldTask.PowerRelay?OperationNode(Math.Min(TaskNode,2)):Task==FieldTask.Convoy?new V2(270+(float)Math.Sin(TaskProgress*Math.PI*2)*80,660-TaskProgress*330):Task==FieldTask.Escort?new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),660-TaskProgress*300):new V2(270+(FieldVariant-1)*(Definition.Region==0?0:70),420); } }
         public float TaskProgress { get; private set; }
         public float TaskIntegrity { get; private set; }=100;
         public int TaskChoice { get; private set; }
         public bool TaskCompleted { get; private set; }
         public bool TaskFailed { get; private set; }
-        public bool TaskActive { get { return Task!=FieldTask.None && Elapsed>=12 && Elapsed<70 && !TaskCompleted && !TaskFailed; } }
+        public bool TaskActive { get { return Task!=FieldTask.None && Elapsed>=12 && Elapsed<(SpecialOperation?125:70) && !TaskCompleted && !TaskFailed; } }
         public bool CanChooseTask { get { return !Ended && !Choosing && TaskActive && Task==FieldTask.Salvage && TaskChoice==0 && V2.Distance(Position,TaskPosition)<=100; } }
         public bool RiskActive { get { return TaskActive && TaskChoice==2; } }
         public int TaskBonusGold { get { return Won && TaskCompleted?TaskChoice==2?400:200:0; } }
         public int TaskBonusParts { get { return Won && TaskCompleted?TaskChoice==2?4:2:0; } }
-        public string TaskTitle { get { return Task==FieldTask.Salvage?"부품 회수":Task==FieldTask.Defense?"중계기 방어":"수송 드론 호위"; } }
+        public string TaskTitle { get { return Task==FieldTask.SalvageChain?"거대 로봇 해체":Task==FieldTask.PowerRelay?"정비소 전력 복구":Task==FieldTask.Convoy?"수송체 호송":Task==FieldTask.Salvage?"부품 회수":Task==FieldTask.Defense?"중계기 방어":"수송 드론 호위"; } }
         public string TaskInstruction
         {
             get
             {
+                if(SpecialOperation)return OperationInstruction;
                 if(TaskCompleted)return FieldModule==0?"부품 확보! 현장 개조를 선택하세요 · 이번 전투 전용":FieldEngineering.Name(FieldModule,Hero)+" 가동 · 승리 시 추가 재화 지급";
                 if(TaskFailed)return TaskTitle+" 종료 · 본 작전은 계속됩니다";
                 if(Elapsed<12)return "선택 임무 예고 · "+TaskTitle+" · 12초에 개방";
@@ -47,8 +48,9 @@ namespace ScrapGuard.Core
         void UpdateFieldTask(float dt)
         {
             if(Task==FieldTask.None || TaskCompleted || TaskFailed)return;
-            if(Elapsed>=70){TaskFailed=true;return;}
+            if(Elapsed>=(SpecialOperation?125:70)){TaskFailed=true;return;}
             if(!TaskActive)return;
+            if(SpecialOperation){UpdateSpecialOperation(dt);return;}
             if(Task==FieldTask.Salvage)
             {
                 if(TaskChoice==2){TaskProgress=Math.Min(1,TaskProgress+dt/20);if(TaskProgress>=1)CompleteTask();}

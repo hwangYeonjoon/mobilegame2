@@ -57,6 +57,7 @@ namespace ScrapGuard.Core
         public string displayName = "새내기 정비사";
         public int showcaseHero;
         public int showcaseTitle;
+        public int showcaseTheme;
         public int showcaseFrame;
         public int selectedSkin, selectedOutfit;
         public List<int> heroOutfits;

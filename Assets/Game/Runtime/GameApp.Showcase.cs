@@ -16,7 +16,7 @@ namespace ScrapGuard
         Color FrameColor(int frame) { return frame == 4 ? Ui.Hex("C89BFF") : frame == 1 || frame == 3 ? Ui.Gold : frame == 2 ? Ui.Blue : Ui.Mint; }
         void Showcase()
         {
-            var body=Ui.Scroll(screen,24,176,492,MenuBottom-176,880);
+            var body=Ui.Scroll(screen,24,176,492,MenuBottom-176,1030);
             var profile=Social.Build(State,Online?cloud.Session.playerId:"",!Online);
             showcaseCard=DrawProfile(body,profile,0,0);
             Ui.Button(body,"확대 감상 · 움직임과 공격 연출",0,548,492,72,()=>GuardianGallery(profile,()=>Show("showcase")),Ui.Gold,true,22);
@@ -24,7 +24,9 @@ namespace ScrapGuard
             Ui.Button(body,"카드 이미지 공유",254,636,238,72,()=>{if(!exportingCard)StartCoroutine(ExportCard(showcaseCard));},null,true,20);
             Ui.Button(body,"장비 · 기록 보기",0,724,238,72,()=>ProfileEquipment(profile),Ui.Raised,true,20);
             Ui.Button(body,"다른 수호대 구경",254,724,238,72,()=>{if(Online&&cloudReady)StartCoroutine(LoadGallery(""));else AccountPanel();},Ui.Raised,true,20);
-            Ui.Label(body,"마음에 드는 모습과 플레이 기록을 함께 전시하세요.",0,817,492,48,18,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(body,"전시 배경 · 플레이 기념관",0,812,492,72,()=>ThemeCollection(State.showcaseTheme),Ui.Raised,true,21);
+            activityButton=Ui.Button(body,"응원 · 지원 활약 보기",0,900,492,72,OpenActivity,Ui.Mint,true,21);
+            if(Online&&cloudReady&&!smokeActive)StartCoroutine(RefreshActivity(false));
         }
         RectTransform DrawProfile(Transform parent,PublicProfile p,float x,float y)
         {
@@ -34,12 +36,12 @@ namespace ScrapGuard
             Ui.Label(card,"SCRAP GUARD / MY GUARDIAN",24,13,444,24,14,accent,TextAnchor.MiddleCenter);
             Ui.Label(card,p.name,24,43,444,43,30,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"〈 "+Social.Titles[p.title]+" 〉",24,90,444,30,20,accent,TextAnchor.MiddleCenter);
-            var stage=WorkshopStage.Draw(card,18,129,456,272,accent);
+            var stage=ShowcaseStage.Draw(card,18,129,456,272,p.theme,accent);
             if(p.frame==4)
             {
                 var orbit=CombatRing.Create(stage,230,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(228,-132);
             }
-            var art=CharacterArt.Draw(stage,80,4,296,253,p.hero,p.skin,p.outfit);
+            var art=CharacterArt.Draw(stage,80,p.theme==0?4:-6,296,p.theme==0?253:226,p.hero,p.skin,p.outfit);
             art.gameObject.AddComponent<ShowroomMotion>();
             Ui.Label(card,StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
             Ui.Label(card,"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);

@@ -21,6 +21,19 @@ static class OutfitChecks
         }
         Reject(()=>Apply(a,new GameCommand("outfit_equip"){skin=1}),"unowned outfit rejected by server");
         Reject(()=>Apply(a,new GameCommand("cosmetic_buy"){value=Outfits.Key}),"server requires full outfit price");
+        Fixture(aa.playerId,s=>s.gems=800);
+        var themePurchase=new GameCommand("cosmetic_buy"){value="theme_orbit"};
+        var themeResult=Apply(a,themePurchase);var themeRetry=repo.Apply(a,themePurchase);
+        check(themeResult.state.gems==400&&themeRetry.state.gems==400,"theme retry debits once");
+        Apply(a,new GameCommand("showcase_theme"){skin=1});
+        check(repo.GetProfile(a,aa.playerId).theme==1,"owned theme survives server storage and DTO");
+        using(var metrics=JsonDocument.Parse(JsonSerializer.Serialize(repo.MetricsDashboard(),GameRepository.Json)))
+        {
+            var theme=metrics.RootElement.GetProperty("themes")[0];
+            check(theme.GetProperty("owners").GetInt32()==1&&theme.GetProperty("equipped").GetInt32()==1,"theme dashboard counts authoritative ownership and application once");
+            check(metrics.RootElement.GetProperty("themes")[2].GetProperty("owners").GetInt32()==0,"unearned memorial is absent from ownership metrics");
+        }
+        Reject(()=>Apply(a,new GameCommand("showcase_theme"){skin=4}),"unearned theme cannot be forged");
         Fixture(aa.playerId,s=>s.gems=900);
         var purchase=new GameCommand("cosmetic_buy"){value=Outfits.Key};var bought=Apply(a,purchase);var retry=repo.Apply(a,purchase);
         check(bought.state.gems==300 && retry.state.gems==300 && Outfits.Owned(retry.state),"purchase retry grants and charges once");

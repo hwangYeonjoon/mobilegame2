@@ -48,8 +48,8 @@ namespace ScrapGuard.Tests
             Check(bolt.EngineeringPulses==1 && Math.Abs(bolt.Shield-bolt.MaxHp*.12f)<.001f && V2.Distance(enemy.position,bolt.Position)>100,"Bolt adds shield and actual knockback");
             var spark=Ready(3,1);for(int i=0;i<50;i++){if(spark.Choosing)spark.Choose(spark.Choices[0]);spark.Tick(.05f,new V2());}
             Check(spark.EngineeringPulses==1,"Spark stationary charge discharges");
-            for(int i=0;i<50;i++)spark.Tick(.05f,new V2());Check(spark.EngineeringPulses==1,"Spark cannot chain forever without moving");
-            spark.Tick(.05f,new V2(0,1));for(int i=0;i<45;i++)spark.Tick(.05f,new V2());Check(spark.EngineeringPulses==2,"movement rearms Spark charge");
+            for(int i=0;i<50;i++){if(spark.Choosing)spark.Choose(spark.Choices[0]);spark.Tick(.05f,new V2());}Check(spark.EngineeringPulses==1,"Spark cannot chain forever without moving");
+            if(spark.Choosing)spark.Choose(spark.Choices[0]);spark.Tick(.05f,new V2(0,1));for(int i=0;i<45;i++){if(spark.Choosing)spark.Choose(spark.Choices[0]);spark.Tick(.05f,new V2());}Check(spark.EngineeringPulses==2,"movement rearms Spark charge");
             var iris=Ready(4,2);enemy=iris.Enemies[0];iris.Enemies.Add(new Enemy{id=1000,position=iris.Position+new V2(0,70),hp=100000,maxHp=100000,finalBoss=true});iris.Tick(.05f,new V2());
             Check(enemy.freezeTime>0 && iris.Enemies[1].freezeTime==0 && iris.Enemies[1].slowTime>0,"Iris freezes ordinary enemy but only slows boss");
         }

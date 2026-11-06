@@ -63,6 +63,20 @@ namespace ScrapGuard.Editor
             Configure(); EditorUserBuildSettings.buildAppBundle = false;
             Build(BuildTarget.Android, "Builds/Android/ScrapGuard-prototype.apk");
         }
+        public static void BuildAndroidSoakQA(){BuildAndroidQA(true);}
+        public static void BuildAndroidPolishQA(){BuildAndroidQA(false);}
+        static void BuildAndroidQA(bool soak)
+        {
+            Configure();EditorUserBuildSettings.buildAppBundle=false;
+            string previous=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),previousName=PlayerSettings.productName;
+            try
+            {
+                PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,ScrapGuard.Core.AppRelease.Package+".qa");
+                PlayerSettings.productName="고철 수호대 QA";
+                Build(BuildTarget.Android,"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
+            }
+            finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();}
+        }
         public static bool InternalTestBuild {get;private set;}
         [MenuItem("Scrap Guard/Build signed internal-test AAB")]
         public static void BuildAndroidBundle()
@@ -104,10 +118,10 @@ namespace ScrapGuard.Editor
         {
             BuildMac(); BuildAndroid();
         }
-        static void Build(BuildTarget target, string path,BuildOptions options=BuildOptions.Development)
+        static void Build(BuildTarget target, string path,BuildOptions options=BuildOptions.Development,string[] extraDefines=null)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
-            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { ScenePath }, target = target, locationPathName = path, options = options });
+            var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { ScenePath }, target = target, locationPathName = path, options = options,extraScriptingDefines=extraDefines });
             if (report.summary.result != BuildResult.Succeeded) throw new BuildFailedException("Build failed: " + report.summary.result);
             Debug.Log("BUILD_READY " + Path.GetFullPath(path));
         }

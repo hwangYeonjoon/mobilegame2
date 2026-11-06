@@ -1,5 +1,21 @@
 # 서버와 안드로이드 출시 계획
 
+## 0.20.0 준비 상태 — 2026-11-06 (로컬, 미배포)
+
+새 대원 능력·현장 개조·작전 목표 때문에 **전투 규칙 12 / 앱 code 23**으로 올렸다. 아래 이전 운영 상태는 이 변경을 포함하지 않는다. 현재 Play 비공개 테스트 트랙·운영 서버·실제 결제/AdMob 설정은 이번 작업에서 변경하지 않았다.
+
+릴리스할 때 rules 12 서버만 먼저 공개하면 rules 11 앱의 출격/정산이 호환되지 않는다. 진행 중 전투를 정리할 점검 시간을 두고 백업한 뒤, code 23을 테스터/대상 이용자가 실제로 받을 수 있는지 확인하고 서버와 전환한다. 전환 환경의 `CLIENT_LATEST_BUILD=23`, `CLIENT_MIN_BUILD=23`, `CLIENT_LATEST_VERSION=0.20.0`을 설정한다. 전투 규칙 12는 새 서버 코어에서 제공한다. 소스의 기본 최소 빌드 19에만 의존하지 않는다. 기존 계정/소유권/재화는 유지하며 이전 버전 롤백은 새 배경 필드를 이해하지 못할 수 있으므로 DB·앱 호환을 함께 판단한다.
+
+Android 연속 검증은 `ProjectBuilder.BuildAndroidSoakQA`를 **`-buildTarget Android`와 함께** 실행한다. 결과는 `Builds/Android/ScrapGuard-qa.apk`, 패키지는 `io.github.hwangyeonjoon.scrapguard.qa`, 표시 이름은 `고철 수호대 QA`다. `SCRAP_QA_SOAK`는 이 빌드에서만 추가하며 운영 패키지에서는 실행을 거절한다. 실제 서버·로그인·결제·광고 요청을 사용하지 않는 로컬 fixture다. 기존 Play 앱과 데이터를 교체하지 않는다. 재검사할 때는 QA 패키지 데이터만 초기화하고 시작한다.
+
+```sh
+/Users/kd-server/.unity/bin/unity run . --timeout 900 --no-tail --log-file TestResults/polish-android.log -- -buildTarget Android -executeMethod ScrapGuard.Editor.ProjectBuilder.BuildAndroidSoakQA
+```
+
+최종 UI만 검사할 때는 같은 Android 명령의 실행 메서드를 `ProjectBuilder.BuildAndroidPolishQA`로 바꾼다. 같은 QA 패키지이므로 연속 검사가 끝난 뒤 설치하고 QA 데이터만 초기화한다. UI 전용 빌드는 `SCRAP_QA_UI`도 함께 설정해 20분 대기 없이 화면 검사를 마친다.
+
+보고서는 QA 앱의 외부 files/PolishSoak(연속 검사) 또는 files/PolishUI(UI 전용)에 PNG·`report.txt`·`soak-minutes.csv`·`frame-summary.txt`로 저장한다. 에뮬레이터 수치는 실제 기기의 발열·배터리·GPU 성능·손가락 조작을 보장하지 않는다.
+
 ## 최신 운영 상태: 2026-11-05 초대 없는 시작·RTDN
 
 이 절은 아래의 이전 시점 기록보다 우선한다.

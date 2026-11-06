@@ -51,7 +51,7 @@ namespace ScrapGuard
             bool moving=initialized && time-movedAt<.12f && enemy.freezeTime<=0;
             Pose=enemy.windup>0?1:enemy.attackFlash>0||enemy.dash>0?2:moving && (int)(time*9+enemy.id)%2==1?3:0;
             float size=enemy.Radius*(boss?4.1f:3.9f);
-            body.sprite=BattleArt.Role(enemy.core?4:boss?region:(int)enemy.role,Pose,boss);
+            body.sprite=BattleArt.Role(enemy.core?7:boss?region:(int)enemy.role,Pose,boss);
             body.rectTransform.sizeDelta=new Vector2(size,size);
             float bounce=moving?Mathf.Abs(Mathf.Sin(time*10+enemy.id))*2:0;
             body.rectTransform.anchoredPosition=new Vector2(0,6+bounce+(Pose==1?-2:Pose==2?3:0));
@@ -86,13 +86,13 @@ namespace ScrapGuard
             var shape=Ui.Rect(root,"Outfit projectile",-34,-7,38,14);
             v.signature=shape.gameObject.AddComponent<OutfitMark>();v.signature.raycastTarget=false;return root;
         }
-        public void Render(Bullet bullet,int level,int outfit,float time)
+        public void Render(Bullet bullet,int level,int outfit,float time,bool compact=false)
         {
             var root=(RectTransform)transform;
             bool styled=Outfits.Valid(outfit)&&!bullet.mod&&!bullet.drone;
             signature.Configure(styled?outfit:0,true);
             signature.color=bullet.chilling?Ui.Hex("91EAFF"):OutfitVisuals.Accent(outfit);
-            trail.enabled=core.enabled=head.enabled=!styled;
+            trail.enabled=!styled&&!compact;core.enabled=head.enabled=!styled;
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
             var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
@@ -147,7 +147,8 @@ namespace ScrapGuard
         public const int Capacity=160;
         struct Particle {public Vector2 position,velocity;public float life,total,size,angle;public Color tint;}
         readonly Particle[] particles=new Particle[Capacity];
-        int count,sequence;
+        int count,sequence,limit=Capacity;
+        public int Limit { get { return limit; } set { int next=Mathf.Clamp(value,0,Capacity);if(limit==next)return;limit=next;count=Mathf.Min(count,limit);SetVerticesDirty(); } }
         public int Count { get { return count; } }
         public static CombatParticles Create(Transform parent)
         {
@@ -156,7 +157,8 @@ namespace ScrapGuard
         }
         public void Burst(V2 position,int amount,Color tint,float speed=75,float size=4)
         {
-            for(int i=0;i<amount && count<Capacity;i++)
+            if(amount<=0||count>=limit)return;
+            for(int i=0;i<amount && count<limit;i++)
             {
                 float a=(++sequence*2.399963f);float life=.3f+(sequence%5)*.07f;
                 particles[count++]=new Particle{position=new Vector2(position.x,-position.y),velocity=new Vector2(Mathf.Cos(a),Mathf.Sin(a))*speed*(.5f+sequence%7*.1f),life=life,total=life,size=size*(.6f+sequence%3*.3f),angle=a,tint=tint};
@@ -165,7 +167,7 @@ namespace ScrapGuard
         }
         public void Advance(float delta)
         {
-            if(delta<=0)return;
+            if(delta<=0||count==0)return;
             for(int i=count-1;i>=0;i--)
             {
                 var p=particles[i];p.life-=delta;

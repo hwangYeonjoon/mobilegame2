@@ -117,12 +117,12 @@ namespace ScrapGuard
             }
             if(twinTurretArt==null){twinTurretArt=Instantiate(turretArt,effectLayer);twinTurretArt.name="Twin sentry";}
             twinTurretArt.gameObject.SetActive(combat.FieldModule==1 && combat.Hero==0);
-            var twin=combat.Position-(combat.TurretPosition-combat.Position);
+            var twin=combat.TurretPosition+new V2(40,0);
             twinTurretArt.anchoredPosition=new Vector2(twin.x,-twin.y);
-            twinTurretArt.localEulerAngles=new Vector3(0,0,combat.Elapsed*100);
+            twinTurretArt.localEulerAngles=new Vector3(0,0,-combat.Facing*Mathf.Rad2Deg);
             turretArt.gameObject.SetActive(combat.HasMod(2));
             turretArt.anchoredPosition=new Vector2(combat.TurretPosition.x,-combat.TurretPosition.y);
-            turretArt.localEulerAngles=new Vector3(0,0,-combat.Elapsed*100);
+            turretArt.localEulerAngles=new Vector3(0,0,-combat.Facing*Mathf.Rad2Deg);
         }
         void WeeklyRecordCard(){WeeklyRecordCard(false);}
         void WeeklyRecordCard(bool skill)

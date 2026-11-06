@@ -6,12 +6,13 @@ namespace ScrapGuard
     {
         static Texture2D enemies;
         static readonly Sprite[,] frames = new Sprite[4,4];
+        static readonly Sprite[,] roleFrames=new Sprite[6,4],bossFrames=new Sprite[8,4];
         public static Sprite Role(int role,int state,bool boss=false)
         {
-            role=Mathf.Clamp(role,0,boss?6:5);state=Mathf.Clamp(state,0,3);
-            if(!boss)return ArenaArt.Cell("EnemyRoles-v3",6,4,role,state);
-            return role<4 ? ArenaArt.Cell("RegionBosses-v2",4,4,role,state)
-                : ArenaArt.Cell("ExpansionBosses-v2",3,4,role-4,state);
+            role=Mathf.Clamp(role,0,boss?7:5);state=Mathf.Clamp(state,0,3);
+            var cache=boss?bossFrames:roleFrames;
+            if(cache[role,state]==null)cache[role,state]=boss?ArenaArt.Cell("RegionBosses-v3",4,8,state,role):ArenaArt.Cell("EnemyRoles-v4",6,4,role,state);
+            return cache[role,state];
         }
         public static Sprite Enemy(int kind,int frame)
         {

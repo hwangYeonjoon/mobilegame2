@@ -52,6 +52,7 @@ namespace ScrapGuard.Core
                 case "hero_upgrade": return e.UpgradeHero();
                 case "rename": return Social.Rename(e.State, c.value);
                 case "customize": return Social.Customize(e.State, c.hero, c.title, c.frame, c.skin);
+                case "showcase_theme": return ShowcaseThemes.Equip(e.State,c.skin);
                 case "outfit_clear": return Outfits.Clear(e.State,c.hero);
                 case "outfit_target": return Outfits.Target(e.State,c.skin);
                 case "outfit_equip": return Outfits.Equip(e.State,c.skin);
@@ -117,7 +118,7 @@ namespace ScrapGuard.Core
             int frames = 0;
             foreach (var step in steps)
             {
-                if (step == null || step.assembly<0 || step.assembly>3 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 7 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
+                if (step == null || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 7 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
                     throw new ArgumentException("전투 입력이 올바르지 않아요.");
                 if(step.assembly!=0 && (step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 개조 선택이에요.");
                 if(step.encounter!=0 && (step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 현장 선택이에요.");

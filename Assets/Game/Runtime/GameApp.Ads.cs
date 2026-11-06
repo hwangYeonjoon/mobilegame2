@@ -10,7 +10,15 @@ namespace ScrapGuard
         RewardedAds rewardedAds;
         bool adBusy;
         [Serializable] sealed class AdHistory { public AdClaim[] claims; }
-        void SetupServices(){services=ServiceSettings.Load();rewardedAds=new RewardedAds(services);rewardedAds.GatherConsent();}
+        void SetupServices(){services=ServiceSettings.Load();
+#if SCRAP_QA_SOAK
+            services.adsEnabled=false;
+#endif
+            rewardedAds=new RewardedAds(services);
+#if !SCRAP_QA_SOAK
+            rewardedAds.GatherConsent();
+#endif
+        }
         bool SameAdAccount(string owner,string endpoint)=>Online&&cloud.Session.playerId==owner&&cloud.Session.endpoint==endpoint;
         void ApplyAd(AdClaim claim)
         {

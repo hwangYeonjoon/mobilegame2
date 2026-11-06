@@ -14,7 +14,7 @@ namespace ScrapGuard.Tests
             {
                 if(c.Choosing){int skill=c.Choices[0];c.Choose(skill);r.Choose(skill);}
                 if(c.CanChooseTask){c.ChooseTask(1);r.Encounter(1);}
-                if(c.CanAssemble){Check(!c.Assemble(0)&&!c.Assemble(4),"assembly allowlist");Check(c.Assemble(1),"recovered parts grant one choice");r.Assemble(1);Check(!c.Assemble(2),"one choice per run");}
+                if(c.CanAssemble){Check(!c.Assemble(0)&&!c.Assemble(5),"assembly allowlist");Check(c.Assemble(1),"recovered parts grant one choice");r.Assemble(1);Check(!c.Assemble(2),"one choice per run");}
                 c.Tick(ReplayRecorder.Step,r.Move((c.TaskPosition-c.Position).Normal));
             }
             c.Abandon();var copy=ReplayRecorder.Verify(s,1,"assembly",71,r.Steps,45);

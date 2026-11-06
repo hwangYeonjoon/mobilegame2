@@ -32,8 +32,8 @@ namespace ScrapGuard.Core
         static StageDefinition[] Build()
         {
             string[][] names = {
-                new[]{"버려진 정비소","부품 회수로","고철의 파도","용접 작업장","폭주 제어기","정비소 탈환"},
-                new[]{"폐역 진입","철길의 불청객","화물 대기선","포격 승강장","끊어진 철교","철도 파괴자"},
+                new[]{"버려진 정비소","부품 회수로","거대 로봇 해체","용접 작업장","정비소 전력 복구","정비소 탈환"},
+                new[]{"폐역 진입","철길의 불청객","수송체 호송","포격 승강장","끊어진 철교","철도 파괴자"},
                 new[]{"폐기물 처리장","독성 배수로","오염 봉쇄선","분해 작업장","폐수 저장고","오염의 심장"},
                 new[]{"냉각실 입구","얼어붙은 배관","냉기 경보","빙결 저장소","차가운 추격","극저온 수호기"},
                 new[]{"멈춰버린 공장","조립 컨베이어","생산 라인 봉쇄","레이저 격자","코어 접근로","중앙 제어 코어"},
@@ -55,7 +55,7 @@ namespace ScrapGuard.Core
             {
                 int id=stages.Count;var mission=local==2 || local==4 ? Mission.Survive : Mission.Eliminate;
                 stages.Add(new StageDefinition {Id=id,Region=region,Layout=local,Name=names[region][local],Boss=bosses[region],Mission=mission,
-                    Description=(mission==Mission.Survive?"생존":"보스 토벌")+" · "+Mechanics[region],
+                    Description=(id==2?"부품 3곳 회수 · ":id==4?"전원 3곳 복구 · ":id==8?"수송체 호송 · ":"")+(mission==Mission.Survive?"생존":"보스 토벌")+" · "+Mechanics[region],
                     Duration=210+local*12, Difficulty=1+id*.075f, SpawnInterval=Math.Max(.48f,.9f-region*.055f),
                     Gold=1500+id*90,Parts=10+id/2,FirstItem=id<5?new[]{1,7,10,2,5}[id]:new[]{3,8,11,4,2,5}[local],
                     FirstRarity=id<2?1:2,Enemies=pools[region]});

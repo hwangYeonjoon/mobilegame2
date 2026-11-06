@@ -12,6 +12,7 @@ namespace ScrapGuard.Core
     {
         public string id, name;
         public int hero, heroLevel, title, frame, skin, outfit, attack, health, kills, stages, attendance, likes;
+        public int theme;
         public int coreBest, trophy = -1;
         public bool local, test, liked;
         public List<ShowcaseItem> items = new List<ShowcaseItem>();
@@ -35,6 +36,7 @@ namespace ScrapGuard.Core
             if (!HasFrame(s, s.showcaseFrame)) s.showcaseFrame = 0;
             if (!HasSkin(s, s.selectedSkin)) s.selectedSkin = 0;
             Outfits.Normalize(s);
+            if(!ShowcaseThemes.Owned(s,s.showcaseTheme))s.showcaseTheme=0;
             if(s.collectionTarget < -1 || s.collectionTarget>=Campaign.Regions.Length)s.collectionTarget=-1;
             StarterGuide.Normalize(s);
             for (int i = 0; i < 3; i++)
@@ -75,7 +77,7 @@ namespace ScrapGuard.Core
         {
             Normalize(s);
             int outfit=Outfits.Find(id);
-            int price = id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : outfit>0 ? Outfits.Price : -1;
+            int price = ShowcaseThemes.Find(id)>0?ShowcaseThemes.Price:id == "frame_solar" ? 250 : id == "skin_amber" ? 300 : outfit>0 ? Outfits.Price : -1;
             if (price < 0) return CommandResult.Fail("등록되지 않은 꾸미기 상품이에요.");
             if(outfit>0 && !s.heroes[Outfits.Hero(outfit)].unlocked)return CommandResult.Fail(Outfits.HeroName(outfit)+"를 먼저 모집해 주세요. 의상은 대원을 포함하지 않아요.");
             if (s.ownedCosmetics.Contains(id)) return CommandResult.Fail("이미 가지고 있는 꾸미기 상품이에요.");
@@ -87,7 +89,7 @@ namespace ScrapGuard.Core
         {
             Normalize(s);
             var p = new PublicProfile { id = id, name = s.displayName, hero = s.showcaseHero, heroLevel = s.heroes[s.showcaseHero].level,
-                title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
+                theme=s.showcaseTheme, title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
                 attendance = s.attendanceCount, local = local, test = s.testProgress };
             for (int slot = 0; slot < 3; slot++)
             {

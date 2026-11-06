@@ -110,7 +110,7 @@ namespace ScrapGuard
             if(combat.Support==null)return;
             supportButton=Ui.Button(screen,"",183,876,146,66,TriggerSupport,Ui.Blue,true,15);supportText=supportButton.GetComponentInChildren<Text>();
             var support=combat.Support;
-            supportArt=CharacterArt.Draw(effectLayer,0,0,72,80,support.hero,support.showIdentity?support.skin:0,support.showIdentity?support.outfit:0).rectTransform;
+            supportArt=CharacterArt.Draw(identityLayer,0,0,80,88,support.hero,support.showIdentity?support.skin:0,support.showIdentity?support.outfit:0).rectTransform;
         }
         void TriggerSupport()
         {
@@ -124,7 +124,11 @@ namespace ScrapGuard
             supportButton.interactable=combat.CanSupport;
             supportText.text=combat.SupportUsed?"지원 완료":combat.Elapsed<8?"지원 준비\n"+Mathf.CeilToInt(8-combat.Elapsed)+"초":SupportNames[combat.Support.hero]+"\n호출 · Q";
             supportArt.gameObject.SetActive(combat.SupportTime>0);
-            supportArt.anchoredPosition=new Vector2(Mathf.Clamp(combat.Position.x-86,0,468),-Mathf.Clamp(combat.Position.y-96,180,730)+Mathf.Sin(combat.Elapsed*9)*2);
+            if(combat.SupportTime<=0)return;
+            var support=combat.Support;bool firing=combat.Elapsed%.36f<.16f;
+            supportArt.GetComponent<Image>().sprite=GuardianMotion.Sample(support.hero,support.showIdentity?support.skin:0,support.showIdentity?support.outfit:0,combat.Elapsed,0,firing,false,false);
+            supportArt.localScale=GuardianMotion.PoseScale(combat.Elapsed,0,firing,false);
+            supportArt.anchoredPosition=new Vector2(Mathf.Clamp(combat.Position.x-86,0,460),-Mathf.Clamp(combat.Position.y-96,180,730)+Mathf.Sin(combat.Elapsed*9)*2);
         }
     }
 }

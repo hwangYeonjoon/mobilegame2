@@ -33,12 +33,12 @@ namespace ScrapGuard
             float recoil = combat.ShotFlash/.11f;
             float scale=StylePresentation.PlayerScale;
             player.anchoredPosition = new Vector2(combat.Position.x-40*scale-Mathf.Cos(combat.Facing)*recoil*2,
-                -combat.Position.y+50*scale+Mathf.Abs(stride)*2.5f);
-            player.localScale = new Vector3(scale*(1+stride*.035f),scale*(1-stride*.035f),1);
+                -combat.Position.y+50*scale+Mathf.Abs(stride)*.8f);
+            player.localScale=Vector3.Scale(new Vector3(scale,scale,1),GuardianMotion.PoseScale(combat.Elapsed,moving,combat.ShotFlash>0,combat.HurtFlash>0));
             player.localEulerAngles = new Vector3(0,0,-combat.LastMovement.x*5+stride*2-recoil*3);
             playerArt.rectTransform.localScale = new Vector3(Mathf.Cos(combat.Facing)<-.05f ? -1 : 1,1,1);
-            int outfit=Outfits.Active(State,combat.Hero);
-            playerArt.sprite=CharacterArt.Get(combat.Hero,State.selectedSkin,outfit,combat.UltimateFlash>0?3:combat.ShotFlash>0?2:moving>.1f && Mathf.Sin(combat.Elapsed*11)>0?1:0);
+            int outfit=battleOutfit;
+            playerArt.sprite=GuardianMotion.Sample(combat.Hero,State.selectedSkin,outfit,combat.Elapsed,moving,combat.ShotFlash>0,combat.HurtFlash>0,combat.UltimateFlash>0);
             playerArt.color = combat.HurtFlash>0 ? new Color(1,.55f,.5f) : outfit>0?Color.white:CharacterArt.Tint(State.selectedSkin);
             muzzle.color=outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
             playerShadow.sizeDelta=new Vector2(40-Mathf.Abs(stride)*4,13-Mathf.Abs(stride));
@@ -51,7 +51,7 @@ namespace ScrapGuard
             muzzle.rectTransform.anchoredPosition = new Vector2(point.x,-point.y);
             muzzle.rectTransform.localScale = Vector3.one*(.5f+recoil*.7f);
             muzzle.rectTransform.localEulerAngles = new Vector3(0,0,-combat.Facing*Mathf.Rad2Deg);
-            arena.anchoredPosition = combat.UltimateFlash>.3f
+            arena.anchoredPosition = visualBudget.Compact?Vector2.zero:combat.UltimateFlash>.3f
                 ? new Vector2(Mathf.Sin(combat.Elapsed*95)*2,Mathf.Cos(combat.Elapsed*80)*2) : combat.HurtFlash>0?new Vector2(Mathf.Sin(combat.Elapsed*85),0):Vector2.zero;
             if (combat.UltimateUses != renderedUltimate)
             {
@@ -90,7 +90,7 @@ namespace ScrapGuard
             particles.Burst(combat.UltimateOrigin,combat.Hero==4?32:24,color,combat.Hero==3?220:150,combat.Hero==4?6:4);
             if(combat.Hero==3)
             {
-                for(int i=0;i<8;i++)
+                for(int i=0;i<(visualBudget.Compact?4:8);i++)
                 {
                     var arcRoot=Ui.Rect(effectLayer,"Discharge arc",0,0,540,960);
                     var arc=arcRoot.gameObject.AddComponent<LightningArc>();arc.raycastTarget=false;arc.color=color;
@@ -111,13 +111,13 @@ namespace ScrapGuard
             else
             {
                 float diameter = combat.Hero == 2 ? 360 : combat.Hero==3 ? 620 : combat.Hero==4 ? 520 : 490;
-                for (int i=0;i<3;i++)
+                for (int i=0;i<(visualBudget.Compact?1:3);i++)
                 {
                     var ring = CombatRing.Create(effectLayer,diameter,color,i==0 ? .018f : .035f);
                     ring.anchoredPosition = origin;
                     ring.gameObject.AddComponent<CombatBurst>().WithClock(combat).Configure(.8f+i*.1f,.12f+i*.09f,1);
                 }
-                for(int i=0;i<12;i++)
+                for(int i=0;i<(visualBudget.Compact?4:12);i++)
                 {
                     float angle=i*Mathf.PI/6;
                     var spark=Ui.Box(effectLayer,origin.x+Mathf.Cos(angle)*70,-origin.y+Mathf.Sin(angle)*70,6,38,color,false).rectTransform;

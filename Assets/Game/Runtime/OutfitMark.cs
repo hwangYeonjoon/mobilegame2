@@ -164,7 +164,7 @@ namespace ScrapGuard
     }
     public static class StylePresentation
     {
-        public const float PlayerScale=.88f;
+        public const float PlayerScale=1f;
         public static string Look(int outfit,int skin){return Outfits.Valid(outfit)?Outfits.Label(outfit):ScrapGuard.Core.Social.Skins[Mathf.Clamp(skin,0,ScrapGuard.Core.Social.Skins.Length-1)];}
         public static void SetLook(Image image,int hero,int skin,int outfit,int pose)
         {

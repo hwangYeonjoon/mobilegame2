@@ -4,15 +4,16 @@ namespace ScrapGuard.Core
 {
     public static class FieldEngineering
     {
-        public static readonly string[] Names={"미장착","현장 포탑","자력 절단기","응급 수리기"};
+        public static readonly string[] Names={"미장착","현장 포탑","자력 절단기","응급 수리기","질주 관통기"};
         public static string Name(int module,int hero)
         { return module==1 && hero==0?"루크 · 쌍둥이 포탑":module==2 && hero==1?"레이 · 질주 레일건":module==3 && hero==2?"볼트 · 방호 충격기":module==1 && hero==3?"스파크 · 축전 포탑":module==2 && hero==4?"아이리스 · 서리 자력장":Names[module]; }
         public static string Detail(int module,int hero)
         {
+            if(module==4)return "이동 거리 150 충전 후 관통탄 발사 · 최대 7회 적중\n적을 일렬로 유도하세요";
             if(module==3 && hero==2)return "6초마다 보호막 12% 보충 · 근처 적 밀어내기\n기본 수리 효과도 유지";
             if(module==1 && hero==3)return "포탑 사격 + 2초간 멈추면 연쇄 전격\n다시 발사하려면 이동 후 재충전";
             if(module==2 && hero==4)return "5초마다 주변 일반 적 1초 동결 · 보스 둔화\n톱날 Lv.1과 주변 적 끌어당기기";
-            if(module==1)return hero==0?"서로 반대편의 포탑 2기가 자동 사격합니다.":"주위를 도는 포탑이 자동 사격합니다.";
+            if(module==1)return hero==0?"거점 포탑 2기 · 원 안에서 사격 강화\n150 이상 떨어져 1초 멈추면 거점 이동":"거점 포탑 · 원 안에서 사격 강화\n150 이상 떨어져 1초 멈추면 거점 이동";
             if(module==2)return hero==1?"이동 거리 180마다 가까운 적에게 관통탄 발사\n톱날 Lv.1과 주변 적 끌어당기기":"톱날 Lv.1과 주변 적 끌어당기기";
             return "10초마다 최대 체력 3% 수리 · 보호막 8% 보충";
         }
@@ -33,8 +34,8 @@ namespace ScrapGuard.Core
         public bool CanAssemble { get { return TaskCompleted && FieldModule==0 && !Ended && !Choosing && !Challenge; } }
         public bool Assemble(int module)
         {
-            if(!CanAssemble || module<1 || module>3)return false;
-            FieldModule=module;
+            if(!CanAssemble || module<1 || module>4)return false;
+            FieldModule=module;InitializeBuild();
             if(module==2)Skills[1]=Math.Max(1,Skills[1]);
             Effects.Add(new BattleEffect{position=Position,kind=10,radius=85,text=FieldEngineering.Name(module,Hero)+" 장착"});
             return true;

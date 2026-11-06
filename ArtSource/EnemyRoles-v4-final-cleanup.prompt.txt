@@ -1,0 +1,1 @@
+Remove the background from this sprite sheet. Keep all 24 robots exactly where they are. Everything outside the robots must be transparent, including the gray studio floor and shadows. Return a transparent PNG.

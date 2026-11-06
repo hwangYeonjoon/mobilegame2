@@ -36,8 +36,20 @@ namespace ScrapGuard
             string profile = Path.Combine(Application.persistentDataPath, "scrap-guard-v1.json");
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-profilePath") profile = args[i + 1];
+#if SCRAP_QA_SOAK
+            if(!Application.identifier.EndsWith(".qa",StringComparison.Ordinal))throw new InvalidOperationException("QA soak requires isolated package");
+            profile=Path.Combine(Application.persistentDataPath,"qa-profile.json");
+#if SCRAP_QA_UI
+            args=new[]{"-smoke","-polishSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishUI")};
+#else
+            args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
+#endif
+#endif
             Store = new ProfileStore(profile);
             SetupCloud(profile);
+#if SCRAP_QA_SOAK
+            cloud.Session.enabled=false;cloud.Session.guestRegistrationPending=false;cloud.Session.localPlaySelected=true;Store=localStore;
+#endif
             SetupResearch(profile);
             SetupServices();
             if (FindFirstObjectByType<EventSystem>() == null)
@@ -160,7 +172,7 @@ namespace ScrapGuard
             var heroPanel=Ui.Box(body,0,0,492,roomHeight,Ui.Panel).rectTransform;
             WorkshopStage.Draw(heroPanel,0,0,492,roomHeight-74,Ui.Mint);
             Ui.Button(heroPanel,StarterGuide.Next(State)<5?"초보 안내 · "+(StarterGuide.Next(State)+1)+" / 5":"초보 안내 · 완료",14,10,268,58,GuidePanel,Ui.Raised,true,19);
-            Ui.Button(heroPanel,State.collectionTarget<0?"개조 · 수집":"수집 목표",296,10,182,58,()=>RegionCollection(State.collectionTarget<0?Campaign.Get(selectedStage).Region:State.collectionTarget),Ui.Raised,true,19);
+            Ui.Button(heroPanel,"성장 · 수집 목표",296,10,182,58,ProgressGoals,Ui.Raised,true,19);
             float artHeight=157+roomExtra;
             var art=CharacterArt.Draw(heroPanel,109,70,274,artHeight,State.selectedHero,State.selectedSkin,Outfits.Active(State,State.selectedHero));
             art.rectTransform.pivot=new Vector2(.5f,0);
@@ -217,16 +229,17 @@ namespace ScrapGuard
         }
         void Settings()
         {
-            var card = Dialog("설정", Online ? "진행 상황은 연결한 서버에 저장됩니다." : "진행 상황은 이 기기에 저장됩니다.", 790);
+            var card = Dialog("설정", Online ? "진행 상황은 연결한 서버에 저장됩니다." : "진행 상황은 이 기기에 저장됩니다.", 880);
             Ui.Button(card, State.sound ? "효과음 켜짐" : "효과음 꺼짐", 24, 134, 444, 53, () => Change(new GameCommand("sound") { enabled = !State.sound }, Settings), Ui.Raised);
             Ui.Button(card,"Play 상점 · 구매 복원",24,202,444,53,ConnectPlayBilling,Ui.Raised,true,17);
             Ui.Button(card, "계정 · 서버 연결", 24, 270, 444, 53, AccountPanel, Ui.Raised);
             Ui.Button(card, "테스트 도구", 24, 337, 444, 53, DemoTools, Ui.Raised, !Online && (Debug.isDebugBuild || Application.isEditor));
             Ui.Label(card, "이동: 화면 드래그 또는 WASD / 방향키\n공격은 자동 · 레벨업하면 스킬 선택\n일시정지: 전투 상단 버튼 또는 ESC", 24, 407, 444, 98, 16, Ui.Muted);
-            Ui.Button(card,"플레이 테스트 · 기록 설정",24,526,444,48,ResearchPanel,Ui.Raised,true,17);
+            Ui.Button(card,"전투 화면 · 효과 설정",24,526,444,48,BattleDisplayOptions,Ui.Raised,true,17);
             Ui.Button(card,"앱 "+AppRelease.Version+" · 업데이트 확인",24,596,444,48,()=>StartCoroutine(CheckAppUpdate(true)),Ui.Raised,true,17);
             Ui.Button(card,"광고 보상 · 개인정보 · 고객지원",24,660,444,48,ServicePanel,Ui.Raised,true,16);
-            Ui.Label(card,"고철 수호대 · 회수하고 개조하는 생존 게임",24,730,444,25,12,Ui.Muted);
+            Ui.Button(card,"플레이 테스트 · 기록 설정",24,724,444,60,ResearchPanel,Ui.Raised,true,19);
+            Ui.Label(card,"고철 수호대 · 회수하고 개조하는 생존 게임",24,812,444,25,14,Ui.Muted);
         }
         void Info(string title, string text)
         {
