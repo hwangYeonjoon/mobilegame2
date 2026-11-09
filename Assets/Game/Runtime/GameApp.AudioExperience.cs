@@ -59,7 +59,7 @@ namespace ScrapGuard
             Ui.Button(card,State.sound?"효과음 켜짐":"효과음 꺼짐",24,142,444,64,()=>Change(new ScrapGuard.Core.GameCommand("sound"){enabled=!State.sound},AudioOptions),Ui.Raised);
             Ui.Button(card,PlayerPrefs.GetInt("scrapguard.music",1)==1?"배경음악 켜짐":"배경음악 꺼짐",24,226,444,64,()=>{PlayerPrefs.SetInt("scrapguard.music",1-PlayerPrefs.GetInt("scrapguard.music",1));PlayerPrefs.Save();UpdateBattleMusic();AudioOptions();},Ui.Raised);
             Ui.Button(card,PlayerPrefs.GetInt("scrapguard.haptics",1)==1?"진동 켜짐":"진동 꺼짐",24,310,444,64,()=>{PlayerPrefs.SetInt("scrapguard.haptics",1-PlayerPrefs.GetInt("scrapguard.haptics",1));PlayerPrefs.Save();PulseHaptics(25);AudioOptions();},Ui.Raised);
-            Ui.Button(card,PlayerPrefs.GetInt("scrapguard.machine.auto",0)==1?"고철 합체 · 자동 발동":"고철 합체 · 직접 발동",24,402,444,64,()=>{PlayerPrefs.SetInt("scrapguard.machine.auto",1-PlayerPrefs.GetInt("scrapguard.machine.auto",0));PlayerPrefs.Save();AudioOptions();},Ui.Raised,true,20);
+            Ui.Button(card,PlayerPrefs.GetInt("scrapguard.machine.auto",0)==1?"고철 합체 · 직전 조합 자동":"고철 합체 · 직접 조립",24,402,444,64,()=>{PlayerPrefs.SetInt("scrapguard.machine.auto",1-PlayerPrefs.GetInt("scrapguard.machine.auto",0));PlayerPrefs.Save();AudioOptions();},Ui.Raised,true,20);
             Ui.Label(card,"피격·성장·필살기·고철 합체에 짧은 진동을 사용해요.\n진동 지원 Android 기기에서 동작합니다.",24,488,444,70,17,Ui.Muted);
             Ui.Label(card,"음악: Alexander Ehlers · 효과음: Kenney (CC0)\n일반 지역·합체·보스전에 따라 음악이 전환됩니다.",24,588,444,70,16,Ui.Muted);
         }

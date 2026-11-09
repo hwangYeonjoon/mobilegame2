@@ -57,7 +57,7 @@ namespace ScrapGuard.Core
         }
         public BattleReport Report()
         {
-            var result=new BattleReport {cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,fieldModule=FieldModule,hero=Hero,machines=MachinesBuilt,waves=WaveNumber,evolution=WeaponEvolution,skillEvolutions=EvolutionMask,revived=Revived,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
+            var result=new BattleReport {robots=RobotReport(),cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,fieldModule=FieldModule,hero=Hero,machines=MachinesBuilt,waves=WaveNumber,evolution=WeaponEvolution,skillEvolutions=EvolutionMask,revived=Revived,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
             if(bossSpawned && !Challenge)
             {
                 result.bossRemaining=Won?0:-1;

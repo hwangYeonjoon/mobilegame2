@@ -12,7 +12,7 @@ namespace ScrapGuard
         {
             public string kind="automated_fresh_loadout_not_human",clip;
             public float[] damageBySource,healingBySource;public float lowHealthSeconds;public int machineKills,machineIntercepts;public float bossSeconds;public float hazardDamageReceived;public float machineActiveSeconds,machineDamage,damageDealt,damageReceived,healingReceived,minimumHp,firstEvolutionSeconds;public int hazardHits;
-            public int seed,kills,peakEnemies,bestThreeSecondKills,machines,frames;
+            public int robotDesign;public int seed,kills,peakEnemies,bestThreeSecondKills,machines,frames;
             public float seconds,firstMachine=-1,hp;
             public bool won;
         }
@@ -57,7 +57,7 @@ namespace ScrapGuard
                     if(combat.CanAssemble){combat.Assemble(2);recorder.Assemble(2);}
                     if(combat.CanActivateMachine&&combat.Enemies.Count>=8)
                     {
-                        combat.ActivateMachine();recorder.Machine();
+                        int design=1+(runIndex-1)*4;combat.ActivateMachine(design);recorder.Machine(design);evidence.robotDesign=design;
                         if(evidence.firstMachine<0){evidence.firstMachine=combat.Elapsed;captureStart=frame;}
                     }
                     if(combat.CanUltimate&&combat.Enemies.Count>=12){combat.UseUltimate();recorder.Ultimate();if(combat.Ended)break;}

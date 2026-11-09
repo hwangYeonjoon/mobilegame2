@@ -23,7 +23,7 @@ namespace ScrapGuard.Core
         }
         void MovePlayer(float dt,V2 move)
         {
-            V2 target=(move.Length>1?move.Normal:move)*baseSpeed*(1+Skills[11]*.035f);
+            V2 target=(move.Length>1?move.Normal:move)*baseSpeed*MachineSpeed*(1+Skills[11]*.035f);
             bool ice=false;if(!BossArenaActive)foreach(var zone in Zones)if(Definition.Region==3 && zone.Contains(Position))ice=true;
             velocity=ice?velocity+(target-velocity)*Math.Min(1,dt*3):target;
             V2 drift=new V2();

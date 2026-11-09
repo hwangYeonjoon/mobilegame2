@@ -10,6 +10,7 @@ namespace ScrapGuard.Core
         public int cause, mods, task, taskChoice, fieldModule, hero;
         public bool taskCompleted, revived;
         public int machines, waves, evolution, skillEvolutions;
+        public List<RobotRecord> robots=new List<RobotRecord>();
         public int[] skills = new int[12];
         public float bossRemaining = -1;
     }
@@ -65,6 +66,7 @@ namespace ScrapGuard.Core
             var result=FinishRun(combat.RunId,combat.Stage,combat.Won,combat.Kills,combat.Elapsed);
             if(!result.Success)return result;
             var receipt=State.receipts.Find(r=>r.id==combat.RunId);receipt.report=combat.Report();
+            RobotAssembly.Record(State,receipt.report.robots,combat.Stage);
             if(combat.TaskBonusGold>0)
             {
                 receipt.gold+=combat.TaskBonusGold;receipt.parts+=combat.TaskBonusParts;

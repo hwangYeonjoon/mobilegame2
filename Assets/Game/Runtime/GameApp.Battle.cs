@@ -181,6 +181,7 @@ namespace ScrapGuard
             if (combat.Ended) { if(!OfferRevive())FinishBattle(); return; }
             if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame) TriggerSupport();
             if(Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame)TriggerMachine();
+            if(battlePaused)return;
             V2 movement = smokeActive ? SmokeMovement() : Movement();
             battleAccumulator += Mathf.Min(Time.deltaTime, .1f);
             frameBattleEffects.Clear();
@@ -280,8 +281,8 @@ namespace ScrapGuard
                     view.gameObject.SetActive(true); pickupViews[p.id] = view;
                 }
                 view.anchoredPosition = new Vector2(p.position.x - 4, -p.position.y + 4); view.localEulerAngles = new Vector3(0, 0, 45);
-                view.localScale = Vector3.one * (p.heal ? 1.5f : p.xp > 2 ? 1.3f : 1);
-                view.GetComponent<Image>().color = p.heal ? Ui.Red : Ui.Mint;
+                view.localScale = Vector3.one * (p.part>=0?2.6f:p.heal ? 1.5f : p.xp > 2 ? 1.3f : 1);
+                var pickupImage=view.GetComponent<Image>();pickupImage.color=p.part>=0?Color.white:p.heal?Ui.Red:Ui.Mint;pickupImage.sprite=p.part>=0?InventoryArt.Equipment(p.part==0?0:p.part==1?1:6):null;if(p.part>=0)view.localEulerAngles=Vector3.zero;
             }
             Recycle(pickupViews, pickupPool); alive.Clear();
             foreach (var h in combat.Hazards)
@@ -468,7 +469,8 @@ namespace ScrapGuard
             }
             if(receipt!=null && receipt.report!=null && receipt.report.taskCompleted)
                 Ui.Label(card,"현장 임무 보상 포함 · 골드 +"+(receipt.report.taskChoice==2?400:200)+" / 부품 +"+(receipt.report.taskChoice==2?4:2),24,334,444,25,12,Ui.Mint,TextAnchor.MiddleCenter);
-            Ui.Button(card,"전투 분석 · 조합 확인",24,360,444,51,BattleAnalysis,Ui.Mint,true,18);
+            Ui.Button(card,"전투 분석",24,360,combat.Challenge?444:214,51,BattleAnalysis,Ui.Mint,true,18);
+            if(!combat.Challenge)Ui.Button(card,"조립 로봇 · "+combat.RobotReport().Count+"종",254,360,214,51,()=>RobotHangar(true),Ui.Gold,true,18);
             bool canBonus = !State.lastResultBonus && State.lastResultGold > 0 && State.dailyRewardGold < 3 && State.lastResultDate == State.serviceDate;
             Ui.Button(card, State.lastResultBonus ? "추가 보상 수령 완료" : "추가 골드 +50%  ·  " + (State.demoAdSkip || State.adSkip ? "광고 없이 받기" : Online?"광고 보고 받기":"체험 안내"), 24, 433, 444, 57,
                 () => RequestReward("result"), Ui.Raised, canBonus, 17);

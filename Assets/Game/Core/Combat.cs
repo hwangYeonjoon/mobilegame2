@@ -23,7 +23,7 @@ namespace ScrapGuard.Core
         public int id, kind, chillStacks;
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
-        public bool finalBoss, core, killedByMachine;
+        public bool finalBoss, core, killedByMachine; public int robotDesign;
         public EnemyRole role;
         public V2 direction;
         public float windup, dash, attackFlash, slowTime, freezeTime;
@@ -36,14 +36,14 @@ namespace ScrapGuard.Core
         public V2 position, velocity;
         public float damage, life;
         public int pierce, lastHit = -1;
-        public bool blast, drone, mod, chilling;
+        public bool blast, drone, mod, chilling; public int robotDesign;
     }
-    public class Pickup { public int id, xp; public V2 position; public bool heal; }
+    public class Pickup { public int id, xp, part=-1, partCount=1; public V2 position; public bool heal; }
     public class Hazard { public int id; public V2 position; public float delay, radius, width, height, damage; public DamageCause cause; public DamageSource source; }
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 17;
+        public const int RulesVersion = 18;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -250,6 +250,7 @@ namespace ScrapGuard.Core
                 if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
                 if((area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }
+            if(MachineTime>0&&RobotAssembly.Frame(MachineDesign)==2)damage*=source==DamageSource.Boss?.8f:.65f;
             if(RiskActive)damage*=1.2f;
             if(PoweredSafety)damage*=.7f;
             if (armor == 7) damage *= .9f;
@@ -342,19 +343,19 @@ namespace ScrapGuard.Core
                 foreach (var e in BulletCandidates(b.position))
                 {
                     if (e.hp <= 0 || e.id == b.lastHit || V2.Distance(e.position, b.position) > e.Radius + 6) continue;
-                    Hit(e, b.damage,b.machine); b.lastHit = e.id;
+                    Hit(e, b.damage,b.machine,b.robotDesign); b.lastHit = e.id;
                     if(b.chilling)IdentityColdHit(e);
                     if (b.blast)
                     {
                         Effects.Add(new BattleEffect { position = b.position, kind = 2, radius = 60 });
-                        foreach (var other in Enemies) if (other != e && other.hp > 0 && V2.Distance(other.position, b.position) < 60) Hit(other, b.damage * .6f,b.machine);
+                        foreach (var other in Enemies) if (other != e && other.hp > 0 && V2.Distance(other.position, b.position) < 60) Hit(other, b.damage * .6f,b.machine,b.robotDesign);
                     }
                     if (b.pierce-- <= 0) { b.life = 0; break; }
                 }
                 if (b.life <= 0 || b.position.x < WorldLeft-60 || b.position.x > WorldRight+60 || b.position.y < WorldTop-60 || b.position.y > WorldBottom+60) Bullets.RemoveAt(i);
             }
         }
-        void Hit(Enemy e, float damage,bool machine=false)
+        void Hit(Enemy e, float damage,bool machine=false,int robotDesign=0)
         {
             if(e.core)
             {
@@ -363,19 +364,19 @@ namespace ScrapGuard.Core
             }
             if(e.role==EnemyRole.Shield && !e.core && V2.Distance(Position,e.position)>125)damage*=.45f;
             damage=(float)(Math.Round(damage*256d)/256d);
-            float effective=Math.Min(Math.Max(0,e.hp),Math.Max(0,damage));DamageDealt+=effective;if(machine)MachineDamage+=effective;
+            float effective=Math.Min(Math.Max(0,e.hp),Math.Max(0,damage));DamageDealt+=effective;if(machine){MachineDamage+=effective;int design=robotDesign==0?MachineDesign:robotDesign;if(RobotAssembly.Valid(design))this.robotDamage[design-1]+=effective;}
             if(MachineTime>0)DamageDuringMachine+=effective;
-            if(effective>0)e.killedByMachine=machine;
+            if(effective>0){e.killedByMachine=machine;e.robotDesign=machine?(robotDesign==0?MachineDesign:robotDesign):0;}
             e.hp -= damage; e.flash = .08f;
             if (e.kind >= 2 || (e.id+Kills)%7==0)
                 Effects.Add(new BattleEffect { position = e.position, text = ((int)damage).ToString(), kind = 0 });
         }
         void Kill(int index)
         {
-            var e = Enemies[index]; if(MachineTime>0)KillsDuringMachine++;if(e.killedByMachine)MachineKills++; DefeatedRoles|=1<<(int)e.role; Kills++; UltimateCharge = Math.Min(100,UltimateCharge + 2);
+            var e = Enemies[index]; RecoverRobotPart(e);if(e.killedByMachine&&RobotAssembly.Valid(e.robotDesign))robotKills[e.robotDesign-1]++; if(MachineTime>0)KillsDuringMachine++;if(e.killedByMachine)MachineKills++; DefeatedRoles|=1<<(int)e.role; Kills++; UltimateCharge = Math.Min(100,UltimateCharge + 2);
             int xp = e.kind >= 2 ? 20 : 2;
             if (Pickups.Count < 220) Pickups.Add(new Pickup { id = nextId++, position = e.position, xp = xp });
-            else Pickups[random.Next(Pickups.Count)].xp += xp;
+            else {var merged=Pickups.Find(p=>!p.heal&&p.part<0);if(merged!=null)merged.xp+=xp;}
             if (Kills % (Challenge?35:60) == 0 && Pickups.Count<230) Pickups.Add(new Pickup { id = nextId++, position = e.position + new V2(10, 0), heal = true });
             Effects.Add(new BattleEffect { position = e.position, kind = 5, radius = e.Radius });
             if (e.finalBoss) { Ended = true; Won = true; }
@@ -389,7 +390,8 @@ namespace ScrapGuard.Core
                 var p = Pickups[i]; float d = V2.Distance(Position, p.position);
                 if (d < radius) p.position += (Position - p.position).Normal * (300 * dt);
                 if (d > 18) continue;
-                if (p.heal) { Heal(MaxHp*(Challenge?.15f:.10f),HealingSource.Pickup); Effects.Add(new BattleEffect { position = Position, kind = 6, text = Challenge?"수리 +15%":"수리 +10%" }); }
+                if(p.part>=0&&p.part<3){robotParts[p.part]=Math.Min(12,robotParts[p.part]+p.partCount);Effects.Add(new BattleEffect{position=Position,kind=6,text=RobotAssembly.Parts[p.part]+" +"+p.partCount});}
+                else if (p.heal) { Heal(MaxHp*(Challenge?.15f:.10f),HealingSource.Pickup); Effects.Add(new BattleEffect { position = Position, kind = 6, text = Challenge?"수리 +15%":"수리 +10%" }); }
                 else { GainExperience(p.xp); if(!Challenge)Salvage+=p.xp*(Skills[11]>0?2:1); }
                 Pickups.RemoveAt(i);
             }

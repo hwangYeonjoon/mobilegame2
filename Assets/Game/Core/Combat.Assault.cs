@@ -18,12 +18,14 @@ namespace ScrapGuard.Core
         public int MachinesBuilt { get; private set; }
         public float MachineTime { get; private set; }
         public bool CanActivateMachine {get{return !Challenge&&!Ended&&!Choosing&&MachineTime<=0&&MachineRecovery<=0&&Salvage>=MachineCost;}}
-        public bool ActivateMachine()
+        public bool ActivateMachine(int design=0)
         {
-            if(!CanActivateMachine)return false;
+            if(design==0)design=MachineDesign;
+            if(!RobotAssembly.Valid(design)||!CanActivateMachine)return false;
             Salvage-=MachineCost;MachinesBuilt++;MachineTime=10;MachineRecovery=50;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,45),20),24);
+            BeginRobot(design);
             for(int i=Hazards.Count-1;i>=0;i--)if(Hazards[i].source==DamageSource.EnemyAttack&&V2.Distance(Hazards[i].position,Position)<230){Hazards.RemoveAt(i);MachineIntercepts++;}
-            Effects.Add(new BattleEffect{position=Position,kind=10,text="고철 합체 · 분쇄 모드!"});return true;
+            Effects.Add(new BattleEffect{position=Position,kind=10,text=RobotAssembly.Name(MachineDesign)+" 합체!"});return true;
         }
         public V2 MachinePosition { get; private set; }
         public int MachineCost { get { return MachinesBuilt==0?40:120; } }
@@ -69,22 +71,9 @@ namespace ScrapGuard.Core
             MachineRecovery=Math.Max(0,MachineRecovery-dt);
             MachineTime=Math.Max(0,MachineTime-dt);
             if(MachineTime<=0)return;
-            V2 follow=ClampWorld(Position+new V2(0,45),24);
-            MachinePosition=Slide(MachinePosition,(follow-MachinePosition).Normal*Math.Min(V2.Distance(follow,MachinePosition),200*dt),20);
-            machineShot-=dt;if(machineShot>0)return;machineShot=.7f;
-            float radius=FieldModule==2?255:210;
-            foreach(var enemy in Enemies)if(enemy.hp>0&&V2.Distance(enemy.position,MachinePosition)<radius)
-            {
-                Hit(enemy,Damage*(enemy.kind>=2?4f:4.8f),true);
-                if(!enemy.finalBoss&&!enemy.core)enemy.position=Slide(enemy.position,(enemy.position-MachinePosition).Normal*30,15);
-            }
-            if(FieldModule==3)Heal(MaxHp*.005f,HealingSource.Machine);
-            if(FieldModule==1||FieldModule==4)
-            {
-                var target=Nearest(MachinePosition);
-                if(target!=null)Bullets.Add(new Bullet{id=nextId++,position=MachinePosition,velocity=(target.position-MachinePosition).Normal*600,damage=Damage*2,life=1.2f,pierce=8,mod=true,machine=true});
-            }
-            Effects.Add(new BattleEffect{position=MachinePosition,kind=4,radius=radius});
+            MachinePosition=Position;
+            machineShot-=dt;if(machineShot>0)return;machineShot=RobotAssembly.Frame(MachineDesign)==0?1.1f:RobotAssembly.Frame(MachineDesign)==1?.6f:.8f;
+            UpdateRobotAttack();
         }
         void ReleaseWave()
         {

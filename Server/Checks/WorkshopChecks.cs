@@ -30,6 +30,7 @@ static class WorkshopChecks
             db.Open();using var q=db.CreateCommand();q.CommandText="SELECT COUNT(*) FROM ledger WHERE currency='blueprints:0' AND delta=-8 AND balance=0";
             check((long)q.ExecuteScalar()==1,"craft is audited once in blueprint ledger");
         }
+        Fails(()=>Apply(a,new GameCommand("robot_showcase"){stage=1}),"unbuilt robot cannot be published");
         var started=Apply(a,new GameCommand("battle_start"));
         // A fixed seed in this isolated database guarantees the run actually earns a mod.
         // Production tickets keep their random seeds; the client cannot change the stored seed.
@@ -46,6 +47,7 @@ static class WorkshopChecks
                 int choice=combat.Choices[0];foreach(int skill in new[]{0,5,1,7,2,3,4,6})if(Array.IndexOf(combat.Choices,skill)>=0){choice=skill;break;}
                 recorder.Choose(choice);combat.Choose(choice);
             }
+            if(combat.CanActivateMachine){int design=1+combat.MachinesBuilt%9;combat.ActivateMachine(design);recorder.Machine(design);}
             if(combat.CanUltimate){recorder.Ultimate();combat.UseUltimate();}
             var target=new V2(270+(float)Math.Cos(combat.Elapsed*.4f)*160,490+(float)Math.Sin(combat.Elapsed*.4f)*210);
             combat.Tick(ReplayRecorder.Step,recorder.Move((target-combat.Position).Normal));
@@ -58,6 +60,12 @@ static class WorkshopChecks
         check(receipt.report.cause==combat.Report().cause && receipt.report.damage.SequenceEqual(combat.Report().damage),"report uses authoritative replay damage");
         check(receipt.blueprints==(combat.Won?1:0) && Workshop.Region(settled.state,0).blueprints==receipt.blueprints,"blueprints require verified campaign success");
         repo.Apply(a,command);check(Workshop.Region(repo.Bootstrap(a).state,0).blueprints==receipt.blueprints,"settlement retry cannot duplicate blueprints");
+        var robots=settled.state.robotRecords;
+        check(robots.Count>0&&robots.Sum(r=>r.builds)==combat.MachinesBuilt,"server settles replay-authorized robot collection");
+        check(repo.Bootstrap(a).state.robotRecords.Sum(r=>r.builds)==combat.MachinesBuilt,"settlement retry cannot duplicate constructed robots");
+        var chosen=Apply(a,new GameCommand("robot_showcase"){stage=robots[0].design});
+        check(Social.Build(chosen.state).robotDesign==robots[0].design,"built robot is exposed through public profile");
+        check(new GameRepository(path,()=>now).Bootstrap(a).state.showcaseRobot==robots[0].design,"robot choice survives repository restart");
         Apply(a,new GameCommand("guild_create"){value="개조 수호대"});Apply(b,new GameCommand("guild_join"){value=repo.Guild(a).code});Apply(b,new GameCommand("guild_support"){enabled=true,hero=0});
         var state=repo.Bootstrap(b).state;state.publicProfile=true;state.attendanceCount=7;state.showcaseTitle=2;state.ownedCosmetics.Add(Workshop.SkinKey(0));state.selectedSkin=3;Fixture(bb.playerId,state);
         var publicRun=Apply(a,new GameCommand("battle_start"){supportId=bb.playerId});

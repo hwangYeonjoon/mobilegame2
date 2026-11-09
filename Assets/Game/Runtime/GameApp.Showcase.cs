@@ -16,16 +16,17 @@ namespace ScrapGuard
         Color FrameColor(int frame) { return frame == 4 ? Ui.Hex("C89BFF") : frame == 1 || frame == 3 ? Ui.Gold : frame == 2 ? Ui.Blue : Ui.Mint; }
         void Showcase()
         {
-            var body=Ui.Scroll(screen,24,176,492,MenuBottom-176,1030);
+            var body=Ui.Scroll(screen,24,176,492,MenuBottom-176,1120);
             var profile=Social.Build(State,Online?cloud.Session.playerId:"",!Online);
             showcaseCard=DrawProfile(body,profile,0,0);
-            Ui.Button(body,"확대 감상 · 움직임과 공격 연출",0,548,492,72,()=>GuardianGallery(profile,()=>Show("showcase")),Ui.Gold,true,22);
+            Ui.Button(body,RobotAssembly.Valid(profile.robotDesign)?"전시한 로봇 · 조립실에서 보기":"확대 감상 · 움직임과 공격 연출",0,548,492,72,()=>{if(RobotAssembly.Valid(profile.robotDesign))RobotHangar();else GuardianGallery(profile,()=>Show("showcase"));},Ui.Gold,true,22);
             Ui.Button(body,"내 프로필 꾸미기",0,636,238,72,CustomizeProfile,Ui.Raised,true,20);
             Ui.Button(body,"카드 이미지 공유",254,636,238,72,()=>{if(!exportingCard)StartCoroutine(ExportCard(showcaseCard));},null,true,20);
             Ui.Button(body,"장비 · 기록 보기",0,724,238,72,()=>ProfileEquipment(profile),Ui.Raised,true,20);
             Ui.Button(body,"다른 수호대 구경",254,724,238,72,()=>{if(Online&&cloudReady)StartCoroutine(LoadGallery(""));else AccountPanel();},Ui.Raised,true,20);
             Ui.Button(body,"전시 배경 · 플레이 기념관",0,812,492,72,()=>ThemeCollection(State.showcaseTheme),Ui.Raised,true,21);
             activityButton=Ui.Button(body,"응원 · 지원 활약 보기",0,900,492,72,OpenActivity,Ui.Mint,true,21);
+            Ui.Button(body,"내가 조립한 로봇 · 9가지 조합",0,986,492,72,()=>RobotHangar(),Ui.Gold,true,21);
             if(Online&&cloudReady&&!smokeActive)StartCoroutine(RefreshActivity(false));
         }
         RectTransform DrawProfile(Transform parent,PublicProfile p,float x,float y)
@@ -41,10 +42,10 @@ namespace ScrapGuard
             {
                 var orbit=CombatRing.Create(stage,230,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(228,-132);
             }
-            var art=CharacterArt.Draw(stage,80,p.theme==0?4:-6,296,p.theme==0?253:226,p.hero,p.skin,p.outfit);
-            art.gameObject.AddComponent<ShowroomMotion>();
-            Ui.Label(card,StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
-            Ui.Label(card,"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);
+            if(RobotAssembly.Valid(p.robotDesign))RobotRigView.Draw(stage,100,3,255,p.robotDesign);
+            else {var art=CharacterArt.Draw(stage,80,p.theme==0?4:-6,296,p.theme==0?253:226,p.hero,p.skin,p.outfit);art.gameObject.AddComponent<ShowroomMotion>();}
+            Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?RobotAssembly.Name(p.robotDesign):StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
+            Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?"전투에서 직접 조립한 로봇":"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"작전 정복 "+p.stages+" / "+Campaign.Count,24,478,444,29,22,accent,TextAnchor.MiddleCenter);
             string status=p.local?"로컬 체험 기록":(p.test?"테스트 · 공개 ID ":"공개 ID ")+p.id;
             Ui.Label(card,status,24,508,444,18,12,Ui.Muted,TextAnchor.MiddleCenter);

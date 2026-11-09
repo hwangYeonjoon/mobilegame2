@@ -40,8 +40,7 @@ namespace ScrapGuard
             machineActor=Ui.Rect(identityLayer,"Salvage assembly",0,0,0,0);
             machineActor.SetAsFirstSibling();
             machineAura=CombatRing.Create(machineActor,230,new Color(.6f,1,.8f,.55f),.018f);
-            var chassis=Ui.Box(machineActor,-140,-150,280,280,Color.white,false);
-            chassis.sprite=ArenaArt.Cell("SalvageMachine-v1",1,1,0,0);chassis.preserveAspect=true;
+            battleRobot=RobotRigView.Draw(machineActor,-155,-170,310,combat.MachineDesign);
             machineRotor=CombatRing.Create(machineActor,22,new Color(.4f,1,.8f,.7f),.06f);
             machineRotor.anchoredPosition=new Vector2(0,26);
 
@@ -64,8 +63,8 @@ namespace ScrapGuard
         }
         void TriggerMachine()
         {
-            if(combat==null||battlePaused||networkBusy||!combat.ActivateMachine())return;
-            recorder.Machine();Track("combat_hook","manual_machine",combat.Stage,combat.Elapsed);dragging=false;RenderBattle();
+            if(combat==null||battlePaused||networkBusy||combat.Challenge)return;
+            RobotAssembler(combat.MachineDesign);
         }
         void RenderUnifiedNotice()
         {
@@ -93,6 +92,7 @@ namespace ScrapGuard
         void RenderAssaultPresentation()
         {
             machineActor.gameObject.SetActive(combat.MachineTime>0);
+            battleRobot.SetDesign(combat.MachineDesign);battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
             float unfold=Mathf.Clamp01((10-combat.MachineTime)*2);
             machineActor.localScale=Vector3.one*Mathf.Lerp(.35f,1,unfold);
@@ -113,8 +113,8 @@ namespace ScrapGuard
                 {mineLinks[i].gameObject.SetActive(true);var from=combat.Mines[i].position;var to=combat.Mines[i+1].position;mineLinks[i].From=new Vector2(from.x,-from.y);mineLinks[i].To=new Vector2(to.x,-to.y);mineLinks[i].SetVerticesDirty();}
                 if(i<combat.Mines.Count){var p=combat.Mines[i].position;mineActors[i].anchoredPosition=new Vector2(p.x,-p.y);}
             }
-            machineButton.interactable=combat.CanActivateMachine&&!battlePaused&&!networkBusy;
-            salvageText.text=combat.MachineTime>0?"합체 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.MachineRecovery>0?"합체 준비 "+Mathf.CeilToInt(combat.MachineRecovery)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?"고철 합체":"고철 합체 · E"):"고철 "+combat.Salvage+"/"+combat.MachineCost;
+            machineButton.interactable=!combat.Challenge&&!combat.Ended&&combat.MachineTime<=0&&!combat.Choosing&&!battlePaused&&!networkBusy;
+            salvageText.text=combat.MachineTime>0?(RobotAssembly.Frame(combat.MachineDesign)==0?"포격":RobotAssembly.Frame(combat.MachineDesign)==1?"돌파":"철벽")+" 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.MachineRecovery>0?"합체 준비 "+Mathf.CeilToInt(combat.MachineRecovery)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?"로봇 조립":"로봇 조립 · E"):"조립 · 고철 "+combat.Salvage+"/"+combat.MachineCost;
             machineButton.image.color=combat.CanActivateMachine?Ui.Mint:Ui.Raised;
             salvageText.color=combat.CanActivateMachine?Ui.Background:Ui.Ink;
             machineFill.rectTransform.sizeDelta=new Vector2(155*Mathf.Clamp01(combat.Salvage/(float)combat.MachineCost),3);

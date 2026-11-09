@@ -30,7 +30,7 @@ namespace ScrapGuard.Core
     [Serializable] public class GuestRequest { public string secret, inviteCode; }
     [Serializable] public class ReplayStep
     {
-        public int x, y, frames, encounter, assembly, skill = -1;
+        public int x, y, frames, encounter, assembly, robot, skill = -1;
         public bool ultimate, support, revive, machine;
     }
     public static class CommandDispatcher
@@ -58,6 +58,7 @@ namespace ScrapGuard.Core
                 case "outfit_equip": return Outfits.Equip(e.State,c.skin);
                 case "guide_seen": e.State.guideIntroSeen=true; return CommandResult.Ok("안내는 정비소에서 다시 볼 수 있어요.");
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);
+                case "robot_showcase": return RobotAssembly.Showcase(e.State,c.stage);
                 case "showcase_equipment": e.State.showcaseItems = new List<string>(e.State.equipped); return CommandResult.Ok("현재 장비를 전시했어요.");
                 case "visibility": e.State.publicProfile = c.enabled; return CommandResult.Ok(c.enabled ? "프로필을 공개했어요." : "프로필을 비공개로 바꿨어요.");
                 case "sound": e.State.sound = c.enabled; return CommandResult.Ok("효과음 설정 저장");
@@ -107,7 +108,7 @@ namespace ScrapGuard.Core
             else Steps.Add(new ReplayStep { x = x, y = y, frames = 1, skill = -1 });
             return new V2(x / 100f, y / 100f);
         }
-        public void Machine(){Steps.Add(new ReplayStep{machine=true});}
+        public void Machine(int design=0){Steps.Add(new ReplayStep{machine=true,robot=design});}
         public void Revive(){Steps.Add(new ReplayStep{revive=true});}
         public void Assemble(int module){Steps.Add(new ReplayStep{assembly=module});}
         public void Encounter(int choice){Steps.Add(new ReplayStep{encounter=choice});}
@@ -120,7 +121,7 @@ namespace ScrapGuard.Core
             int frames = 0;
             foreach (var step in steps)
             {
-                if (step == null || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 11 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
+                if (step == null || step.robot<0 || step.robot>9 || (!step.machine&&step.robot!=0) || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 11 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
                     throw new ArgumentException("전투 입력이 올바르지 않아요.");
                 if(step.machine && (step.revive || step.assembly!=0 || step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 합체 입력이에요.");
                 if(step.revive && (step.assembly!=0 || step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 부활 입력이에요.");
@@ -137,7 +138,7 @@ namespace ScrapGuard.Core
             foreach (var step in steps)
             {
                 if (combat.Ended && !step.revive) throw new ArgumentException("종료된 전투 뒤에 입력이 있어요.");
-                if(step.machine){if(!combat.ActivateMachine())throw new ArgumentException("합체 준비가 되지 않았어요.");}
+                if(step.machine){if(!combat.ActivateMachine(step.robot))throw new ArgumentException("합체 준비가 되지 않았어요.");}
                 else if(step.revive){if(!reviveAllowed || !combat.Revive())throw new ArgumentException("확인된 부활 권리가 없거나 부활할 수 없는 상태예요.");}
                 else if(step.assembly!=0){if(!combat.Assemble(step.assembly))throw new ArgumentException("장착할 수 없는 현장 개조예요.");}
                 else if(step.encounter!=0){if(!combat.ChooseTask(step.encounter))throw new ArgumentException("선택할 수 없는 현장 임무예요.");}

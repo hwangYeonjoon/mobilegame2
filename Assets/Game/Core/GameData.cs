@@ -24,6 +24,8 @@ namespace ScrapGuard.Core
         public int paidGems,gemDebt;
         public bool adSkip;
         public int coreShards;
+        public int showcaseRobot;
+        public List<RobotRecord> robotRecords=new List<RobotRecord>();
         public int collectionVersion, enemyDiscoveries, bossDiscoveries;
         public List<RegionProgress> regions = new List<RegionProgress>();
         public int selectedHero;

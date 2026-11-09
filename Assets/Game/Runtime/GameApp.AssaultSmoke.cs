@@ -22,7 +22,7 @@ namespace ScrapGuard
                 for(int frame=0;frame<6000&&!run.Ended;frame++)
                 {
                     if(run.Choosing){int skill=run.Choices[0];foreach(int candidate in run.Choices)if(candidate>=8){skill=candidate;break;}run.Choose(skill);input.Choose(skill);}
-                    if(run.CanActivateMachine){run.ActivateMachine();input.Machine();}
+                    if(run.CanActivateMachine){int design=1+run.MachinesBuilt%9;run.ActivateMachine(design);input.Machine(design);}
                 if(run.CanUltimate){run.UseUltimate();input.Ultimate();if(run.Ended)break;}
                     var target=new V2(270+Mathf.Cos(run.Elapsed*.06f)*450,490+Mathf.Sin(run.Elapsed*.06f)*600);
                     run.Tick(ReplayRecorder.Step,input.Move((target-run.Position).Normal));
@@ -32,6 +32,27 @@ namespace ScrapGuard
                 var probe=new AssaultReplayProbe{state=snapshot,steps=input.Steps,id=run.RunId,mode=run.Mode,stage=stage,seed=71,kills=run.Kills,machines=run.MachinesBuilt,waves=run.WaveNumber,hp=run.Hp,seconds=run.Elapsed,won=run.Won};
                 File.WriteAllText(Path.Combine(smokeOutput,"runtime-replay-"+stage+".json"),JsonUtility.ToJson(probe));
             }
+        }
+        IEnumerator RobotAssemblySmoke()
+        {
+            OpenBattle(0,"robot-visual-fixture",17,false);battlePaused=true;
+            for(int id=1;id<=9;id++){RobotAssembler(id);yield return Capture("robot-design-"+id);}
+            CloseModal();
+            foreach(int id in new[]{1,5,9})
+            {
+                OpenBattle(0,"robot-frame-fixture-"+id,17,false);battlePaused=true;
+                combat.Pickups.Add(new Pickup{id=9000,position=combat.Position,xp=40});
+                for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9100+part,position=combat.Position,part=part,partCount=2});
+                combat.Tick(.05f,new V2());if(combat.Choosing)combat.Choose(combat.Choices[0]);
+                combat.ActivateMachine(id);
+                for(int n=0;n<32;n++)combat.Enemies.Add(new Enemy{id=10000+n,position=combat.Position+V2.Angle(n*.8f)*(100+n*7),hp=5000,maxHp=5000});
+                for(int frame=0;frame<45;frame++){if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.Tick(ReplayRecorder.Step,new V2(.3f,.1f));}
+                RenderBattle();yield return Capture("robot-frame-"+id);
+                var records=combat.RobotReport();Store.Change(e=>{RobotAssembly.Record(e.State,records,0);return CommandResult.Ok("Isolated robot visual fixture");});
+            }
+            combat=null;Show("home");RobotHangar();yield return Capture("robot-hangar");
+            Store.Change(e=>RobotAssembly.Showcase(e.State,1));Show("showcase");yield return Capture("robot-showcase");
+            Store.Change(e=>RobotAssembly.Showcase(e.State,0));CloseModal();Show("home");
         }
         IEnumerator AssaultSmokeRoutine()
         {
@@ -77,6 +98,7 @@ namespace ScrapGuard
             DrawReviveChoice();yield return Capture("12-revive-choice");CloseModal();
             if(Resources.Load<AudioClip>("Audio/Licensed/Factory")==null)smokeErrors.Add("Missing combat music asset");
             combat=null;Show("home");yield return Capture("13-home-return");
+            yield return RobotAssemblySmoke();
             yield return AssaultReplayCapture();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Assault UI errors: "+smokeErrors.Count+"\n"+Screen.width+"x"+Screen.height+"\n"+string.Join("\n",smokeErrors));
             if(smokeWithNatural){smokeOutput=Path.Combine(smokeOutput,"Natural");Directory.CreateDirectory(smokeOutput);yield return NaturalCombatRoutine();yield break;}
