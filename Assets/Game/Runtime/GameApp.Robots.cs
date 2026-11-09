@@ -10,44 +10,57 @@ namespace ScrapGuard
         bool robotMenuOpen;float robotMenuOpenedAt;
         void FinishRobotMenu(string action,int design){Track("robot_choice",action,design,Time.unscaledTime-robotMenuOpenedAt);robotMenuOpen=false;}
         int robotTargetDesign=RobotAssembly.DefaultDesign;
+        bool robotSupportOptions;
+        void ConfirmRobotPlan(int design,bool upgrade)
+        {
+            if(!combat.PlanRobot(design,upgrade))return;
+            recorder.RobotPlan(design,upgrade);
+            if(upgrade)Track("combat_robot","upgrade",design,combat.RobotRank(design));
+            if(combat.CanActivateMachine&&combat.ActivateMachine())recorder.Machine();
+            FinishRobotMenu("select",design);battlePaused=false;CloseModal();RenderBattle();
+        }
         void RobotAssembler(int design)
         {
             if(combat==null||combat.Ended||combat.Challenge||combat.Choosing||combat.MachineTime>0)return;
-            if(!robotMenuOpen){robotMenuOpen=true;robotMenuOpenedAt=Time.unscaledTime;Track("robot_choice","open",combat.MachinesBuilt,combat.Elapsed);}
+            if(!robotMenuOpen){robotMenuOpen=true;robotSupportOptions=false;robotMenuOpenedAt=Time.unscaledTime;Track("robot_choice","open",combat.MachinesBuilt,combat.Elapsed);}
             battlePaused=true;dragging=false;robotTargetDesign=design;
             int main=RobotAssembly.Frame(design),sub=RobotAssembly.Support(design),rank=combat.RobotRank(design);var parts=combat.RobotParts;var cost=combat.RobotRecipe(design);
-            var card=Dialog("이번 판의 로봇 설계","포격·자폭 적 → 포신 / 추격·돌진 적 → 구동부\n방패·소환 적 → 장갑 · 포/장 표식 운반 적도 회수",862);
+            bool craft=combat.CanPlanRobot(design,true),available=combat.RobotAvailable(design),board=combat.CanActivateMachine;
+            var card=Dialog("어떤 로봇을 만들까요?","회수한 부품으로 제작 · 만든 설계는 이번 판에 유지",800);
             var close=card.GetChild(2).GetComponent<Button>();close.onClick.RemoveAllListeners();close.onClick.AddListener(()=>{FinishRobotMenu("close",design);battlePaused=false;CloseModal();});
-            RobotRigView.Draw(card,24,133,202,design,rank);
-            Ui.Label(card,RobotAssembly.Name(design),234,143,234,61,23,RobotRigView.Accent(main));
-            Ui.Label(card,rank==0&&design==RobotAssembly.DefaultDesign?"기본 보행기 · 주변 적을 밟아 돌파\n특화형 제작 후 보조 기능 활성":RobotAssembly.Detail(design),234,210,234,100,16,Ui.Ink);
-            Ui.Label(card,rank==0?(design==RobotAssembly.DefaultDesign?"기본형 · 부품 없이 탑승":"미완성 · 회수 부품 필요"):rank==1?"특화형 · 이번 판 재사용":"완성형 · 이번 판 재사용",24,324,444,30,18,Ui.Gold,TextAnchor.MiddleCenter);
-            for(int i=0;i<3;i++){int pick=i;Ui.Button(card,RobotAssembly.Frames[i],24+i*150,370,144,55,()=>RobotAssembler(pick*3+sub+1),main==i?Ui.Mint:Ui.Raised,true,16);}
-            for(int i=0;i<3;i++){int pick=i;Ui.Button(card,RobotAssembly.Supports[i]+" · "+RobotAssembly.Parts[i],24+i*150,444,144,52,()=>RobotAssembler(main*3+pick+1),sub==i?Ui.Mint:Ui.Raised,true,16);}
-            string recipe="";for(int i=0;i<3;i++)if(cost[i]>0)recipe+=(recipe.Length>0?" / ":"")+RobotAssembly.Parts[i]+" "+parts[i]+"/"+cost[i];
-            Ui.Label(card,rank<2?"다음 설계에 필요한 부품\n"+recipe:"완성형 제작 완료 · 다음 탑승에도 유지",24,515,444,57,17,Ui.Gold,TextAnchor.MiddleCenter);
-            Ui.Button(card,rank==0?"회수 부품으로 특화형 제작":rank==1?"회수 부품으로 완성형 제작":"완성형 제작 완료",24,591,444,55,()=>
+            RobotRigView.Draw(card,24,120,176,design,rank);
+            Ui.Label(card,RobotAssembly.Frames[main],212,132,256,35,23,RobotRigView.Accent(main));
+            Ui.Label(card,RobotAssembly.Role(main)+"\n"+RobotAssembly.Tradeoff(main),212,178,256,76,16,Ui.Ink);
+            Ui.Label(card,rank==0?(design==RobotAssembly.DefaultDesign?"기본형 사용 가능":"미제작"):rank==1?"특화형 보유":"완성형 보유",212,267,256,26,16,Ui.Gold);
+            for(int i=0;i<3;i++){int pick=i;Ui.Button(card,RobotAssembly.Frames[i],24+i*150,318,144,50,()=>RobotAssembler(pick==main?design:pick*4+1),main==i?Ui.Mint:Ui.Raised,true,16);}
+            Ui.Button(card,"보조: "+new[]{"관통탄 추가","이동·범위 증가","소형 보호막"}[sub]+(robotSupportOptions?"  ▴":"  변경 ▾"),24,386,444,42,()=>{robotSupportOptions=!robotSupportOptions;RobotAssembler(design);},Ui.Raised,true,16);
+            if(robotSupportOptions)for(int i=0;i<3;i++){int pick=i;Ui.Button(card,new[]{"관통탄","이동·범위","보호막"}[i],24+i*150,440,144,42,()=>{robotSupportOptions=false;RobotAssembler(main*3+pick+1);},sub==i?Ui.Mint:Ui.Raised,true,16);}
+            float y=robotSupportOptions?498:444;
+            string recipe="";for(int i=0;i<3;i++)if(cost[i]>0)recipe+=(recipe.Length>0?"\n":"")+RobotAssembly.Parts[i]+" 필요 "+cost[i]+"개 · 보유 "+parts[i]+"개";
+            Ui.Label(card,rank<2?(rank==0?"특화형 제작":"완성형 강화")+"\n"+recipe:"완성형 · 재탑승에는 고철만 사용",24,y,444,76,17,craft?Ui.Mint:Ui.Gold,TextAnchor.MiddleCenter);
+            string action=board?"탑승":"선택 후 전투로";
+            bool upgrade=rank==0&&craft;
+            string primary=upgrade?"특화형 제작하고 "+(board?"탑승":"선택"):available?action:"부품 수집 목표로 선택";
+            Ui.Button(card,primary,24,y+92,444,58,()=>
             {
-                if(!combat.PlanRobot(design,true))return;recorder.RobotPlan(design,true);Track("combat_robot","upgrade",design,combat.RobotRank(design));RobotAssembler(design);
-            },Ui.Gold,combat.CanPlanRobot(design,true),18);
-            string ready=combat.CanActivateMachine?"탑승 · 고철 "+combat.MachineCost:"선택 후 전투로";
-            Ui.Button(card,combat.RobotAvailable(design)?ready:"부품을 회수해 설계를 완성하세요",24,670,444,63,()=>
-            {
-                if(!combat.PlanRobot(design,false))return;recorder.RobotPlan(design,false);
-                if(combat.CanActivateMachine){combat.ActivateMachine();recorder.Machine();}
-                FinishRobotMenu("select",design);battlePaused=false;CloseModal();RenderBattle();
-            },Ui.Mint,combat.CanPlanRobot(design,false),18);
-            Ui.Label(card,"탑승 "+combat.RobotDuration(design)+"초 · 재탑승에는 고철만 사용\n후반에는 특화·완성형 가동 시간 +4초\n짧게 눌러 즉시 탑승 · 길게 눌러 설계 변경",24,754,444,80,15,Ui.Muted,TextAnchor.MiddleCenter);
+                if(!available&&!upgrade){FinishRobotMenu("target",design);battlePaused=false;CloseModal();RenderBattle();return;}
+                ConfirmRobotPlan(design,upgrade);
+            },Ui.Mint,true,19);
+            if(rank==1&&craft)Ui.Button(card,"완성형 제작하고 "+(board?"탑승":"선택"),24,y+160,444,43,()=>ConfirmRobotPlan(design,true),Ui.Gold,true,16);
+            else if(rank==0&&craft&&available)Ui.Button(card,"부품을 아끼고 기본형 "+(board?"탑승":"선택"),24,y+160,444,43,()=>ConfirmRobotPlan(design,false),Ui.Raised,true,15);
+            string status=board?"탑승 시 고철 "+combat.MachineCost+"개 사용":combat.MachineRecovery>0?"탑승 대기 "+Mathf.CeilToInt(combat.MachineRecovery)+"초 · 설계 선택은 지금 가능":"탑승에 고철 "+combat.MachineCost+"개 필요 · 보유 "+combat.Salvage+"개";
+            Ui.Label(card,status+"\n재탑승은 짧게 · 설계 변경은 길게 누르기",24,728,444,58,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         string RobotRecoveryHint()
         {
             if(combat==null||combat.RobotRank(robotTargetDesign)>=2)return "";
             var cost=combat.RobotRecipe(robotTargetDesign);var stock=combat.RobotParts;int needed=-1;
             for(int i=0;i<3;i++)if(stock[i]<cost[i]&&(needed<0||cost[i]-stock[i]>cost[needed]-stock[needed]))needed=i;
-            if(needed<0)return "부품 준비 완료 · 합체 버튼을 길게 눌러 설계 강화";
+            if(needed<0)return "부품 준비 완료 · 합체 버튼을 길게 눌러 제작";
+            foreach(var pickup in combat.Pickups)if(pickup.part==needed)return BattleBearing(pickup.position)+" 떨어진 "+RobotAssembly.Parts[needed]+" 회수 · "+(cost[needed]-stock[needed])+"개 더 필요";
             Enemy target=null;float nearest=float.MaxValue;
             foreach(var enemy in combat.Enemies)if(enemy.hp>0&&RobotAssembly.PartFor(enemy)==needed){float d=V2.Distance(combat.Position,enemy.position);if(d<nearest){nearest=d;target=enemy;}}
-            return (target==null?"":BattleBearing(target.position)+" ")+RobotAssembly.Parts[needed]+" 회수 "+stock[needed]+"/"+cost[needed]+" · "+(needed==0?"포격·자폭 / 포 표식":needed==1?"추격·돌진 적":"방패·소환 / 장 표식");
+            return (target==null?"":BattleBearing(target.position)+" ")+RobotAssembly.Parts[needed]+" "+(cost[needed]-stock[needed])+"개 더 · "+(needed==0?"포격·자폭 / 포 표식":needed==1?"추격·돌진 적":"방패·소환 / 장 표식");
         }
         void RobotHangar(bool currentRun=false)
         {

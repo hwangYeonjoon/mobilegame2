@@ -180,7 +180,7 @@ namespace ScrapGuard
             if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame) TriggerUltimate();
             if (combat.Ended) { if(!OfferRevive())FinishBattle(); return; }
             if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame) TriggerSupport();
-            if(Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame){if(Keyboard.current.shiftKey.isPressed)RobotAssembler(combat.MachineDesign);else TriggerMachine();}
+            if(Keyboard.current!=null&&Keyboard.current.eKey.wasPressedThisFrame){if(Keyboard.current.shiftKey.isPressed)RobotAssembler(robotTargetDesign);else TriggerMachine();}
             if(battlePaused)return;
             V2 movement = smokeActive ? SmokeMovement() : Movement();
             battleAccumulator += Mathf.Min(Time.deltaTime, .1f);
@@ -418,7 +418,7 @@ namespace ScrapGuard
             Ui.Button(card, combat.Challenge ? "도전 종료하고 기록 저장" : "작전 종료하고 보상 받기", 24, 318, 444, 58, () => { battlePaused = false; combat.Abandon(); CloseModal(); FinishBattle(); }, Ui.Raised, true, 17);
             Ui.Button(card,"전투 화면 · 효과 설정",24,401,444,64,BattleDisplayOptions,Ui.Raised,true,20);
             Ui.Button(card,"소리 · 진동 · 합체 발동 설정",24,484,444,64,AudioOptions,Ui.Raised,true,20);
-            Ui.Button(card,"로봇 설계 · 조합 변경",24,565,444,54,()=>RobotAssembler(combat.MachineDesign),Ui.Gold,!combat.Challenge&&combat.MachineTime<=0,18);
+            Ui.Button(card,"로봇 설계 · 조합 변경",24,565,444,54,()=>RobotAssembler(robotTargetDesign),Ui.Gold,!combat.Challenge&&combat.MachineTime<=0,18);
             card.GetChild(2).gameObject.SetActive(false);
         }
         void ChooseBattleSkill(int skill)

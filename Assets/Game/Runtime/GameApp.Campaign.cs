@@ -32,7 +32,7 @@ namespace ScrapGuard
         void CampaignDetails(int id)
         {
             var stage=Campaign.Get(id);bool cleared=State.clearedStages.Contains(id),unlocked=id<=State.unlockedStage;
-            var card=Dialog("작전 "+(id+1).ToString("D2")+" · "+stage.Name,Campaign.Regions[stage.Region],700);
+            var card=Dialog("작전 "+(id+1).ToString("D2")+" · "+stage.Name,Campaign.Regions[stage.Region],770);
             Ui.Label(card,stage.Objective+"  /  "+(id==0&&!State.tutorialCompleted?180:stage.Duration)+"초",24,128,444,38,23,Ui.Mint);
             Ui.Label(card,Campaign.Mechanics[stage.Region],24,181,444,45,18);
             string enemies="";foreach(var role in stage.Enemies)enemies+=(enemies.Length>0?" · ":"")+new[]{"추격","돌진","포격","자폭","방패","소환"}[(int)role];
@@ -42,8 +42,10 @@ namespace ScrapGuard
             string field=(id==0 || stage.Layout==1 || stage.Layout==4)?"회수 · 안전 / 과부하 선택":stage.Layout==2?"중계기 방어":stage.Layout==3?"수송 드론 호위":"지역 보스 공략";
             Ui.Label(card,"현장 임무: "+field+(stage.Region>0?" · 출격마다 경로 변형":""),24,460,444,25,13,Ui.Blue);
             Ui.Label(card,stage.Region==0?"첫 지역은 기본 작전으로 진행해요.":"출격 시 기본 / 돌진 순찰 / 불안정 전력 중 결정\n보상은 동일 · 전투 중 일시정지에서 조건 확인",24,494,444,51,14,Ui.Muted);
-            Ui.Button(card,unlocked?"이 작전 선택":"이전 작전을 완료하세요",24,560,444,57,()=>{selectedStage=id;CloseModal();Show("home");},null,unlocked,19);
-            Ui.Button(card,"지역 지도로",24,632,444,42,()=>CampaignMap(stage.Region),Ui.Raised,true,16);
+            Ui.Label(card,RobotAssembly.RegionAdvice(stage),24,555,444,45,16,Ui.Mint);
+            Ui.Label(card,(id+1)%6==0?"지역 최종 작전 · 장비 강화와 보스 경고를 확인하세요":"기체 선택은 자유 · 역할에 맞춰 이동해 보세요",24,603,444,32,14,Ui.Muted);
+            Ui.Button(card,unlocked?"이 작전 선택":"이전 작전을 완료하세요",24,643,444,57,()=>{selectedStage=id;CloseModal();Show("home");},null,unlocked,19);
+            Ui.Button(card,"지역 지도로",24,711,444,42,()=>CampaignMap(stage.Region),Ui.Raised,true,16);
         }
     }
 }

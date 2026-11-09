@@ -153,7 +153,7 @@ namespace ScrapGuard.Tests
         }
         public static void MachineRecoveryAndTelemetry()
         {
-            var c=new Combat(GameState.New(),0,"recovery");
+            var state=GameState.New();state.tutorialCompleted=true;var c=new Combat(state,0,"recovery");
             c.Pickups.Add(new Pickup{id=9000,position=c.Position,xp=500});c.Tick(.05f,new V2());
             while(c.Choosing)c.Choose(c.Choices[0]);Check(c.ActivateMachine(),"first assembly available");
             for(int i=0;i<240;i++){if(c.Choosing)c.Choose(c.Choices[0]);c.Enemies.Clear();c.Tick(.05f,new V2());}
@@ -263,6 +263,25 @@ namespace ScrapGuard.Tests
             var target=new Enemy{id=9999,position=c2.Position+new V2(420,0),hp=100000,maxHp=100000};c2.Enemies.Clear();c2.Enemies.Add(target);c2.ActivateMachine(1);c2.Tick(.05f,new V2());Check(c2.MachineDamage>0,"cannon retains long reach");
             var trial=new Combat(GameState.New(),4,"fair",17,false,SkillTrial.Mode);Check(!trial.PlanRobot(1,true)&&!trial.ActivateMachine(1),"fixed competition remains isolated until its own rules are validated");
             var fresh=new Combat(GameState.New(),0,"new-run");Check(fresh.RobotRank(1)==0&&!fresh.RobotAvailable(1),"crafted power never carries to next run");
+        }
+        public static void IntroRobotRecoveryScope()
+        {
+            var state=GameState.New();var intro=new Combat(state,0,"intro-parts",17);
+            state.tutorialCompleted=true;var repeat=new Combat(state,0,"repeat-parts",17);
+            var found=new bool[3];
+            for(int i=0;i<440;i++)
+            {
+                foreach(var c in new[]{intro,repeat}){if(c.Choosing)c.Choose(c.Choices[0]);c.Tick(.05f,new V2());}
+                foreach(var e in intro.Enemies)if(e.salvagePart>=0)found[e.salvagePart]=true;
+            }
+            Check(Array.TrueForAll(found,x=>x),"first-clear lesson introduces all three real carrier types before 22 seconds");
+            Check(repeat.Enemies.TrueForAll(e=>e.salvagePart<0),"repeat stage does not receive early tutorial carriers");
+            var basic=new Combat(GameState.New(),0,"first-board");RobotFixtureParts(basic,0);basic.ActivateMachine();
+            Check(basic.MachineRecovery==30,"first tutorial basic boarding returns in time for specialization");
+            var regular=new Combat(state,0,"normal-board");RobotFixtureParts(regular,0);regular.ActivateMachine();
+            Check(regular.MachineRecovery==50,"normal campaign recovery remains unchanged");
+            var crafting=new Combat(GameState.New(),0,"no-gifts");
+            Check(!crafting.CanPlanRobot(1,true)&&crafting.RobotPartsSpent==0,"a tutorial clock never substitutes for recovered parts");
         }
         public static void RobotReplayAndCollection()
         {

@@ -46,21 +46,30 @@ namespace ScrapGuard
                 for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9100+part,position=combat.Position,part=part,partCount=12});
                 combat.Tick(.05f,new V2());if(combat.Choosing)combat.Choose(combat.Choices[0]);
                 combat.PlanRobot(id,true);combat.PlanRobot(id,true);combat.ActivateMachine(id);
-                for(int n=0;n<32;n++)combat.Enemies.Add(new Enemy{id=10000+n,position=combat.Position+V2.Angle(n*.8f)*(100+n*7),hp=5000,maxHp=5000});
+                for(int n=0;n<210;n++)combat.Enemies.Add(new Enemy{id=10000+n,position=combat.Position+V2.Angle(n*.8f)*(65+n%30*9),hp=5000,maxHp=5000});
+                RenderBattle();yield return Capture("robot-crowded-entry-"+id);
                 for(int frame=0;frame<45;frame++){if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.Tick(ReplayRecorder.Step,new V2(.3f,.1f));}
                 RenderBattle();yield return Capture("robot-frame-"+id);
                 var records=combat.RobotReport();Store.Change(e=>{RobotAssembly.Record(e.State,records,0);return CommandResult.Ok("Isolated robot visual fixture");});
             }
+            CampaignDetails(17);yield return Capture("robot-region-advice");CloseModal();
             // Actual button callbacks: a first configuration, then immediate boarding and held reconfiguration.
             OpenBattle(0,"robot-input-fixture",17,false);battlePaused=true;
             for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9400+part,position=combat.Position,part=part,partCount=12});
             combat.Pickups.Add(new Pickup{id=9450,position=combat.Position,xp=40});combat.Tick(.05f,new V2());while(combat.Choosing)combat.Choose(combat.Choices[0]);
             RobotAssembler(1);yield return Capture("robot-recipe-ready");
-            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="회수 부품으로 특화형 제작"){button.onClick.Invoke();break;}
-            if(combat.RobotRank(1)!=1)smokeErrors.Add("Robot upgrade button did not spend parts");
-            yield return Capture("robot-specialized-ready");
-            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text.StartsWith("탑승 ·")){button.onClick.Invoke();break;}
-            if(battlePaused||combat.MachineTime<=0)smokeErrors.Add("Configured robot did not board");
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="특화형 제작하고 탑승"){button.onClick.Invoke();break;}
+            if(combat.RobotRank(1)!=1||combat.RobotPartsSpent!=4||battlePaused||combat.MachineTime<=0)smokeErrors.Add("One press must craft, spend exactly four parts and board");
+            RenderBattle();yield return Capture("robot-crafted-and-boarded");
+            OpenBattle(0,"robot-select-fixture",17,false);battlePaused=true;
+            for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9470+part,position=combat.Position,part=part,partCount=12});
+            combat.Tick(.05f,new V2());RobotAssembler(9);yield return Capture("robot-craft-no-scrap");
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="특화형 제작하고 선택"){button.onClick.Invoke();break;}
+            if(combat.RobotRank(9)!=1||combat.MachineTime>0||battlePaused)smokeErrors.Add("Without scrap, crafting selects and returns without a fake boarding");
+            RobotAssembler(9);robotSupportOptions=true;RobotAssembler(9);yield return Capture("robot-support-options");CloseModal();
+            OpenBattle(0,"robot-target-fixture",17,false);battlePaused=true;RobotAssembler(1);
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="부품 수집 목표로 선택"){button.onClick.Invoke();break;}
+            if(battlePaused||combat.RobotPlansBuilt!=0||combat.RobotPartsSpent!=0||robotTargetDesign!=1)smokeErrors.Add("Target selection must not manufacture missing parts");
             // Fresh ready state preserves selected plan, without advancing or altering a live user's run.
             OpenBattle(0,"robot-quick-fixture",17,false);battlePaused=false;CloseModal();
             combat.Pickups.Add(new Pickup{id=9500,position=combat.Position,xp=40});combat.Tick(.05f,new V2());while(combat.Choosing)combat.Choose(combat.Choices[0]);combat.PlanRobot(5,false);

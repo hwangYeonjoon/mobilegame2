@@ -17,6 +17,13 @@ namespace ScrapGuard.Core
         public static int Frame(int id){return Valid(id)?(id-1)/3:1;}
         public static int Support(int id){return Valid(id)?(id-1)%3:1;}
         public static string Name(int id){return Valid(id)?Supports[Support(id)]+" "+Frames[Frame(id)]:"미조립";}
+        public static string Role(int frame){return frame==0?"떨어진 적에게 범위 포격":frame==1?"빠르게 움직이며 포위 돌파":"근접 충격파 · 받는 피해 감소";}
+        public static string Tradeoff(int frame){return frame==0?"이동이 느려요":frame==1?"적 가까이 접근해야 해요":"이동과 공격 주기가 느려요";}
+        public static string RegionAdvice(StageDefinition stage)
+        {
+            bool ranged=Array.Exists(stage.Enemies,r=>r==EnemyRole.Artillery);
+            return ranged?"포격 적 주의 · 철벽은 피해 완화, 돌파는 빠른 이탈":Array.Exists(stage.Enemies,r=>r==EnemyRole.Charger)?"돌진 적 주의 · 돌파로 이동, 포격으로 접근 전 공격":"무리 접근 · 돌파는 근접 돌파, 포격은 거리 유지";
+        }
         public static string Detail(int id)
         {
             string body=Frame(id)==0?"느리게 이동 · 먼 적에게 범위 포격":Frame(id)==1?"빠르게 이동 · 주변 적을 밟아 돌파":"중장 이동 · 근접 충격파와 피해 감소";
@@ -83,9 +90,14 @@ namespace ScrapGuard.Core
         {
             var result=new List<RobotRecord>();for(int i=0;i<9;i++)if(robotBuilds[i]>0)result.Add(new RobotRecord{design=i+1,builds=robotBuilds[i],kills=robotKills[i],damage=robotDamage[i],rank=robotBestRank[i]});return result;
         }
-        int robotSpawnSerial;
+        int robotSpawnSerial,introCarrierSerial;
         int NextCarrierPart()
         {
+            // First-clear lesson: finite, evenly supplied parts; still kill and collect them.
+            if(IntroBattle&&Elapsed>=6&&Elapsed<=60&&introCarrierSerial<72)
+            {
+                introCarrierSerial++;return introCarrierSerial%4==0?(introCarrierSerial/4-1)%3:-1;
+            }
             if(Challenge||Elapsed<25)return -1;
             robotSpawnSerial++;if(robotSpawnSerial%24!=0)return -1;
             bool cannon=!Array.Exists(Definition.Enemies,r=>r==EnemyRole.Artillery||r==EnemyRole.Bomber);
@@ -99,7 +111,7 @@ namespace ScrapGuard.Core
             partProgress[type]+=enemy.kind>=2||enemy.salvagePart>=0?12:enemy.role==EnemyRole.Pursuer?1:3;
             if(partProgress[type]<12)return;partProgress[type]-=12;
             // Merge pickups before adding more objects to a crowded battlefield.
-            var existing=Pickups.Find(p=>p.part==type);
+            var existing=Pickups.Find(p=>p.part==type&&(!IntroBattle||Elapsed>65||V2.Distance(p.position,enemy.position)<100));
             if(existing!=null){existing.partCount=Math.Min(12,existing.partCount+1);return;}
             if(Pickups.Count<230)Pickups.Add(new Pickup{id=nextId++,position=enemy.position,part=type,partCount=1});
         }

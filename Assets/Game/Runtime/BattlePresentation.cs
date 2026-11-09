@@ -64,7 +64,7 @@ namespace ScrapGuard
             shadow.rectTransform.sizeDelta=new Vector2(enemy.Radius*2,enemy.Radius*.58f);
             shadow.rectTransform.anchoredPosition=new Vector2(-enemy.Radius,enemy.Radius*.12f);
             shadow.color=new Color(0,0,0,enemy.windup>0?.5f:.32f);
-            mark.text=enemy.windup>0?"!":rage?"Ⅱ":enemy.kind==2?"◆":enemy.salvagePart==0?"포":enemy.salvagePart==2?"장":"";
+            mark.text=enemy.windup>0?"!":rage?"Ⅱ":enemy.kind==2?"◆":enemy.salvagePart==0?"포":enemy.salvagePart==1?"동":enemy.salvagePart==2?"장":"";
             mark.color=enemy.windup>0?Ui.Red:Ui.Gold;
             mark.rectTransform.anchoredPosition=new Vector2(-22,size*.5f+16);
             ((RectTransform)transform).anchoredPosition=position;

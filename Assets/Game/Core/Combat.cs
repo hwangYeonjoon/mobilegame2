@@ -43,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 19;
+        public const int RulesVersion = 20;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -201,7 +201,9 @@ namespace ScrapGuard.Core
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
             if(!Challenge&&!final)role=OpeningEnemyRole(role);
             if(final)role=BossRole();
-            Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, salvagePart=kind<2?NextCarrierPart():-1, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
+            int carrier=kind<2?NextCarrierPart():-1;
+            if(IntroBattle&&Elapsed<=60&&carrier>=0)p=SpawnPoint(210);
+            Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, salvagePart=carrier, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
                 speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
             if (kind >= 2) Effects.Add(new BattleEffect { position = Position+new V2(0,-140), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
         }
@@ -388,7 +390,7 @@ namespace ScrapGuard.Core
             for (int i = Pickups.Count - 1; i >= 0; i--)
             {
                 var p = Pickups[i]; float d = V2.Distance(Position, p.position);
-                if (d < radius) p.position += (Position - p.position).Normal * (300 * dt);
+                if (d < (IntroBattle&&Elapsed<=65&&p.part>=0?Math.Max(radius,120):radius)) p.position += (Position - p.position).Normal * (300 * dt);
                 if (d > 18) continue;
                 if(p.part>=0&&p.part<3){robotParts[p.part]=Math.Min(12,robotParts[p.part]+p.partCount);Effects.Add(new BattleEffect{position=Position,kind=6,text=RobotAssembly.Parts[p.part]+" +"+p.partCount});}
                 else if (p.heal) { Heal(MaxHp*(Challenge?.15f:.10f),HealingSource.Pickup); Effects.Add(new BattleEffect { position = Position, kind = 6, text = Challenge?"수리 +15%":"수리 +10%" }); }
