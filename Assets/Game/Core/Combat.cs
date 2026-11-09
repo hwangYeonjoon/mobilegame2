@@ -6,16 +6,19 @@ namespace ScrapGuard.Core
     public struct V2
     {
         public float x, y;
-        // Canonical sub-pixel coordinates prevent Mono, IL2CPP and .NET rounding drift.
-        public V2(float x, float y) { this.x = (float)(Math.Round(x*4096d)/4096d); this.y = (float)(Math.Round(y*4096d)/4096d); }
+        // Round once on the canonical grid, after double intermediate arithmetic.
+        // A float intermediate can land on opposite sides of a grid boundary across runtimes.
+        public V2(float x, float y) : this((double)x,(double)y) { }
+        V2(double x,double y) { this.x=(float)(Math.Round(x*4096d)/4096d);this.y=(float)(Math.Round(y*4096d)/4096d); }
         public float Length { get { return (float)Math.Sqrt((double)x * x + (double)y * y); } }
         public V2 Normal { get { float d = Length; return d > .001f ? this / d : new V2(); } }
-        public static V2 operator +(V2 a, V2 b) { return new V2(a.x + b.x, a.y + b.y); }
-        public static V2 operator -(V2 a, V2 b) { return new V2(a.x - b.x, a.y - b.y); }
-        public static V2 operator *(V2 a, float b) { return new V2(a.x * b, a.y * b); }
-        public static V2 operator /(V2 a, float b) { return new V2(a.x / b, a.y / b); }
+        public static V2 operator +(V2 a, V2 b) { return new V2((double)a.x + b.x, (double)a.y + b.y); }
+        public static V2 operator -(V2 a, V2 b) { return new V2((double)a.x - b.x, (double)a.y - b.y); }
+        public static V2 operator *(V2 a, float b) { return a*(double)b; }
+        public static V2 operator *(V2 a, double b) { return new V2(a.x*b,a.y*b); }
+        public static V2 operator /(V2 a, float b) { return new V2((double)a.x / b, (double)a.y / b); }
         public static float Distance(V2 a, V2 b) { return (a - b).Length; }
-        public static V2 Angle(float a) { return new V2((float)Math.Cos(a), (float)Math.Sin(a)); }
+        public static V2 Angle(double a) { return new V2(Math.Cos(a), Math.Sin(a)); }
     }
     public class Enemy
     {
@@ -43,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 22;
+        public const int RulesVersion = 23;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -68,7 +71,7 @@ namespace ScrapGuard.Core
         float supportShot;
         public bool CanSupport { get { return Support!=null && !SupportUsed && !Ended && !Choosing && Elapsed>=8 && !Challenge; } }
         readonly Random random;
-        readonly int hero, weapon, module, armor;
+        readonly int hero, weapon, module, armor, moduleGrowth;
         readonly float baseDamage, baseSpeed;
         float spawnTimer = .3f, shotTimer, sawTimer, coilTimer, droneTimer, contactTimer, shieldTimer, bossTimer;
         bool eliteSpawned, bossSpawned;
@@ -108,7 +111,8 @@ namespace ScrapGuard.Core
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
             module = state.items.Find(i => i.id == state.equipped[2]).definition;
-            baseDamage = Catalog.Attack(state,Challenge); MaxHp = Hp = Catalog.Health(state,Challenge);MinimumHp=Hp;
+            moduleGrowth=Mode==SkillTrial.Mode?0:state.items.Find(i=>i.id==state.equipped[2]).level-1;
+            baseDamage = Catalog.Attack(state,Mode==SkillTrial.Mode); MaxHp = Hp = Catalog.Health(state,Mode==SkillTrial.Mode);MinimumHp=Hp;
             baseSpeed = HeroCatalog.All[hero].Speed * (armor == 8 ? 1.08f : 1);
             Duration = Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
             Skills[0] = 1;
@@ -284,10 +288,10 @@ namespace ScrapGuard.Core
             {
                 float speed = weapon == 3 ? .17f : weapon == 4 ? .8f : weapon == 5 ? 1.2f : .5f;
                 shotTimer = speed * Math.Max(.35f, 1 - Skills[5] * .12f);
-                float angle = (float)Math.Atan2(target.position.y - Position.y, target.position.x - Position.x);
-                Facing = angle; ShotFlash = .11f;
+                double angle = Math.Atan2(target.position.y - Position.y, target.position.x - Position.x);
+                Facing = (float)angle; ShotFlash = .11f;
                 int count = 1 + Skills[0] / 2 + (weapon == 1 ? 2 : 0)+(WeaponEvolution==2?2:0);
-                for (int i = 0; i < count; i++) Shoot(Position, angle + (i - (count - 1) * .5f) * .16f, false);
+                for (int i = 0; i < count; i++) Shoot(Position, angle + (i - (count - 1) * .5) * .16, false);
                 IdentityVolley();
             }
             if (Skills[1] > 0 && sawTimer <= 0)
@@ -321,14 +325,14 @@ namespace ScrapGuard.Core
                 if(SkillEvolved(3))foreach(int side in new[]{-1,1}){var wing=Position+new V2(side*75,-40);Shoot(wing,(float)Math.Atan2(target.position.y-wing.y,target.position.x-wing.x),true);}
             }
         }
-        public V2 SawPosition(int n) { return Position + V2.Angle(Elapsed * 2.8f + n * (float)(Math.PI * 2) / (1 + Skills[1])) * (SkillEvolved(1)?105:65); }
+        public V2 SawPosition(int n) { return Position + V2.Angle(Elapsed * 2.8 + n * (Math.PI * 2) / (1 + Skills[1])) * (SkillEvolved(1)?105:65); }
         public V2 DronePosition { get { return Position + new V2((float)Math.Sin(Elapsed * 2) * 35, -55); } }
-        void Shoot(V2 origin, float angle, bool drone)
+        void Shoot(V2 origin, double angle, bool drone)
         {
-            float multiplier = drone ? (hero == 0 ? 1.15f : 1) * (module == 10 ? 1.2f : 1) : weapon == 4 ? 1.7f : weapon == 5 ? 2.5f : weapon == 3 ? .5f : 1;
+            float multiplier = drone ? (hero == 0 ? 1.15f : 1) * (module == 10 ? 1.2f+moduleGrowth*.025f : 1) : weapon == 4 ? 1.7f : weapon == 5 ? 2.5f : weapon == 3 ? .5f : 1;
             if (!drone && WeaponEvolution==1) multiplier *= weapon==4?2.2f:1.6f;
             if (!drone && WeaponEvolution==2) multiplier *= .7f;
-            float critical = hero == 1 ? .10f : .05f; if (module == 11) critical += .05f;
+            float critical = hero == 1 ? .10f : .05f; if (module == 11) critical += .05f+moduleGrowth*.004f;
             float damage = Damage * multiplier * (random.NextDouble() < critical ? 1.5f : 1);
             Bullets.Add(new Bullet { id = nextId++, position = origin, velocity = V2.Angle(angle) * (drone ? 450 : 390),
                 visual=drone?(SkillEvolved(3)?3:0):WeaponEvolution, damage = damage, life = weapon == 3 && !drone ? .45f : 1.7f, pierce = !drone && WeaponEvolution==1 ? (weapon==2?8:3) : weapon == 2 || Skills[0] == 5 ? 2 : 0,
@@ -386,7 +390,7 @@ namespace ScrapGuard.Core
         }
         void Collect(float dt)
         {
-            float radius = 65 + Skills[7] * 24 + (module == 9 ? 25 : 0);
+            float radius = 65 + Skills[7] * 24 + (module == 9 ? 25+moduleGrowth*3 : 0);
             for (int i = Pickups.Count - 1; i >= 0; i--)
             {
                 var p = Pickups[i]; float d = V2.Distance(Position, p.position);

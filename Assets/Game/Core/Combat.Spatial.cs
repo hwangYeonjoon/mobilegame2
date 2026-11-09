@@ -58,11 +58,12 @@ namespace ScrapGuard.Core
                     foreach(var other in cell)
                     {
                         if(other.id<=e.id||other.hp<=0||other.core)continue;
-                        SeparationPairs++;var delta=e.position-other.position;float gap=(e.Radius+other.Radius)*.88f;
+                        SeparationPairs++;var delta=e.position-other.position;double gap=(e.Radius+other.Radius)*.88;
                         if(Math.Abs(delta.x)>=gap||Math.Abs(delta.y)>=gap)continue;
                         float distance=delta.Length;if(distance>=gap)continue;
-                        var direction=distance>.01f?delta/distance:V2.Angle(((e.id*17+other.id*31)&7)*(float)Math.PI/4);
-                        var push=direction*((gap-distance)*.32f);
+                        var direction=distance>.01f?delta/distance:V2.Angle(((e.id*17+other.id*31)&7)*Math.PI/4);
+                        // Keep subtraction and scaling in double until the position grid is rounded.
+                        var push=direction*((gap-distance)*.32);
                         separation[e.spatialIndex]+=push;separation[other.spatialIndex]-=push;
                     }
                 }

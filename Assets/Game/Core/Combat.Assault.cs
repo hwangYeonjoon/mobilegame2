@@ -42,13 +42,13 @@ namespace ScrapGuard.Core
         {
             for(int i=0;i<24;i++)
             {
-                var p=ClampWorld(Position+V2.Angle((float)random.NextDouble()*(float)Math.PI*2)*distance,20);
+                var p=ClampWorld(Position+V2.Angle(random.NextDouble()*Math.PI*2)*distance,20);
                 if(V2.Distance(p,Position)>180&&!IsBlocked(p,20))return p;
             }
             // Deterministic safe fallback around a corner; never spawn on the player.
             for(int i=0;i<16;i++)
             {
-                var p=ClampWorld(Position+V2.Angle(i*(float)Math.PI/8)*distance,20);
+                var p=ClampWorld(Position+V2.Angle(i*Math.PI/8)*distance,20);
                 if(V2.Distance(p,Position)>150&&!IsBlocked(p,20))return p;
             }
             return ClampWorld(new V2(Position.x<270?WorldRight-30:WorldLeft+30,Position.y),20);
@@ -81,7 +81,7 @@ namespace ScrapGuard.Core
             for(int i=0;i<count;i++)
             {
                 // 80-degree gap points toward the announced escape direction.
-                float angle=EscapeAngle+.7f+(float)(Math.PI*2-1.4)*(i+.5f)/Math.Max(1,count);
+                double angle=EscapeAngle+.7+(Math.PI*2-1.4)*(i+.5)/Math.Max(1,count);
                 var p=ClampWorld(WaveCenter+V2.Angle(angle)*(WaveNumber%2==0?300:380),20);
                 if(IsBlocked(p,18)||V2.Distance(p,Position)<135)continue;
                 float hp=50*Definition.Difficulty;
@@ -101,7 +101,7 @@ namespace ScrapGuard.Core
                 if(boss.hp<boss.maxHp*.5f&&BossExtraWarnings>0)
                 {
                     last=delay+.6f;
-                    for(int i=0;i<BossExtraWarnings;i++)Warn(Position+V2.Angle(i*2.094f+Facing)*130,45,last,140,0,0,DamageCause.Boss,DamageSource.Boss);
+                    for(int i=0;i<BossExtraWarnings;i++)Warn(Position+V2.Angle(i*2.094+Facing)*130,45,last,140,0,0,DamageCause.Boss,DamageSource.Boss);
                 }
             }
             else if(BossLearningTier==1)Warn(Position,0,delay,180,400,30,DamageCause.Boss,DamageSource.Boss);
@@ -109,7 +109,7 @@ namespace ScrapGuard.Core
             {
                 last=delay+.5f;int count=BossRingWarnings;
                 // Keep a real opening while density grows from six to ten circles.
-                for(int i=2;i<count+2;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI*2/(count+2))*190,32,last,150,0,0,DamageCause.Boss,DamageSource.Boss);
+                for(int i=2;i<count+2;i++)Warn(Position+V2.Angle(Facing+i*Math.PI*2/(count+2))*190,32,last,150,0,0,DamageCause.Boss,DamageSource.Boss);
                 Effects.Add(new BattleEffect{position=Position,kind=10,text="포위 예고 · 빈 방향으로 이동"});
             }
             else
@@ -166,7 +166,7 @@ namespace ScrapGuard.Core
             if(Skills[9]>0&&bladeTimer<=0)
             {
                 bladeTimer=2.5f-Skills[9]*.2f;
-                for(int i=0;i<4;i++)Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=V2.Angle(Facing+i*(float)Math.PI/2)*260,damage=Damage*(SkillEvolved(9)?1.1f:.8f),life=SkillEvolved(9)?2.4f:1.3f,pierce=2+Skills[9],mod=true,returning=SkillEvolved(9),visual=SkillEvolved(9)?4:0});
+                for(int i=0;i<4;i++)Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=V2.Angle(Facing+i*Math.PI/2)*260,damage=Damage*(SkillEvolved(9)?1.1f:.8f),life=SkillEvolved(9)?2.4f:1.3f,pierce=2+Skills[9],mod=true,returning=SkillEvolved(9),visual=SkillEvolved(9)?4:0});
             }
             if(Skills[10]>0&&mineTimer<=0&&Mines.Count<12){mineTimer=3-Skills[10]*.3f;Mines.Add(new ScrapMine{position=Position});}
             for(int i=Mines.Count-1;i>=0;i--)

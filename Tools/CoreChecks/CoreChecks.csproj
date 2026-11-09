@@ -17,6 +17,8 @@
     <Compile Include="../../Assets/Tests/EditMode/ReleaseSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/PolishSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/AssaultSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/GrowthSpecification.cs" />
+    <Compile Include="../../Assets/Editor/ReplayDiagnostic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BalanceAudit.cs" />
     <Compile Include="GrowthAudit.cs" />

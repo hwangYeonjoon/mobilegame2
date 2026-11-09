@@ -39,6 +39,7 @@ namespace ScrapGuard.Core
         public int dailyItemPurchases;
         public int dailyPartsPurchases;
         public int dailyGemPartsPurchases;
+        public int dailyGrowthKits, growthPassFree, growthPassPremium;
         public int dailyRewardGold;
         public int dailyRewardParts;
         public bool demoAdSkip;
@@ -131,9 +132,9 @@ namespace ScrapGuard.Core
             return HealthFor(s.selectedHero,s.heroes[s.selectedHero].level,armor,fixedChallenge);
         }
         public static int AttackFor(int hero,int level,Item weapon,bool fixedChallenge=false)
-        { return (int)(HeroCatalog.All[hero].Attack*(100+3*(level-1))/100f+(weapon==null?0:30*Multiplier(weapon,fixedChallenge))); }
+        { return (int)(HeroCatalog.All[hero].Attack*(100+3*(level-1))/100f*(fixedChallenge||weapon==null?1:1+.065f*(weapon.level-1))+(weapon==null?0:30*Multiplier(weapon,fixedChallenge))); }
         public static int HealthFor(int hero,int level,Item armor,bool fixedChallenge=false)
-        { return (int)(HeroCatalog.All[hero].Health*(100+3*(level-1))/100f+(armor==null?0:180*Multiplier(armor,fixedChallenge))); }
+        { return (int)(HeroCatalog.All[hero].Health*(100+3*(level-1))/100f*(fixedChallenge||armor==null?1:1+.045f*(armor.level-1))+(armor==null?0:180*Multiplier(armor,fixedChallenge))); }
         public static float Multiplier(Item item,bool fixedChallenge=false) { return new[] { 1f, 1.15f, 1.35f }[item.rarity] * (1 + (fixedChallenge?.05f:.12f) * (item.level - 1)); }
         public static string ServiceDate(DateTimeOffset utc) { return utc.ToOffset(TimeSpan.FromHours(9)).AddHours(-5).ToString("yyyy-MM-dd"); }
     }

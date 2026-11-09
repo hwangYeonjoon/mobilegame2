@@ -35,7 +35,7 @@ static class GrowthAuditChecks
         s=GameState.New();e=new Economy(s,()=>GrowthAudit.Start);j=Journey("balanced","daily_plus_rewarded");
         GrowthAudit.ClaimBenefits(e,j,0,1);var gold=s.gold;var parts=s.parts;
         GrowthAudit.ClaimBenefits(e,j,0,1);
-        Check(gold==2800&&parts==50&&s.gold==gold&&s.parts==parts,"attendance and two parts ads are capped within same service day");
+        Check(gold==4000&&parts==46&&s.gold==gold&&s.parts==parts,"attendance and two parts ads are capped within same service day");
         for(int i=0;i<4;i++)
         {
             GrowthAudit.Act(e,j,0,i+1,"battle_start","cap"+i,()=>e.BeginRun("cap"+i,0));

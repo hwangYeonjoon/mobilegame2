@@ -45,11 +45,16 @@ namespace ScrapGuard
             args=new[]{"-smoke","-assaultSmoke","-withNatural","-smokeOutput",Path.Combine(Application.persistentDataPath,"AssaultUI")};
 #elif SCRAP_QA_BOSS
             args=new[]{"-smoke","-naturalCombat","-bossProgression","-smokeOutput",Path.Combine(Application.persistentDataPath,"BossProgression")};
+#elif SCRAP_QA_GROWTH
+            args=new[]{"-smoke","-growthSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"GrowthUI")};
 #elif SCRAP_QA_UI
             args=new[]{"-smoke","-polishSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishUI")};
 #else
             args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
 #endif
+#endif
+#if SCRAP_QA_GROWTH
+            profile=Path.Combine(Application.persistentDataPath,"qa-growth-"+Guid.NewGuid().ToString("N")+".json");
 #endif
             Store = new ProfileStore(profile);
             SetupCloud(profile);
@@ -185,7 +190,7 @@ namespace ScrapGuard
             Ui.Label(room,Catalog.HeroNames[State.selectedHero]+"  Lv."+State.heroes[State.selectedHero].level,18,height-51,456,35,25,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(screen,(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage],24,MenuBottom-168,492,32,23,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Button(screen,"출격하기  →",24,MenuBottom-124,310,78,CampaignLaunch,Ui.Mint,true,26);
-            Ui.Button(screen,"성장하기",348,MenuBottom-124,168,78,()=>Show("gear"),Ui.Raised,true,23);
+            Ui.Button(screen,Growth.CanUpgrade(State)?"강화 가능 ●":"성장하기",348,MenuBottom-124,168,78,GrowthPanel,Growth.CanUpgrade(State)?Ui.Gold:Ui.Raised,true,21);
             Ui.Button(screen,"작전 지도 · 출석 · 더 보기",24,MenuBottom-36,492,35,HomeActivities,Ui.Panel,true,17);
         }
         void HomeActivities()

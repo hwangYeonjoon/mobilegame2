@@ -22,7 +22,8 @@ namespace ScrapGuard
                 Ui.Label(card,Catalog.Items[item.definition].Name,7,137,142,30,18,Ui.Ink,TextAnchor.MiddleCenter);
                 Ui.Button(card,"Lv."+item.level+" 정비",8,174,140,52,()=>ItemDetail(id),Ui.Raised,true,18);
             }
-            Ui.Label(screen,"보관함  "+State.items.Count+"/80",24,469,492,35,21,Ui.Muted);
+            Ui.Label(screen,"보관함  "+State.items.Count+"/80",24,469,260,35,21,Ui.Muted);
+            Ui.Button(screen,Growth.CanUpgrade(State)?"강화 가능 · 비교":"성장 경로",294,462,222,44,GrowthPanel,Ui.Mint,true,18);
             var list=Ui.Scroll(screen,24,516,492,MenuBottom-516,State.items.Count*125);
             for(int i=0;i<State.items.Count;i++)
             {
@@ -45,7 +46,9 @@ namespace ScrapGuard
             Ui.Label(card,definition.Description,186,230,282,53,18,Ui.Muted);
             Ui.Button(card,State.equipped.Contains(id)?"장착 중":"장착하기",24,300,214,64,()=>Change(new GameCommand("equip",id),()=>ItemDetail(id)),null,!State.equipped.Contains(id),20);
             Ui.Button(card,item.locked?"잠금 해제":"판매 잠금",254,300,214,64,()=>Change(new GameCommand("lock",id),()=>ItemDetail(id)),Ui.Raised,true,20);
-            Ui.Label(card,"강화 비용  골드 "+(item.level*300).ToString("N0")+" · 부품 "+item.level*2,24,384,444,32,19,Ui.Gold);
+            var nextItem=new Item{definition=item.definition,rarity=item.rarity,level=Math.Min(20,item.level+1)};int heroLevel=State.heroes[State.selectedHero].level;
+            string preview=definition.Slot==0?"공격 "+Catalog.AttackFor(State.selectedHero,heroLevel,item)+" → "+Catalog.AttackFor(State.selectedHero,heroLevel,nextItem):definition.Slot==1?"체력 "+Catalog.HealthFor(State.selectedHero,heroLevel,item)+" → "+Catalog.HealthFor(State.selectedHero,heroLevel,nextItem):Growth.ModuleEffect(item)+" → "+Growth.ModuleEffect(nextItem);
+            Ui.Label(card,preview+"\n골드 "+(item.level*300).ToString("N0")+" · 부품 "+item.level*2,24,373,444,52,17,Ui.Gold);
             Ui.Button(card,item.level>=20?"최대 강화":"장비 강화  +1",24,431,444,64,()=>UpgradeItemWithFeedback(id),null,item.level<20,22);
             Ui.Button(card,"강화 이전",24,511,214,64,()=>TransferTargets(id),Ui.Raised,item.level>1,20);
             Ui.Button(card,"판매  +"+new[]{300,600,1200}[item.rarity],254,511,214,64,()=>ConfirmSale(id),Ui.Raised,!State.equipped.Contains(id)&&!item.locked&&item.level==1,20);
@@ -136,12 +139,14 @@ namespace ScrapGuard
                 CurrencyArt.Draw(panel,2,16,22,98);
                 Ui.Label(panel,"다음 작전을 위한 정비",130,20,338,36,23);
                 Ui.Label(panel,"골드와 부품으로 장비·대원을 강화해요.\n구매한 재료는 보유량에 바로 더해져요.",130,65,338,57,16,Ui.Muted);
-                var list=ShopScroll(501,MenuBottom-501,386,0);
+                var list=ShopScroll(501,MenuBottom-501,620,0);
                 ShopRow(list,0,"공용 부품 ×20","매일 1회 · 골드로 성장 재료 보충","2,000 골드",()=>ConfirmBuy("parts_gold","부품 20개","골드 2,000"),State.dailyPartsPurchases<1);
                 ShopRow(list,110,"공용 부품 ×100","매일 1회 · 확정 수량","100 보석",()=>ConfirmBuy("parts_gems","부품 100개","보석 100"),State.dailyGemPartsPurchases<1);
-                Ui.Button(list,"장비 강화로 이동",0,230,238,53,()=>Show("gear"),Ui.Raised,true,17);
-                Ui.Button(list,"대원 성장으로 이동",254,230,238,53,()=>Show("heroes"),Ui.Raised,true,17);
-                Ui.Label(list,"무료 부품은 보석 · 광고 탭에서 받을 수 있어요.",0,305,492,43,15,Ui.Muted,TextAnchor.MiddleCenter);
+                ShopRow(list,220,"성장 보급 · 골드 + 부품","골드 4,500 · 부품 40 · 하루 1회","100 보석",GrowthKitPanel,State.dailyGrowthKits<1);
+                ShopRow(list,330,"작전 성장 패스","무료 트랙 · 추가 트랙 · 기간 만료 없음","구성 보기",GrowthPassPanel);
+                Ui.Button(list,"강화 전후 비교",0,450,238,53,GrowthPanel,Ui.Raised,true,17);
+                Ui.Button(list,"대원 성장으로 이동",254,450,238,53,()=>Show("heroes"),Ui.Raised,true,17);
+                Ui.Label(list,"무료 부품은 보석 · 광고 탭에서 받을 수 있어요.",0,525,492,43,15,Ui.Muted,TextAnchor.MiddleCenter);
                 return;
             }
             var gearList=ShopScroll(340,MenuBottom-340,1670,1);
@@ -177,7 +182,7 @@ namespace ScrapGuard
             var list=ShopScroll(258,MenuBottom-258,1365,2);
             var free=Ui.Box(list,0,0,492,146,Ui.Panel).transform;
             CurrencyArt.Draw(free,2,12,24,90);
-            Ui.Label(free,"무료 보급 · 부품 10개",116,16,355,34,22);
+            Ui.Label(free,"정비 보급 · 골드 "+Growth.RepairGold(State)+" / 부품 "+Growth.RepairParts(State),116,16,355,34,18);
             Ui.Label(free,"오늘 "+State.dailyRewardParts+" / 2회 · 선택 보상",116,52,355,27,15,Ui.Muted);
             Ui.Button(free,State.dailyRewardParts>=2?"오늘 수령 완료":State.demoAdSkip||State.adSkip?"광고 없이 받기":Online?"광고 보고 받기":"보상 체험 안내",116,91,352,42,()=>RequestReward("parts"),Ui.Mint,State.dailyRewardParts<2,17);
             Ui.Button(list,"무료 보석 획득처",0,161,238,66,()=>GemSources(0,()=>{shopTab=2;Show("shop");}),Ui.Raised,true,16);

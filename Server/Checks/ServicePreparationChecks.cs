@@ -57,7 +57,7 @@ static class ServicePreparationChecks
         Fails(()=>repo.CompleteAd(callback with{Amount=10},ads),400,"SSV amount cannot control game economy");
         Fails(()=>repo.CompleteAd(callback with{Timestamp=now.AddDays(-1).ToUnixTimeMilliseconds()},ads),400,"stale SSV timestamp rejected");
         int parts=repo.Bootstrap(key).state.parts;repo.CompleteAd(callback,ads);repo.CompleteAd(callback,ads);
-        check(repo.Bootstrap(key).state.parts==parts+10&&repo.AdClaimStatus(key,claim.id).status=="granted","duplicate SSV grants once with persisted receipt");
+        check(repo.Bootstrap(key).state.parts==parts+claim.parts&&repo.AdClaimStatus(key,claim.id).status=="granted","duplicate SSV grants once with persisted receipt");
         check(repo.Bootstrap(key).state.testProgress,"test ad rewards mark test progression");
         Fails(()=>repo.VerifyPurchase(key,new PurchaseRequest{productId="gems_600",purchaseToken="real-on-test-progress"},provider).GetAwaiter().GetResult(),409,"test progress cannot mix with production purchases");
         check(!repo.Commerce(key,production).salesEnabled,"test account sees production sales disabled");

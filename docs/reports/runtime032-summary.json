@@ -1,0 +1,201 @@
+{
+  "total": 39,
+  "passed": 39,
+  "cases": [
+    {
+      "file": "probe-0-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=862/862 machines=4/4 hp=4904.75/4904.75"
+    },
+    {
+      "file": "probe-0-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=869/869 machines=3/3 hp=4035.5/4035.5"
+    },
+    {
+      "file": "probe-0-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=865/865 machines=3/3 hp=4112/4112"
+    },
+    {
+      "file": "probe-1-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1295/1295 machines=4/4 hp=4112/4112"
+    },
+    {
+      "file": "probe-1-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1304/1304 machines=4/4 hp=4265/4265"
+    },
+    {
+      "file": "probe-1-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1300/1300 machines=4/4 hp=4265/4265"
+    },
+    {
+      "file": "probe-11-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=708/708 machines=3/3 hp=0/0"
+    },
+    {
+      "file": "probe-11-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1849/1849 machines=5/5 hp=2402.582/2402.582"
+    },
+    {
+      "file": "probe-11-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1846/1846 machines=6/6 hp=0/0"
+    },
+    {
+      "file": "probe-12-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1609/1609 machines=4/4 hp=2464.7039/2464.7039"
+    },
+    {
+      "file": "probe-12-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1605/1605 machines=4/4 hp=4128.37/4128.37"
+    },
+    {
+      "file": "probe-12-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1608/1608 machines=4/4 hp=2795.0925/2795.0925"
+    },
+    {
+      "file": "probe-17-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=2296/2296 machines=5/5 hp=0/0"
+    },
+    {
+      "file": "probe-17-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=2298/2298 machines=5/5 hp=0/0"
+    },
+    {
+      "file": "probe-17-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=2299/2299 machines=5/5 hp=0/0"
+    },
+    {
+      "file": "probe-18-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1788/1788 machines=4/4 hp=3575/3575"
+    },
+    {
+      "file": "probe-18-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1797/1797 machines=4/4 hp=876.49805/876.49805"
+    },
+    {
+      "file": "probe-18-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1795/1795 machines=4/4 hp=3395/3395"
+    },
+    {
+      "file": "probe-29-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=3640/3640 machines=6/6 hp=658.03467/658.03467"
+    },
+    {
+      "file": "probe-29-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=3483/3483 machines=5/5 hp=1490.46/1490.46"
+    },
+    {
+      "file": "probe-29-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1027/1027 machines=2/2 hp=0/0"
+    },
+    {
+      "file": "probe-3-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1646/1646 machines=5/5 hp=3825.65/3825.65"
+    },
+    {
+      "file": "probe-3-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1647/1647 machines=4/4 hp=3739.7998/3739.7998"
+    },
+    {
+      "file": "probe-3-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1651/1651 machines=5/5 hp=3911.5/3911.5"
+    },
+    {
+      "file": "probe-4-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=34/34 machines=0/0 hp=0/0"
+    },
+    {
+      "file": "probe-4-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=34/34 machines=0/0 hp=0/0"
+    },
+    {
+      "file": "probe-4-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=28/28 machines=0/0 hp=0/0"
+    },
+    {
+      "file": "probe-41-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=4708/4708 machines=6/6 hp=1582.085/1582.085"
+    },
+    {
+      "file": "probe-41-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=4687/4687 machines=6/6 hp=0/0"
+    },
+    {
+      "file": "probe-41-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=4649/4649 machines=6/6 hp=0/0"
+    },
+    {
+      "file": "probe-5-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1799/1799 machines=5/5 hp=3973.8003/3973.8003"
+    },
+    {
+      "file": "probe-5-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1799/1799 machines=5/5 hp=3777.8003/3777.8003"
+    },
+    {
+      "file": "probe-5-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1798/1798 machines=5/5 hp=3688.2/3688.2"
+    },
+    {
+      "file": "probe-6-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1201/1201 machines=4/4 hp=3931.9038/3931.9038"
+    },
+    {
+      "file": "probe-6-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1198/1198 machines=4/4 hp=2898.0051/2898.0051"
+    },
+    {
+      "file": "probe-6-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1197/1197 machines=4/4 hp=3089.0488/3089.0488"
+    },
+    {
+      "file": "probe-7-1.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1336/1336 machines=4/4 hp=4325.4907/4325.49"
+    },
+    {
+      "file": "probe-7-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1338/1338 machines=5/5 hp=2392.3188/2392.3188"
+    },
+    {
+      "file": "probe-7-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1340/1340 machines=4/4 hp=3326.8523/3326.8518"
+    }
+  ]
+}

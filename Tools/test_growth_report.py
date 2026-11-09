@@ -76,5 +76,27 @@ class GrowthReportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Truncated'): summarize(data)
 
 
+class BossGrowthGuardTests(unittest.TestCase):
+    def test_changed_formula_requires_explicit_flag_and_same_levels(self):
+        import gzip, json, io, tempfile
+        from contextlib import redirect_stdout
+        from pathlib import Path
+        from summarize_boss_audit import summary
+        root=Path(__file__).resolve().parents[1]
+        before=json.loads(gzip.decompress((root/'docs/reports/boss032-before.json.gz').read_bytes()))
+        after=json.loads(gzip.decompress((root/'docs/reports/boss032-after.json.gz').read_bytes()))
+        before['rows']=[next(r for r in before['rows'] if r['loadout']=='fixed_upgrade_sensitivity')]
+        key=lambda r:tuple(r[k] for k in ('stage','loadout','policy','seed','robot'))
+        after['rows']=[next(r for r in after['rows'] if key(r)==key(before['rows'][0]))]
+        with tempfile.TemporaryDirectory() as directory:
+            a,b=Path(directory)/'a.json',Path(directory)/'b.json'
+            a.write_text(json.dumps(before));b.write_text(json.dumps(after))
+            with self.assertRaisesRegex(ValueError,'Loadout changed'):summary(a,b)
+            with redirect_stdout(io.StringIO()) as out:summary(a,b,True)
+            self.assertIn('156/1386 -> 185/1588',out.getvalue())
+            after['rows'][0]['itemLevels'][0]+=1;b.write_text(json.dumps(after))
+            with self.assertRaisesRegex(ValueError,'Equipment levels changed'):summary(a,b,True)
+
+
 if __name__ == '__main__':
     unittest.main()

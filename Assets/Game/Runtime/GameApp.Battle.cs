@@ -479,7 +479,7 @@ namespace ScrapGuard
                 Ui.Button(card,"지원해 준 동료의 전시실",24,591,444,34,()=>{Track("profile_source","support_result");StartCoroutine(LoadPublic(combat.Support.owner));},Ui.Raised,true,14);
             int stage = combat.Stage;
             Ui.Button(card, "다시 출격", 24, 519, 214, 62, () => { combat = null; StartBattle(stage); });
-            Ui.Button(card, "장비 정비", 254, 519, 214, 62, () => { combat = null; Show("gear"); }, Ui.Raised);
+            Ui.Button(card, Growth.CanUpgrade(State)?"강화하고 재도전":"성장 경로 확인", 254, 519, 214, 62, () => { combat = null; GrowthPanel(); }, Ui.Raised);
             if(!showSupport && StarterGuide.Next(State)<5)Ui.Button(card,"다음 목표 · "+StarterGuide.Names[StarterGuide.Next(State)],24,591,444,34,()=>{combat=null;Show("home");GuidePanel();},Ui.Raised,true,14);
             Ui.Button(card, "정비소로 돌아가기", 24, 632, 444, 51, () => { combat = null; Show("home"); }, Ui.Panel, true, 16);
             Ui.Button(card,ratedRun==combat.RunId?"플레이 의견 저장 완료":"플레이 의견 남기기 · 선택",24,693,444,32,CombatOpinion,Ui.Panel,ratedRun!=combat.RunId,15);

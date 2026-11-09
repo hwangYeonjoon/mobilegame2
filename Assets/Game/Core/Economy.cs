@@ -16,6 +16,7 @@ namespace ScrapGuard.Core
             State.serviceDate = today;
             State.dailyRuns = State.dailyKills = State.dailyItemPurchases = State.dailyPartsPurchases = State.dailyGemPartsPurchases = 0;
             State.dailySupportStarts = 0;
+            State.dailyGrowthKits = 0;
             State.dailyRewardGold = State.dailyRewardParts = 0; State.missionClaimed = false;
         }
         public bool CanAttend { get { return String.CompareOrdinal(State.serviceDate, State.attendanceDate) > 0; } }
@@ -51,6 +52,8 @@ namespace ScrapGuard.Core
         public CommandResult Buy(string offer)
         {
             RefreshDay();
+            if (offer == "growth_kit")return BuyGrowthKit();
+            if (offer == "growth_pass")return BuyGrowthPass();
             if (offer == "hero")
             {
                 if (State.heroes[1].unlocked) return CommandResult.Fail("이미 합류한 캐릭터예요.");
@@ -161,7 +164,7 @@ namespace ScrapGuard.Core
             if (State.activeRun != id || string.IsNullOrEmpty(id) || stage != State.activeStage || stage < 0 || stage >= Campaign.Count || kills < 0 || seconds < 0 || float.IsNaN(seconds) || float.IsInfinity(seconds))
                 return CommandResult.Fail("유효하지 않은 전투 결과예요.");
             var definition = Campaign.Get(stage);
-            int gold = won ? definition.Gold : Math.Min(1000, (int)Math.Min(seconds, 300) * 4);
+            int gold = won ? definition.Gold : Math.Min(definition.Gold*65/100, (int)(Math.Min(seconds, 300)*(4+stage*.2f)));
             int parts = won ? definition.Parts : Math.Min(8, (int)seconds / 30);
             int gems = 0;
             if (won && !State.clearedStages.Contains(stage))
@@ -192,12 +195,12 @@ namespace ScrapGuard.Core
             else if (placement == "parts")
             {
                 if (State.dailyRewardParts >= 2) return CommandResult.Fail("오늘 부품 보상을 모두 받았어요.");
-                parts = 10; State.dailyRewardParts++;
+                gold = Growth.RepairGold(State); parts = Growth.RepairParts(State); State.dailyRewardParts++;
             }
             else return CommandResult.Fail("없는 보상이에요.");
             State.gold += gold; State.parts += parts;
             State.receipts.Add(new Receipt { id = claim, kind = "demo_reward", gold = gold, parts = parts });
-            return CommandResult.Ok(gold > 0 ? "추가 골드 +" + gold : "부품 +10");
+            return CommandResult.Ok("골드 +"+gold+(parts>0?" · 부품 +"+parts:""));
         }
     }
 }

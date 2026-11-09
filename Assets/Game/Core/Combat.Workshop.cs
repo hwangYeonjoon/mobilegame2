@@ -11,7 +11,7 @@ namespace ScrapGuard.Core
         public int DefeatedRoles { get; private set; }
         public int Mods { get { return Workshop.ModMask(Skills)|FieldMods; } }
         public bool HasMod(int id){return (Mods&(1<<id))!=0;}
-        public V2 TurretPosition { get { return FieldModule==1?FieldAnchor:Position+V2.Angle(Elapsed*1.8f)*46; } }
+        public V2 TurretPosition { get { return FieldModule==1?FieldAnchor:Position+V2.Angle(Elapsed*1.8)*46; } }
         void UpdateMods(float dt)
         {
             int unlocked=Mods&~announcedMods;

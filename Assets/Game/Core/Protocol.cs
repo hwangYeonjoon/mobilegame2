@@ -41,6 +41,7 @@ namespace ScrapGuard.Core
             {
                 case "attendance": return e.Attend();
                 case "missions": return e.ClaimMissions();
+                case "growth_claim": return e.ClaimGrowthPass(c.stage,c.enabled);
                 case "buy": return e.Buy(c.value);
                 case "equip": return e.Equip(c.id);
                 case "lock": return e.Lock(c.id);

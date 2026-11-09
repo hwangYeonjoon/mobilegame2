@@ -61,8 +61,8 @@ namespace ScrapGuard
         void RewardDone(AdClaim claim)
         {
             if(claim.placement=="revive"){AcceptRevive(claim);return;}
-            Toast(claim.gold>0?"추가 골드 +"+claim.gold:"부품 +"+claim.parts);
-            if(combat!=null&&combat.Ended)ShowResult();else{CloseModal();Show(page);}
+            Toast("골드 +"+claim.gold+(claim.parts>0?" · 부품 +"+claim.parts:""));
+            if(combat!=null&&combat.Ended)ShowResult();else if(claim.placement=="parts")GrowthPanel("정비 보급 수령 · 원하는 강화를 선택하세요.");else{CloseModal();Show(page);}
         }
         void ServicePanel()
         {
@@ -91,7 +91,7 @@ namespace ScrapGuard
             {
                 var claim=history.claims[i];ApplyAd(claim);float y=i*110;
                 string state=claim.status=="granted"?"지급 완료":claim.status=="pending"?"확인 중":claim.status=="canceled"?"취소됨":"시간 만료";
-                Ui.Label(list,(claim.placement=="revive"?"긴급 수리 1회":claim.gold>0?"골드 "+claim.gold:"부품 "+claim.parts)+" · "+state,0,y,430,38,18);
+                Ui.Label(list,(claim.placement=="revive"?"긴급 수리 1회":"골드 "+claim.gold+(claim.parts>0?" · 부품 "+claim.parts:""))+" · "+state,0,y,430,38,18);
                 if(claim.status=="pending")Ui.Button(list,"광고가 열리지 않은 요청 취소",0,y+44,430,46,()=>ConfirmCancelAd(claim.id),Ui.Raised,true,15);
             }
         }

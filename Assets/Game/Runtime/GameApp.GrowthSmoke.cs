@@ -1,0 +1,42 @@
+using System.Collections;
+using System.IO;
+using ScrapGuard.Core;
+using UnityEngine;
+using UnityEngine.UI;
+namespace ScrapGuard
+{
+    public partial class GameApp
+    {
+        IEnumerator GrowthSmokeRoutine()
+        {
+            DismissTitleScreen();CloseModal();
+            Store.Change(e=>{e.State.gems=2000;e.State.gold=1800;e.State.parts=30;e.State.testProgress=true;return CommandResult.Ok("Isolated UI fixture, not human or balance evidence");});
+            Show("home");yield return Capture("01-home-growth-ready");
+            ClickVisibleButton("강화 가능 ●");yield return Capture("02-upgrade-before");
+            int attack=Catalog.Attack(State);ClickVisibleButton("강화");yield return Capture("03-upgrade-after");
+            if(Catalog.Attack(State)<=attack||State.gold!=1500)smokeErrors.Add("Upgrade preview/action mismatch");
+            string before=JsonUtility.ToJson(State);GrowthKitPanel();yield return Capture("04-kit-preview");
+            if(before!=JsonUtility.ToJson(State))smokeErrors.Add("Kit preview mutated wallet");
+            ClickVisibleButton("100 보석으로 구매");yield return Capture("05-kit-use-now");
+            if(State.gold!=6000||State.parts!=68||State.gems!=1900)smokeErrors.Add("Kit grant mismatch");
+            GrowthPassPanel();yield return Capture("06-pass-free-and-premium");
+            ClickVisibleButton("추가 트랙 900 보석 · 구성 확인");yield return Capture("07-pass-confirmation");
+            ClickVisibleButton("900 보석으로 해금");yield return Capture("08-pass-owned");
+            if(!Growth.PassOwned(State)||State.gems!=1000)smokeErrors.Add("Pass purchase mismatch");
+            Store.Change(e=>{for(int i=0;i<12;i++)if(!e.State.clearedStages.Contains(i))e.State.clearedStages.Add(i);e.State.unlockedStage=12;return CommandResult.Ok("Earned milestones UI fixture only");});
+            GrowthPassPanel();yield return null;modal.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition=0;yield return Capture("09-pass-final-tier");
+            ClaimGrowthReward(3,true);yield return Capture("10-pass-outfit-acquired");
+            if(!Outfits.Owned(State,1)||State.growthPassPremium!=8)smokeErrors.Add("Final tier missing outfit/receipt");
+            CloseModal();shopTab=1;shopGear=false;Show("shop");yield return Capture("11-growth-shop");
+            screen.GetComponentInChildren<ScrollRect>().verticalNormalizedPosition=0;yield return Capture("12-growth-shop-options");
+            Store.Change(e=>{e.State.gold=0;e.State.parts=0;return CommandResult.Ok("Shortage fixture");});RefreshWallet();
+            GrowthPanel();ClickVisibleButton("부족분");yield return Capture("13-free-and-optional-paths");
+            CloseModal();shopTab=2;Show("shop");yield return Capture("14-repair-ad-offer");
+            GrowthPanel();ClickVisibleButton("강화한 장비로 무료 연습");yield return null;
+            if(combat==null||combat.Mode!=Endgame.PracticeMode||combat.Damage!=Catalog.Attack(State))smokeErrors.Add("Practice did not use upgraded stats");
+            if(combat!=null){battlePaused=true;RenderBattle();yield return Capture("15-upgraded-practice");}
+            File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
+            Debug.Log("GROWTH_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);
+        }
+    }
+}
