@@ -19,5 +19,7 @@
     <Compile Include="../../Assets/Tests/EditMode/AssaultSpecification.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BalanceAudit.cs" />
+    <Compile Include="GrowthAudit.cs" />
+    <Compile Include="GrowthAuditChecks.cs" />
   </ItemGroup>
 </Project>

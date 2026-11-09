@@ -69,14 +69,14 @@ static class BalanceAudit
             notes="Paired fixed seeds per cell. Assumed and advanced progression are sensitivity profiles, not a measured player economy. Machine on/off paths may diverge. Controlled ignore/avoid share skill priority, boss pursuit, movement candidate scoring and boss button rules; only hazard avoidance differs. Natural legacy is a separate observational policy. Fixed upgrade uses hero/item level 5, rarity 0, not measured player progression. Boss source includes contact and warnings. No HP, enemies, clock or skills injected during runs.",rows},new JsonSerializerOptions{WriteIndented=true}));
         return 0;
     }
-    static V2 NaturalMove(Combat c)
+    internal static V2 NaturalMove(Combat c)
     {
         V2 target=new V2(270+(float)Math.Cos(c.Elapsed*.055f)*240,510+(float)Math.Sin(c.Elapsed*.055f)*280);
         float nearest=300;foreach(var p in c.Pickups){float d=V2.Distance(p.position,c.Position);if(d<nearest){nearest=d;target=p.position;}}
         V2 away=new V2();foreach(var e in c.Enemies){var delta=c.Position-e.position;float d=delta.Length;if(d<90)away+=delta.Normal*((90-d)/55);}
         return ((target-c.Position).Normal+away).Normal;
     }
-    static V2 Move(Combat c,bool avoid)
+    internal static V2 Move(Combat c,bool avoid)
     {
         V2 target=c.BossArenaActive?c.BossArenaCenter:new V2(270+(float)Math.Cos(c.Elapsed*.055f)*240,510+(float)Math.Sin(c.Elapsed*.055f)*280);
         var boss=c.Enemies.Find(e=>e.finalBoss&&e.hp>0);
