@@ -21,13 +21,14 @@ namespace ScrapGuard.Core
         public bool ActivateMachine()
         {
             if(!CanActivateMachine)return false;
-            Salvage-=MachineCost;MachinesBuilt++;MachineTime=10;MachineRecovery=50;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,95),20),24);
+            Salvage-=MachineCost;MachinesBuilt++;MachineTime=10;MachineRecovery=50;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,45),20),24);
+            for(int i=Hazards.Count-1;i>=0;i--)if(Hazards[i].source==DamageSource.EnemyAttack&&V2.Distance(Hazards[i].position,Position)<230){Hazards.RemoveAt(i);MachineIntercepts++;}
             Effects.Add(new BattleEffect{position=Position,kind=10,text="고철 합체 · 분쇄 모드!"});return true;
         }
         public V2 MachinePosition { get; private set; }
         public int MachineCost { get { return MachinesBuilt==0?40:120; } }
         public int WeaponEvolution { get; private set; }
-        public string EvolutionName { get { return WeaponEvolution==0?(Challenge?"리벳 Lv.5 + 고밀도/장전 Lv.3":"리벳 Lv.4 + 고밀도/장전 Lv.2"):WeaponEvolution==1?"중장 진화 · "+EvolutionWeapons[weapon]:"분산 진화 · "+EvolutionWeapons[weapon]; } }
+        public string EvolutionName { get { return WeaponEvolution==0?"리벳 Lv.5 + 고밀도/장전 Lv.3":WeaponEvolution==1?"중장 진화 · "+EvolutionWeapons[weapon]:"분산 진화 · "+EvolutionWeapons[weapon]; } }
         static readonly string[] EvolutionWeapons={"리벳", "산탄", "관통", "화염", "저격", "유탄"};
         float nextWave=22,machineShot,mortarTimer,bladeTimer,mineTimer;
         int bossPattern;
@@ -68,14 +69,14 @@ namespace ScrapGuard.Core
             MachineRecovery=Math.Max(0,MachineRecovery-dt);
             MachineTime=Math.Max(0,MachineTime-dt);
             if(MachineTime<=0)return;
-            V2 follow=ClampWorld(Position+new V2(0,85),24);
-            MachinePosition=Slide(MachinePosition,(follow-MachinePosition).Normal*Math.Min(V2.Distance(follow,MachinePosition),100*dt),20);
+            V2 follow=ClampWorld(Position+new V2(0,45),24);
+            MachinePosition=Slide(MachinePosition,(follow-MachinePosition).Normal*Math.Min(V2.Distance(follow,MachinePosition),200*dt),20);
             machineShot-=dt;if(machineShot>0)return;machineShot=.7f;
-            float radius=FieldModule==2?225:180;
+            float radius=FieldModule==2?255:210;
             foreach(var enemy in Enemies)if(enemy.hp>0&&V2.Distance(enemy.position,MachinePosition)<radius)
             {
-                Hit(enemy,Damage*(enemy.kind>=2?1.6f:3.2f),true);
-                if(!enemy.finalBoss&&!enemy.core)enemy.position=Slide(enemy.position,(enemy.position-MachinePosition).Normal*18,15);
+                Hit(enemy,Damage*(enemy.kind>=2?4f:4.8f),true);
+                if(!enemy.finalBoss&&!enemy.core)enemy.position=Slide(enemy.position,(enemy.position-MachinePosition).Normal*30,15);
             }
             if(FieldModule==3)Heal(MaxHp*.005f);
             if(FieldModule==1||FieldModule==4)
@@ -100,51 +101,51 @@ namespace ScrapGuard.Core
         }
         void BossPattern()
         {
-            if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss);return;}
+            if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return;}
             var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null)return;
-            bossPattern++;
+            bossPattern++;BossPatterns++;
             if(bossPattern%3==1)
             {
-                Warn(Position,65,1.5f,180,0,0,DamageCause.Boss);
+                Warn(Position,65,1.5f,180,0,0,DamageCause.Boss,DamageSource.Boss);
                 if(boss.hp<boss.maxHp*.5f)
-                    for(int i=0;i<3;i++)Warn(Position+V2.Angle(i*2.094f+Facing)*130,45,2.1f,140,0,0,DamageCause.Boss);
+                    for(int i=0;i<3;i++)Warn(Position+V2.Angle(i*2.094f+Facing)*130,45,2.1f,140,0,0,DamageCause.Boss,DamageSource.Boss);
             }
             else if(bossPattern%3==2)
             {
                 // Cross sweeps are staggered, allowing movement between them.
-                Warn(Position,0,1.5f,180,480,30,DamageCause.Boss);
-                Warn(Position,0,2.3f,180,30,480,DamageCause.Boss);
+                Warn(Position,0,1.5f,180,480,30,DamageCause.Boss,DamageSource.Boss);
+                Warn(Position,0,2.3f,180,30,480,DamageCause.Boss,DamageSource.Boss);
             }
             else
             {
-                for(int i=2;i<12;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI/6)*190,35,2,150,0,0,DamageCause.Boss);
+                for(int i=2;i<12;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI/6)*190,35,2,150,0,0,DamageCause.Boss,DamageSource.Boss);
                 Effects.Add(new BattleEffect{position=Position,kind=10,text="봉쇄 포격 · 열린 틈으로 이동"});
             }
         }
         int announcedEvolutions;
         public bool SkillEvolved(int skill)
         {
-            if(skill<0||skill>=Skills.Length||Skills[skill]<(Challenge?5:4))return false;
+            if(skill<0||skill>=Skills.Length||Skills[skill]<5)return false;
             int support=skill==1?7:skill==2?6:skill==3?5:skill==8?4:skill==9?11:skill==10?7:-1;
-            return support>=0&&Skills[support]>=(Challenge?3:2);
+            return support>=0&&Skills[support]>=3;
         }
         static readonly int[] EvolutionSkills={1,2,3,8,9,10};
         public int EvolutionMask {get{int mask=0;foreach(int skill in EvolutionSkills)if(SkillEvolved(skill))mask|=1<<skill;return mask;}}
         public static string EvolutionTitle(int skill)
         {switch(skill){case 1:return "행성 절단륜";case 2:return "극저온 폭풍";case 3:return "삼각 드론 편대";case 8:return "융단 포격";case 9:return "귀환 절단기";case 10:return "연쇄 지뢰망";default:return "주무기 진화";}}
         public static string EvolutionRecipe(int skill,bool challenge=false)
-        {var recipe=CampaignEvolutionRecipe(skill);return challenge?recipe.Replace(" 4 +"," 5 +").Replace(" 2 ·"," 3 ·"):recipe;}
+        {return CampaignEvolutionRecipe(skill);}
         static string CampaignEvolutionRecipe(int skill)
-        {switch(skill){case 1:return "톱날 4 + 자력 2 · 넓은 궤도";case 2:return "코일 4 + 수리 2 · 광역 동결";case 3:return "드론 4 + 장전 2 · 3기 편대";case 8:return "박격포 4 + 고밀도 2 · 3연 포격";case 9:return "절단기 4 + 회수 엔진 2 · 귀환 궤도";case 10:return "지뢰 4 + 자력 2 · 연결 폭발";default:return "";}}
+        {switch(skill){case 1:return "톱날 5 + 자력 3 · 넓은 궤도";case 2:return "코일 5 + 수리 3 · 광역 동결";case 3:return "드론 5 + 장전 3 · 3기 편대";case 8:return "박격포 5 + 고밀도 3 · 3연 포격";case 9:return "절단기 5 + 회수 엔진 3 · 귀환 궤도";case 10:return "지뢰 5 + 자력 3 · 연결 폭발";default:return "";}}
         void ResolveEvolution()
         {
             int now=EvolutionMask,unlocked=now&~announcedEvolutions;
             foreach(int skill in EvolutionSkills)if((unlocked&(1<<skill))!=0)Effects.Add(new BattleEffect{position=Position,kind=7,text=EvolutionTitle(skill)+" 진화!"});
             announcedEvolutions=now;
             if(now!=0 && FirstEvolutionSeconds<0)FirstEvolutionSeconds=Elapsed;
-            if(WeaponEvolution!=0||Skills[0]<(Challenge?5:4))return;
-            if(Skills[4]>=(Challenge?3:2))WeaponEvolution=1;
-            else if(Skills[5]>=(Challenge?3:2))WeaponEvolution=2;
+            if(WeaponEvolution!=0||Skills[0]<5)return;
+            if(Skills[4]>=3)WeaponEvolution=1;
+            else if(Skills[5]>=3)WeaponEvolution=2;
             if(WeaponEvolution>0 && FirstEvolutionSeconds<0)FirstEvolutionSeconds=Elapsed;
             if(WeaponEvolution>0)Effects.Add(new BattleEffect{position=Position,kind=10,text=EvolutionName});
         }

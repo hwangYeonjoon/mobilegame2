@@ -63,7 +63,7 @@ namespace ScrapGuard.Core
                 int id=stages.Count;var mission=local==2 || local==4 ? Mission.Survive : Mission.Eliminate;
                 stages.Add(new StageDefinition {Id=id,Region=region,Layout=local,Name=names[region][local],Boss=bosses[region],Mission=mission,
                     Description=(id==2?"부품 3곳 회수 · ":id==4?"전원 3곳 복구 · ":id==8?"수송체 호송 · ":"")+(mission==Mission.Survive?"생존":"보스 토벌")+" · "+Mechanics[region],
-                    Duration=210+local*12, Difficulty=1+id*.075f, SpawnInterval=Math.Max(.48f,.9f-region*.055f),
+                    Duration=210+local*12, Difficulty=1+id*.05f, SpawnInterval=Math.Max(.48f,.9f-region*.055f),
                     Gold=1500+id*90,Parts=10+id/2,FirstItem=id<5?new[]{1,7,10,2,5}[id]:new[]{3,8,11,4,2,5}[local],
                     FirstRarity=id<2?1:2,Enemies=pools[region]});
             }

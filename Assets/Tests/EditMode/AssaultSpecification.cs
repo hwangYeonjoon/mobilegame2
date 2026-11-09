@@ -127,8 +127,8 @@ namespace ScrapGuard.Tests
             int[] attacks={1,2,3,8,9,10},supports={7,6,5,4,11,7};
             for(int n=0;n<attacks.Length;n++)
             {
-                var c=new Combat(GameState.New(),0,"evo",71);int skill=attacks[n];c.Skills[skill]=4;c.Skills[supports[n]]=1;
-                Check(!c.SkillEvolved(skill),"evolution requires its support investment");c.Skills[supports[n]]=2;
+                var c=new Combat(GameState.New(),0,"evo",71);int skill=attacks[n];c.Skills[skill]=5;c.Skills[supports[n]]=2;
+                Check(!c.SkillEvolved(skill),"evolution requires its support investment");c.Skills[supports[n]]=3;
                 Check(c.SkillEvolved(skill),"every attack has its own evolution");
                 c.Enemies.Add(new Enemy{id=10000,hp=100000,maxHp=100000,position=c.Position+new V2(130,0)});c.Tick(.05f,new V2());
                 if(skill==1)Check(Math.Abs(V2.Distance(c.SawPosition(0),c.Position)-105)<.1f,"evolved saw changes orbit");
@@ -184,10 +184,63 @@ namespace ScrapGuard.Tests
         public static void EarlyEvolutionAndGrowthTail()
         {
             var c=new Combat(GameState.New(),0,"growth");c.Skills[1]=4;c.Skills[7]=2;c.Tick(.05f,new V2());
-            Check(c.SkillEvolved(1)&&c.FirstEvolutionSeconds>=0,"campaign evolution can precede maximum level");
+            Check(!c.SkillEvolved(1),"early partial investment does not finish evolution");c.Skills[1]=5;c.Skills[7]=3;c.Tick(.05f,new V2());
+            Check(c.SkillEvolved(1)&&c.FirstEvolutionSeconds>=0,"campaign evolution needs full attack and support investment");
             c.Level=20;Check(c.NeededXp>6+20*4,"later growth leaves room for meaningful choices");
             var ranked=new Combat(GameState.New(),4,"fair",17,false,SkillTrial.Mode);ranked.Skills[1]=4;ranked.Skills[7]=2;
             Check(!ranked.SkillEvolved(1),"fixed challenge keeps the five plus three recipe");
+        }
+        public static void DamageSourceAccountingAndStackGuard()
+        {
+            var c=new Combat(GameState.New(),0,"sources");c.Elapsed=30;
+            foreach(DamageSource source in new[]{DamageSource.Contact,DamageSource.EnemyAttack,DamageSource.Terrain,DamageSource.Condition,DamageSource.Boss})
+            {
+                for(int i=0;i<15;i++){if(c.Choosing)c.Choose(c.Choices[0]);c.Enemies.Clear();c.Pickups.Clear();c.Tick(.05f,new V2());}
+                c.Hazards.Add(new Hazard{position=c.Position,radius=60,delay=0,damage=100,cause=DamageCause.Artillery,source=source});c.Tick(.05f,new V2());
+                Check(c.DamageBySource[(int)source]>0,"explicit source overrides visual/cause category");
+            }
+            float sum=0;foreach(float damage in c.DamageBySource)sum+=damage;
+            Check(Math.Abs(sum-c.DamageReceived)<.01f,"all actual damage accounted once");
+            var copy=c.DamageBySource;copy[1]=99999;Check(c.DamageBySource[1]!=99999,"telemetry snapshots cannot mutate combat");
+            c=new Combat(GameState.New(),0,"stack");c.Elapsed=30;
+            for(int i=0;i<6;i++)c.Hazards.Add(new Hazard{position=c.Position,radius=60,delay=0,damage=100,source=DamageSource.EnemyAttack});
+            c.Tick(.05f,new V2());Check(Math.Abs(c.DamageReceived-80)<.01f,"six overlapping attacks cause one hit within recovery window");
+            var early=new Combat(GameState.New(),0,"grace");early.Hazards.Add(new Hazard{position=early.Position,radius=60,damage=100,source=DamageSource.EnemyAttack});early.Tick(.05f,new V2());
+            Check(early.DamageReceived==20,"opening gives readable nonzero practice damage");
+            var poison=new Combat(GameState.New(),12,"poison");poison.Elapsed=30;poison.Position=poison.Zones[0].Center;poison.Tick(.05f,new V2());
+            Check(poison.DamageBySource[(int)DamageSource.Terrain]>0&&poison.HazardDamageReceived==0,"direct poison is terrain even without a delayed warning");
+        }
+        public static void OpeningThreatBudget()
+        {
+            foreach(int stage in new[]{17,29,41})
+            {
+                var c=new Combat(GameState.New(),stage,"opening",17);
+                for(int i=0;i<210;i++){if(c.Choosing)c.Choose(c.Choices[0]);c.Tick(.05f,new V2());}
+                Check(!c.Ended&&c.Enemies.TrueForAll(e=>e.role==EnemyRole.Pursuer),"first ten seconds introduce approaching enemies before ranged pressure");
+            }
+            var pressure=new Combat(GameState.New(),17,"warnings",71);pressure.Elapsed=30;pressure.Hp=pressure.MaxHp=100000;
+            for(int i=0;i<12;i++)pressure.Enemies.Add(new Enemy{id=8000+i,hp=100000,maxHp=100000,role=EnemyRole.Artillery,position=pressure.Position+V2.Angle(i)*180});
+            for(int i=0;i<200;i++){if(pressure.Choosing)pressure.Choose(pressure.Choices[0]);pressure.Tick(.05f,new V2());}
+            Check(pressure.PeakEnemyWarnings>0&&pressure.PeakEnemyWarnings<=3,"many artillery units share the warning budget");
+        }
+        public static void MachineRescueAndBurst()
+        {
+            var c=new Combat(GameState.New(),0,"rescue");c.Pickups.Add(new Pickup{id=9000,position=c.Position,xp=40});c.Tick(.05f,new V2());
+            while(c.Choosing)c.Choose(c.Choices[0]);
+            foreach(var source in new[]{DamageSource.EnemyAttack,DamageSource.Terrain,DamageSource.Boss})c.Hazards.Add(new Hazard{position=c.Position,radius=60,delay=5,damage=100,source=source});
+            Check(c.ActivateMachine()&&c.MachineIntercepts==1,"activation intercepts nearby enemy artillery");
+            Check(c.Hazards.Count==2&&c.Hazards.TrueForAll(h=>h.source!=DamageSource.EnemyAttack),"terrain and boss attacks cannot be erased by assembly");
+            c.Enemies.Add(new Enemy{id=9999,kind=2,hp=10000,maxHp=10000,position=c.MachinePosition});c.Tick(.05f,new V2());
+            Check(c.MachineDamage>=c.Damage*4&&c.DamageDuringMachine>=c.MachineDamage,"assembly delivers measured burst against a durable target");
+        }
+        public static void EquipmentGrowthAndFixedChallenge()
+        {
+            var s=GameState.New();int attack=Catalog.Attack(s),hp=Catalog.Health(s);
+            foreach(var item in s.items)item.level=10;
+            Check(Catalog.Attack(s)>attack*1.2f&&Catalog.Health(s)>hp*1.1f,"equipment levels create meaningful visible attack and health growth");
+            var c=new Combat(s,0,"stats");Check(c.Damage==Catalog.Attack(s)&&c.MaxHp==Catalog.Health(s),"inventory previews match actual campaign stats");
+            var fixedState=SkillTrial.Loadout();var ranked=new Combat(s,4,"fixed",17,false,SkillTrial.Mode);
+            Check(ranked.Damage==Catalog.Attack(fixedState,true)&&ranked.MaxHp==Catalog.Health(fixedState,true),"fixed challenge retains the previous five-percent equipment curve");
         }
     }
 }

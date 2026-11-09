@@ -20,7 +20,7 @@ namespace ScrapGuard.Core
             if(Condition!=2)return;
             conditionTimer-=dt;if(conditionTimer>0)return;
             conditionTimer=8;ConditionPulses++;
-            Warn(Position,58,1.6f,90+Definition.Region*8,0,0,DamageCause.Electricity);
+            Warn(Position,58,1.6f,90+Definition.Region*8,0,0,DamageCause.Electricity,DamageSource.Condition);
         }
     }
 }

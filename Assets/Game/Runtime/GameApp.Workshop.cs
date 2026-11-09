@@ -44,7 +44,7 @@ namespace ScrapGuard
                 int sub=combat.Skills[Workshop.SubSkills[i]]+(Workshop.SubSkills[i]==skill?1:0);
                 hints+="\n"+Workshop.ModNames[i]+(main>=Workshop.MainLevels[i] && sub>=Workshop.SubLevels[i]?" 완성!":" · "+Math.Min(main,Workshop.MainLevels[i])+"/"+Workshop.MainLevels[i]+" + "+Math.Min(sub,Workshop.SubLevels[i])+"/"+Workshop.SubLevels[i]);shown++;
             }
-            if((skill==0||skill==4||skill==5)&&combat.Skills[0]>=3)return combat.Challenge?"리벳 5 + 고밀도 3 → 중장\n리벳 5 + 장전 3 → 분산 (먼저 완성한 쪽)":"리벳 4 + 고밀도 2 → 중장\n리벳 4 + 장전 2 → 분산 (먼저 완성한 쪽)";
+            if((skill==0||skill==4||skill==5)&&combat.Skills[0]>=3)return "리벳 5 + 고밀도 3 → 중장\n리벳 5 + 장전 3 → 분산 (먼저 완성한 쪽)";
             return hints;
         }
         void RegionCollection(int region)

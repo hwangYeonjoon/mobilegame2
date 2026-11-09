@@ -1,0 +1,55 @@
+{
+  "reason": "Superseded art: no runtime name/GUID references. GuardianMotion dynamic names are retained. Refinery test replaced with active floor validation. Archived outside Assets so not imported or packed.",
+  "assets": [
+    {
+      "asset": "ArenaProps-v2",
+      "bytes": 1514112,
+      "sha256": "9e51e1c5e551bf60935d24bd249666c349db31693fe21fe16c2f953bb2d09e9a"
+    },
+    {
+      "asset": "EnemyRoles-v2",
+      "bytes": 2743662,
+      "sha256": "c4a0e4118e4b8b64ea21d2e31fa331de9e161a24e6fc0679d092da9a7db02a23"
+    },
+    {
+      "asset": "EnemyRoles-v3",
+      "bytes": 2155106,
+      "sha256": "9299edbaa3ecdc85f844165ae59c0075232a98d1deefd5e0bf80441e257a0444"
+    },
+    {
+      "asset": "ExpansionBosses-v1",
+      "bytes": 1411986,
+      "sha256": "2fcd7d2921857c00a83ea58f846112159b3eb461c57822da8972f01f640b9538"
+    },
+    {
+      "asset": "ExpansionBosses-v2",
+      "bytes": 1743418,
+      "sha256": "1b03b9a3c1d877522129fc5e5b027ee6442e28a60c3d0b2885d8b382a75211ba"
+    },
+    {
+      "asset": "Landmarks-v1",
+      "bytes": 2102879,
+      "sha256": "138ce62d07f0f8aa93b3914256b3cae1be2eabec180a34a8517cae983c0a90a9"
+    },
+    {
+      "asset": "OutfitConcepts-v1",
+      "bytes": 2597041,
+      "sha256": "cd8cf442e6e490adc72c1c065cb844eadd71be7c51e1ac78e28528f29eabf4d1"
+    },
+    {
+      "asset": "Refinery-v1",
+      "bytes": 3138332,
+      "sha256": "56d99a0883899e27c39f77d554735ec00b79182bb25373565364c5c94c19a97d"
+    },
+    {
+      "asset": "RegionBosses-v1",
+      "bytes": 3353191,
+      "sha256": "0c025f4da54752022d24197d613781aa007bcf8aba90ab060c8df6222d140d08"
+    },
+    {
+      "asset": "RegionBosses-v2",
+      "bytes": 1791955,
+      "sha256": "67b83d910a3c09a4568efcc1179d6fa79d9859beaa47e8a7d3ee3fd98edf67e7"
+    }
+  ]
+}

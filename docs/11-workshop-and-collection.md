@@ -43,8 +43,8 @@
 
 | 파일 | 내용 | 최종 생성 프롬프트 |
 | --- | --- | --- |
-| [EnemyRoles-v2.png](../Assets/Resources/Art/EnemyRoles-v2.png) | 6역할 × 기본·공격 준비·공격·피격 4상태 = 24개 | [enemy-roles-v2.prompt.txt](../ArtSource/enemy-roles-v2.prompt.txt) |
-| [RegionBosses-v1.png](../Assets/Resources/Art/RegionBosses-v1.png) | 5지역 보스 × 4상태 = 20개 | [region-bosses-v1.prompt.txt](../ArtSource/region-bosses-v1.prompt.txt) |
+| [EnemyRoles-v2.png](../ArtSource/Archive/Pre024/EnemyRoles-v2.png) | 6역할 × 기본·공격 준비·공격·피격 4상태 = 24개 | [enemy-roles-v2.prompt.txt](../ArtSource/enemy-roles-v2.prompt.txt) |
+| [RegionBosses-v1.png](../ArtSource/Archive/Pre024/RegionBosses-v1.png) | 5지역 보스 × 4상태 = 20개 | [region-bosses-v1.prompt.txt](../ArtSource/region-bosses-v1.prompt.txt) |
 
 공격 준비·공격 타이머·피격 상태에 따라 프레임을 전환하고, 돌진 회전·반동·보행 흔들림을 결합한다. 셀 경계를 측정해 스프라이트로 사용한다. 8방향 프레임이나 본 애니메이션, 모든 역할의 개별 연속 보행 시퀀스를 제작한 것은 아니다. 아트 생성은 기본 내장 도구를 사용했고 CLI/API 키는 사용하지 않았다.
 

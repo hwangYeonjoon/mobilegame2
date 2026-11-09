@@ -51,7 +51,7 @@
 | 최종 파일 | 구성 | 프롬프트 |
 | --- | --- | --- |
 | [Guardians-expansion-v1.png](../Assets/Resources/Art/Guardians-expansion-v1.png) | 신규 대원 2명 × 기본·앰버·서리 3도색 | [생성 프롬프트](../ArtSource/guardians-expansion-v1.prompt.txt) |
-| [ExpansionBosses-v1.png](../Assets/Resources/Art/ExpansionBosses-v1.png) | 신규 보스 2종 × 기본·준비·공격·피격 4상태 | [생성·구도·투명 배경 수정 프롬프트](../ArtSource/expansion-bosses-v1.prompt.txt) |
+| [ExpansionBosses-v1.png](../ArtSource/Archive/Pre024/ExpansionBosses-v1.png) | 신규 보스 2종 × 기본·준비·공격·피격 4상태 | [생성·구도·투명 배경 수정 프롬프트](../ArtSource/expansion-bosses-v1.prompt.txt) |
 
 대원은 기존 이동 흔들림·사격 반동·피격 연출을 사용한다. 새 대원별 연속 보행 프레임을 별도로 제작한 것은 아니다. 지역 도색은 기본 이미지에 색을 적용한다.
 

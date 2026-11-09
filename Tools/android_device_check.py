@@ -7,6 +7,7 @@ from pathlib import Path
 
 p = argparse.ArgumentParser(description=__doc__)
 p.add_argument('--adb', default='adb')
+p.add_argument('--serial', help='Select one device when a Play AVD and dedicated QA AVD are both connected')
 p.add_argument('--package', default='io.github.hwangyeonjoon.scrapguard')
 p.add_argument('--output', type=Path, default=Path('TestResults/AndroidDevice'))
 p.add_argument('--samples', type=int, default=1, help='For a 20 minute session use 21 samples at 60 seconds')
@@ -14,20 +15,22 @@ p.add_argument('--interval', type=int, default=60, help='Seconds between samples
 a = p.parse_args()
 if not 1 <= a.samples <= 61 or not 1 <= a.interval <= 60:
     p.error('samples must be 1..61 and interval 1..60')
+adb_prefix = [a.adb] + (['-s', a.serial] if a.serial else [])
 def run(*args):
-    r = subprocess.run([a.adb, *args], text=True, capture_output=True, timeout=30)
+    r = subprocess.run([*adb_prefix, *args], text=True, capture_output=True, timeout=30)
     if r.returncode:
         raise RuntimeError('adb command failed: ' + args[0])
     return r.stdout
 
 a.output.mkdir(parents=True, exist_ok=True)
+(a.output / 'status.json').write_text(json.dumps({'status': 'collecting', 'samples': [], 'reason': 'Incomplete until all commands finish; an interrupted collection is not performance evidence.'}, indent=2))
 devices = [line.split() for line in run('devices').splitlines()[1:] if line.strip()]
-ready = [line for line in devices if len(line) > 1 and line[1] == 'device']
+ready = [line for line in devices if len(line) > 1 and line[1] == 'device' and (not a.serial or line[0] == a.serial)]
 if len(ready) != 1:
     (a.output / 'status.json').write_text(json.dumps({'status': 'not_tested', 'reason': 'Exactly one authorized Android device is required.'}, indent=2))
     raise SystemExit('No result: connect exactly one authorized Android device, run a battle, then retry.')
 emulator = run('shell', 'getprop', 'ro.kernel.qemu').strip() == '1'
-initial = subprocess.run([a.adb, 'shell', 'pidof', a.package], capture_output=True, timeout=30)
+initial = subprocess.run([*adb_prefix, 'shell', 'pidof', a.package], capture_output=True, timeout=30)
 if initial.returncode != 0:
     (a.output / 'status.json').write_text(json.dumps({'status': 'app_not_running', 'emulator': emulator, 'samples': [], 'reason': 'Launch the requested package and start a battle before collecting evidence.'}, indent=2))
     raise SystemExit('No performance result: requested app is not running.')
@@ -44,7 +47,7 @@ for index in range(a.samples):
         'battery.txt': ('shell', 'dumpsys', 'battery'),
     }.items():
         (folder / name).write_text(run(*command))
-    process = subprocess.run([a.adb, 'shell', 'pidof', a.package], capture_output=True, timeout=30)
+    process = subprocess.run([*adb_prefix, 'shell', 'pidof', a.package], capture_output=True, timeout=30)
     samples.append({'elapsed_seconds': round(time.monotonic()-start, 2), 'app_running': process.returncode == 0})
     print(f'Sample {index+1}/{a.samples} collected; emulator={emulator}', flush=True)
     if index+1 < a.samples:

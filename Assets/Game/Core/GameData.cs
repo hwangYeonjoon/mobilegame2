@@ -118,21 +118,21 @@ namespace ScrapGuard.Core
             new ItemDefinition(10, 2, "드론 모듈", "지원 드론 공격력 증가", "D"),
             new ItemDefinition(11, 2, "조준 모듈", "치명타 확률 증가", "C")
         };
-        public static int Attack(GameState s)
+        public static int Attack(GameState s,bool fixedChallenge=false)
         {
             var weapon = s.items.Find(i => i.id == s.equipped[0]);
-            return AttackFor(s.selectedHero,s.heroes[s.selectedHero].level,weapon);
+            return AttackFor(s.selectedHero,s.heroes[s.selectedHero].level,weapon,fixedChallenge);
         }
-        public static int Health(GameState s)
+        public static int Health(GameState s,bool fixedChallenge=false)
         {
             var armor = s.items.Find(i => i.id == s.equipped[1]);
-            return HealthFor(s.selectedHero,s.heroes[s.selectedHero].level,armor);
+            return HealthFor(s.selectedHero,s.heroes[s.selectedHero].level,armor,fixedChallenge);
         }
-        public static int AttackFor(int hero,int level,Item weapon)
-        { return (int)(HeroCatalog.All[hero].Attack*(100+3*(level-1))/100f+(weapon==null?0:30*Multiplier(weapon))); }
-        public static int HealthFor(int hero,int level,Item armor)
-        { return (int)(HeroCatalog.All[hero].Health*(100+3*(level-1))/100f+(armor==null?0:180*Multiplier(armor))); }
-        public static float Multiplier(Item item) { return new[] { 1f, 1.15f, 1.35f }[item.rarity] * (1 + .05f * (item.level - 1)); }
+        public static int AttackFor(int hero,int level,Item weapon,bool fixedChallenge=false)
+        { return (int)(HeroCatalog.All[hero].Attack*(100+3*(level-1))/100f+(weapon==null?0:30*Multiplier(weapon,fixedChallenge))); }
+        public static int HealthFor(int hero,int level,Item armor,bool fixedChallenge=false)
+        { return (int)(HeroCatalog.All[hero].Health*(100+3*(level-1))/100f+(armor==null?0:180*Multiplier(armor,fixedChallenge))); }
+        public static float Multiplier(Item item,bool fixedChallenge=false) { return new[] { 1f, 1.15f, 1.35f }[item.rarity] * (1 + (fixedChallenge?.05f:.12f) * (item.level - 1)); }
         public static string ServiceDate(DateTimeOffset utc) { return utc.ToOffset(TimeSpan.FromHours(9)).AddHours(-5).ToString("yyyy-MM-dd"); }
     }
     public struct CommandResult

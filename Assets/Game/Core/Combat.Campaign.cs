@@ -36,7 +36,7 @@ namespace ScrapGuard.Core
             poisonTimer-=dt;
             if(Definition.Region==2 && poisonTimer<=0)
             {
-                foreach(var zone in Zones)if(zone.Contains(Position)){Hurt(65+Definition.Region*15,DamageCause.Poison);poisonTimer=.8f;break;}
+                foreach(var zone in Zones)if(zone.Contains(Position)){Hurt(65+Definition.Region*15,DamageCause.Poison,DamageSource.Terrain);poisonTimer=.8f;break;}
             }
             terrainTimer-=dt;
             if(terrainTimer>0 || (Definition.Region!=1 && Definition.Region!=4 && Definition.Region!=5 && Definition.Region!=6))return;
@@ -44,19 +44,19 @@ namespace ScrapGuard.Core
             {
                 terrainTimer=Definition.Region==5?5.5f:6.5f;
                 var zone=Zones[terrainPulse++%Zones.Length];
-                Warn(zone.Center,0,Definition.Region==5?1.6f:2f,Definition.Region==5?190:230,zone.W,zone.H,Definition.Region==5?DamageCause.Electricity:DamageCause.Heat);
+                Warn(zone.Center,0,Definition.Region==5?1.6f:2f,Definition.Region==5?190:230,zone.W,zone.H,Definition.Region==5?DamageCause.Electricity:DamageCause.Heat,DamageSource.Terrain);
                 return;
             }
             terrainTimer=Definition.Region==1?7:9;
             if(Definition.Region==1)
             {
                 var zone=Zones[terrainPulse++%Zones.Length];
-                Warn(zone.Center,0,1.8f,170,zone.W,zone.H,DamageCause.Rail);
+                Warn(zone.Center,0,1.8f,170,zone.W,zone.H,DamageCause.Rail,DamageSource.Terrain);
             }
             else
             {
                 float y=310+(terrainPulse++%3)*160;
-                Warn(new V2(270,y),0,1.6f,200,480,32,DamageCause.Laser);
+                Warn(new V2(270,y),0,1.6f,200,480,32,DamageCause.Laser,DamageSource.Terrain);
             }
         }
         EnemyRole BossRole()
@@ -64,10 +64,17 @@ namespace ScrapGuard.Core
             if(Challenge)return EnemyRole.Pursuer;
             return Campaign.BossRole(Definition.Region);
         }
-        void Warn(V2 position,float radius,float delay,float damage,float width=0,float height=0,DamageCause cause=DamageCause.Artillery)
+        bool Warn(V2 position,float radius,float delay,float damage,float width=0,float height=0,DamageCause cause=DamageCause.Artillery,DamageSource source=DamageSource.EnemyAttack)
         {
-            if(Hazards.Count>=48)return;
-            Hazards.Add(new Hazard {id=nextId++,position=position,radius=radius,delay=delay,damage=damage,width=width,height=height,cause=cause});
+            if(Hazards.Count>=48)return false;
+            if(!Challenge&&source==DamageSource.EnemyAttack)
+            {
+                int count=0;foreach(var h in Hazards)if(h.source==DamageSource.EnemyAttack)count++;
+                if(enemyWarningRecovery>0||count>=(Elapsed<25?2:3))return false;
+                enemyWarningRecovery=.8f;PeakEnemyWarnings=Math.Max(PeakEnemyWarnings,count+1);
+                delay=Math.Max(delay,1.6f);
+            }
+            Hazards.Add(new Hazard {id=nextId++,position=position,radius=radius,delay=delay,damage=damage,width=width,height=height,cause=cause,source=source});return true;
         }
         void UpdateEnemyRole(Enemy e,float dt)
         {
@@ -85,7 +92,7 @@ namespace ScrapGuard.Core
                 }
                 if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?190:240;}
                 else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=.8f;e.cooldown=4.5f;
-                    if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat);
+                    if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat,DamageSource.Boss);
                     return;}
             }
             else if(e.role==EnemyRole.Artillery)
@@ -96,12 +103,12 @@ namespace ScrapGuard.Core
                     e.cooldown=e.finalBoss?3:4.8f;e.attackFlash=.4f;
                     if(e.finalBoss && Definition.Region==5)
                     {
-                        Warn(Position,0,1.5f,185,400,28,DamageCause.Electricity);
-                        if(e.hp<e.maxHp*.5f)Warn(Position,0,1.9f,185,28,400,DamageCause.Electricity);
+                        Warn(Position,0,1.5f,185,400,28,DamageCause.Electricity,DamageSource.Boss);
+                        if(e.hp<e.maxHp*.5f)Warn(Position,0,1.9f,185,28,400,DamageCause.Electricity,DamageSource.Boss);
                     }
-                    else Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100);
+                    else Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
                     if(e.finalBoss && e.hp<e.maxHp*.5f)
-                    { Warn(Position+new V2(100,0),50,1.7f,130);Warn(Position-new V2(100,0),50,1.7f,130); }
+                    { Warn(Position+new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss);Warn(Position-new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss); }
                 }
             }
             else if(e.role==EnemyRole.Bomber)
@@ -114,8 +121,10 @@ namespace ScrapGuard.Core
                 }
                 if(distance<(e.finalBoss?150:85) && e.cooldown<=0)
                 {
-                    e.cooldown=5;e.windup=1.1f;
-                    Warn(e.position,e.finalBoss?120:82,1.05f,e.finalBoss?230:150,0,0,DamageCause.Explosion);return;
+                    if(Warn(e.position,e.finalBoss?120:82,1.05f,e.finalBoss?230:150,0,0,DamageCause.Explosion,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
+                    {e.cooldown=5;e.windup=e.finalBoss?1.1f:1.65f;}
+                    else e.cooldown=.3f;
+                    return;
                 }
                 speed*=1.15f;
             }

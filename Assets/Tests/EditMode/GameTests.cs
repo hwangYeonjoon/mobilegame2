@@ -220,7 +220,9 @@ namespace ScrapGuard.Tests
                 rects.Add(sprite.rect);
             }
             Assert.That(rects.Count,Is.EqualTo(16));
-            Assert.That(Resources.Load<Texture2D>("Art/Refinery-v1"),Is.Not.Null);
+            Assert.That(Resources.Load<Texture2D>("Art/ContinuousFloor-v1"),Is.Not.Null);
+            foreach(string archived in new[]{"ArenaProps-v2","EnemyRoles-v2","EnemyRoles-v3","ExpansionBosses-v1","ExpansionBosses-v2","Landmarks-v1","OutfitConcepts-v1","Refinery-v1","RegionBosses-v1","RegionBosses-v2"})
+                Assert.That(Resources.Load<Texture2D>("Art/"+archived),Is.Null,"Archived texture must stay out of Resources: "+archived);
         }
         [Test]
         public void ServerNullSupportDoesNotBecomeAGhostCompanion()

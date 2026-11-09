@@ -2,8 +2,38 @@ using System;
 using System.Collections.Generic;
 namespace ScrapGuard.Core
 {
+    public enum DamageSource { Unspecified, Contact, EnemyAttack, Terrain, Condition, Boss }
     public sealed partial class Combat
     {
+        readonly float[] damageBySource=new float[6];
+        float areaHitRecovery,bossHitRecovery,enemyWarningRecovery;
+        public float[] DamageBySource {get{return (float[])damageBySource.Clone();}}
+        public float DamageDuringMachine {get;private set;}
+        public int KillsDuringMachine {get;private set;}
+        public int MachineKills {get;private set;}
+        public int MachineIntercepts {get;private set;}
+        public int BossPatterns {get;private set;}
+        public int PeakEnemyWarnings {get;private set;}
+        static DamageSource ResolveDamageSource(DamageSource source,DamageCause cause)
+        {
+            if(source!=DamageSource.Unspecified)return source;
+            if(cause==DamageCause.Boss)return DamageSource.Boss;
+            if(cause==DamageCause.Contact||cause==DamageCause.Charge)return DamageSource.Contact;
+            if(cause==DamageCause.Poison||cause==DamageCause.Rail||cause==DamageCause.Laser||cause==DamageCause.Heat)return DamageSource.Terrain;
+            if(cause==DamageCause.Electricity)return DamageSource.Condition;
+            return DamageSource.EnemyAttack;
+        }
+        EnemyRole OpeningEnemyRole(EnemyRole role)
+        {
+            if(Elapsed<12)return EnemyRole.Pursuer;
+            if(role==EnemyRole.Artillery||role==EnemyRole.Bomber)
+            {
+                int limit=Elapsed<25?1:3,count=0;
+                foreach(var e in Enemies)if(e.hp>0&&!e.finalBoss&&e.role==role)count++;
+                if(count>=limit)return EnemyRole.Pursuer;
+            }
+            return role;
+        }
         public float MachineRecovery {get;private set;}
         public float MachineActiveSeconds {get;private set;}
         public float DamageDealt {get;private set;}
@@ -48,15 +78,15 @@ namespace ScrapGuard.Core
         static int EvolutionSupport(int attack){return attack==0||attack==8?4:attack==1||attack==10?7:attack==2?6:attack==3?5:11;}
         int FocusedGrowth(List<int> pool)
         {
-            if(Challenge)return -1;
+            if(Challenge||Level%2!=0)return -1;
             // Encourage completing a chosen attack, without selecting it for the player.
             int best=-1,level=0;
             foreach(int attack in EvolutionAttackIds)
             {
                 int support=EvolutionSupport(attack);
-                if(Skills[attack]>level&&(Skills[attack]<4||Skills[support]<2)){best=attack;level=Skills[attack];}
+                if(Skills[attack]>level&&(Skills[attack]<5||Skills[support]<3)){best=attack;level=Skills[attack];}
             }
-            if(best>=0){int option=Skills[best]<4?best:EvolutionSupport(best);if(pool.Contains(option))return option;}
+            if(best>=0){int option=Skills[best]<5?best:EvolutionSupport(best);if(pool.Contains(option))return option;}
             return -1;
         }
     }

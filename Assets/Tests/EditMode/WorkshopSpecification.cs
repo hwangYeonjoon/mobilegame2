@@ -42,7 +42,7 @@ namespace ScrapGuard.Tests
         }
         public static void BattleDamageReport()
         {
-            var c=new Combat(GameState.New(),12,"damage");c.Position=c.Zones[0].Center;c.Shield=50;c.Hp=20;
+            var c=new Combat(GameState.New(),12,"damage");c.Position=c.Zones[0].Center;c.Shield=5;c.Hp=20;c.Elapsed=30;
             c.Tick(.05f,new V2());var report=c.Report();
             Check(c.Ended && report.cause==(int)DamageCause.Poison,"fatal source recorded");
             Check(report.damage[(int)DamageCause.Poison]==20,"only actual HP lost, no shield or overkill");

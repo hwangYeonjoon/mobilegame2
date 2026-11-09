@@ -12,6 +12,7 @@ namespace ScrapGuard.Editor
             public string id,mode;public int stage,seed,kills,machines,waves;public float hp,seconds;public bool won;
         }
         public static void CaptureAndBuildMac(){Capture();ProjectBuilder.BuildMac();}
+        public static void CaptureAndBuildAndroidQA(){Capture();ProjectBuilder.BuildAndroidAssaultQA();}
         public static void Capture()
         {
             string folder="TestResults/RuntimeAudit-"+AppRelease.Build;Directory.CreateDirectory(folder);

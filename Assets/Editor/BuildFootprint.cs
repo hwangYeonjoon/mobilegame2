@@ -11,14 +11,16 @@ namespace ScrapGuard.Editor
     {
         public int callbackOrder {get{return 9999;}}
         [Serializable] sealed class Entry {public string path;public long bytes;}
-        [Serializable] sealed class Footprint {public string target,options,output;public long unityReportedBytes,artifactBytes,musicBytes;public Entry[] largestAssets;}
+        [Serializable] sealed class Footprint {public string target,options,output;public long unityReportedBytes,artifactBytes,musicBytes;public Entry[] largestAssets;public string[] archivedAssetsPacked;}
         public void OnPostprocessBuild(BuildReport report)
         {
             var entries=report.packedAssets.SelectMany(p=>p.contents).GroupBy(p=>p.sourceAssetPath)
                 .Select(g=>new Entry{path=g.Key??"",bytes=g.Sum(x=>(long)x.packedSize)}).ToArray();
             var result=new Footprint{target=report.summary.platform.ToString(),options=report.summary.options.ToString(),output=report.summary.outputPath,
                 unityReportedBytes=(long)report.summary.totalSize,artifactBytes=File.Exists(report.summary.outputPath)?new FileInfo(report.summary.outputPath).Length:0,musicBytes=entries.Where(e=>e.path.StartsWith("Assets/Resources/Audio/Licensed/")&&e.path.EndsWith(".ogg")).Sum(e=>e.bytes),
+                archivedAssetsPacked=entries.Where(e=>e.path.StartsWith("Assets/Resources/Art/")&&File.Exists("ArtSource/Archive/Pre024/"+Path.GetFileName(e.path))).Select(e=>e.path).ToArray(),
                 largestAssets=entries.OrderByDescending(e=>e.bytes).Take(30).ToArray()};
+            if(result.archivedAssetsPacked.Length>0)throw new BuildFailedException("Archived textures unexpectedly included: "+string.Join(",",result.archivedAssetsPacked));
             Directory.CreateDirectory("TestResults/BuildSize");File.WriteAllText("TestResults/BuildSize/"+Path.GetFileNameWithoutExtension(report.summary.outputPath)+(report.summary.platform==BuildTarget.Android&&EditorUserBuildSettings.buildAppBundle?(Environment.GetEnvironmentVariable("SCRAP_AUDIO_BASELINE")=="1"?"-baseline":"-optimized"):"")+".json",JsonUtility.ToJson(result,true));
         }
         static void ReimportMusic()
