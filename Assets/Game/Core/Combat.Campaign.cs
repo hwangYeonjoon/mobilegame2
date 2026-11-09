@@ -67,6 +67,12 @@ namespace ScrapGuard.Core
         bool Warn(V2 position,float radius,float delay,float damage,float width=0,float height=0,DamageCause cause=DamageCause.Artillery,DamageSource source=DamageSource.EnemyAttack)
         {
             if(Hazards.Count>=48)return false;
+            if(!Challenge&&source==DamageSource.Boss)
+            {
+                int count=Hazards.FindAll(h=>h.source==DamageSource.Boss).Count;
+                if(count>=BossWarningLimit)return false;
+                PeakBossWarnings=Math.Max(PeakBossWarnings,count+1);
+            }
             if(!Challenge&&source==DamageSource.EnemyAttack)
             {
                 int count=0;foreach(var h in Hazards)if(h.source==DamageSource.EnemyAttack)count++;
@@ -91,24 +97,27 @@ namespace ScrapGuard.Core
                     e.windup-=dt;if(e.windup<=0){e.dash=.65f;e.attackFlash=.65f;}return;
                 }
                 if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?BossChargeSpeed:240;}
-                else if(e.cooldown<=0 && distance<330 && !(e.finalBoss&&BossLearningTier>0&&Hazards.Exists(h=>h.source==DamageSource.Boss))){e.direction=direction;e.windup=e.finalBoss?BossChargeWindup:.8f;e.cooldown=e.finalBoss?BossChargeRecovery:4.5f;
+                else if(e.cooldown<=0 && distance<330 && BossActionReady(e,true)){e.direction=direction;e.windup=e.finalBoss?BossChargeWindup:.8f;e.cooldown=e.finalBoss?BossChargeRecovery:4.5f;
+                    ReserveBossAction(e,true,e.windup+.65f);
                     if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat,DamageSource.Boss);
                     return;}
             }
             else if(e.role==EnemyRole.Artillery)
             {
                 if(distance<210)speed=distance<120?-e.speed*.5f:0;
-                if(e.cooldown<=0)
+                if(e.cooldown<=0&&BossActionReady(e,true))
                 {
-                    e.cooldown=e.finalBoss?(Definition.Region==1?5f:3f):4.8f;e.attackFlash=.4f;
+                    e.cooldown=e.finalBoss?BossPatternInterval:4.8f;e.attackFlash=.4f;
+                    float delay=e.finalBoss?BossWarningDelay:1.25f,last=delay;
                     if(e.finalBoss && Definition.Region==5)
                     {
-                        Warn(Position,0,1.5f,185,400,28,DamageCause.Electricity,DamageSource.Boss);
-                        if(e.hp<e.maxHp*.5f)Warn(Position,0,1.9f,185,28,400,DamageCause.Electricity,DamageSource.Boss);
+                        Warn(Position,0,delay,185,400,28,DamageCause.Electricity,DamageSource.Boss);
+                        if(e.hp<e.maxHp*.5f){last=delay+.8f;Warn(Position,0,last,185,28,400,DamageCause.Electricity,DamageSource.Boss);}
                     }
-                    else Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
-                    if(e.finalBoss && Definition.Region>1 && e.hp<e.maxHp*.5f)
-                    { Warn(Position+new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss);Warn(Position-new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss); }
+                    else Warn(Position,e.finalBoss?72:43,delay,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
+                    if(e.finalBoss && Definition.Region>1 && e.hp<e.maxHp*.5f && BossExtraWarnings>0)
+                    { last=delay+.6f;Warn(Position+new V2(100,0),50,last,130,0,0,DamageCause.Artillery,DamageSource.Boss);if(BossExtraWarnings>=2)Warn(Position-new V2(100,0),50,last,130,0,0,DamageCause.Artillery,DamageSource.Boss); }
+                    ReserveBossAction(e,true,last);
                 }
             }
             else if(e.role==EnemyRole.Bomber)
@@ -119,19 +128,19 @@ namespace ScrapGuard.Core
                     if(e.windup<=0){e.attackFlash=.4f;if(!e.finalBoss)e.hp=0;}
                     return;
                 }
-                if(distance<(e.finalBoss?150:85) && e.cooldown<=0)
+                if(distance<(e.finalBoss?150:85) && e.cooldown<=0 && BossActionReady(e,true))
                 {
-                    if(Warn(e.position,e.finalBoss?120:82,1.05f,e.finalBoss?230:150,0,0,DamageCause.Explosion,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
-                    {e.cooldown=5;e.windup=e.finalBoss?1.1f:1.65f;}
+                    if(Warn(e.position,e.finalBoss?120:82,e.finalBoss?BossWarningDelay:1.05f,e.finalBoss?230:150,0,0,DamageCause.Explosion,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
+                    {e.cooldown=5;e.windup=e.finalBoss?BossWarningDelay:1.65f;ReserveBossAction(e,true,e.windup);}
                     else e.cooldown=.3f;
                     return;
                 }
                 speed*=1.15f;
             }
             else if(e.role==EnemyRole.Shield)speed*=.7f;
-            else if(e.role==EnemyRole.Summoner && e.cooldown<=0)
+            else if(e.role==EnemyRole.Summoner && e.cooldown<=0 && BossActionReady(e,true))
             {
-                e.cooldown=e.finalBoss?5:9;e.attackFlash=.5f;
+                e.cooldown=e.finalBoss?5:9;e.attackFlash=.5f;ReserveBossAction(e,true,.5f);
                 if(Enemies.Count<EnemyLimit-5)
                 {
                     var p=e.position+new V2(0,55);

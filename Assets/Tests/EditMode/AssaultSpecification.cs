@@ -316,13 +316,13 @@ namespace ScrapGuard.Tests
             Check(!repeat.IntroBattle&&!new Combat(GameState.New(),6,"next").IntroBattle&&!new Combat(GameState.New(),0,"trial",17,false,SkillTrial.Mode).IntroBattle,"first-clear assistance cannot leak to replay, later stages or ranked trials");
             foreach(var c in new[]{intro,repeat}){c.Elapsed=c.Duration-30;c.Tick(.05f,new V2());}
             var firstBoss=intro.Enemies.Find(e=>e.finalBoss);var normalBoss=repeat.Enemies.Find(e=>e.finalBoss);
-            Check(firstBoss!=null&&normalBoss!=null&&firstBoss.maxHp<normalBoss.maxHp*.4f,"intro boss has lower fixed health rather than scaling to player gear");
+            Check(firstBoss!=null&&normalBoss!=null&&firstBoss.maxHp<normalBoss.maxHp,"intro boss has lower fixed health rather than scaling to player gear");
             for(int i=0;i<40;i++){if(intro.Choosing)intro.Choose(intro.Choices[0]);intro.Tick(.05f,new V2(1,0));}
             Check(intro.Hazards.FindAll(h=>h.source==DamageSource.Boss).Count<=1,"intro teaches one warning shape at a time");
             var a=new Combat(GameState.New(),0,"damage");a.Elapsed=30;
             var b=new Combat(state,0,"damage");b.Elapsed=30;
             foreach(var c in new[]{a,b}){c.Hazards.Add(new Hazard{position=c.Position,radius=60,damage=100,source=DamageSource.Boss});c.Tick(.05f,new V2());}
-            Check(Math.Abs(a.DamageReceived-45)<.01f&&Math.Abs(b.DamageReceived-60)<.01f,"intro and early campaign boss damage are explicit and nonzero");
+            Check(Math.Abs(a.DamageReceived-45)<.01f&&Math.Abs(b.DamageReceived-45)<.01f,"intro and early campaign boss damage are explicit and nonzero");
             Check(new Combat(state,6,"entry").RegionEntryThreat<new Combat(state,9,"later").RegionEntryThreat&&new Combat(state,17,"final").RegionEntryThreat==1,"new regional mechanics ramp within each region");
         }
         public static void EarlyBossLessonsAndDamageAccounting()
@@ -338,7 +338,7 @@ namespace ScrapGuard.Tests
                 c.Enemies.Add(boss);
                 for(int cycle=0;cycle<6;cycle++)
                 {
-                    c.Hazards.Clear();pattern.Invoke(c,null);
+                    c.Hazards.Clear();typeof(Combat).GetField("bossActionRecovery",flags).SetValue(c,0f);pattern.Invoke(c,null);
                     int expected=stage==1?1:stage==3?(cycle%2==0?1:2):cycle%3==0?1:cycle%3==1?2:6;
                     Check(c.Hazards.Count==expected,"low-health boss does not add unlearned layers at operation "+(stage+1));
                     foreach(var h in c.Hazards)Check(h.delay>=1.9f&&h.source==DamageSource.Boss,"learning attacks retain readable boss warnings");
@@ -360,8 +360,50 @@ namespace ScrapGuard.Tests
                 Check(c.BossWarningDamage>0&&Math.Abs(c.BossContactDamage+c.BossWarningDamage-c.DamageBySource[(int)DamageSource.Boss])<.01f,"boss subtotals reconcile after mitigation and immunity");
             }
             var normal=GameState.New();normal.tutorialCompleted=true;
-            foreach(int stage in new[]{0,6,17,41})Check(new Combat(normal,stage,"normal").BossLearningTier==0,"later campaign and completed first operation retain normal rules");
+            foreach(int stage in new[]{6,17,41})Check(new Combat(normal,stage,"normal").BossLearningTier==3,"learned patterns continue across regional boundaries");
             Check(new Combat(GameState.New(),1,"trial",17,false,SkillTrial.Mode).BossLearningTier==0,"ranked mode has no campaign learning assistance");
+        }
+        public static void ContinuousBossCurve()
+        {
+            var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+            float previousHp=0,previousDamage=0,previousInterval=5;
+            for(int stage=1;stage<=18;stage++)
+            {
+                var c=new Combat(GameState.New(),stage,"curve",17);
+                float hp=(float)typeof(Combat).GetProperty("BossBaseHealth",flags).GetValue(c);
+                float damage=(float)typeof(Combat).GetProperty("BossDamageScale",flags).GetValue(c);
+                float interval=(float)typeof(Combat).GetProperty("BossPatternInterval",flags).GetValue(c);
+                if(stage>1)Check(hp>=previousHp&&hp<=previousHp*1.13f&&damage>=previousDamage&&damage<=previousDamage*1.08f&&interval<=previousInterval&&previousInterval-interval<=.21f,"no numeric boss cliff at operation "+(stage+1));
+                previousHp=hp;previousDamage=damage;previousInterval=interval;
+                Check(c.BossWarningLimit<=10,"campaign warnings have a finite shared budget");
+            }
+            var a=new Combat(GameState.New(),17,"end");var b=new Combat(GameState.New(),18,"next");
+            Check((float)typeof(Combat).GetProperty("BossBaseHealth",flags).GetValue(a)==(float)typeof(Combat).GetProperty("BossBaseHealth",flags).GetValue(b),"curve endpoint does not restore a second health cliff");
+        }
+        public static void BossAttackCoordination()
+        {
+            var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+            var pattern=typeof(Combat).GetMethod("BossPattern",flags);
+            foreach(int stage in new[]{6,12,18,24,30,36})
+            {
+                var state=GameState.New();state.tutorialCompleted=true;
+                var c=new Combat(state,stage,"coordination",17);c.Elapsed=c.Duration-30;c.Tick(.05f,new V2());
+                var boss=c.Enemies.Find(e=>e.finalBoss);Check(boss!=null,"regional boss spawned");boss.hp=boss.maxHp=1000000;
+                if(boss.role!=EnemyRole.Shield)
+                {
+                    Check(!(bool)pattern.Invoke(c,null),"new-region role is demonstrated before common patterns");
+                    boss.cooldown=0;boss.position=c.Position+new V2(100,0);c.Tick(.05f,new V2());
+                    Check(c.BossRoleAttacks==1&&c.BossPatterns==0,"first attack is the boss role");
+                    Check(!(bool)pattern.Invoke(c,null),"role attack reserves the common attack channel");
+                }
+                for(int frame=0;frame<1100;frame++)
+                {
+                    c.Hp=c.MaxHp;if(c.Choosing)c.Choose(c.Choices[0]);c.Tick(.05f,new V2(1,0));
+                    Check(c.Hazards.FindAll(h=>h.source==DamageSource.Boss).Count<=c.BossWarningLimit,"all boss sources share a warning cap");
+                }
+                Check(c.BossPatterns>0,"common patterns are not starved by role attacks");
+                if(boss.role!=EnemyRole.Shield)Check(c.BossRoleAttacks>=2,"boss identity survives scheduling");
+            }
         }
         public static void EarlyBossReplayRoundTrip()
         {

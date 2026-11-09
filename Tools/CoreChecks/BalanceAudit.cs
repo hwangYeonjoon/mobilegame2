@@ -14,7 +14,7 @@ static class BalanceAudit
         var completed=new List<(int index,object row)>();var jobs=new List<(int index,int stage,int growth,string policy,bool machineEnabled,int seed,int robot)>();if(seedCount<1||seedCount>100)throw new ArgumentOutOfRangeException(nameof(seedCount));
         var seeds=new List<int>();int[] original={17,41,71,91,123};for(int i=0;i<seedCount;i++)seeds.Add(i<5?original[i]:127+(i-5)*37);
         onboarding=onboarding||introRobots;robots=robots||introRobots||rampRobots||bossRamp;
-        stages=bossRamp?(stages??new[]{0,1,3,5,6}):rampRobots?Enumerable.Range(0,6).ToArray():onboarding?new[]{0}:stages??(machineComparison?new[]{0,17,41}:new[]{0,5,17,29,41});
+        stages=bossRamp?(stages??new[]{1,2,3,4,5,6,7,8,9,10,11,12,17,18}):rampRobots?Enumerable.Range(0,6).ToArray():onboarding?new[]{0}:stages??(machineComparison?new[]{0,17,41}:new[]{0,5,17,29,41});
         if(stages.Length==0||stages.Any(s=>s<0||s>=Campaign.Count))throw new ArgumentOutOfRangeException(nameof(stages));
         foreach(int stage in stages.Distinct())foreach(int growth in bossRamp?new[]{0,3}:rampRobots?new[]{0,1}:onboarding?new[]{0}:machineComparison?new[]{1}:new[]{0,1,2})
         foreach(string policy in bossRamp?new[]{"natural_legacy","controlled_ignore","controlled_avoid"}:rampRobots?new[]{"natural_legacy","avoid_hazards"}:onboarding?new[]{"natural_legacy","natural_no_buttons","natural_random","avoid_hazards"}:machineComparison?new[]{"avoid_hazards"}:new[]{"ignore_hazards","avoid_hazards"})foreach(bool machineEnabled in machineComparison?new[]{true,false}:new[]{true})foreach(int seed in seeds)foreach(int robot in robots?new[]{1,5,9}:new[]{0})
@@ -57,7 +57,7 @@ static class BalanceAudit
                 machines=c.MachinesBuilt,firstMachine,firstPartsReady,firstCraft,firstSpecialized,machineSeconds=c.MachineActiveSeconds,
                 machineUptime=c.MachineActiveSeconds/Math.Max(1,c.Elapsed),machineDamageShare=c.MachineDamage/Math.Max(1,c.DamageDealt),
                 machineKills=c.MachineKills,killsDuringMachine=c.KillsDuringMachine,damageDuringMachine=c.DamageDuringMachine,damageDealt=c.DamageDealt,machineIntercepts=c.MachineIntercepts,
-                bossContactDamage=c.BossContactDamage,bossWarningDamage=c.BossWarningDamage,bossReached=c.BossArenaActive,bossPatterns=c.BossPatterns,bossSeconds=c.BossCombatSeconds,firstEvolution=c.FirstEvolutionSeconds,evolvedPlaySeconds=c.FirstEvolutionSeconds<0?0:c.Elapsed-c.FirstEvolutionSeconds,
+                peakBossWarnings=c.PeakBossWarnings,bossWarningLimit=c.BossWarningLimit,bossRoleAttacks=c.BossRoleAttacks,bossAttackGroups=c.BossAttackGroups,bossContactDamage=c.BossContactDamage,bossWarningDamage=c.BossWarningDamage,bossReached=c.BossArenaActive,bossPatterns=c.BossPatterns,bossSeconds=c.BossCombatSeconds,firstEvolution=c.FirstEvolutionSeconds,evolvedPlaySeconds=c.FirstEvolutionSeconds<0?0:c.Elapsed-c.FirstEvolutionSeconds,
                 evolutions=c.EvolutionMask,gunEvolution=c.WeaponEvolution,cause=(int)c.Report().cause};
             lock(completed)completed.Add((job.index,row));
             Console.WriteLine("stage="+(stage+1)+" "+row.loadout+" "+row.policy+" seed="+seed+" win="+c.Won+" time="+c.Elapsed.ToString("F1")+" machine="+row.machineUptime.ToString("P0"));

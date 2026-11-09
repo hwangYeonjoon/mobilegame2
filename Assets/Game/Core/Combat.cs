@@ -43,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 21;
+        public const int RulesVersion = 22;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -125,7 +125,7 @@ namespace ScrapGuard.Core
             if (Ended || Choosing) return;
             dt = Math.Max(0, Math.Min(.05f, dt)); Elapsed += dt;
             if(Hp<MaxHp*.5f)LowHealthSeconds+=dt;
-            areaHitRecovery=Math.Max(0,areaHitRecovery-dt);bossHitRecovery=Math.Max(0,bossHitRecovery-dt);enemyWarningRecovery=Math.Max(0,enemyWarningRecovery-dt);
+            areaHitRecovery=Math.Max(0,areaHitRecovery-dt);bossHitRecovery=Math.Max(0,bossHitRecovery-dt);bossActionRecovery=Math.Max(0,bossActionRecovery-dt);enemyWarningRecovery=Math.Max(0,enemyWarningRecovery-dt);
             if(Challenge && Elapsed>=Duration) { Elapsed=Duration;Ended=true;Won=Hp>0;return; }
             LastMovement = movement;
             UltimateCharge = Math.Min(100,UltimateCharge + dt*2);
@@ -164,8 +164,7 @@ namespace ScrapGuard.Core
                 bossTimer -= dt;
                 if (bossTimer <= 0)
                 {
-                    bossTimer = Challenge?3.2f:BossPatternInterval;
-                    BossPattern();
+                    bossTimer = BossPattern()?(Challenge?3.2f:BossPatternInterval):.15f;
                 }
             }
             if(!Challenge && Definition.Mission==Mission.Survive && Elapsed>=Duration) { Ended=true;Won=Hp>0;return; }
@@ -230,7 +229,7 @@ namespace ScrapGuard.Core
                 if(e.hp<=0) { Kill(i);continue; }
                 if (V2.Distance(Position, e.position) < 15 + e.Radius && contactTimer <= 0)
                 {
-                    Hurt(e.kind == 3 ? 170 : e.kind == 2 ? 110 : 70,e.dash>0?DamageCause.Charge:DamageCause.Contact,e.finalBoss?DamageSource.Boss:DamageSource.Contact);e.attackFlash=.25f; contactTimer = .65f;
+                    Hurt(e.kind == 3 ? 170 : e.kind == 2 ? 110 : 70,e.dash>0?DamageCause.Charge:DamageCause.Contact,e.finalBoss?DamageSource.Boss:DamageSource.Contact);e.attackFlash=.25f; contactTimer = e.finalBoss&&!Challenge?BossContactInterval:.65f;
                     if(!e.core)e.position=Slide(e.position,(e.position - Position).Normal * 22,Math.Min(e.Radius,20));
                 }
             }

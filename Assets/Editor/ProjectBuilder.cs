@@ -66,7 +66,9 @@ namespace ScrapGuard.Editor
         public static void BuildAndroidSoakQA(){BuildAndroidQA(true);}
         public static void BuildAndroidPolishQA(){BuildAndroidQA(false);}
         public static void BuildAndroidAssaultQA(){BuildAndroidQA(false,true);}
-        static void BuildAndroidQA(bool soak,bool assault=false)
+        public static void BuildAndroidBossQA(){BuildAndroidQA(false,false,true);}
+        public static void BuildAndroidPlaytest(){BuildAndroidQA(false,false,false,true);}
+        static void BuildAndroidQA(bool soak,bool assault=false,bool bosses=false,bool manual=false)
         {
             Configure();EditorUserBuildSettings.buildAppBundle=false;
             string previous=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),previousName=PlayerSettings.productName;
@@ -75,8 +77,8 @@ namespace ScrapGuard.Editor
             try
             {
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,ScrapGuard.Core.AppRelease.Package+".qa");
-                PlayerSettings.productName="고철 수호대 QA";
-                Build(BuildTarget.Android,"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
+                PlayerSettings.productName=manual?"고철 수호대 체험":"고철 수호대 QA";
+                Build(BuildTarget.Android,manual?"Builds/Android/ScrapGuard-playtest.apk":"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,manual?new[]{"SCRAP_QA_SOAK","SCRAP_QA_MANUAL"}:bosses?new[]{"SCRAP_QA_SOAK","SCRAP_QA_BOSS"}:assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
             }
             finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();if(previousDependencies!=null)File.WriteAllBytes(dependencyPath,previousDependencies);}
         }

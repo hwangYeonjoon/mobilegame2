@@ -39,8 +39,12 @@ namespace ScrapGuard
 #if SCRAP_QA_SOAK
             if(!Application.identifier.EndsWith(".qa",StringComparison.Ordinal))throw new InvalidOperationException("QA soak requires isolated package");
             profile=Path.Combine(Application.persistentDataPath,"qa-profile.json");
-#if SCRAP_QA_ASSAULT
+#if SCRAP_QA_MANUAL
+            args=Array.Empty<string>();
+#elif SCRAP_QA_ASSAULT
             args=new[]{"-smoke","-assaultSmoke","-withNatural","-smokeOutput",Path.Combine(Application.persistentDataPath,"AssaultUI")};
+#elif SCRAP_QA_BOSS
+            args=new[]{"-smoke","-naturalCombat","-bossProgression","-smokeOutput",Path.Combine(Application.persistentDataPath,"BossProgression")};
 #elif SCRAP_QA_UI
             args=new[]{"-smoke","-polishSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishUI")};
 #else

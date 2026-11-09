@@ -18,9 +18,14 @@ namespace ScrapGuard
         bool UpdateBlocksPlay { get { return cloud!=null && cloud.UpdateBlocked; } }
         void SetupUpdates()
         {
+#if SCRAP_QA_SOAK
+            // Isolated offline QA builds must not query or block on production release rules.
+            return;
+#else
             var asset=Resources.Load<TextAsset>("ClientConnection");
             try{if(asset!=null)configuredReleaseEndpoint=JsonUtility.FromJson<ClientConnection>(asset.text)?.releaseEndpoint??"";}catch(ArgumentException){}
             if(!smokeActive && !Online && CloudClient.ValidEndpoint(configuredReleaseEndpoint))StartCoroutine(CheckAppUpdate(false));
+#endif
         }
         string UpdateEndpoint()
         {

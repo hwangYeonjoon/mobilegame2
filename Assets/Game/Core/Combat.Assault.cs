@@ -88,55 +88,38 @@ namespace ScrapGuard.Core
                 Enemies.Add(new Enemy{id=nextId++,position=p,hp=hp,maxHp=hp,speed=WaveNumber%2==0?50:62,role=EnemyRole.Pursuer});
             }
         }
-        void BossPattern()
+        bool BossPattern()
         {
-            if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return;}
-            var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null)return;
-            if(BossLearningTier>0&&(boss.windup>0||boss.dash>0))return;
+            if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return true;}
+            var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null||!BossActionReady(boss,false))return false;
             bossPattern++;BossPatterns++;
-            if(BossLearningTier==1)
+            float delay=BossWarningDelay,last=delay;
+            int pattern=bossPattern%(BossLearningTier==1?2:BossLearningTier==2?2:3);
+            if(pattern==1)
             {
-                // Teach one readable shape at a time before introducing layered boss patterns.
-                if(bossPattern%2==1)Warn(Position,65,2.2f,180,0,0,DamageCause.Boss,DamageSource.Boss);
-                else Warn(Position,0,2.2f,180,400,30,DamageCause.Boss,DamageSource.Boss);
-                return;
-            }
-            if(BossLearningTier>=2)
-            {
-                // Keep the familiar single target between new lessons. No low-HP layering.
-                int pattern=bossPattern%(BossLearningTier==2?2:3);
-                if(pattern==1)Warn(Position,65,1.9f,180,0,0,DamageCause.Boss,DamageSource.Boss);
-                else if(pattern==0&&BossLearningTier==3)
+                Warn(Position,65,delay,180,0,0,DamageCause.Boss,DamageSource.Boss);
+                if(boss.hp<boss.maxHp*.5f&&BossExtraWarnings>0)
                 {
-                    // Six warnings and a wide escape opening before the full later-region ring.
-                    for(int i=2;i<8;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI/4)*190,32,2.4f,150,0,0,DamageCause.Boss,DamageSource.Boss);
-                    Effects.Add(new BattleEffect{position=Position,kind=10,text="포위 예고 · 빈 방향으로 이동"});
+                    last=delay+.6f;
+                    for(int i=0;i<BossExtraWarnings;i++)Warn(Position+V2.Angle(i*2.094f+Facing)*130,45,last,140,0,0,DamageCause.Boss,DamageSource.Boss);
                 }
-                else
-                {
-                    Warn(Position,0,1.9f,180,400,28,DamageCause.Boss,DamageSource.Boss);
-                    Warn(Position,0,2.9f,180,28,400,DamageCause.Boss,DamageSource.Boss);
-                    if(bossPattern==2)Effects.Add(new BattleEffect{position=Position,kind=10,text="십자 예고 · 첫 줄을 피한 뒤 이동"});
-                }
-                return;
             }
-            if(bossPattern%3==1)
+            else if(BossLearningTier==1)Warn(Position,0,delay,180,400,30,DamageCause.Boss,DamageSource.Boss);
+            else if(pattern==0&&BossLearningTier==3)
             {
-                Warn(Position,65,1.5f,180,0,0,DamageCause.Boss,DamageSource.Boss);
-                if(boss.hp<boss.maxHp*.5f)
-                    for(int i=0;i<3;i++)Warn(Position+V2.Angle(i*2.094f+Facing)*130,45,2.1f,140,0,0,DamageCause.Boss,DamageSource.Boss);
-            }
-            else if(bossPattern%3==2)
-            {
-                // Cross sweeps are staggered, allowing movement between them.
-                Warn(Position,0,1.5f,180,480,30,DamageCause.Boss,DamageSource.Boss);
-                Warn(Position,0,2.3f,180,30,480,DamageCause.Boss,DamageSource.Boss);
+                last=delay+.5f;int count=BossRingWarnings;
+                // Keep a real opening while density grows from six to ten circles.
+                for(int i=2;i<count+2;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI*2/(count+2))*190,32,last,150,0,0,DamageCause.Boss,DamageSource.Boss);
+                Effects.Add(new BattleEffect{position=Position,kind=10,text="포위 예고 · 빈 방향으로 이동"});
             }
             else
             {
-                for(int i=2;i<12;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI/6)*190,35,2,150,0,0,DamageCause.Boss,DamageSource.Boss);
-                Effects.Add(new BattleEffect{position=Position,kind=10,text="봉쇄 포격 · 열린 틈으로 이동"});
+                last=delay+BossCurve(1,1,.8f);
+                Warn(Position,0,delay,180,400,28,DamageCause.Boss,DamageSource.Boss);
+                Warn(Position,0,last,180,28,400,DamageCause.Boss,DamageSource.Boss);
+                if(bossPattern==2)Effects.Add(new BattleEffect{position=Position,kind=10,text="십자 예고 · 첫 줄을 피한 뒤 이동"});
             }
+            ReserveBossAction(boss,false,last);return true;
         }
         int announcedEvolutions;
         public bool SkillEvolved(int skill)

@@ -9,16 +9,48 @@ namespace ScrapGuard.Core
         readonly float[] damageBySource=new float[6];
         readonly float[] healingBySource=new float[7];
         public readonly bool IntroBattle;
-        // Campaign operations 2/4/6 extend the introduction without changing ranked rules.
-        // Stage is zero-based; the first-clear-only introduction remains separate.
-        public int BossLearningTier {get{return Challenge?0:IntroBattle?1:Stage>=1&&Stage<=5?(Stage<=1?1:Stage<=3?2:3):0;}}
-        float BossBaseHealth {get{return IntroBattle?18000:BossLearningTier==1?24000:BossLearningTier==2?32000:BossLearningTier==3?36000:50000;}}
-        float BossPatternInterval {get{return BossLearningTier==1?5f:BossLearningTier==2?4.6f:BossLearningTier==3?4.2f:3.8f;}}
-        float BossHitRecovery {get{return BossLearningTier==1?.8f:BossLearningTier==2?.7f:BossLearningTier==3?.7f:.45f;}}
-        float BossDamageScale {get{return BossLearningTier==1?.45f:BossLearningTier==2?.52f:BossLearningTier==3?.56f:.6f+.4f*Math.Min(1,Stage/18f);}}
-        float BossChargeSpeed {get{return BossLearningTier==1?145:BossLearningTier==2?160:BossLearningTier==3?170:190;}}
-        float BossChargeWindup {get{return BossLearningTier==1?1.3f:BossLearningTier==2?1.15f:BossLearningTier==3?1f:.8f;}}
-        float BossChargeRecovery {get{return BossLearningTier==1?6f:BossLearningTier==2?5.5f:BossLearningTier==3?5f:4.5f;}}
+        // One campaign curve: operation 2 -> first region finale -> operation 18.
+        // Numeric difficulty continues across region boundaries; pattern unlocks are additive.
+        float BossCurve(float opening,float firstFinale,float standard)
+        {
+            if(Stage<=5)return opening+(firstFinale-opening)*Math.Max(0,Stage-1)/4f;
+            return firstFinale+(standard-firstFinale)*Math.Min(1,(Stage-5)/12f);
+        }
+        public int BossLearningTier {get{return Challenge?0:Stage<=1?1:Stage<=3?2:3;}}
+        float BossBaseHealth {get{return IntroBattle?18000:BossCurve(24000,36000,50000);}}
+        float BossPatternInterval {get{return BossCurve(5,4.2f,3.8f);}}
+        float BossHitRecovery {get{return BossCurve(.8f,.7f,.45f);}}
+        float BossContactInterval {get{return BossCurve(1.3f,1.3f,.75f);}}
+        float BossDamageScale {get{return Stage<=17?BossCurve(.45f,.56f,.6f+.4f*17/18f):.6f+.4f*Math.Min(1,Stage/18f);}}
+        float BossChargeSpeed {get{return BossCurve(145,170,190);}}
+        float BossChargeWindup {get{return BossCurve(1.3f,1,.8f);}}
+        float BossChargeRecovery {get{return BossCurve(6,5,4.5f);}}
+        float BossWarningDelay {get{return BossCurve(2.2f,1.9f,1.5f);}}
+        float BossActionRest {get{return BossCurve(.9f,.75f,.45f);}}
+        int BossExtraWarnings {get{return Math.Max(0,Math.Min(3,(Stage-5)/4));}}
+        int BossRingWarnings {get{return 6+Math.Max(0,Math.Min(4,(Stage-5)/3));}}
+        public int BossWarningLimit {get{return BossLearningTier==1?1:BossLearningTier==2?2:BossRingWarnings;}}
+        public int PeakBossWarnings {get;private set;}
+        public int BossRoleAttacks {get;private set;}
+        public int BossAttackGroups {get;private set;}
+        float bossActionRecovery;
+        bool bossRoleTurn;
+        int bossRoleLessonsRemaining;
+        static bool HasBossRoleAction(Enemy e)
+        {return e.role==EnemyRole.Charger||e.role==EnemyRole.Artillery||e.role==EnemyRole.Bomber||e.role==EnemyRole.Summoner;}
+        bool BossActionReady(Enemy e,bool role)
+        {
+            if(!e.finalBoss||Challenge)return true;
+            return bossActionRecovery<=0&&e.windup<=0&&e.dash<=0&&!Hazards.Exists(h=>h.source==DamageSource.Boss)
+                &&(!HasBossRoleAction(e)||bossRoleTurn==role);
+        }
+        void ReserveBossAction(Enemy e,bool role,float duration)
+        {
+            if(!e.finalBoss||Challenge)return;
+            bossActionRecovery=duration+BossActionRest;BossAttackGroups++;
+            if(role){BossRoleAttacks++;bossRoleLessonsRemaining=Math.Max(0,bossRoleLessonsRemaining-1);bossRoleTurn=bossRoleLessonsRemaining>0;}
+            else bossRoleTurn=HasBossRoleAction(e);
+        }
         public float RegionEntryThreat {get{return Challenge?1:.75f+.25f*Math.Min(1,(Stage%6)/3f);}}
         public float LowHealthSeconds {get;private set;}
         public float[] HealingBySource {get{return (float[])healingBySource.Clone();}}
@@ -84,7 +116,7 @@ namespace ScrapGuard.Core
             // The warning precedes this transition. Center on the player's current position,
             // then clear regional geometry rather than teleporting into an obstacle.
             BossArenaCenter=new V2(Math.Max(WorldLeft+235,Math.Min(WorldRight-235,Position.x)),Math.Max(WorldTop+300,Math.Min(WorldBottom-300,Position.y)));
-            BossArenaActive=true;Position=ClampBossPoint(Position,26);Hazards.Clear();WaveWarning=0;reviveGuard=Math.Max(reviveGuard,2);
+            BossArenaActive=true;bossRoleLessonsRemaining=Definition.Region>0?2:0;bossRoleTurn=bossRoleLessonsRemaining>0;Position=ClampBossPoint(Position,26);Hazards.Clear();WaveWarning=0;reviveGuard=Math.Max(reviveGuard,2);
             foreach(var enemy in Enemies)enemy.position=ClampBossPoint(enemy.position,enemy.Radius);
             Effects.Add(new BattleEffect{position=Position,kind=10,text="보스 결전 · 전투 구역 고정"});
         }

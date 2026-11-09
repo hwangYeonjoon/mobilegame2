@@ -37,8 +37,8 @@ def summary(before_path, after_path):
     print(f'Automated simulation only; rules {before_meta["rules"]} -> {after_meta["rules"]}; {len(after)} paired runs per version.')
     print('Three robot targets reuse each seed; these are not independent human participants.')
     print('Boss seconds include losses. Damage shares use actual HP loss, exclude absorbed/immune damage.')
-    print('| Stage | Loadout (ATK/HP) | Policy | Before wins | After wins | Loss->win / win->loss | Boss seconds median | End HP median | Boss contact / warning share |')
-    print('|---|---|---|---|---|---|---|---|---|')
+    print('| Stage | Loadout (ATK/HP) | Policy | Before wins | After wins | Loss->win / win->loss | Boss seconds median | End HP median | Boss contact / warning share | Peak boss warnings |')
+    print('|---|---|---|---|---|---|---|---|---|---|')
     for (stage, loadout, policy), pairs in sorted(groups.items()):
         rows = [new for _, new in pairs]
         old_wins = sum(old['won'] for old, _ in pairs)
@@ -49,7 +49,9 @@ def summary(before_path, after_path):
         contact = sum(row['bossContactDamage'] for row in rows) / total if total else 0
         warning = sum(row['bossWarningDamage'] for row in rows) / total if total else 0
         stats = rows[0]
-        print(f'| {stage} | {loadout} ({stats["attack"]}/{stats["health"]}) | {policy} | {old_wins}/{len(rows)} | {wins}/{len(rows)} | {gained}/{lost} | {median(r["bossSeconds"] for r in rows):.1f} | {median(max(0,r["hp"]) for r in rows):.0f} | {contact:.1%} / {warning:.1%} |')
+        peaks = [row['peakBossWarnings'] for row in rows if 'peakBossWarnings' in row]
+        peak = max(peaks) if peaks else 'unmeasured'
+        print(f'| {stage} | {loadout} ({stats["attack"]}/{stats["health"]}) | {policy} | {old_wins}/{len(rows)} | {wins}/{len(rows)} | {gained}/{lost} | {median(r["bossSeconds"] for r in rows):.1f} | {median(max(0,r["hp"]) for r in rows):.0f} | {contact:.1%} / {warning:.1%} | {peak} |')
 
 
 if __name__ == '__main__':

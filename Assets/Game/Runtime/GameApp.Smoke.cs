@@ -11,13 +11,13 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        bool smokeActive,smokeRecover,smokeWithNatural;
+        bool smokeActive,smokeRecover,smokeWithNatural,smokeBossProgression;
         bool smokeCapturing;
         string smokeOutput;
         readonly List<string> smokeErrors = new List<string>();
         void SetupSmoke(string[] args)
         {
-            smokeActive = Array.IndexOf(args, "-smoke") >= 0;smokeWithNatural=Array.IndexOf(args,"-withNatural")>=0;
+            smokeActive = Array.IndexOf(args, "-smoke") >= 0;smokeWithNatural=Array.IndexOf(args,"-withNatural")>=0;smokeBossProgression=Array.IndexOf(args,"-bossProgression")>=0;
             if (!smokeActive) return;
             Application.runInBackground = true;
             smokeOutput = Path.Combine(Application.persistentDataPath, "Smoke");
