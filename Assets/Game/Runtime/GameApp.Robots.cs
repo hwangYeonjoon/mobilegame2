@@ -10,9 +10,50 @@ namespace ScrapGuard
         bool robotMenuOpen;float robotMenuOpenedAt;
         void FinishRobotMenu(string action,int design){Track("robot_choice",action,design,Time.unscaledTime-robotMenuOpenedAt);robotMenuOpen=false;}
         int robotTargetDesign=RobotAssembly.DefaultDesign;
+        bool robotWorkshopObserved,robotPartsObserved,robotCraftObserved,robotBoardObserved,robotSpecializedObserved,robotPromptUsed;
+        float robotPromptRemaining,nextRobotProbe;int robotPromptDesign,readyRobotDesign;
+        bool RobotPromptActive {get{return robotPromptRemaining>0&&combat!=null&&!combat.Ended&&combat.MachineTime<=0&&!combat.Choosing&&!battlePaused&&!networkBusy;}}
+        int ReadyRobotDesign()
+        {
+            if(combat==null||combat.Challenge)return 0;
+            var stock=combat.RobotParts;
+            for(int n=0;n<=9;n++)
+            {
+                int id=n==0?robotTargetDesign:n;if(combat.RobotRank(id)!=0)continue;
+                var cost=combat.RobotRecipe(id);bool enough=true;for(int i=0;i<3;i++)if(stock[i]<cost[i])enough=false;
+                if(enough)return id;
+            }
+            return 0;
+        }
+        void ObserveRobotExperience()
+        {
+            if(combat.Elapsed>=nextRobotProbe){readyRobotDesign=(!robotPartsObserved||!robotPromptUsed&&combat.IntroBattle&&!robotCraftObserved)?ReadyRobotDesign():0;nextRobotProbe=combat.Elapsed+.25f;}
+            int ready=readyRobotDesign;
+            if(!robotPartsObserved&&ready!=0){robotPartsObserved=true;Track("robot_milestone","parts_ready",combat.Stage+1,combat.Elapsed);}
+            if(!robotCraftObserved&&combat.RobotPlansBuilt>0){robotCraftObserved=true;Track("robot_milestone","first_craft",combat.Stage+1,combat.Elapsed);}
+            if(!robotBoardObserved&&combat.MachinesBuilt>0){robotBoardObserved=true;Track("robot_milestone","first_board",combat.Stage+1,combat.Elapsed);}
+            if(!robotSpecializedObserved&&combat.MachineTime>0&&combat.RobotRank(combat.MachineDesign)>0){robotSpecializedObserved=true;Track("robot_milestone","first_specialized_board",combat.Stage+1,combat.Elapsed);}
+            if(!robotPromptUsed&&!combat.Ended&&combat.IntroBattle&&!robotCraftObserved&&ready!=0&&!battlePaused&&!combat.Choosing&&combat.MachineTime<=0&&!networkBusy&&!playerInDanger&&combat.WaveWarning<=0&&!combat.BossArenaActive)
+            {robotPromptUsed=true;robotPromptDesign=ready;robotPromptRemaining=8;Track("robot_discovery","prompt_shown",combat.Stage+1,combat.Elapsed);}
+            if(RobotPromptActive&&!playerInDanger&&combat.WaveWarning<=0)robotPromptRemaining=Mathf.Max(0,robotPromptRemaining-Time.unscaledDeltaTime);
+        }
+        string RobotSituation(int frame)
+        {
+            bool artillery=false,charger=false,crowded=false;int close=0;
+            foreach(var enemy in combat.Enemies)if(enemy.hp>0)
+            {if(enemy.role==EnemyRole.Artillery)artillery=true;if(enemy.role==EnemyRole.Charger)charger=true;if(V2.Distance(enemy.position,combat.Position)<180)close++;}
+            crowded=close>=12;
+            if(combat.BossArenaActive)return frame==0?"보스전 · 거리를 벌려 포격, 장판은 직접 회피":frame==1?"보스전 · 빠르게 접근한 뒤 경고 밖으로 이동":"보스전 · 피해 감소만 믿지 말고 장판을 피하세요";
+            if(artillery)return frame==0?"적 포격 중 · 느린 이동에 주의하며 거리 유지":frame==1?"적 포격 중 · 빠른 이동으로 예고 범위 이탈":"적 포격 중 · 피해를 줄이며 가까운 적 밀어내기";
+            if(crowded)return frame==0?"근접 포위 · 느린 전차는 먼저 탈출 공간 확보":frame==1?"근접 포위 · 빠른 이동과 근접 공격으로 돌파":"근접 포위 · 충격파로 밀어내며 천천히 전진";
+            if(charger)return frame==0?"돌진 적 접근 · 접근하기 전에 포격하세요":frame==1?"돌진 적 접근 · 정면 대신 옆으로 빠르게 이동":"돌진 적 접근 · 충격파 뒤에도 경고를 확인하세요";
+            return RobotAssembly.RegionAdvice(combat.Definition);
+        }
         bool robotSupportOptions;
         void ConfirmRobotPlan(int design,bool upgrade)
         {
+            if(!combat.CanPlanRobot(design,upgrade))return;
+            if(upgrade&&!robotPartsObserved){robotPartsObserved=true;Track("robot_milestone","parts_ready",combat.Stage+1,combat.Elapsed);}
             if(!combat.PlanRobot(design,upgrade))return;
             recorder.RobotPlan(design,upgrade);
             if(upgrade)Track("combat_robot","upgrade",design,combat.RobotRank(design));
@@ -22,11 +63,11 @@ namespace ScrapGuard
         void RobotAssembler(int design)
         {
             if(combat==null||combat.Ended||combat.Challenge||combat.Choosing||combat.MachineTime>0)return;
-            if(!robotMenuOpen){robotMenuOpen=true;robotSupportOptions=false;robotMenuOpenedAt=Time.unscaledTime;Track("robot_choice","open",combat.MachinesBuilt,combat.Elapsed);}
+            if(!robotMenuOpen){if(!robotWorkshopObserved){robotWorkshopObserved=true;Track("robot_discovery",RobotPromptActive?"prompt_opened":"unprompted_opened",combat.Stage+1,combat.Elapsed);}robotPromptRemaining=0;robotMenuOpen=true;robotSupportOptions=false;robotMenuOpenedAt=Time.unscaledTime;Track("robot_choice","open",combat.MachinesBuilt,combat.Elapsed);}
             battlePaused=true;dragging=false;robotTargetDesign=design;
             int main=RobotAssembly.Frame(design),sub=RobotAssembly.Support(design),rank=combat.RobotRank(design);var parts=combat.RobotParts;var cost=combat.RobotRecipe(design);
             bool craft=combat.CanPlanRobot(design,true),available=combat.RobotAvailable(design),board=combat.CanActivateMachine;
-            var card=Dialog("어떤 로봇을 만들까요?","회수한 부품으로 제작 · 만든 설계는 이번 판에 유지",800);
+            var card=Dialog("어떤 로봇을 만들까요?",RobotSituation(main),800);
             var close=card.GetChild(2).GetComponent<Button>();close.onClick.RemoveAllListeners();close.onClick.AddListener(()=>{FinishRobotMenu("close",design);battlePaused=false;CloseModal();});
             RobotRigView.Draw(card,24,120,176,design,rank);
             Ui.Label(card,RobotAssembly.Frames[main],212,132,256,35,23,RobotRigView.Accent(main));

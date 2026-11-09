@@ -33,6 +33,7 @@ namespace ScrapGuard
         }
         void SetupAssaultPresentation()
         {
+            robotWorkshopObserved=robotPartsObserved=robotCraftObserved=robotBoardObserved=robotSpecializedObserved=robotPromptUsed=false;robotPromptRemaining=nextRobotProbe=0;readyRobotDesign=0;
             trackedMachines=trackedWaves=trackedEvolution=trackedSkillEvolutions=0;robotTargetDesign=combat.MachineDesign;robotMenuOpen=false;
             bossFence=Ui.Rect(arena,"Boss arena fence",0,0,470,600);
             Ui.Box(bossFence,0,0,470,4,Ui.Blue,false);Ui.Box(bossFence,0,596,470,4,Ui.Blue,false);
@@ -65,6 +66,7 @@ namespace ScrapGuard
         void TriggerMachine()
         {
             if(combat==null||battlePaused||networkBusy||combat.Challenge)return;
+            if(RobotPromptActive){RobotAssembler(robotPromptDesign);return;}
             if(!combat.RobotPlanned){RobotAssembler(robotTargetDesign);return;}
             if(!combat.ActivateMachine())return;recorder.Machine();dragging=false;RenderBattle();
         }
@@ -78,6 +80,7 @@ namespace ScrapGuard
             else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
             else if(combat.IntroBattle&&combat.BossArenaActive)message=combat.CanActivateMachine?"아래 합체 버튼으로 보스를 공격하세요":combat.CanUltimate?"필살기 준비 완료 · 오른쪽 아래 버튼을 누르세요":"공격은 자동 · 보스의 빨간 예고 밖으로 이동하세요";
             else if(combat.BossArenaActive)message="";
+            else if(RobotPromptActive)message="↓ 모은 부품으로 로봇을 만들어 보세요";
             else if(combat.IntroBattle&&combat.Elapsed>8&&combat.Elapsed<14)message="포·동·장 표식 적을 부수고 부품을 회수하세요";
             else if(!combat.Challenge&&combat.Elapsed>12&&combat.Elapsed%12<(combat.IntroBattle?7:4))message=RobotRecoveryHint();
             else if(guideHint.gameObject.activeSelf)message=guideHint.text;
@@ -95,12 +98,16 @@ namespace ScrapGuard
         }
         void RenderAssaultPresentation()
         {
+            ObserveRobotExperience();
             machineActor.gameObject.SetActive(combat.MachineTime>0);
             float arrival=combat.MachineActiveDuration-combat.MachineTime;
             battleRobot.SetDesign(combat.MachineDesign,combat.RobotRank(combat.MachineDesign));battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f,combat.MachineTime>0?arrival:-1);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
             float unfold=Mathf.Clamp01(arrival/.18f);
-            machineActor.localScale=Vector3.one*Mathf.Lerp(.92f,1,unfold);
+            bool clearer=PlayerPrefs.GetInt("scrapguard.robot.clear",1)==1;
+            machineActor.localScale=Vector3.one*Mathf.Lerp(.92f,1,unfold)*(clearer?.82f:1);
+            bool nearby=false;if(clearer&&combat.MachineTime>0)foreach(var e in combat.Enemies)if(e.hp>0&&V2.Distance(e.position,combat.Position)<140){nearby=true;break;}
+            battleRobot.SetBattleClarity(nearby);
             bossFence.gameObject.SetActive(combat.BossArenaActive);
             bossFence.anchoredPosition=new Vector2(combat.BossArenaCenter.x-235,-combat.BossArenaCenter.y+300);
             machineAura.GetComponent<CombatRing>().color=new Color(.6f,1,.8f,combat.FinalBossActive?.1f:.3f);
@@ -122,6 +129,7 @@ namespace ScrapGuard
             salvageText.text=combat.MachineTime>0?(RobotAssembly.Frame(combat.MachineDesign)==0?"포격":RobotAssembly.Frame(combat.MachineDesign)==1?"돌파":"철벽")+" 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.MachineRecovery>0?"합체 준비 "+Mathf.CeilToInt(combat.MachineRecovery)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?(combat.RobotPlanned?"즉시 탑승":"로봇 조립"):(combat.RobotPlanned?"탑승 · E":"조립 · E")):"조립 · 고철 "+combat.Salvage+"/"+combat.MachineCost;
             machineButton.image.color=combat.CanActivateMachine?Ui.Mint:Ui.Raised;
             salvageText.color=combat.CanActivateMachine?Ui.Background:Ui.Ink;
+            if(RobotPromptActive){salvageText.text="눌러서 특화형 제작";machineButton.image.color=Color.Lerp(Ui.Mint,Ui.Gold,(Mathf.Sin(Time.unscaledTime*4)+1)*.5f);salvageText.color=Ui.Background;}
             machineFill.rectTransform.sizeDelta=new Vector2(155*Mathf.Clamp01(combat.Salvage/(float)combat.MachineCost),3);
             for(int i=0;i<2;i++){wingDrones[i].gameObject.SetActive(combat.SkillEvolved(3));wingDrones[i].anchoredPosition=new Vector2(combat.Position.x+(i==0?-75:75)-10,-combat.Position.y+54);}
             objectiveBearing.text="";

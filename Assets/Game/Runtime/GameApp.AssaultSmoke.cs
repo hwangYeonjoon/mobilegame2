@@ -36,6 +36,7 @@ namespace ScrapGuard
         }
         IEnumerator RobotAssemblySmoke()
         {
+            int priorView=PlayerPrefs.GetInt("scrapguard.robot.clear",1);PlayerPrefs.SetInt("scrapguard.robot.clear",1);
             OpenBattle(0,"robot-visual-fixture",17,false);battlePaused=true;
             for(int id=1;id<=9;id++){RobotAssembler(id);yield return Capture("robot-design-"+id);}
             CloseModal();
@@ -50,8 +51,22 @@ namespace ScrapGuard
                 RenderBattle();yield return Capture("robot-crowded-entry-"+id);
                 for(int frame=0;frame<45;frame++){if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.Tick(ReplayRecorder.Step,new V2(.3f,.1f));}
                 RenderBattle();yield return Capture("robot-frame-"+id);
+                if(id==5){float hp=combat.Hp,time=combat.Elapsed;int count=combat.Enemies.Count;PlayerPrefs.SetInt("scrapguard.robot.clear",0);RenderBattle();yield return Capture("robot-visibility-large");PlayerPrefs.SetInt("scrapguard.robot.clear",1);RenderBattle();yield return Capture("robot-visibility-clear");if(combat.Hp!=hp||combat.Elapsed!=time||combat.Enemies.Count!=count)smokeErrors.Add("Robot visibility preference changed simulation");}
                 var records=combat.RobotReport();Store.Change(e=>{RobotAssembly.Record(e.State,records,0);return CommandResult.Ok("Isolated robot visual fixture");});
             }
+            // Discovery is a suggestion: no forced modal, spend, or activation.
+            OpenBattle(0,"robot-prompt-fixture",17,false);battlePaused=false;CloseModal();
+            for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9300+part,position=combat.Position,part=part,partCount=4});
+            for(int step=0;step<10;step++)combat.Tick(ReplayRecorder.Step,new V2());RenderBattle();
+            if(!RobotPromptActive||battlePaused||combat.MachinesBuilt!=0||combat.RobotPartsSpent!=0)smokeErrors.Add("Ready prompt must not force boarding or spend parts");
+            yield return Capture("robot-ready-prompt");
+            playerInDanger=true;RenderUnifiedNotice();if(combatNotice.text!="위험 구역 밖으로 이동!")smokeErrors.Add("Prompt covered a danger warning");playerInDanger=false;
+            TriggerMachine();if(!battlePaused||RobotPromptActive||combat.RobotPartsSpent!=0)smokeErrors.Add("Prompt tap must open a ready design without spending");
+            yield return Capture("robot-prompt-workshop");
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="닫기"){button.onClick.Invoke();break;}
+            RenderBattle();if(RobotPromptActive||battlePaused||combat.MachinesBuilt!=0)smokeErrors.Add("Dismissed prompt repeated or auto-boarded");
+            combat.Enemies.Add(new Enemy{id=9340,hp=5000,maxHp=5000,role=EnemyRole.Artillery,position=combat.Position+new V2(250,0)});
+            RobotAssembler(1);yield return Capture("robot-live-artillery-advice");CloseModal();
             CampaignDetails(17);yield return Capture("robot-region-advice");CloseModal();
             // Actual button callbacks: a first configuration, then immediate boarding and held reconfiguration.
             OpenBattle(0,"robot-input-fixture",17,false);battlePaused=true;
@@ -82,7 +97,7 @@ namespace ScrapGuard
             yield return Capture("robot-held-workshop");CloseModal();
             combat=null;Show("home");RobotHangar();yield return Capture("robot-hangar");
             Store.Change(e=>RobotAssembly.Showcase(e.State,1));Show("showcase");yield return Capture("robot-showcase");
-            Store.Change(e=>RobotAssembly.Showcase(e.State,0));CloseModal();Show("home");
+            Store.Change(e=>RobotAssembly.Showcase(e.State,0));CloseModal();PlayerPrefs.SetInt("scrapguard.robot.clear",priorView);Show("home");
         }
         IEnumerator AssaultSmokeRoutine()
         {

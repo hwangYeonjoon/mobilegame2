@@ -27,6 +27,8 @@ namespace ScrapGuard
             outline.effectColor=Accent(RobotAssembly.Frame(id));
             rankRing.gameObject.SetActive(level>=2);body.color=level==0?new Color(.84f,.88f,.88f,1):Color.white;
         }
+        public void SetBattleClarity(bool nearbyEnemy)
+        {var c=body.color;c.a=nearbyEnemy?.58f:1;body.color=c;outline.enabled=!nearbyEnemy;}
         public void Animate(float time,bool moving,float arrival=-1)
         {
             int frame=RobotAssembly.Frame(design);float cycle=Mathf.Sin(time*(frame==1?12:7));

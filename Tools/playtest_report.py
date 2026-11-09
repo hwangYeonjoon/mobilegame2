@@ -3,6 +3,7 @@ import argparse
 import collections
 import datetime as dt
 import json
+import statistics
 from pathlib import Path
 
 
@@ -20,6 +21,8 @@ def summarize(paths, as_of=None):
                 continue
             if event.get('id'):
                 people[participant][event['id']] = event
+    robot_samples = collections.defaultdict(lambda: collections.defaultdict(list))
+    discovery = collections.defaultdict(collections.Counter)
     counts = collections.Counter()
     groups = collections.defaultdict(set)
     gems_in = gems_out = 0
@@ -40,6 +43,13 @@ def summarize(paths, as_of=None):
                 cohort['frame_p95_ms'].append(event.get('value', 0))
             if event['kind'] == 'feedback' and event['subject'] == 'replay_interest':
                 cohort['replay_interest_responses'][str(event.get('number'))] += 1
+            robot_key = (event.get('version') or 'unknown') + ' / ' + (event.get('platform') or 'unknown') + ' / stage_' + str(event.get('number', 0))
+            if event['kind'] == 'robot_milestone' and event['subject'] in ('parts_ready', 'first_craft', 'first_board', 'first_specialized_board'):
+                value = event.get('value')
+                if isinstance(value, (int, float)) and 0 <= value <= 600:
+                    robot_samples[robot_key][event['subject']].append(value)
+            if event['kind'] == 'robot_discovery':
+                discovery[robot_key][event['subject']] += 1
             key = event['kind'] + ':' + event['subject']
             counts[key] += 1
             groups[key].add(participant)
@@ -68,12 +78,13 @@ def summarize(paths, as_of=None):
             'mean_machines_per_reported_run': sum(machines) / len(machines) if machines else None,
             'reported_p95_ms_range': [min(frames), max(frames)] if frames else None,
             'replay_interest_responses': dict(cohort['replay_interest_responses'])}
-    return {'combat_quality_by_build_platform': quality, 'participants': len(days), 'excluded_test_events': excluded,
+    robot_summary = {key: {name: {'observed_events': len(values), 'median_seconds': statistics.median(values), 'range_seconds': [min(values), max(values)]} for name, values in samples.items()} for key, samples in robot_samples.items()}
+    return {'robot_milestones_by_build_platform_stage': robot_summary, 'robot_discovery_events': {key: dict(values) for key, values in discovery.items()}, 'combat_quality_by_build_platform': quality, 'participants': len(days), 'excluded_test_events': excluded,
             'events': dict(counts), 'interested_participants': {k: len(v) for k, v in groups.items() if 'interest:' in k},
             'gems_earned': gems_in, 'gems_spent': gems_out,
             'battle_starts': dict(starts), 'battle_ends': dict(ends),
             'observed_retention': retention,
-            'limits': 'Opt-in sample; first observed day is not installation day. 14-day local retention, voluntary exports and consent changes can bias results. Interest is not a cash purchase; cosmetic_purchase uses game gems. Unfinished battles are not proven quits. Replay-interest responses are intentions, not measured retention; per-run p95 is capped at 250 ms and is not a population percentile.'}
+            'limits': 'Robot milestone times are observed event samples, not completion rates; missing samples do not prove failure. parts_ready means any uncrafted design, not a fixed bot target; observed at approximately 0.25-second intervals. An unprompted workshop open does not prove independent button discovery. Opt-in sample; first observed day is not installation day. 14-day local retention, voluntary exports and consent changes can bias results. Interest is not a cash purchase; cosmetic_purchase uses game gems. Unfinished battles are not proven quits. Replay-interest responses are intentions, not measured retention; per-run p95 is capped at 250 ms and is not a population percentile.'}
 
 if __name__ == '__main__':
     p = argparse.ArgumentParser(description=__doc__)
