@@ -25,7 +25,7 @@ namespace ScrapGuard.Core
             repairTimer-=dt;
             if(HasMod(4) && repairTimer<=0)
             {
-                repairTimer=10;Heal(MaxHp*.03f);Shield=Math.Max(Shield,MaxHp*.08f);
+                repairTimer=10;Heal(MaxHp*.03f,HealingSource.RepairMod);Shield=Math.Max(Shield,MaxHp*.08f);
                 Effects.Add(new BattleEffect{position=DronePosition,kind=6,text="수리 드론 +3%"});
             }
             turretTimer-=dt;

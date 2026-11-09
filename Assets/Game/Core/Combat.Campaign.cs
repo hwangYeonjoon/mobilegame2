@@ -90,8 +90,8 @@ namespace ScrapGuard.Core
                 {
                     e.windup-=dt;if(e.windup<=0){e.dash=.65f;e.attackFlash=.65f;}return;
                 }
-                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?190:240;}
-                else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=.8f;e.cooldown=4.5f;
+                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?(IntroBattle?145:190):240;}
+                else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=e.finalBoss&&IntroBattle?1.3f:.8f;e.cooldown=e.finalBoss&&IntroBattle?6f:4.5f;
                     if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat,DamageSource.Boss);
                     return;}
             }
@@ -100,14 +100,14 @@ namespace ScrapGuard.Core
                 if(distance<210)speed=distance<120?-e.speed*.5f:0;
                 if(e.cooldown<=0)
                 {
-                    e.cooldown=e.finalBoss?3:4.8f;e.attackFlash=.4f;
+                    e.cooldown=e.finalBoss?(Definition.Region==1?5f:3f):4.8f;e.attackFlash=.4f;
                     if(e.finalBoss && Definition.Region==5)
                     {
                         Warn(Position,0,1.5f,185,400,28,DamageCause.Electricity,DamageSource.Boss);
                         if(e.hp<e.maxHp*.5f)Warn(Position,0,1.9f,185,28,400,DamageCause.Electricity,DamageSource.Boss);
                     }
                     else Warn(Position,e.finalBoss?72:43,1.25f,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
-                    if(e.finalBoss && e.hp<e.maxHp*.5f)
+                    if(e.finalBoss && Definition.Region>1 && e.hp<e.maxHp*.5f)
                     { Warn(Position+new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss);Warn(Position-new V2(100,0),50,1.7f,130,0,0,DamageCause.Artillery,DamageSource.Boss); }
                 }
             }

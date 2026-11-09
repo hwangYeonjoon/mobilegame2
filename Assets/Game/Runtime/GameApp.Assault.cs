@@ -75,6 +75,7 @@ namespace ScrapGuard
             else if(combat.BossArenaWarning>0)message="보스 결전 "+Mathf.CeilToInt(combat.BossArenaWarning)+"초 · 주변 전투 구역 고정";
             else if(combat.WaveWarning>0)message="포위 접근 · "+BattleBearing(combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150)+" 열린 방향으로";
             else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
+            else if(combat.IntroBattle&&combat.BossArenaActive)message=combat.CanActivateMachine?"아래 합체 버튼으로 보스를 공격하세요":combat.CanUltimate?"필살기 준비 완료 · 오른쪽 아래 버튼을 누르세요":"공격은 자동 · 보스의 빨간 예고 밖으로 이동하세요";
             else if(combat.BossArenaActive)message="";
             else if(guideHint.gameObject.activeSelf)message=guideHint.text;
             else if(objectiveBearing.text.Length>0)message=objectiveBearing.text;

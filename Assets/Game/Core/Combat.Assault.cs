@@ -78,7 +78,7 @@ namespace ScrapGuard.Core
                 Hit(enemy,Damage*(enemy.kind>=2?4f:4.8f),true);
                 if(!enemy.finalBoss&&!enemy.core)enemy.position=Slide(enemy.position,(enemy.position-MachinePosition).Normal*30,15);
             }
-            if(FieldModule==3)Heal(MaxHp*.005f);
+            if(FieldModule==3)Heal(MaxHp*.005f,HealingSource.Machine);
             if(FieldModule==1||FieldModule==4)
             {
                 var target=Nearest(MachinePosition);
@@ -104,6 +104,13 @@ namespace ScrapGuard.Core
             if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return;}
             var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null)return;
             bossPattern++;BossPatterns++;
+            if(IntroBattle)
+            {
+                // Teach one readable shape at a time before introducing layered boss patterns.
+                if(bossPattern%2==1)Warn(Position,65,2.2f,180,0,0,DamageCause.Boss,DamageSource.Boss);
+                else Warn(Position,0,2.2f,180,400,30,DamageCause.Boss,DamageSource.Boss);
+                return;
+            }
             if(bossPattern%3==1)
             {
                 Warn(Position,65,1.5f,180,0,0,DamageCause.Boss,DamageSource.Boss);

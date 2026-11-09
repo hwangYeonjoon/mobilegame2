@@ -233,6 +233,35 @@ namespace ScrapGuard.Tests
             c.Enemies.Add(new Enemy{id=9999,kind=2,hp=10000,maxHp=10000,position=c.MachinePosition});c.Tick(.05f,new V2());
             Check(c.MachineDamage>=c.Damage*4&&c.DamageDuringMachine>=c.MachineDamage,"assembly delivers measured burst against a durable target");
         }
+        public static void IntroBossScopeAndLearning()
+        {
+            var state=GameState.New();var intro=new Combat(state,0,"intro",17);
+            Check(intro.IntroBattle,"first clear has a dedicated introduction");
+            state.tutorialCompleted=true;var repeat=new Combat(state,0,"repeat",17);
+            Check(!repeat.IntroBattle&&!new Combat(GameState.New(),6,"next").IntroBattle&&!new Combat(GameState.New(),0,"trial",17,false,SkillTrial.Mode).IntroBattle,"first-clear assistance cannot leak to replay, later stages or ranked trials");
+            foreach(var c in new[]{intro,repeat}){c.Elapsed=c.Duration-30;c.Tick(.05f,new V2());}
+            var firstBoss=intro.Enemies.Find(e=>e.finalBoss);var normalBoss=repeat.Enemies.Find(e=>e.finalBoss);
+            Check(firstBoss!=null&&normalBoss!=null&&firstBoss.maxHp<normalBoss.maxHp*.4f,"intro boss has lower fixed health rather than scaling to player gear");
+            for(int i=0;i<40;i++){if(intro.Choosing)intro.Choose(intro.Choices[0]);intro.Tick(.05f,new V2(1,0));}
+            Check(intro.Hazards.FindAll(h=>h.source==DamageSource.Boss).Count<=1,"intro teaches one warning shape at a time");
+            var a=new Combat(GameState.New(),0,"damage");a.Elapsed=30;
+            var b=new Combat(state,0,"damage");b.Elapsed=30;
+            foreach(var c in new[]{a,b}){c.Hazards.Add(new Hazard{position=c.Position,radius=60,damage=100,source=DamageSource.Boss});c.Tick(.05f,new V2());}
+            Check(Math.Abs(a.DamageReceived-45)<.01f&&Math.Abs(b.DamageReceived-60)<.01f,"intro and early campaign boss damage are explicit and nonzero");
+            Check(new Combat(state,6,"entry").RegionEntryThreat<new Combat(state,9,"later").RegionEntryThreat&&new Combat(state,17,"final").RegionEntryThreat==1,"new regional mechanics ramp within each region");
+        }
+        public static void HealingSourcesAndLowHealthTime()
+        {
+            var c=new Combat(GameState.New(),1,"healing");c.Elapsed=30;c.Hp=c.MaxHp*.25f;
+            c.Tick(.05f,new V2());Check(c.LowHealthSeconds>0,"low health is measured against current maximum health");
+            c.Pickups.Add(new Pickup{id=9000,position=c.Position,heal=true});c.Tick(.05f,new V2());
+            Check(c.HealingBySource[(int)HealingSource.Pickup]>0,"actual pickup recovery has a source");
+            c.Choosing=true;c.Choices=new[]{6};c.Choose(6);
+            Check(c.HealingBySource[(int)HealingSource.RepairSkill]>0,"maximum-health skill recovery is distinct from drops");
+            float sum=0;foreach(float h in c.HealingBySource)sum+=h;Check(Math.Abs(sum-c.HealingReceived)<.01f,"healing sources reconcile to actual healing");
+            c.Hp=c.MaxHp;float before=c.HealingReceived;c.Pickups.Add(new Pickup{id=9001,position=c.Position,heal=true});c.Tick(.05f,new V2());
+            Check(c.HealingReceived==before,"overhealing does not inflate recovery telemetry");
+        }
         public static void EquipmentGrowthAndFixedChallenge()
         {
             var s=GameState.New();int attack=Catalog.Attack(s),hp=Catalog.Health(s);

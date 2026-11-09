@@ -18,7 +18,7 @@ for (stage, loadout, policy, machine), rows in groups.items():
     values = dict(stage=stage, loadout=loadout, policy=policy, machine_enabled=machine, seeds=len(rows),
                   wins=sum(r['won'] for r in rows), early_deaths=sum(not r['won'] and r['seconds'] < 20 for r in rows),
                   budget_exhausted=sum(r['budget_exhausted'] for r in rows))
-    for key in ('seconds', 'hp', 'minHp', 'damageReceived', 'healing', 'openingDamage',
+    for key in ('seconds', 'hp', 'minHp', 'maxHp', 'lowHealthSeconds', 'damageReceived', 'healing', 'openingDamage',
                 'machines', 'machineUptime', 'machineDamageShare', 'machineKills', 'machineIntercepts', 'level'):
         present = [r[key] for r in rows if key in r]
         values[key + '_mean'] = round(statistics.mean(present), 3) if present else None
@@ -29,6 +29,10 @@ for (stage, loadout, policy, machine), rows in groups.items():
         damage = sum(r['damageBySource'][i] for r in rows)
         values[name + '_damage_mean'] = round(damage / len(rows), 3)
         values[name + '_damage_share'] = round(damage / total_damage, 4) if total_damage else 0
+    for i, name in enumerate(data.get('healingSources', [])):
+        values[name + '_healing_mean'] = round(statistics.mean(r['healingBySource'][i] for r in rows), 3)
+    if all('lowHealthSeconds' in r for r in rows):
+        values['low_health_time_fraction'] = round(sum(r['lowHealthSeconds'] for r in rows) / max(1, sum(r['seconds'] for r in rows)), 4)
     reached = [r for r in rows if r.get('bossReached', r['bossSeconds'] > 0)]
     boss_wins = [r for r in reached if r['won']]
     values['boss_reached'] = len(reached)

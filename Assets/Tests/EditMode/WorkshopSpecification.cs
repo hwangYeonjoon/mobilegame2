@@ -42,10 +42,10 @@ namespace ScrapGuard.Tests
         }
         public static void BattleDamageReport()
         {
-            var c=new Combat(GameState.New(),12,"damage");c.Position=c.Zones[0].Center;c.Shield=5;c.Hp=20;c.Elapsed=30;
+            var c=new Combat(GameState.New(),12,"damage");c.Position=c.Zones[0].Center;c.Shield=5;c.Hp=10;c.Elapsed=30;
             c.Tick(.05f,new V2());var report=c.Report();
             Check(c.Ended && report.cause==(int)DamageCause.Poison,"fatal source recorded");
-            Check(report.damage[(int)DamageCause.Poison]==20,"only actual HP lost, no shield or overkill");
+            Check(report.damage[(int)DamageCause.Poison]==10,"only actual HP lost, no shield or overkill");
             c.Abandon();Check(c.Report().cause==(int)DamageCause.Poison,"abandon cannot overwrite already ended cause");
             c=new Combat(GameState.New(),0,"boss");c.Enemies.Add(new Enemy{id=999,kind=3,finalBoss=true,hp=250,maxHp=1000});
             c.Elapsed=c.Duration-31;c.Tick(.05f,new V2());c.Abandon();

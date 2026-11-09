@@ -35,7 +35,7 @@ namespace ScrapGuard.Core
         {
             if(!CanChooseTask || choice<1 || choice>2)return false;
             TaskChoice=choice;
-            if(choice==1){Heal(MaxHp*.12f);CompleteTask();}
+            if(choice==1){Heal(MaxHp*.12f,HealingSource.FieldTask);CompleteTask();}
             else Effects.Add(new BattleEffect{position=TaskPosition,kind=7,text="과부하 회수 시작 · 20초를 버티세요"});
             return true;
         }

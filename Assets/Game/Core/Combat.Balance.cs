@@ -3,9 +3,15 @@ using System.Collections.Generic;
 namespace ScrapGuard.Core
 {
     public enum DamageSource { Unspecified, Contact, EnemyAttack, Terrain, Condition, Boss }
+    public enum HealingSource { Pickup, RepairSkill, FieldTask, RepairMod, Machine, MaxedBuild, Support }
     public sealed partial class Combat
     {
         readonly float[] damageBySource=new float[6];
+        readonly float[] healingBySource=new float[7];
+        public readonly bool IntroBattle;
+        public float RegionEntryThreat {get{return Challenge?1:.75f+.25f*Math.Min(1,(Stage%6)/3f);}}
+        public float LowHealthSeconds {get;private set;}
+        public float[] HealingBySource {get{return (float[])healingBySource.Clone();}}
         float areaHitRecovery,bossHitRecovery,enemyWarningRecovery;
         public float[] DamageBySource {get{return (float[])damageBySource.Clone();}}
         public float DamageDuringMachine {get;private set;}
@@ -70,9 +76,9 @@ namespace ScrapGuard.Core
             foreach(var enemy in Enemies)enemy.position=ClampBossPoint(enemy.position,enemy.Radius);
             Effects.Add(new BattleEffect{position=Position,kind=10,text="보스 결전 · 전투 구역 고정"});
         }
-        void Heal(float amount)
+        void Heal(float amount,HealingSource source)
         {
-            float actual=Math.Max(0,Math.Min(MaxHp-Hp,amount));HealingReceived+=actual;Hp+=actual;
+            float actual=Math.Max(0,Math.Min(MaxHp-Hp,amount));HealingReceived+=actual;healingBySource[(int)source]+=actual;Hp+=actual;
         }
         static readonly int[] EvolutionAttackIds={0,1,2,3,8,9,10};
         static int EvolutionSupport(int attack){return attack==0||attack==8?4:attack==1||attack==10?7:attack==2?6:attack==3?5:11;}

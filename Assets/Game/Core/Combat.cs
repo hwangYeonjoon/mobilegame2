@@ -43,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 16;
+        public const int RulesVersion = 17;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -104,6 +104,7 @@ namespace ScrapGuard.Core
             Zones=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Zones(Definition));
             if(Mode==SkillTrial.Mode)state=SkillTrial.Loadout();
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
+            IntroBattle=!Challenge&&stage==0&&!state.tutorialCompleted;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
             module = state.items.Find(i => i.id == state.equipped[2]).definition;
@@ -123,6 +124,7 @@ namespace ScrapGuard.Core
             Effects.Clear();
             if (Ended || Choosing) return;
             dt = Math.Max(0, Math.Min(.05f, dt)); Elapsed += dt;
+            if(Hp<MaxHp*.5f)LowHealthSeconds+=dt;
             areaHitRecovery=Math.Max(0,areaHitRecovery-dt);bossHitRecovery=Math.Max(0,bossHitRecovery-dt);enemyWarningRecovery=Math.Max(0,enemyWarningRecovery-dt);
             if(Challenge && Elapsed>=Duration) { Elapsed=Duration;Ended=true;Won=Hp>0;return; }
             LastMovement = movement;
@@ -162,7 +164,7 @@ namespace ScrapGuard.Core
                 bossTimer -= dt;
                 if (bossTimer <= 0)
                 {
-                    bossTimer = Challenge?3.2f:3.8f;
+                    bossTimer = Challenge?3.2f:IntroBattle?5f:3.8f;
                     BossPattern();
                 }
             }
@@ -193,7 +195,7 @@ namespace ScrapGuard.Core
         {
             V2 p=final&&BossArenaActive?BossArenaCenter+new V2(0,-190):SpawnPoint(kind>=2?360:330);
             float difficulty = (Challenge?2.12f:Definition.Difficulty) + Elapsed / Duration * .55f;
-            float hp = (kind == 3 ? (Challenge?7000:50000) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
+            float hp = (kind == 3 ? (Challenge?7000:IntroBattle?18000:50000) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
             var role=Challenge?EnemyRole.Pursuer:Definition.Enemies[random.Next(Definition.Enemies.Length)];
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
@@ -239,12 +241,13 @@ namespace ScrapGuard.Core
             if(!Challenge)
             {
                 bool area=source==DamageSource.EnemyAttack||source==DamageSource.Terrain||source==DamageSource.Condition;
-                if(source==DamageSource.Boss){if(bossHitRecovery>0)return;bossHitRecovery=.45f;}
+                if(source==DamageSource.Boss){if(bossHitRecovery>0)return;bossHitRecovery=IntroBattle?.8f:.45f;damage*=IntroBattle?.45f:.6f+.4f*Math.Min(1,Stage/18f);}
                 if(area&&areaHitRecovery>0)return;
                 if(area)areaHitRecovery=.55f;
                 if(source==DamageSource.Terrain)damage*=.35f;
                 else if(source==DamageSource.EnemyAttack)damage*=.8f*(1+Stage*.022f);
                 else if(source==DamageSource.Contact)damage*=1+Stage*.022f;
+                if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
                 if((area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }
             if(RiskActive)damage*=1.2f;
@@ -386,7 +389,7 @@ namespace ScrapGuard.Core
                 var p = Pickups[i]; float d = V2.Distance(Position, p.position);
                 if (d < radius) p.position += (Position - p.position).Normal * (300 * dt);
                 if (d > 18) continue;
-                if (p.heal) { Heal(MaxHp*(Challenge?.15f:.10f)); Effects.Add(new BattleEffect { position = Position, kind = 6, text = Challenge?"수리 +15%":"수리 +10%" }); }
+                if (p.heal) { Heal(MaxHp*(Challenge?.15f:.10f),HealingSource.Pickup); Effects.Add(new BattleEffect { position = Position, kind = 6, text = Challenge?"수리 +15%":"수리 +10%" }); }
                 else { GainExperience(p.xp); if(!Challenge)Salvage+=p.xp*(Skills[11]>0?2:1); }
                 Pickups.RemoveAt(i);
             }
@@ -395,7 +398,7 @@ namespace ScrapGuard.Core
         void OfferSkills()
         {
             var pool = new List<int>(); for (int i = 0; i < Skills.Length; i++) if (Skills[i] < 5) pool.Add(i);
-            if (pool.Count == 0) { Xp -= NeededXp; Level++; Heal(MaxHp*.1f); return; }
+            if (pool.Count == 0) { Xp -= NeededXp; Level++; Heal(MaxHp*.1f,HealingSource.MaxedBuild); return; }
             Choosing = true; Choices = new int[Math.Min(3, pool.Count)];
             if(Stage==0 && Level==1 && !Challenge && pool.Contains(1) && pool.Contains(2) && pool.Contains(3)){Choices=new[]{1,2,3};return;}
             if(Stage==0 && Level==2 && !Challenge && pool.Contains(0) && pool.Contains(4) && pool.Contains(5)){Choices=new[]{0,4,5};return;}
@@ -406,7 +409,7 @@ namespace ScrapGuard.Core
         {
             if (!Choosing || Array.IndexOf(Choices, skill) < 0 || Skills[skill] >= 5) return false;
             Xp -= NeededXp; Level++; Skills[skill]++;
-            if (skill == 6) { MaxHp *= 1.15f; Heal(MaxHp*.35f); }
+            if (skill == 6) { MaxHp *= 1.15f; Heal(MaxHp*.35f,HealingSource.RepairSkill); }
             Choosing = false; ResolveEvolution(); return true;
         }
         public bool UseUltimate()
@@ -442,7 +445,7 @@ namespace ScrapGuard.Core
         {
             if(!CanSupport)return false;
             SupportUsed=true;SupportTime=8;supportShot=0;
-            if(Support.hero==0)Heal(MaxHp*.25f);
+            if(Support.hero==0)Heal(MaxHp*.25f,HealingSource.Support);
             if(Support.hero==2) { Shield=Math.Max(Shield,MaxHp*.4f);ultimateGuard=8;shieldTimer=0; }
             return true;
         }
