@@ -6,7 +6,7 @@ class Program
 {
     static int Main(string[] args)
     {
-        if (args.Length>=2 && (args[0]=="--balance-audit"||args[0]=="--machine-audit"||args[0]=="--onboarding-audit"||args[0]=="--robot-audit"||args[0]=="--intro-robot-audit"||args[0]=="--ramp-robot-audit")) return BalanceAudit.Run(args[1],args.Length>2?int.Parse(args[2]):5,args[0]=="--machine-audit",args.Length>3?Array.ConvertAll(args[3].Split(','),s=>int.Parse(s)-1):null,args[0]=="--onboarding-audit",args[0]=="--robot-audit",args[0]=="--intro-robot-audit",args[0]=="--ramp-robot-audit");
+        if (args.Length>=2 && (args[0]=="--balance-audit"||args[0]=="--machine-audit"||args[0]=="--onboarding-audit"||args[0]=="--robot-audit"||args[0]=="--intro-robot-audit"||args[0]=="--ramp-robot-audit"||args[0]=="--boss-ramp-audit")) return BalanceAudit.Run(args[1],args.Length>2?int.Parse(args[2]):5,args[0]=="--machine-audit",args.Length>3?Array.ConvertAll(args[3].Split(','),s=>int.Parse(s)-1):null,args[0]=="--onboarding-audit",args[0]=="--robot-audit",args[0]=="--intro-robot-audit",args[0]=="--ramp-robot-audit",args[0]=="--boss-ramp-audit");
         if (args.Length==2 && args[0]=="--case") { CoreSpecification.Run(args[1]);Console.WriteLine("PASS "+args[1]);return 0; }
         if (args.Length==2 && args[0]=="--verify-replay") return VerifyRuntimeReplay(args[1]);
         if (Array.IndexOf(args, "--simulate") >= 0) return Simulate();

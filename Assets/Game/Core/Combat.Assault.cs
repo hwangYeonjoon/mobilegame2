@@ -92,12 +92,32 @@ namespace ScrapGuard.Core
         {
             if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return;}
             var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null)return;
+            if(BossLearningTier>0&&(boss.windup>0||boss.dash>0))return;
             bossPattern++;BossPatterns++;
-            if(IntroBattle)
+            if(BossLearningTier==1)
             {
                 // Teach one readable shape at a time before introducing layered boss patterns.
                 if(bossPattern%2==1)Warn(Position,65,2.2f,180,0,0,DamageCause.Boss,DamageSource.Boss);
                 else Warn(Position,0,2.2f,180,400,30,DamageCause.Boss,DamageSource.Boss);
+                return;
+            }
+            if(BossLearningTier>=2)
+            {
+                // Keep the familiar single target between new lessons. No low-HP layering.
+                int pattern=bossPattern%(BossLearningTier==2?2:3);
+                if(pattern==1)Warn(Position,65,1.9f,180,0,0,DamageCause.Boss,DamageSource.Boss);
+                else if(pattern==0&&BossLearningTier==3)
+                {
+                    // Six warnings and a wide escape opening before the full later-region ring.
+                    for(int i=2;i<8;i++)Warn(Position+V2.Angle(Facing+i*(float)Math.PI/4)*190,32,2.4f,150,0,0,DamageCause.Boss,DamageSource.Boss);
+                    Effects.Add(new BattleEffect{position=Position,kind=10,text="포위 예고 · 빈 방향으로 이동"});
+                }
+                else
+                {
+                    Warn(Position,0,1.9f,180,400,28,DamageCause.Boss,DamageSource.Boss);
+                    Warn(Position,0,2.9f,180,28,400,DamageCause.Boss,DamageSource.Boss);
+                    if(bossPattern==2)Effects.Add(new BattleEffect{position=Position,kind=10,text="십자 예고 · 첫 줄을 피한 뒤 이동"});
+                }
                 return;
             }
             if(bossPattern%3==1)

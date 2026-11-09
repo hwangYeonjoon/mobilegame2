@@ -43,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 20;
+        public const int RulesVersion = 21;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -164,7 +164,7 @@ namespace ScrapGuard.Core
                 bossTimer -= dt;
                 if (bossTimer <= 0)
                 {
-                    bossTimer = Challenge?3.2f:IntroBattle?5f:3.8f;
+                    bossTimer = Challenge?3.2f:BossPatternInterval;
                     BossPattern();
                 }
             }
@@ -195,7 +195,7 @@ namespace ScrapGuard.Core
         {
             V2 p=final&&BossArenaActive?BossArenaCenter+new V2(0,-190):SpawnPoint(kind>=2?360:330);
             float difficulty = (Challenge?2.12f:Definition.Difficulty) + Elapsed / Duration * .55f;
-            float hp = (kind == 3 ? (Challenge?7000:IntroBattle?18000:50000) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
+            float hp = (kind == 3 ? (Challenge?7000:BossBaseHealth) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
             var role=Challenge?EnemyRole.Pursuer:Definition.Enemies[random.Next(Definition.Enemies.Length)];
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
@@ -243,7 +243,7 @@ namespace ScrapGuard.Core
             if(!Challenge)
             {
                 bool area=source==DamageSource.EnemyAttack||source==DamageSource.Terrain||source==DamageSource.Condition;
-                if(source==DamageSource.Boss){if(bossHitRecovery>0)return;bossHitRecovery=IntroBattle?.8f:.45f;damage*=IntroBattle?.45f:.6f+.4f*Math.Min(1,Stage/18f);}
+                if(source==DamageSource.Boss){if(bossHitRecovery>0)return;bossHitRecovery=BossHitRecovery;damage*=BossDamageScale;}
                 if(area&&areaHitRecovery>0)return;
                 if(area)areaHitRecovery=.55f;
                 if(source==DamageSource.Terrain)damage*=.35f;
@@ -261,6 +261,7 @@ namespace ScrapGuard.Core
             float actual=Math.Min(Hp,Math.Max(0,damage-absorbed));
             if((int)cause>0 && (int)cause<damageTaken.Length)damageTaken[(int)cause]+=actual;
             DamageReceived+=actual;damageBySource[(int)source]+=actual;
+            if(source==DamageSource.Boss){if(cause==DamageCause.Contact||cause==DamageCause.Charge)BossContactDamage+=actual;else BossWarningDamage+=actual;}
             Hp -= damage - absorbed;MinimumHp=Math.Min(MinimumHp,Math.Max(0,Hp));
             Effects.Add(new BattleEffect { position = Position, text = "-" + (int)(damage - absorbed), kind = 1 });
             if (Hp <= 0) { Hp = 0; Ended = true; Won = false; endCause=cause; }

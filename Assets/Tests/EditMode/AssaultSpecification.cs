@@ -325,6 +325,65 @@ namespace ScrapGuard.Tests
             Check(Math.Abs(a.DamageReceived-45)<.01f&&Math.Abs(b.DamageReceived-60)<.01f,"intro and early campaign boss damage are explicit and nonzero");
             Check(new Combat(state,6,"entry").RegionEntryThreat<new Combat(state,9,"later").RegionEntryThreat&&new Combat(state,17,"final").RegionEntryThreat==1,"new regional mechanics ramp within each region");
         }
+        public static void EarlyBossLessonsAndDamageAccounting()
+        {
+            var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+            var pattern=typeof(Combat).GetMethod("BossPattern",flags);
+            var hurt=typeof(Combat).GetMethod("Hurt",flags);
+            foreach(int stage in new[]{1,3,5})
+            {
+                var state=GameState.New();state.tutorialCompleted=true;
+                var c=new Combat(state,stage,"lesson",17);
+                var boss=new Enemy{id=9000,kind=3,finalBoss=true,hp=1,maxHp=100000,position=c.Position+new V2(0,-190)};
+                c.Enemies.Add(boss);
+                for(int cycle=0;cycle<6;cycle++)
+                {
+                    c.Hazards.Clear();pattern.Invoke(c,null);
+                    int expected=stage==1?1:stage==3?(cycle%2==0?1:2):cycle%3==0?1:cycle%3==1?2:6;
+                    Check(c.Hazards.Count==expected,"low-health boss does not add unlearned layers at operation "+(stage+1));
+                    foreach(var h in c.Hazards)Check(h.delay>=1.9f&&h.source==DamageSource.Boss,"learning attacks retain readable boss warnings");
+                    if(expected==2)Check(c.Hazards[1].delay-c.Hazards[0].delay>=.99f,"cross sweep leaves a full second between lines");
+                }
+                c.Hazards.Clear();int count=c.BossPatterns;boss.windup=1;
+                pattern.Invoke(c,null);Check(c.Hazards.Count==0&&c.BossPatterns==count,"charge windup never stacks a new learning pattern");
+                boss.windup=0;boss.dash=.5f;pattern.Invoke(c,null);
+                Check(c.Hazards.Count==0,"charge movement never stacks a new learning pattern");
+                c.Enemies.Clear();
+                hurt.Invoke(c,new object[]{100f,DamageCause.Contact,DamageSource.Boss});
+                Check(c.BossContactDamage>0&&c.BossWarningDamage==0,"boss contact is not mislabeled as telegraph damage");
+                // Recovery is simulated, not bypassed, before the second source is observed.
+                for(int i=0;i<13;i++)c.Tick(.05f,new V2());
+                float contact=c.BossContactDamage;hurt.Invoke(c,new object[]{100f,DamageCause.Contact,DamageSource.Boss});
+                Check(c.BossContactDamage==contact,"operation 6 does not double contact frequency at the shared 0.65-second contact interval");
+                for(int i=0;i<7;i++)c.Tick(.05f,new V2());
+                hurt.Invoke(c,new object[]{100f,DamageCause.Boss,DamageSource.Boss});
+                Check(c.BossWarningDamage>0&&Math.Abs(c.BossContactDamage+c.BossWarningDamage-c.DamageBySource[(int)DamageSource.Boss])<.01f,"boss subtotals reconcile after mitigation and immunity");
+            }
+            var normal=GameState.New();normal.tutorialCompleted=true;
+            foreach(int stage in new[]{0,6,17,41})Check(new Combat(normal,stage,"normal").BossLearningTier==0,"later campaign and completed first operation retain normal rules");
+            Check(new Combat(GameState.New(),1,"trial",17,false,SkillTrial.Mode).BossLearningTier==0,"ranked mode has no campaign learning assistance");
+        }
+        public static void EarlyBossReplayRoundTrip()
+        {
+            foreach(int stage in new[]{1,3,5})
+            {
+                var state=GameState.New();state.tutorialCompleted=true;
+                state.heroes[0].level=10;foreach(var item in state.items)item.level=10;
+                var c=new Combat(state,stage,"early-replay",17);var record=new ReplayRecorder();
+                for(int frame=0;frame<12000&&!c.Ended;frame++)
+                {
+                    if(c.Choosing){int skill=c.Choices[0];c.Choose(skill);record.Choose(skill);}
+                    if(c.CanUltimate){c.UseUltimate();record.Ultimate();if(c.Ended)break;}
+                    if(c.CanActivateMachine){c.ActivateMachine();record.Machine();}
+                    V2 target=new V2(270+(float)Math.Cos(c.Elapsed*.055f)*240,510+(float)Math.Sin(c.Elapsed*.055f)*280);
+                    c.Tick(ReplayRecorder.Step,record.Move((target-c.Position).Normal));
+                }
+                Check(c.BossArenaActive&&c.BossPatterns>0,"replay exercises actual early boss patterns in operation "+(stage+1));
+                if(!c.Ended)c.Abandon();
+                var copy=ReplayRecorder.Verify(state,stage,"early-replay",17,record.Steps,600);
+                Check(copy.Won==c.Won&&copy.Hp==c.Hp&&copy.Kills==c.Kills&&copy.BossPatterns==c.BossPatterns&&copy.BossContactDamage==c.BossContactDamage&&copy.BossWarningDamage==c.BossWarningDamage,"early lesson replay and damage accounting match");
+            }
+        }
         public static void HealingSourcesAndLowHealthTime()
         {
             var c=new Combat(GameState.New(),1,"healing");c.Elapsed=30;c.Hp=c.MaxHp*.25f;

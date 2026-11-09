@@ -9,6 +9,16 @@ namespace ScrapGuard.Core
         readonly float[] damageBySource=new float[6];
         readonly float[] healingBySource=new float[7];
         public readonly bool IntroBattle;
+        // Campaign operations 2/4/6 extend the introduction without changing ranked rules.
+        // Stage is zero-based; the first-clear-only introduction remains separate.
+        public int BossLearningTier {get{return Challenge?0:IntroBattle?1:Stage>=1&&Stage<=5?(Stage<=1?1:Stage<=3?2:3):0;}}
+        float BossBaseHealth {get{return IntroBattle?18000:BossLearningTier==1?24000:BossLearningTier==2?32000:BossLearningTier==3?36000:50000;}}
+        float BossPatternInterval {get{return BossLearningTier==1?5f:BossLearningTier==2?4.6f:BossLearningTier==3?4.2f:3.8f;}}
+        float BossHitRecovery {get{return BossLearningTier==1?.8f:BossLearningTier==2?.7f:BossLearningTier==3?.7f:.45f;}}
+        float BossDamageScale {get{return BossLearningTier==1?.45f:BossLearningTier==2?.52f:BossLearningTier==3?.56f:.6f+.4f*Math.Min(1,Stage/18f);}}
+        float BossChargeSpeed {get{return BossLearningTier==1?145:BossLearningTier==2?160:BossLearningTier==3?170:190;}}
+        float BossChargeWindup {get{return BossLearningTier==1?1.3f:BossLearningTier==2?1.15f:BossLearningTier==3?1f:.8f;}}
+        float BossChargeRecovery {get{return BossLearningTier==1?6f:BossLearningTier==2?5.5f:BossLearningTier==3?5f:4.5f;}}
         public float RegionEntryThreat {get{return Challenge?1:.75f+.25f*Math.Min(1,(Stage%6)/3f);}}
         public float LowHealthSeconds {get;private set;}
         public float[] HealingBySource {get{return (float[])healingBySource.Clone();}}
@@ -19,6 +29,8 @@ namespace ScrapGuard.Core
         public int MachineKills {get;private set;}
         public int MachineIntercepts {get;private set;}
         public int BossPatterns {get;private set;}
+        public float BossContactDamage {get;private set;}
+        public float BossWarningDamage {get;private set;}
         public int PeakEnemyWarnings {get;private set;}
         static DamageSource ResolveDamageSource(DamageSource source,DamageCause cause)
         {

@@ -16,7 +16,7 @@ namespace ScrapGuard.Editor
         public static void Capture()
         {
             string folder="TestResults/RuntimeAudit-"+AppRelease.Build;Directory.CreateDirectory(folder);
-            foreach(int stage in new[]{0,5,17,29,41,4})foreach(int seed in new[]{1,17,71})
+            foreach(int stage in new[]{0,1,3,5,17,29,41,4})foreach(int seed in new[]{1,17,71})
             {
                 var state=GameState.New();state.heroes[0].level=30;foreach(var item in state.items){item.level=20;item.rarity=2;}
                 var c=new Combat(state,stage,"editor-probe-"+stage+"-"+seed,seed,false,stage==4?SkillTrial.Mode:"");var input=new ReplayRecorder();

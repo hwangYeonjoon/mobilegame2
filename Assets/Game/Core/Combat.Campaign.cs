@@ -90,8 +90,8 @@ namespace ScrapGuard.Core
                 {
                     e.windup-=dt;if(e.windup<=0){e.dash=.65f;e.attackFlash=.65f;}return;
                 }
-                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?(IntroBattle?145:190):240;}
-                else if(e.cooldown<=0 && distance<330){e.direction=direction;e.windup=e.finalBoss&&IntroBattle?1.3f:.8f;e.cooldown=e.finalBoss&&IntroBattle?6f:4.5f;
+                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?BossChargeSpeed:240;}
+                else if(e.cooldown<=0 && distance<330 && !(e.finalBoss&&BossLearningTier>0&&Hazards.Exists(h=>h.source==DamageSource.Boss))){e.direction=direction;e.windup=e.finalBoss?BossChargeWindup:.8f;e.cooldown=e.finalBoss?BossChargeRecovery:4.5f;
                     if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat,DamageSource.Boss);
                     return;}
             }
