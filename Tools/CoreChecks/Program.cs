@@ -6,6 +6,10 @@ class Program
 {
     static int Main(string[] args)
     {
+        if(args.Length==1&&args[0]=="--purchase-audit-checks")return PurchaseAuditChecks.Run();
+        if(args.Length>=2&&args[0]=="--purchase-audit")return PurchaseAudit.Run(args[1],args.Length>2?int.Parse(args[2]):3,args.Length>3?int.Parse(args[3]):14,args.Length>4?int.Parse(args[4]):42,args.Length>5?int.Parse(args[5]):6,args.Length>6?args[6]:null);
+        if(args.Length==2&&args[0]=="--purchase-study-profiles")return PurchaseAudit.StudyProfiles(args[1]);
+        if(args.Length==3&&args[0]=="--purchase-study-clone")return PurchaseAudit.StudyClone(args[1],args[2]);
         if(args.Length==3&&args[0]=="--trace-replay"){var d=System.Text.Json.JsonSerializer.Deserialize<RuntimeProbe>(System.IO.File.ReadAllText(args[1]),new System.Text.Json.JsonSerializerOptions{IncludeFields=true});ScrapGuard.Editor.ReplayDiagnostic.Trace(d.state,d.stage,d.id,d.seed,d.mode,d.steps,args[2]);return 0;}
         if(args.Length==1&&args[0]=="--growth-audit-checks")return GrowthAuditChecks.Run();
         if(args.Length>=2&&args[0]=="--growth-audit")return GrowthAudit.Run(args[1],args.Length>2?int.Parse(args[2]):5,args.Length>3?int.Parse(args[3]):13,args.Length>4?int.Parse(args[4]):4);

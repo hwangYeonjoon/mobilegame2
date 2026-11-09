@@ -23,5 +23,7 @@
     <Compile Include="BalanceAudit.cs" />
     <Compile Include="GrowthAudit.cs" />
     <Compile Include="GrowthAuditChecks.cs" />
+    <Compile Include="PurchaseAudit.cs" />
+    <Compile Include="PurchaseAuditChecks.cs" />
   </ItemGroup>
 </Project>

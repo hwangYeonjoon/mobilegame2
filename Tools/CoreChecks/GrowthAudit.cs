@@ -24,6 +24,7 @@ static class GrowthAudit
     internal sealed class Entry
     {
         public int sequence,stage,attempt;public string action,target;public Wallet before,after,delta;
+        public int paidBefore,paidAfter;public string serviceDate;
     }
     internal sealed class Quote
     {
@@ -56,14 +57,14 @@ static class GrowthAudit
         equipped=s.equipped.Select((id,slot)=>{var i=s.items.Find(x=>x.id==id);return new Gear{slot=slot,definition=i.definition,name=Catalog.Items[i.definition].Name,rarity=i.rarity,level=i.level};}).ToArray()};
     internal static bool Act(Economy e,Journey j,int stage,int attempt,string action,string target,Func<CommandResult> command)
     {
-        var before=Funds(e.State);var result=command();var after=Funds(e.State);
+        var before=Funds(e.State);int paidBefore=e.State.paidGems;var result=command();var after=Funds(e.State);
         if(!result.Success)
         {
-            if(before.gold!=after.gold||before.parts!=after.parts||before.gems!=after.gems)throw new Exception("Rejected action changed wallet: "+action);
+            if(before.gold!=after.gold||before.parts!=after.parts||before.gems!=after.gems||paidBefore!=e.State.paidGems)throw new Exception("Rejected action changed wallet: "+action);
             return false;
         }
         if(after.gold<0||after.parts<0||after.gems<0)throw new Exception("Negative economic balance");
-        j.ledger.Add(new Entry{sequence=j.ledger.Count+1,stage=stage+1,attempt=attempt,action=action,target=target,before=before,after=after,delta=Delta(before,after)});
+        j.ledger.Add(new Entry{sequence=j.ledger.Count+1,stage=stage+1,attempt=attempt,action=action,target=target,before=before,after=after,delta=Delta(before,after),paidBefore=paidBefore,paidAfter=e.State.paidGems,serviceDate=e.State.serviceDate});
         return true;
     }
     static CommandResult Upgrade(Economy e,int slot)=>slot==3?e.UpgradeHero():e.Upgrade(e.State.equipped[slot]);
