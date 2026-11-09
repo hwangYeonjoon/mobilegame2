@@ -9,11 +9,12 @@ namespace ScrapGuard.Editor
             if (!assetPath.StartsWith("Assets/Resources/Art/")) return;
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Default;
+            importer.textureShape = TextureImporterShape.Texture2D;
             importer.alphaSource = TextureImporterAlphaSource.FromInput;
             importer.alphaIsTransparency = true; importer.mipmapEnabled = false;
             importer.npotScale = TextureImporterNPOTScale.None; importer.isReadable = false;
             importer.filterMode = FilterMode.Bilinear; importer.wrapMode = TextureWrapMode.Clamp;
-            importer.maxTextureSize = assetPath.Contains("SalvageMachine")?512:assetPath.Contains("ContinuousFloor")?1024:2048;
+            importer.maxTextureSize = (assetPath.Contains("SalvageMachine")||assetPath.Contains("RobotFrame-"))?512:assetPath.Contains("ContinuousFloor")?1024:2048;
             if(assetPath.Contains("ContinuousFloor")){importer.textureType=TextureImporterType.Default;importer.wrapMode=TextureWrapMode.Mirror;} importer.textureCompression = TextureImporterCompression.Uncompressed;
             var android = importer.GetPlatformTextureSettings("Android");
             android.overridden = true; android.maxTextureSize = CompactAndroidAtlas(assetPath)?1024:importer.maxTextureSize;

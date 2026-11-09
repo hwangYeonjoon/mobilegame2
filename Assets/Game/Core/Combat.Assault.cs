@@ -21,8 +21,8 @@ namespace ScrapGuard.Core
         public bool ActivateMachine(int design=0)
         {
             if(design==0)design=MachineDesign;
-            if(!RobotAssembly.Valid(design)||!CanActivateMachine)return false;
-            Salvage-=MachineCost;MachinesBuilt++;MachineTime=10;MachineRecovery=50;machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,45),20),24);
+            if(!RobotAvailable(design)||!CanActivateMachine)return false;
+            Salvage-=MachineCost;MachinesBuilt++;MachineTime=RobotDuration(design);MachineRecovery=MachineTime+(RobotRank(design)>0?30:40);machineShot=0;MachinePosition=ClampWorld(Slide(Position,new V2(0,45),20),24);
             BeginRobot(design);
             for(int i=Hazards.Count-1;i>=0;i--)if(Hazards[i].source==DamageSource.EnemyAttack&&V2.Distance(Hazards[i].position,Position)<230){Hazards.RemoveAt(i);MachineIntercepts++;}
             Effects.Add(new BattleEffect{position=Position,kind=10,text=RobotAssembly.Name(MachineDesign)+" 합체!"});return true;

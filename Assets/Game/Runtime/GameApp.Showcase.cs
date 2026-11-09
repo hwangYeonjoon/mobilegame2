@@ -42,7 +42,7 @@ namespace ScrapGuard
             {
                 var orbit=CombatRing.Create(stage,230,Ui.Hex("C89BFF"),.02f);orbit.anchoredPosition=new Vector2(228,-132);
             }
-            if(RobotAssembly.Valid(p.robotDesign))RobotRigView.Draw(stage,100,3,255,p.robotDesign);
+            if(RobotAssembly.Valid(p.robotDesign))RobotRigView.Draw(stage,100,3,255,p.robotDesign,p.robotRank);
             else {var art=CharacterArt.Draw(stage,80,p.theme==0?4:-6,296,p.theme==0?253:226,p.hero,p.skin,p.outfit);art.gameObject.AddComponent<ShowroomMotion>();}
             Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?RobotAssembly.Name(p.robotDesign):StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
             Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?"전투에서 직접 조립한 로봇":"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);

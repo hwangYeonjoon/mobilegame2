@@ -28,6 +28,7 @@ namespace ScrapGuard
         }
         void RenderPlayerMotion()
         {
+            playerArt.enabled=combat.MachineTime<=0;
             float moving = Mathf.Clamp01(combat.LastMovement.Length);
             float stride = Mathf.Sin(combat.Elapsed*17)*moving;
             float recoil = combat.ShotFlash/.11f;

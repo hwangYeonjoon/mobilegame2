@@ -9,15 +9,15 @@ using ScrapGuard.Core;
 // Deterministic bot comparison, not human difficulty/performance evidence.
 static class BalanceAudit
 {
-    public static int Run(string output,int seedCount=5,bool machineComparison=false,int[] stages=null,bool onboarding=false)
+    public static int Run(string output,int seedCount=5,bool machineComparison=false,int[] stages=null,bool onboarding=false,bool robots=false)
     {
-        var completed=new List<(int index,object row)>();var jobs=new List<(int index,int stage,int growth,string policy,bool machineEnabled,int seed)>();if(seedCount<1||seedCount>100)throw new ArgumentOutOfRangeException(nameof(seedCount));
+        var completed=new List<(int index,object row)>();var jobs=new List<(int index,int stage,int growth,string policy,bool machineEnabled,int seed,int robot)>();if(seedCount<1||seedCount>100)throw new ArgumentOutOfRangeException(nameof(seedCount));
         var seeds=new List<int>();int[] original={17,41,71,91,123};for(int i=0;i<seedCount;i++)seeds.Add(i<5?original[i]:127+(i-5)*37);
         stages=onboarding?new[]{0}:stages??(machineComparison?new[]{0,17,41}:new[]{0,5,17,29,41});
         if(stages.Length==0||stages.Any(s=>s<0||s>=Campaign.Count))throw new ArgumentOutOfRangeException(nameof(stages));
         foreach(int stage in stages.Distinct())foreach(int growth in onboarding?new[]{0}:machineComparison?new[]{1}:new[]{0,1,2})
-        foreach(string policy in onboarding?new[]{"natural_legacy","natural_no_buttons","natural_random","avoid_hazards"}:machineComparison?new[]{"avoid_hazards"}:new[]{"ignore_hazards","avoid_hazards"})foreach(bool machineEnabled in machineComparison?new[]{true,false}:new[]{true})foreach(int seed in seeds)
-            jobs.Add((jobs.Count,stage,growth,policy,machineEnabled,seed));
+        foreach(string policy in onboarding?new[]{"natural_legacy","natural_no_buttons","natural_random","avoid_hazards"}:machineComparison?new[]{"avoid_hazards"}:new[]{"ignore_hazards","avoid_hazards"})foreach(bool machineEnabled in machineComparison?new[]{true,false}:new[]{true})foreach(int seed in seeds)foreach(int robot in robots?new[]{1,5,9}:new[]{0})
+            jobs.Add((jobs.Count,stage,growth,policy,machineEnabled,seed,robot));
         Parallel.ForEach(jobs,new ParallelOptions{MaxDegreeOfParallelism=2},job=>
         {
             int stage=job.stage,growth=job.growth,seed=job.seed;string policy=job.policy;bool natural=policy.StartsWith("natural_"),buttons=policy!="natural_no_buttons",avoid=policy=="avoid_hazards",machineEnabled=job.machineEnabled;var choiceRandom=new Random(seed+4096);
@@ -34,13 +34,14 @@ static class BalanceAudit
                 if(c.Choosing){int choice=c.Choices[0];if(natural){if(policy=="natural_random")choice=c.Choices[choiceRandom.Next(c.Choices.Length)];else foreach(int preferred in new[]{1,8,0,2,3,9,4,5,10,7,11,6})if(Array.IndexOf(c.Choices,preferred)>=0){choice=preferred;break;}}c.Choose(choice);record.Choose(choice);}
                 if(c.CanChooseTask){c.ChooseTask(1);record.Encounter(1);}
                 if(c.CanAssemble){c.Assemble(2);record.Assemble(2);}
+                if(buttons&&machineEnabled&&job.robot>0&&c.CanPlanRobot(job.robot,true)){c.PlanRobot(job.robot,true);record.RobotPlan(job.robot,true);}
                 if(buttons&&machineEnabled&&c.CanActivateMachine&&(c.Enemies.Count>=8||!natural&&c.FinalBossActive))
                 {c.ActivateMachine();record.Machine();if(firstMachine<0)firstMachine=c.Elapsed;}
                 if(buttons&&c.CanUltimate&&(c.Enemies.Count>=12||!natural&&c.FinalBossActive)){c.UseUltimate();record.Ultimate();if(c.Ended)break;}
                 c.Tick(ReplayRecorder.Step,record.Move(natural?NaturalMove(c):Move(c,avoid)));peak=Math.Max(peak,c.Enemies.Count);if(c.Elapsed<=20)openingDamage=c.DamageReceived;
             }
             bool exhausted=!c.Ended;if(exhausted)c.Abandon();
-            var row=new {stage=stage+1,seed,loadout=growth==0?"fresh":growth==1?"assumed_progression":"advanced_sensitivity",machineEnabled=machineEnabled&&buttons,policy,
+            var row=new {stage=stage+1,seed,robot=job.robot,rank=job.robot==0?0:c.RobotRank(job.robot),partsSpent=c.RobotPartsSpent,plansBuilt=c.RobotPlansBuilt,loadout=growth==0?"fresh":growth==1?"assumed_progression":"advanced_sensitivity",machineEnabled=machineEnabled&&buttons,policy,
                 attack=Catalog.Attack(state),health=Catalog.Health(state),duration=c.Duration,seconds=c.Elapsed,won=c.Won,budget_exhausted=exhausted,
                 kills=c.Kills,level=c.Level,peakEnemies=peak,hp=c.Hp,maxHp=c.MaxHp,minHp=c.MinimumHp,
                 openingDamage,lowHealthSeconds=c.LowHealthSeconds,healingBySource=c.HealingBySource,damageBySource=c.DamageBySource,damageByCause=c.Report().damage,peakEnemyWarnings=c.PeakEnemyWarnings,damageReceived=c.DamageReceived,healing=c.HealingReceived,hazardHits=c.HazardHits,hazardDamage=c.HazardDamageReceived,
@@ -55,7 +56,7 @@ static class BalanceAudit
         var rows=completed.OrderBy(x=>x.index).Select(x=>x.row).ToArray();
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)));
         File.WriteAllText(output,JsonSerializer.Serialize(new {kind="automated_simulation_not_human",rules=Combat.RulesVersion,
-            seedCount,machineComparison,onboarding,healingSources=Enum.GetNames(typeof(HealingSource)),damageSources=Enum.GetNames(typeof(DamageSource)),
+            seedCount,machineComparison,onboarding,robots,healingSources=Enum.GetNames(typeof(HealingSource)),damageSources=Enum.GetNames(typeof(DamageSource)),
             notes="Paired fixed seeds per cell. Assumed and advanced progression are sensitivity profiles, not a measured player economy. Machine on/off paths may diverge. No HP, enemies, clock or skills injected during runs.",rows},new JsonSerializerOptions{WriteIndented=true}));
         return 0;
     }

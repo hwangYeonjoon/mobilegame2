@@ -46,7 +46,7 @@ namespace ScrapGuard
         void ResearchPanel()
         {
             var card=Dialog("플레이 테스트 기록","기록은 이 기기에만 저장됩니다. 자동 전송하지 않아요.",860);
-            Ui.Label(card,"선택 동의 시 화면 이동, 전투 결과, 보석 증감,\\n의상 관심도와 전투 프레임을 기록합니다.\\n이름·계정 코드·광고 식별자는 기록하지 않아요.\\n최근 14일, 최대 2,000건을 보관합니다.".Replace("\\n","\n"),24,140,444,133,16,Ui.Muted);
+            Ui.Label(card,"선택 동의 시 화면 이동, 전투 결과, 보석 증감,\\n의상 관심도·로봇 조립 선택·전투 프레임을 기록합니다.\\n이름·계정 코드·광고 식별자는 기록하지 않아요.\\n최근 14일, 최대 2,000건을 보관합니다.".Replace("\\n","\n"),24,140,444,133,16,Ui.Muted);
             Ui.Button(card,research.Data.consent?"기록 켜짐 · 끄기":"기록 꺼짐 · 동의하고 켜기",24,300,444,53,()=>{research.Consent(!research.Data.consent);if(research.Data.consent)Track("session","start");ResearchPanel();},Ui.Mint,true,17);
             Ui.Label(card,"저장된 기록 "+research.Data.events.Count+"건\n전투 중 느린 프레임 "+slowFrames+" / "+frameSamples,24,374,444,62,16,Ui.Muted);
             Ui.Button(card,"기록 파일 내보내기",24,465,444,52,()=>{

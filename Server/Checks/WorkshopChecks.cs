@@ -47,7 +47,8 @@ static class WorkshopChecks
                 int choice=combat.Choices[0];foreach(int skill in new[]{0,5,1,7,2,3,4,6})if(Array.IndexOf(combat.Choices,skill)>=0){choice=skill;break;}
                 recorder.Choose(choice);combat.Choose(choice);
             }
-            if(combat.CanActivateMachine){int design=1+combat.MachinesBuilt%9;combat.ActivateMachine(design);recorder.Machine(design);}
+            int design=1+combat.MachinesBuilt%9;if(combat.CanPlanRobot(design,true)){combat.PlanRobot(design,true);recorder.RobotPlan(design,true);}
+            if(combat.CanActivateMachine){combat.ActivateMachine();recorder.Machine();}
             if(combat.CanUltimate){recorder.Ultimate();combat.UseUltimate();}
             var target=new V2(270+(float)Math.Cos(combat.Elapsed*.4f)*160,490+(float)Math.Sin(combat.Elapsed*.4f)*210);
             combat.Tick(ReplayRecorder.Step,recorder.Move((target-combat.Position).Normal));
@@ -62,10 +63,13 @@ static class WorkshopChecks
         repo.Apply(a,command);check(Workshop.Region(repo.Bootstrap(a).state,0).blueprints==receipt.blueprints,"settlement retry cannot duplicate blueprints");
         var robots=settled.state.robotRecords;
         check(robots.Count>0&&robots.Sum(r=>r.builds)==combat.MachinesBuilt,"server settles replay-authorized robot collection");
+        check(robots.All(r=>r.rank==combat.RobotReport().Find(x=>x.design==r.design).rank),"blueprint completion rank comes from replay, not submitted state");
         check(repo.Bootstrap(a).state.robotRecords.Sum(r=>r.builds)==combat.MachinesBuilt,"settlement retry cannot duplicate constructed robots");
         var chosen=Apply(a,new GameCommand("robot_showcase"){stage=robots[0].design});
         check(Social.Build(chosen.state).robotDesign==robots[0].design,"built robot is exposed through public profile");
-        check(new GameRepository(path,()=>now).Bootstrap(a).state.showcaseRobot==robots[0].design,"robot choice survives repository restart");
+        var restarted=new GameRepository(path,()=>now).Bootstrap(a).state;
+        check(restarted.showcaseRobot==robots[0].design,"robot choice survives repository restart");
+        check(restarted.robotRecords.All(r=>r.rank==robots.Find(x=>x.design==r.design).rank),"blueprint completion ranks survive persistence");
         Apply(a,new GameCommand("guild_create"){value="개조 수호대"});Apply(b,new GameCommand("guild_join"){value=repo.Guild(a).code});Apply(b,new GameCommand("guild_support"){enabled=true,hero=0});
         var state=repo.Bootstrap(b).state;state.publicProfile=true;state.attendanceCount=7;state.showcaseTitle=2;state.ownedCosmetics.Add(Workshop.SkinKey(0));state.selectedSkin=3;Fixture(bb.playerId,state);
         var publicRun=Apply(a,new GameCommand("battle_start"){supportId=bb.playerId});

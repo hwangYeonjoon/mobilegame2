@@ -12,7 +12,7 @@ namespace ScrapGuard.Core
     {
         public string id, name;
         public int hero, heroLevel, title, frame, skin, outfit, attack, health, kills, stages, attendance, likes;
-        public int theme, robotDesign;
+        public int theme, robotDesign, robotRank;
         public int coreBest, trophy = -1;
         public bool local, test, liked;
         public List<ShowcaseItem> items = new List<ShowcaseItem>();
@@ -89,7 +89,7 @@ namespace ScrapGuard.Core
         {
             Normalize(s);RobotAssembly.Normalize(s);
             var p = new PublicProfile { id = id, name = s.displayName, hero = s.showcaseHero, heroLevel = s.heroes[s.showcaseHero].level,
-                robotDesign=s.showcaseRobot,theme=s.showcaseTheme, title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
+                robotDesign=s.showcaseRobot,robotRank=s.robotRecords.Find(r=>r.design==s.showcaseRobot)?.rank??0,theme=s.showcaseTheme, title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
                 attendance = s.attendanceCount, local = local, test = s.testProgress };
             for (int slot = 0; slot < 3; slot++)
             {

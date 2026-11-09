@@ -234,6 +234,16 @@ namespace ScrapGuard.Tests
             combat=new Combat(GameState.New(),0,ticket.id,1,false,"",ticket.GetSupport());
             Assert.That(combat.Support.power,Is.EqualTo(130));
         }
+        [TestCase("artillery")]
+        [TestCase("walker")]
+        [TestCase("fortress")]
+        public void RobotArtworkIsLoadableAs2DTexture(string frame)
+        {
+            var texture=Resources.Load<Texture2D>("Art/RobotFrame-"+frame+"-v1");
+            Assert.That(texture,Is.Not.Null,"A cubemap cannot be loaded by the runtime sprite renderer.");
+            Assert.That(texture.width,Is.LessThanOrEqualTo(512));
+            Assert.That(ArenaArt.Cell("RobotFrame-"+frame+"-v1",1,1,0,0),Is.Not.Null);
+        }
         [Test]
         public void FontContainsKoreanGlyphs()
         {

@@ -12,7 +12,7 @@ namespace ScrapGuard
         {
             public string kind="automated_fresh_loadout_not_human",clip;
             public float[] damageBySource,healingBySource;public float lowHealthSeconds;public int machineKills,machineIntercepts;public float bossSeconds;public float hazardDamageReceived;public float machineActiveSeconds,machineDamage,damageDealt,damageReceived,healingReceived,minimumHp,firstEvolutionSeconds;public int hazardHits;
-            public int robotDesign;public int seed,kills,peakEnemies,bestThreeSecondKills,machines,frames;
+            public int robotDesign,robotRank,plansBuilt,partsSpent;public float firstSpecialized=-1;public int seed,kills,peakEnemies,bestThreeSecondKills,machines,frames;
             public float seconds,firstMachine=-1,hp;
             public bool won;
         }
@@ -55,10 +55,12 @@ namespace ScrapGuard
                     }
                     if(combat.CanChooseTask){combat.ChooseTask(1);recorder.Encounter(1);}
                     if(combat.CanAssemble){combat.Assemble(2);recorder.Assemble(2);}
+                    int planned=1+(runIndex-1)*4;if(combat.CanPlanRobot(planned,true)){combat.PlanRobot(planned,true);recorder.RobotPlan(planned,true);}
                     if(combat.CanActivateMachine&&combat.Enemies.Count>=8)
                     {
-                        int design=1+(runIndex-1)*4;combat.ActivateMachine(design);recorder.Machine(design);evidence.robotDesign=design;
-                        if(evidence.firstMachine<0){evidence.firstMachine=combat.Elapsed;captureStart=frame;}
+                        combat.ActivateMachine();recorder.Machine();evidence.robotDesign=combat.MachineDesign;
+                        if(evidence.firstMachine<0)evidence.firstMachine=combat.Elapsed;
+                        if(evidence.firstSpecialized<0&&combat.RobotRank(combat.MachineDesign)>0){evidence.firstSpecialized=combat.Elapsed;captureStart=frame;}
                     }
                     if(combat.CanUltimate&&combat.Enemies.Count>=12){combat.UseUltimate();recorder.Ultimate();if(combat.Ended)break;}
                     combat.Tick(ReplayRecorder.Step,recorder.Move(NaturalMovement()));
@@ -79,6 +81,7 @@ namespace ScrapGuard
                     if(frame%300==0)File.WriteAllText(Path.Combine(smokeOutput,"progress.txt"),"run="+runIndex+" seconds="+combat.Elapsed+" kills="+combat.Kills+" frame="+frame);
                 }
                 if(!combat.Ended)combat.Abandon();
+                evidence.robotRank=combat.RobotRank(evidence.robotDesign);evidence.plansBuilt=combat.RobotPlansBuilt;evidence.partsSpent=combat.RobotPartsSpent;
                 evidence.kills=combat.Kills;evidence.seconds=combat.Elapsed;evidence.machines=combat.MachinesBuilt;evidence.hp=combat.Hp;evidence.won=combat.Won;
                 evidence.damageBySource=combat.DamageBySource;evidence.healingBySource=combat.HealingBySource;evidence.lowHealthSeconds=combat.LowHealthSeconds;evidence.machineKills=combat.MachineKills;evidence.machineIntercepts=combat.MachineIntercepts;evidence.bossSeconds=combat.BossCombatSeconds;evidence.hazardDamageReceived=combat.HazardDamageReceived;evidence.machineActiveSeconds=combat.MachineActiveSeconds;evidence.machineDamage=combat.MachineDamage;evidence.damageDealt=combat.DamageDealt;evidence.damageReceived=combat.DamageReceived;evidence.healingReceived=combat.HealingReceived;evidence.minimumHp=combat.MinimumHp;evidence.hazardHits=combat.HazardHits;evidence.firstEvolutionSeconds=combat.FirstEvolutionSeconds;
                 File.WriteAllText(Path.Combine(folder,"evidence.json"),JsonUtility.ToJson(evidence,true));

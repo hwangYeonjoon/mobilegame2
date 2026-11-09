@@ -4,7 +4,7 @@ namespace ScrapGuard.Core
 {
     [Serializable] public sealed class RobotRecord
     {
-        public int design, builds, kills, stage;
+        public int design, builds, kills, stage, rank;
         public float damage;
     }
     public static class RobotAssembly
@@ -20,8 +20,9 @@ namespace ScrapGuard.Core
         public static string Detail(int id)
         {
             string body=Frame(id)==0?"느리게 이동 · 먼 적에게 범위 포격":Frame(id)==1?"빠르게 이동 · 주변 적을 밟아 돌파":"중장 이동 · 근접 충격파와 피해 감소";
-            return body+"\n"+(Support(id)==0?"보조 포신: 관통탄 추가":Support(id)==1?"보조 구동부: 속도·범위 증가":"보조 장갑: 합체 시 보호막");
+            return body+"\n"+(Support(id)==0?"보조 포신: 3갈래 관통탄":Support(id)==1?"보조 구동부: 속도·범위 증가":"보조 장갑: 탑승 시 소형 보호막");
         }
+        public static int PartFor(Enemy enemy){return enemy.salvagePart>=0?enemy.salvagePart:PartFor(enemy.role);}
         public static int PartFor(EnemyRole role){return role==EnemyRole.Artillery||role==EnemyRole.Bomber?0:role==EnemyRole.Shield||role==EnemyRole.Summoner?2:1;}
         public static void Normalize(GameState s)
         {
@@ -40,7 +41,7 @@ namespace ScrapGuard.Core
                 if(!Valid(run.design)||run.builds<=0)continue;
                 var record=s.robotRecords.Find(r=>r.design==run.design);
                 if(record==null){record=new RobotRecord{design=run.design};s.robotRecords.Add(record);}
-                record.builds+=run.builds;record.kills+=run.kills;record.damage+=run.damage;record.stage=Math.Max(record.stage,stage+1);
+                record.builds+=run.builds;record.kills+=run.kills;record.damage+=run.damage;record.stage=Math.Max(record.stage,stage+1);record.rank=Math.Max(record.rank,run.rank);
             }
         }
     }
@@ -48,23 +49,54 @@ namespace ScrapGuard.Core
     {
         readonly int[] robotParts=new int[3],partProgress=new int[3],robotBuilds=new int[9],robotKills=new int[9];
         readonly float[] robotDamage=new float[9];
-        public int MachineDesign {get;private set;}=RobotAssembly.DefaultDesign;
-        public int MachineRecoveredParts {get;private set;}
-        public int[] RobotParts {get{return (int[])robotParts.Clone();}}
-        public float MachineSpeed {get{return MachineTime<=0?1:(RobotAssembly.Frame(MachineDesign)==0?.65f:RobotAssembly.Frame(MachineDesign)==1?1.1f:.75f)+(RobotAssembly.Support(MachineDesign)==1?.15f:0);}}
-        public int RecoveredFor(int design)
+        readonly int[] robotRanks=new int[9],robotBestRank=new int[9];
+        public bool RobotPlanned {get;private set;}
+        public int RobotPartsSpent {get;private set;}
+        public int RobotPlansBuilt {get;private set;}
+        public float MachineActiveDuration {get;private set;}=10;
+        public int RobotRank(int design){return RobotAssembly.Valid(design)?robotRanks[design-1]:0;}
+        public bool RobotAvailable(int design){return RobotAssembly.Valid(design)&&(design==RobotAssembly.DefaultDesign||RobotRank(design)>0);}
+        public int[] RobotRecipe(int design)
         {
-            if(!RobotAssembly.Valid(design))return 0;int a=RobotAssembly.Frame(design),b=RobotAssembly.Support(design);
-            return a==b?Math.Min(2,robotParts[a]):Math.Min(1,robotParts[a])+Math.Min(1,robotParts[b]);
+            var cost=new int[3];if(!RobotAssembly.Valid(design)||RobotRank(design)>=2)return cost;
+            cost[RobotAssembly.Frame(design)]+=RobotRank(design)==0?3:5;cost[RobotAssembly.Support(design)]+=RobotRank(design)==0?1:3;return cost;
         }
+        public bool CanPlanRobot(int design,bool upgrade)
+        {
+            if(Challenge||Ended||Choosing||MachineTime>0||!RobotAssembly.Valid(design))return false;
+            if(!upgrade)return RobotAvailable(design);if(RobotRank(design)>=2)return false;
+            var cost=RobotRecipe(design);for(int i=0;i<3;i++)if(robotParts[i]<cost[i])return false;return true;
+        }
+        public bool PlanRobot(int design,bool upgrade)
+        {
+            if(!CanPlanRobot(design,upgrade))return false;
+            if(upgrade){var cost=RobotRecipe(design);for(int i=0;i<3;i++){robotParts[i]-=cost[i];RobotPartsSpent+=cost[i];}robotRanks[design-1]++;RobotPlansBuilt++;}
+            MachineDesign=design;RobotPlanned=true;return true;
+        }
+        public float RobotDuration(int design)
+        {int rank=RobotRank(design);return rank==0?10:10+rank*4+(Elapsed>=Duration*.6f?4:0);}
+        public float RobotDamageReduction {get{return MachineTime>0&&RobotAssembly.Frame(MachineDesign)==2&&RobotRank(MachineDesign)>0?.15f:0;}}
+        public int MachineDesign {get;private set;}=RobotAssembly.DefaultDesign;
+        public int[] RobotParts {get{return (int[])robotParts.Clone();}}
+        public float MachineSpeed {get{return MachineTime<=0?1:(RobotAssembly.Frame(MachineDesign)==0?.65f:RobotAssembly.Frame(MachineDesign)==1?1.1f:.75f)+(RobotRank(MachineDesign)>0&&RobotAssembly.Support(MachineDesign)==1?.15f:0);}}
         public List<RobotRecord> RobotReport()
         {
-            var result=new List<RobotRecord>();for(int i=0;i<9;i++)if(robotBuilds[i]>0)result.Add(new RobotRecord{design=i+1,builds=robotBuilds[i],kills=robotKills[i],damage=robotDamage[i]});return result;
+            var result=new List<RobotRecord>();for(int i=0;i<9;i++)if(robotBuilds[i]>0)result.Add(new RobotRecord{design=i+1,builds=robotBuilds[i],kills=robotKills[i],damage=robotDamage[i],rank=robotBestRank[i]});return result;
+        }
+        int robotSpawnSerial;
+        int NextCarrierPart()
+        {
+            if(Challenge||Elapsed<25)return -1;
+            robotSpawnSerial++;if(robotSpawnSerial%24!=0)return -1;
+            bool cannon=!Array.Exists(Definition.Enemies,r=>r==EnemyRole.Artillery||r==EnemyRole.Bomber);
+            bool armor=!Array.Exists(Definition.Enemies,r=>r==EnemyRole.Shield||r==EnemyRole.Summoner);
+            if(cannon&&armor)return (robotSpawnSerial/24)%2==0?0:2;
+            return cannon?0:armor?2:-1;
         }
         void RecoverRobotPart(Enemy enemy)
         {
-            if(Challenge)return;int type=RobotAssembly.PartFor(enemy.role);
-            partProgress[type]+=enemy.kind>=2?12:enemy.role==EnemyRole.Pursuer?1:3;
+            if(Challenge)return;int type=RobotAssembly.PartFor(enemy);
+            partProgress[type]+=enemy.kind>=2||enemy.salvagePart>=0?12:enemy.role==EnemyRole.Pursuer?1:3;
             if(partProgress[type]<12)return;partProgress[type]-=12;
             // Merge pickups before adding more objects to a crowded battlefield.
             var existing=Pickups.Find(p=>p.part==type);
@@ -73,18 +105,17 @@ namespace ScrapGuard.Core
         }
         void BeginRobot(int design)
         {
-            MachineDesign=design;MachineRecoveredParts=RecoveredFor(design);
-            int a=RobotAssembly.Frame(design),b=RobotAssembly.Support(design);
-            if(robotParts[a]>0)robotParts[a]--;if(robotParts[b]>0)robotParts[b]--;
-            robotBuilds[design-1]++;
-            if(b==2)Shield=Math.Max(Shield,MaxHp*.18f);
+            MachineDesign=design;RobotPlanned=true;
+            robotBuilds[design-1]++;robotBestRank[design-1]=Math.Max(robotBestRank[design-1],RobotRank(design));
+            MachineActiveDuration=RobotDuration(design);
+            if(RobotRank(design)>0&&RobotAssembly.Support(design)==2)Shield=Math.Max(Shield,Math.Min(90,MaxHp*.06f));
             MachinePosition=Position;
         }
         void UpdateRobotAttack()
         {
             int frame=RobotAssembly.Frame(MachineDesign),support=RobotAssembly.Support(MachineDesign);
-            float quality=1+MachineRecoveredParts*.15f;
-            float radius=(frame==0?100:frame==1?165:190)+(support==1?25:0)+(FieldModule==2?35:0);
+            int rank=RobotRank(MachineDesign);float quality=rank==0?1:1+rank*.15f;
+            float radius=(frame==0?100:frame==1?165:190)+(rank>0&&support==1?35:0)+(FieldModule==2?35:0);
             V2 center=Position;
             if(frame==0)
             {
@@ -97,11 +128,16 @@ namespace ScrapGuard.Core
                 Hit(enemy,Damage*power*quality,true);
                 if(!enemy.finalBoss&&!enemy.core)enemy.position=Slide(enemy.position,(enemy.position-Position).Normal*(frame==2?65:35),15);
             }
-            if(FieldModule==3)Heal(MaxHp*.005f,HealingSource.Machine);
-            if(support==0||FieldModule==1||FieldModule==4)
+            if(FieldModule==3)Heal(MaxHp*.003f,HealingSource.Machine);
+            if(rank>0&&support==0||FieldModule==1||FieldModule==4)
             {
                 var target=Nearest(Position);
-                if(target!=null)Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=(target.position-Position).Normal*600,damage=Damage*2*quality,life=1.2f,pierce=8,mod=true,machine=true,robotDesign=MachineDesign});
+                if(target!=null)
+                {
+                    var direction=(target.position-Position).Normal;int count=rank>0&&support==0?3:1;
+                    for(int i=0;i<count;i++){float angle=count==1?0:(i-1)*.14f;var shot=new V2(direction.x*(float)Math.Cos(angle)-direction.y*(float)Math.Sin(angle),direction.x*(float)Math.Sin(angle)+direction.y*(float)Math.Cos(angle));
+                    Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=shot*600,damage=Damage*(count==1?2:.8f)*quality,life=1.2f,pierce=8,mod=true,machine=true,robotDesign=MachineDesign});}
+                }
             }
             Effects.Add(new BattleEffect{position=center,kind=frame==0?11:4,radius=radius});
         }

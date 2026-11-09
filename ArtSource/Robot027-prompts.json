@@ -1,0 +1,22 @@
+{
+  "generator": "built-in image_gen",
+  "reference": "Assets/Resources/Art/SalvageMachine-v1.png",
+  "outputs": [
+    {
+      "key": "artillery",
+      "prompt": "Use case: stylized-concept. Asset type: finished transparent 2D mobile survival game robot sprite, square canvas. Primary request: A squat tracked artillery siege robot, broad low chassis with heavy articulated tank treads, a large twin howitzer turret angled forward, two unmistakably long gun barrels, compact cyan targeting lamps. NO legs, NO humanoid face, NO saw arms. Reference image supplied is ONLY a palette and scrapyard material reference, do not reproduce its silhouette. Style: polished high-detail pixel art with deliberate crisp pixel clusters, not smooth 3D rendering; industrial salvage machinery, warm worn ochre painted metal, charcoal steel, restrained glowing reactor. Orthographic three-quarter top-down game view, facing down toward viewer, full body completely inside frame with 10% transparent margin, no cropping, centered, no platform or cast ground shadow. Each component should look integrated and mechanically believable; distinctive beautiful collectible hero machine. Lighting from upper left, readable at 160px. No text, labels, border, background, UI, people or watermark. Single robot only. True transparent alpha background.",
+      "asset": "Assets/Resources/Art/RobotFrame-artillery-v1.png"
+    },
+    {
+      "key": "walker",
+      "prompt": "Use case: stylized-concept. Asset type: finished transparent 2D mobile survival game robot sprite, square canvas. Primary request: An agile four-legged demolition walker robot. Four separate articulated hydraulic legs with wide mechanical feet, compact suspended central cockpit, two forward rotary saw arms, mint reactor. NO tank treads, NO cannon barrels, NO large shields. Strong open spaces between its four legs. Reference image supplied is ONLY a palette and scrapyard material reference, do not reproduce its silhouette. Style: polished high-detail pixel art with deliberate crisp pixel clusters, not smooth 3D rendering; industrial salvage machinery, warm worn ochre painted metal, charcoal steel, restrained glowing reactor. Orthographic three-quarter top-down game view, facing down toward viewer, full body completely inside frame with 10% transparent margin, no cropping, centered, no platform or cast ground shadow. Each component should look integrated and mechanically believable; distinctive beautiful collectible hero machine. Lighting from upper left, readable at 160px. No text, labels, border, background, UI, people or watermark. Single robot only. True transparent alpha background.",
+      "asset": "Assets/Resources/Art/RobotFrame-walker-v1.png"
+    },
+    {
+      "key": "fortress",
+      "prompt": "Use case: stylized-concept. Asset type: finished transparent 2D mobile survival game robot sprite, square canvas. Primary request: A massive upright defensive robot with two short sturdy legs, extremely broad overlapping armored shoulders and two huge curved shield forearms. Amber reactor slit and rugged layered scrap steel. NO tank treads, NO cannon barrels, NO saw arms. Unmistakable wide shield silhouette. Reference image supplied is ONLY a palette and scrapyard material reference, do not reproduce its silhouette. Style: polished high-detail pixel art with deliberate crisp pixel clusters, not smooth 3D rendering; industrial salvage machinery, warm worn ochre painted metal, charcoal steel, restrained glowing reactor. Orthographic three-quarter top-down game view, facing down toward viewer, full body completely inside frame with 10% transparent margin, no cropping, centered, no platform or cast ground shadow. Each component should look integrated and mechanically believable; distinctive beautiful collectible hero machine. Lighting from upper left, readable at 160px. No text, labels, border, background, UI, people or watermark. Single robot only. True transparent alpha background.",
+      "asset": "Assets/Resources/Art/RobotFrame-fortress-v1.png"
+    }
+  ],
+  "referenceArchived": "ArtSource/Archive/Pre027/SalvageMachine-v1.png"
+}

@@ -22,7 +22,8 @@ namespace ScrapGuard
                 for(int frame=0;frame<6000&&!run.Ended;frame++)
                 {
                     if(run.Choosing){int skill=run.Choices[0];foreach(int candidate in run.Choices)if(candidate>=8){skill=candidate;break;}run.Choose(skill);input.Choose(skill);}
-                    if(run.CanActivateMachine){int design=1+run.MachinesBuilt%9;run.ActivateMachine(design);input.Machine(design);}
+                    int design=1+run.MachinesBuilt%9;if(run.CanPlanRobot(design,true)){run.PlanRobot(design,true);input.RobotPlan(design,true);}
+                    if(run.CanActivateMachine){run.ActivateMachine();input.Machine();}
                 if(run.CanUltimate){run.UseUltimate();input.Ultimate();if(run.Ended)break;}
                     var target=new V2(270+Mathf.Cos(run.Elapsed*.06f)*450,490+Mathf.Sin(run.Elapsed*.06f)*600);
                     run.Tick(ReplayRecorder.Step,input.Move((target-run.Position).Normal));
@@ -42,14 +43,34 @@ namespace ScrapGuard
             {
                 OpenBattle(0,"robot-frame-fixture-"+id,17,false);battlePaused=true;
                 combat.Pickups.Add(new Pickup{id=9000,position=combat.Position,xp=40});
-                for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9100+part,position=combat.Position,part=part,partCount=2});
+                for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9100+part,position=combat.Position,part=part,partCount=12});
                 combat.Tick(.05f,new V2());if(combat.Choosing)combat.Choose(combat.Choices[0]);
-                combat.ActivateMachine(id);
+                combat.PlanRobot(id,true);combat.PlanRobot(id,true);combat.ActivateMachine(id);
                 for(int n=0;n<32;n++)combat.Enemies.Add(new Enemy{id=10000+n,position=combat.Position+V2.Angle(n*.8f)*(100+n*7),hp=5000,maxHp=5000});
                 for(int frame=0;frame<45;frame++){if(combat.Choosing)combat.Choose(combat.Choices[0]);combat.Tick(ReplayRecorder.Step,new V2(.3f,.1f));}
                 RenderBattle();yield return Capture("robot-frame-"+id);
                 var records=combat.RobotReport();Store.Change(e=>{RobotAssembly.Record(e.State,records,0);return CommandResult.Ok("Isolated robot visual fixture");});
             }
+            // Actual button callbacks: a first configuration, then immediate boarding and held reconfiguration.
+            OpenBattle(0,"robot-input-fixture",17,false);battlePaused=true;
+            for(int part=0;part<3;part++)combat.Pickups.Add(new Pickup{id=9400+part,position=combat.Position,part=part,partCount=12});
+            combat.Pickups.Add(new Pickup{id=9450,position=combat.Position,xp=40});combat.Tick(.05f,new V2());while(combat.Choosing)combat.Choose(combat.Choices[0]);
+            RobotAssembler(1);yield return Capture("robot-recipe-ready");
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text=="회수 부품으로 특화형 제작"){button.onClick.Invoke();break;}
+            if(combat.RobotRank(1)!=1)smokeErrors.Add("Robot upgrade button did not spend parts");
+            yield return Capture("robot-specialized-ready");
+            foreach(var button in modal.GetComponentsInChildren<UnityEngine.UI.Button>())if(button.GetComponentInChildren<UnityEngine.UI.Text>().text.StartsWith("탑승 ·")){button.onClick.Invoke();break;}
+            if(battlePaused||combat.MachineTime<=0)smokeErrors.Add("Configured robot did not board");
+            // Fresh ready state preserves selected plan, without advancing or altering a live user's run.
+            OpenBattle(0,"robot-quick-fixture",17,false);battlePaused=false;CloseModal();
+            combat.Pickups.Add(new Pickup{id=9500,position=combat.Position,xp=40});combat.Tick(.05f,new V2());while(combat.Choosing)combat.Choose(combat.Choices[0]);combat.PlanRobot(5,false);
+            TriggerMachine();if(battlePaused||combat.MachineTime<=0)smokeErrors.Add("Quick press opened a menu instead of boarding");
+            RenderBattle();yield return Capture("robot-quick-board");
+            OpenBattle(0,"robot-hold-fixture",17,false);battlePaused=false;CloseModal();combat.PlanRobot(5,false);RenderBattle();
+            var hold=machineButton.GetComponent<RobotInputButton>();var pointer=new UnityEngine.EventSystems.PointerEventData(UnityEngine.EventSystems.EventSystem.current);
+            hold.OnPointerDown(pointer);yield return new WaitForSecondsRealtime(.55f);hold.OnPointerUp(pointer);hold.Click();
+            if(!battlePaused||combat.MachineTime>0)smokeErrors.Add("Held press did not exclusively open the assembly menu");
+            yield return Capture("robot-held-workshop");CloseModal();
             combat=null;Show("home");RobotHangar();yield return Capture("robot-hangar");
             Store.Change(e=>RobotAssembly.Showcase(e.State,1));Show("showcase");yield return Capture("robot-showcase");
             Store.Change(e=>RobotAssembly.Showcase(e.State,0));CloseModal();Show("home");

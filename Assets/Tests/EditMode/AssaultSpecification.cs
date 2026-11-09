@@ -233,29 +233,36 @@ namespace ScrapGuard.Tests
             c.Enemies.Add(new Enemy{id=9999,kind=2,hp=10000,maxHp=10000,position=c.MachinePosition});c.Tick(.05f,new V2());
             Check(c.MachineDamage>=c.Damage*4&&c.DamageDuringMachine>=c.MachineDamage,"assembly delivers measured burst against a durable target");
         }
+        static void RobotFixtureParts(Combat c,int quantity)
+        {
+            for(int i=0;i<3;i++)c.Pickups.Add(new Pickup{id=9100+i,position=c.Position,part=i,partCount=quantity});
+            c.Pickups.Add(new Pickup{id=9200,position=c.Position,xp=40});c.Tick(.05f,new V2());while(c.Choosing)c.Choose(c.Choices[0]);
+        }
         public static void RobotPartsAndDistinctFrames()
         {
-            Check(RobotAssembly.PartFor(EnemyRole.Artillery)==0&&RobotAssembly.PartFor(EnemyRole.Charger)==1&&RobotAssembly.PartFor(EnemyRole.Shield)==2,"enemy functions map to useful recovered parts");
             for(int id=1;id<=9;id++)
             {
-                var c=new Combat(GameState.New(),1,"robot",17);
-                c.Pickups.Add(new Pickup{id=9000,position=c.Position,xp=40});
-                c.Pickups.Add(new Pickup{id=9001,position=c.Position,part=RobotAssembly.Frame(id),partCount=2});
-                c.Tick(.05f,new V2());if(c.Choosing)c.Choose(c.Choices[0]);
-                int before=c.Salvage;Check(!c.ActivateMachine(99)&&c.Salvage==before,"invalid design never consumes resources");
-                Check(c.ActivateMachine(id)&&c.MachineDesign==id,"all nine combinations activate from ordinary salvage");
-                Check(c.MachineRecoveredParts==(RobotAssembly.Frame(id)==RobotAssembly.Support(id)?2:1),"matching parts consumed atomically, duplicate slots need two parts");
-                Check(!c.ActivateMachine(id),"no repeated activation during transformation");
-                float sum=0;foreach(int n in c.RobotParts)sum+=n;Check(sum==2-c.MachineRecoveredParts,"recovered-part stock reconciles");
-                if(RobotAssembly.Support(id)==2)Check(c.Shield>0,"armor attachment grants its shield");
-                if(RobotAssembly.Frame(id)==0)Check(c.MachineSpeed<1,"artillery trades movement for reach");
-                if(RobotAssembly.Frame(id)==1)Check(c.MachineSpeed>1,"walker changes actual movement");
-                Check(c.RobotReport().Count==1&&c.RobotReport()[0].design==id,"actual construction appears in battle report");
+                var c=new Combat(GameState.New(),1,"robot",17);int before=c.Salvage;
+                Check(!c.PlanRobot(id,true)&&!c.ActivateMachine(id)&&c.Salvage==before,"missing parts cannot manufacture or spend salvage");
+                RobotFixtureParts(c,12);var recipe=c.RobotRecipe(id);int[] stock=c.RobotParts;
+                Check(c.PlanRobot(id,true)&&c.RobotRank(id)==1,"recovered parts complete a persistent specialized design");
+                for(int i=0;i<3;i++)Check(c.RobotParts[i]==stock[i]-recipe[i],"both slots consume required stock exactly once");
+                Check(c.PlanRobot(id,true)&&c.RobotRank(id)==2&&!c.PlanRobot(id,true),"completed design has a bounded upgrade path");
+                var remaining=c.RobotParts;Check(c.ActivateMachine(id),"crafted design can be boarded");
+                for(int i=0;i<3;i++)Check(c.RobotParts[i]==remaining[i],"boarding never repeatedly consumes blueprint parts");
+                Check(!c.PlanRobot(id,false)&&!c.PlanRobot(id,true),"cannot alter a running machine");
+                Check(c.MachineTime==18&&c.RobotReport()[0].rank==2,"completion extends run time and persists in report");
+                if(RobotAssembly.Frame(id)==2)Check(c.RobotDamageReduction<=.15f&&c.Shield<=90,"longer fortress uptime has bounded defense");
             }
-            var cannon=new Combat(GameState.New(),1,"range");cannon.Pickups.Add(new Pickup{id=8000,position=cannon.Position,xp=40});cannon.Tick(.05f,new V2());if(cannon.Choosing)cannon.Choose(cannon.Choices[0]);
-            cannon.Enemies.Clear();var target=new Enemy{id=9999,position=cannon.Position+new V2(420,0),hp=100000,maxHp=100000};cannon.Enemies.Add(target);
-            cannon.ActivateMachine(1);cannon.Tick(.05f,new V2());Check(cannon.MachineDamage>0,"cannon hits beyond former melee aura range");
-            var trial=new Combat(GameState.New(),4,"fair",17,false,SkillTrial.Mode);Check(!trial.ActivateMachine(1),"assembled robots cannot enter fixed-condition competition");
+            Check(RobotAssembly.PartFor(new Enemy{role=EnemyRole.Charger,salvagePart=0})==0,"marked carriers make missing regional parts recoverable without replacing enemy combat roles");
+            var basic=new Combat(GameState.New(),0,"basic");basic.Pickups.Add(new Pickup{id=7000,position=basic.Position,xp=40});basic.Tick(.05f,new V2());while(basic.Choosing)basic.Choose(basic.Choices[0]);
+            Check(basic.PlanRobot(5,false)&&basic.ActivateMachine(),"basic walker remains available without recovered parts");
+            Check(!basic.RobotAvailable(1),"artillery cannot be used merely by requesting its number");
+            var c2=new Combat(GameState.New(),0,"late");RobotFixtureParts(c2,12);c2.PlanRobot(1,true);c2.PlanRobot(1,true);c2.Elapsed=c2.Duration*.65f;
+            Check(c2.RobotDuration(1)==22,"late battle extends completed robot without infinite uptime");
+            var target=new Enemy{id=9999,position=c2.Position+new V2(420,0),hp=100000,maxHp=100000};c2.Enemies.Clear();c2.Enemies.Add(target);c2.ActivateMachine(1);c2.Tick(.05f,new V2());Check(c2.MachineDamage>0,"cannon retains long reach");
+            var trial=new Combat(GameState.New(),4,"fair",17,false,SkillTrial.Mode);Check(!trial.PlanRobot(1,true)&&!trial.ActivateMachine(1),"fixed competition remains isolated until its own rules are validated");
+            var fresh=new Combat(GameState.New(),0,"new-run");Check(fresh.RobotRank(1)==0&&!fresh.RobotAvailable(1),"crafted power never carries to next run");
         }
         public static void RobotReplayAndCollection()
         {
@@ -264,15 +271,19 @@ namespace ScrapGuard.Tests
             for(int frame=0;frame<6000&&!c.Ended;frame++)
             {
                 if(c.Choosing){int skill=c.Choices[0];c.Choose(skill);r.Choose(skill);}
-                if(c.CanActivateMachine){int id=c.MachinesBuilt%3==0?1:c.MachinesBuilt%3==1?5:9;Check(c.ActivateMachine(id),"configured machine activation");r.Machine(id);}
+                int desired=c.MachinesBuilt%3==0?1:c.MachinesBuilt%3==1?5:9;
+                if(c.CanPlanRobot(desired,true)){c.PlanRobot(desired,true);r.RobotPlan(desired,true);}
+                if(c.CanActivateMachine){Check(c.ActivateMachine(),"configured machine activation");r.Machine();}
                 if(c.CanUltimate){c.UseUltimate();r.Ultimate();if(c.Ended)break;}
                 c.Tick(ReplayRecorder.Step,r.Move(V2.Angle(c.Elapsed*.15f)));
             }
             if(!c.Ended)c.Abandon();var copy=ReplayRecorder.Verify(state,0,"robot-replay",17,r.Steps,220);
             Check(c.MachinesBuilt>=2&&c.MachinesBuilt==copy.MachinesBuilt&&c.Hp==copy.Hp&&c.Kills==copy.Kills,"different robot designs reproduce on server");
             var report=c.RobotReport();var replay=copy.RobotReport();Check(report.Count==replay.Count,"replay preserves constructed designs");
-            for(int i=0;i<report.Count;i++)Check(report[i].damage==replay[i].damage&&report[i].kills==replay[i].kills,"per-design damage and kills reconcile");
+            for(int i=0;i<report.Count;i++)Check(report[i].rank==replay[i].rank&&report[i].damage==replay[i].damage&&report[i].kills==replay[i].kills,"per-design damage and kills reconcile");
             bool denied=false;try{ReplayRecorder.Verify(state,0,"bad",17,new System.Collections.Generic.List<ReplayStep>{new ReplayStep{frames=1,robot=2}},1);}catch(ArgumentException){denied=true;}Check(denied,"design attached to movement cannot bypass input validation");
+            foreach(var forged in new[]{new ReplayStep{robotPlan=1,robotUpgrade=true},new ReplayStep{robotPlan=5,frames=1},new ReplayStep{robotUpgrade=true,frames=1},new ReplayStep{robotPlan=5,machine=true}})
+            {bool rejected=false;try{ReplayRecorder.Verify(GameState.New(),0,"forged",17,new System.Collections.Generic.List<ReplayStep>{forged},1);}catch(ArgumentException){rejected=true;}Check(rejected,"forged or mixed blueprint input rejected");}
             var fresh=GameState.New();Check(!RobotAssembly.Showcase(fresh,1).Success,"unbuilt robots cannot be publicly equipped");
             RobotAssembly.Record(fresh,report,0);Check(RobotAssembly.Showcase(fresh,report[0].design).Success,"real constructions unlock exhibition");
             Check(Social.Build(fresh).robotDesign==report[0].design,"public profile exposes chosen assembly");

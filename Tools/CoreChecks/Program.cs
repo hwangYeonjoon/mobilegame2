@@ -6,7 +6,7 @@ class Program
 {
     static int Main(string[] args)
     {
-        if (args.Length>=2 && (args[0]=="--balance-audit"||args[0]=="--machine-audit"||args[0]=="--onboarding-audit")) return BalanceAudit.Run(args[1],args.Length>2?int.Parse(args[2]):5,args[0]=="--machine-audit",args.Length>3?Array.ConvertAll(args[3].Split(','),s=>int.Parse(s)-1):null,args[0]=="--onboarding-audit");
+        if (args.Length>=2 && (args[0]=="--balance-audit"||args[0]=="--machine-audit"||args[0]=="--onboarding-audit"||args[0]=="--robot-audit")) return BalanceAudit.Run(args[1],args.Length>2?int.Parse(args[2]):5,args[0]=="--machine-audit",args.Length>3?Array.ConvertAll(args[3].Split(','),s=>int.Parse(s)-1):null,args[0]=="--onboarding-audit",args[0]=="--robot-audit");
         if (args.Length==2 && args[0]=="--case") { CoreSpecification.Run(args[1]);Console.WriteLine("PASS "+args[1]);return 0; }
         if (args.Length==2 && args[0]=="--verify-replay") return VerifyRuntimeReplay(args[1]);
         if (Array.IndexOf(args, "--simulate") >= 0) return Simulate();
@@ -33,7 +33,8 @@ class Program
         var trace=new Combat(data.state,data.stage,data.id,data.seed,false,data.mode);int at=0;
         foreach(var step in data.steps)
         {
-            if(step.machine){if(!trace.ActivateMachine(step.robot))throw new Exception("Invalid machine input");}
+            if(step.robotPlan!=0){if(!trace.PlanRobot(step.robotPlan,step.robotUpgrade))throw new Exception("Invalid robot plan input");}
+            else if(step.machine){if(!trace.ActivateMachine(step.robot))throw new Exception("Invalid machine input");}
             else if(step.encounter!=0){if(!trace.ChooseTask(step.encounter))throw new Exception("Invalid encounter");}
             else if(step.assembly!=0){if(!trace.Assemble(step.assembly))throw new Exception("Invalid assembly");}
             else if(step.skill>=0&&!trace.Choose(step.skill)){Console.WriteLine("DIVERGED step="+at+" time="+trace.Elapsed+" level="+trace.Level+" xp="+trace.Xp+" requested="+step.skill+" choosing="+trace.Choosing+" offered="+string.Join(",",trace.Choices)+" pos="+trace.Position.x+","+trace.Position.y+" kills="+trace.Kills);return 1;}

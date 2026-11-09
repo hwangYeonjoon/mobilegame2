@@ -24,7 +24,7 @@ namespace ScrapGuard.Core
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
         public bool finalBoss, core, killedByMachine; public int robotDesign;
-        public EnemyRole role;
+        public EnemyRole role; public int salvagePart=-1;
         public V2 direction;
         public float windup, dash, attackFlash, slowTime, freezeTime;
         public float Radius { get { return kind == 3 ? 35 : kind == 2 ? 23 : 15; } }
@@ -43,7 +43,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 18;
+        public const int RulesVersion = 19;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -201,7 +201,7 @@ namespace ScrapGuard.Core
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
             if(!Challenge&&!final)role=OpeningEnemyRole(role);
             if(final)role=BossRole();
-            Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
+            Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, salvagePart=kind<2?NextCarrierPart():-1, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
                 speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
             if (kind >= 2) Effects.Add(new BattleEffect { position = Position+new V2(0,-140), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
         }
@@ -250,7 +250,7 @@ namespace ScrapGuard.Core
                 if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
                 if((area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }
-            if(MachineTime>0&&RobotAssembly.Frame(MachineDesign)==2)damage*=source==DamageSource.Boss?.8f:.65f;
+            if(RobotDamageReduction>0)damage*=1-RobotDamageReduction*(source==DamageSource.Boss?.5f:1);
             if(RiskActive)damage*=1.2f;
             if(PoweredSafety)damage*=.7f;
             if (armor == 7) damage *= .9f;
