@@ -8,6 +8,7 @@ namespace ScrapGuard.Core
     {
         public string week;
         public int bestScore, attempts, claimed;
+        public bool robotContract; public int robotDesign;
     }
     [Serializable] public class RankEntry
     {

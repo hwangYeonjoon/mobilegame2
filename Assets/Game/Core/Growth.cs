@@ -34,6 +34,11 @@ namespace ScrapGuard.Core
         public static bool CanUpgrade(GameState s){return Steps(s).Exists(p=>p.affordable);}
         public static int RepairGold(GameState s){return Math.Min(2400,600+100*s.clearedStages.Count);}
         public static int RepairParts(GameState s){return Math.Min(24,8+2*(s.clearedStages.Count/3));}
+        public static int SalvageStage(GameState s)
+        {
+            foreach(int stage in s.clearedStages)if(Campaign.Get(stage).Mission==Mission.Survive)return stage;
+            return s.clearedStages.Contains(0)?0:-1;
+        }
         public static int FarmStage(GameState s)
         {
             int stage=-1;foreach(int cleared in s.clearedStages)if(cleared>stage)stage=cleared;return stage;

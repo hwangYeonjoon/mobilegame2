@@ -15,7 +15,7 @@ namespace ScrapGuard
         bool RobotPromptActive {get{return robotPromptRemaining>0&&combat!=null&&!combat.Ended&&combat.MachineTime<=0&&!combat.Choosing&&!battlePaused&&!networkBusy;}}
         int ReadyRobotDesign()
         {
-            if(combat==null||combat.Challenge)return 0;
+            if(combat==null||!combat.RobotEnabled)return 0;
             var stock=combat.RobotParts;
             for(int n=0;n<=9;n++)
             {
@@ -39,6 +39,7 @@ namespace ScrapGuard
         }
         string RobotSituation(int frame)
         {
+            if(combat.Challenge)return "이번 주 목표: "+RobotAssembly.Frames[combat.WeeklyFrame]+" 특화형 탑승 · 60초 생존";
             bool artillery=false,charger=false,crowded=false;int close=0;
             foreach(var enemy in combat.Enemies)if(enemy.hp>0)
             {if(enemy.role==EnemyRole.Artillery)artillery=true;if(enemy.role==EnemyRole.Charger)charger=true;if(V2.Distance(enemy.position,combat.Position)<180)close++;}
@@ -62,7 +63,7 @@ namespace ScrapGuard
         }
         void RobotAssembler(int design)
         {
-            if(combat==null||combat.Ended||combat.Challenge||combat.Choosing||combat.MachineTime>0)return;
+            if(combat==null||combat.Ended||!combat.RobotEnabled||combat.Choosing||combat.MachineTime>0)return;
             if(!robotMenuOpen){if(!robotWorkshopObserved){robotWorkshopObserved=true;Track("robot_discovery",RobotPromptActive?"prompt_opened":"unprompted_opened",combat.Stage+1,combat.Elapsed);}robotPromptRemaining=0;robotMenuOpen=true;robotSupportOptions=false;robotMenuOpenedAt=Time.unscaledTime;Track("robot_choice","open",combat.MachinesBuilt,combat.Elapsed);}
             battlePaused=true;dragging=false;robotTargetDesign=design;
             int main=RobotAssembly.Frame(design),sub=RobotAssembly.Support(design),rank=combat.RobotRank(design);var parts=combat.RobotParts;var cost=combat.RobotRecipe(design);

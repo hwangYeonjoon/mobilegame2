@@ -154,7 +154,7 @@ namespace ScrapGuard
             UpdateBattleMusic();
             page = target; if (!Online) Store.Economy.RefreshDay(); Ui.Clear(screen); CloseModal();
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
-            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "특수 던전 · 코어 균열" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 396, 40, 30);
+            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "주간 로봇 도전 · 반복 보상" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 396, 40, 30);
             Ui.Button(screen, "설정", 432, 34, 84, 60, Settings, Ui.Raised, true, 16);
             for(int i=0;i<3;i++)walletAmounts[i]=CurrencyArt.Balance(screen,i,24+i*166,104,160);
             RefreshWallet();
@@ -189,14 +189,14 @@ namespace ScrapGuard
             Ui.Label(room,"부수고 · 회수하고 · 합체하라",18,12,456,28,19,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Label(room,Catalog.HeroNames[State.selectedHero]+"  Lv."+State.heroes[State.selectedHero].level,18,height-51,456,35,25,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(screen,(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage],24,MenuBottom-168,492,32,23,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Button(screen,"출격하기  →",24,MenuBottom-124,310,78,CampaignLaunch,Ui.Mint,true,26);
+            Ui.Button(screen,State.clearedStages.Count==Campaign.Count?"주간 로봇 도전 →":"출격하기  →",24,MenuBottom-124,310,78,()=>{if(State.clearedStages.Count==Campaign.Count)Show("weekly");else CampaignLaunch();},Ui.Mint,true,24);
             Ui.Button(screen,Growth.CanUpgrade(State)?"강화 가능 ●":"성장하기",348,MenuBottom-124,168,78,GrowthPanel,Growth.CanUpgrade(State)?Ui.Gold:Ui.Raised,true,21);
             Ui.Button(screen,"작전 지도 · 출석 · 더 보기",24,MenuBottom-36,492,35,HomeActivities,Ui.Panel,true,17);
         }
         void HomeActivities()
         {
             var card=Dialog("정비소 활동","출격과 성장은 홈에서 바로, 다른 활동은 여기서 확인해요.",830);
-            string[] labels={"작전 지도","출석 · "+(Store.Economy.CanAttend?"보상 받기":"수령 완료"),"오늘의 임무 · "+Math.Min(3,State.dailyRuns)+"/3","성장 · 수집 목표","초보 안내","특수 던전 · 코어 균열","길드 · 지원 대원"};
+            string[] labels={"작전 지도","출석 · "+(Store.Economy.CanAttend?"보상 받기":"수령 완료"),"오늘의 임무 · "+Math.Min(3,State.dailyRuns)+"/3","성장 · 수집 목표","초보 안내","주간 로봇 도전 · 반복 보상","길드 · 지원 대원"};
             Action[] actions={()=>CampaignMap(),Attendance,Missions,ProgressGoals,GuidePanel,()=>Show("weekly"),OpenGuild};
             for(int i=0;i<labels.Length;i++)Ui.Button(card,labels[i],24,135+i*91,444,70,actions[i],Ui.Raised,true,21);
         }

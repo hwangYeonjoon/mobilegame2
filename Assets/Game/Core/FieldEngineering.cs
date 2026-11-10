@@ -18,7 +18,7 @@ namespace ScrapGuard.Core
             return "10초마다 최대 체력 3% 수리 · 보호막 8% 보충";
         }
         public static string TrialTitle(string mode)
-        { return mode==SkillTrial.Mode?"동일 조건 실력전":mode==Endgame.PracticeMode?"성장 도전 연습":"주간 성장 도전"; }
+        { return mode==SkillTrial.Mode?"동일 조건 실력전":mode==Endgame.PracticeMode?"성장 도전 연습":"주간 로봇 도전"; }
         public static string TrialObjective(string mode)
         { return mode==SkillTrial.Mode?"개인 최고 기록에 도전 · 재화 보상 없음":mode==Endgame.PracticeMode?"연습 중 · 기록과 보상은 저장되지 않아요":"최고 단계 목표 · 코어 피해 30,000점"; }
     }

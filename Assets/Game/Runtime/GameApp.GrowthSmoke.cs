@@ -32,9 +32,21 @@ namespace ScrapGuard
             Store.Change(e=>{e.State.gold=0;e.State.parts=0;return CommandResult.Ok("Shortage fixture");});RefreshWallet();
             GrowthPanel();ClickVisibleButton("부족분");yield return Capture("13-free-and-optional-paths");
             CloseModal();shopTab=2;Show("shop");yield return Capture("14-repair-ad-offer");
-            GrowthPanel();ClickVisibleButton("강화한 장비로 무료 연습");yield return null;
-            if(combat==null||combat.Mode!=Endgame.PracticeMode||combat.Damage!=Catalog.Attack(State))smokeErrors.Add("Practice did not use upgraded stats");
-            if(combat!=null){battlePaused=true;RenderBattle();yield return Capture("15-upgraded-practice");}
+            GrowthPanel();ClickVisibleButton("보스 패턴 무료 연습");yield return Capture("15-boss-selector");
+            StartBattle(1,false,BossTraining.Mode);yield return null;
+            if(combat==null||!combat.BossPractice||!combat.BossArenaActive||combat.Damage!=Catalog.Attack(State)*1.6f)smokeErrors.Add("Practice preset/start mismatch");
+            battlePaused=true;RenderBattle();yield return Capture("16-boss-practice");
+            combat.Abandon();FinishBattle();yield return Capture("17-practice-result");combat=null;
+            SalvagePanel();yield return Capture("18-free-salvage");
+            Show("weekly");yield return Capture("19-weekly-hub");RobotWeekPanel(CurrentWeek());yield return Capture("20-weekly-contract");
+            StartBattle(4,false,Endgame.WeeklyMode);yield return null;battlePaused=true;
+            int design=combat.WeeklyFrame*4+1;RobotAssembler(design);yield return Capture("21-weekly-assembly");
+            ConfirmRobotPlan(design,true);battlePaused=true;RenderBattle();yield return Capture("22-weekly-machine");
+            if(combat.MachineTime<=0||combat.RobotRank(design)!=1)smokeErrors.Add("Weekly robot control failed");
+            combat.Abandon();FinishBattle();combat=null;
+            Store.Change(e=>{for(int i=0;i<Campaign.Count;i++)if(!e.State.clearedStages.Contains(i))e.State.clearedStages.Add(i);e.State.unlockedStage=41;return CommandResult.Ok("Completed campaign UI fixture only");});
+            Show("home");yield return Capture("23-campaign-complete-home");
+            yield return ReplayExpansionCapture();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
             Debug.Log("GROWTH_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);
         }

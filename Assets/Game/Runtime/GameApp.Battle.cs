@@ -415,10 +415,10 @@ namespace ScrapGuard
             var card = Dialog("잠시 정비 중", "작전은 일시정지되어 있어요.", 700);
             Ui.Label(card,combat.Challenge?FieldEngineering.TrialTitle(combat.Mode):OperationConditions.Names[combat.Condition]+"\n"+OperationConditions.Details[combat.Condition],24,138,444,78,16,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(card, "계속하기", 24, 235, 444, 62, () => { battlePaused = false; CloseModal(); });
-            Ui.Button(card, combat.Challenge ? "도전 종료하고 기록 저장" : "작전 종료하고 보상 받기", 24, 318, 444, 58, () => { battlePaused = false; combat.Abandon(); CloseModal(); FinishBattle(); }, Ui.Raised, true, 17);
+            Ui.Button(card, combat.BossPractice?"보상 없이 연습 종료":combat.Challenge ? "도전 종료하고 기록 저장" : "작전 종료하고 보상 받기", 24, 318, 444, 58, () => { battlePaused = false; combat.Abandon(); CloseModal(); FinishBattle(); }, Ui.Raised, true, 17);
             Ui.Button(card,"전투 화면 · 효과 설정",24,401,444,64,BattleDisplayOptions,Ui.Raised,true,20);
             Ui.Button(card,"소리 · 진동 · 합체 발동 설정",24,484,444,64,AudioOptions,Ui.Raised,true,20);
-            Ui.Button(card,"로봇 설계 · 조합 변경",24,565,444,54,()=>RobotAssembler(robotTargetDesign),Ui.Gold,!combat.Challenge&&combat.MachineTime<=0,18);
+            Ui.Button(card,"로봇 설계 · 조합 변경",24,565,444,54,()=>RobotAssembler(robotTargetDesign),Ui.Gold,combat.RobotEnabled&&combat.MachineTime<=0,18);
             card.GetChild(2).gameObject.SetActive(false);
         }
         void ChooseBattleSkill(int skill)
@@ -443,10 +443,11 @@ namespace ScrapGuard
                 card.GetChild(2).gameObject.SetActive(false);
             };
             if (Online) StartCoroutine(SubmitCloud(finishCommand, reply => complete(new CommandResult(reply.success, reply.message))));
-            else complete(Store.Change(e => combat.Challenge ? e.FinishChallenge(combat) : e.FinishCampaign(combat)));
+            else complete(Store.Change(e => combat.BossPractice ? e.FinishBossPractice(combat) : combat.Challenge ? e.FinishChallenge(combat) : e.FinishCampaign(combat)));
         }
         void ShowResult()
         {
+            if(combat.BossPractice){BossPracticeResult();return;}
             if (combat.Challenge) { ChallengeResult(); return; }
             var receipt = State.receipts.Find(r => r.id == combat.RunId);
             bool won = receipt != null ? receipt.won : combat.Won;
@@ -478,7 +479,7 @@ namespace ScrapGuard
             if(showSupport)
                 Ui.Button(card,"지원해 준 동료의 전시실",24,591,444,34,()=>{Track("profile_source","support_result");StartCoroutine(LoadPublic(combat.Support.owner));},Ui.Raised,true,14);
             int stage = combat.Stage;
-            Ui.Button(card, "다시 출격", 24, 519, 214, 62, () => { combat = null; StartBattle(stage); });
+            Ui.Button(card, won&&stage==Campaign.Count-1?"주간 로봇 도전":"다시 출격", 24, 519, 214, 62, () => { combat = null;if(won&&stage==Campaign.Count-1)Show("weekly");else StartBattle(stage); });
             Ui.Button(card, Growth.CanUpgrade(State)?"강화하고 재도전":"성장 경로 확인", 254, 519, 214, 62, () => { combat = null; GrowthPanel(); }, Ui.Raised);
             if(!showSupport && StarterGuide.Next(State)<5)Ui.Button(card,"다음 목표 · "+StarterGuide.Names[StarterGuide.Next(State)],24,591,444,34,()=>{combat=null;Show("home");GuidePanel();},Ui.Raised,true,14);
             Ui.Button(card, "정비소로 돌아가기", 24, 632, 444, 51, () => { combat = null; Show("home"); }, Ui.Panel, true, 16);

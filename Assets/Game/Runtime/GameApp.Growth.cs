@@ -35,9 +35,8 @@ namespace ScrapGuard
             if(steps.Count==0)Ui.Label(card,"장착 장비와 대원이 최대 레벨입니다.",24,210,444,60,22,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(card,"작전 패스 · 달성 보상",24,606,444,51,GrowthPassPanel,Ui.Gold,true,18);
             int farm=Growth.FarmStage(State);
-            Ui.Button(card,farm<0?"첫 작전에 다시 도전":"작전 "+(farm+1)+" 반복 · 골드 "+Campaign.Get(farm).Gold+" / 부품 "+Campaign.Get(farm).Parts,24,671,444,52,
-                ()=>{combat=null;StartBattle(Math.Max(0,farm));},Ui.Raised,true,17);
-            Ui.Button(card,"강화한 장비로 무료 연습",24,736,214,52,()=>{combat=null;StartBattle(4,false,Endgame.PracticeMode);},Ui.Raised,true,16);
+            Ui.Button(card,"보석 없이 재료 모으기 · 회수 임무",24,671,444,52,SalvagePanel,Ui.Raised,true,17);
+            Ui.Button(card,"보스 패턴 무료 연습",24,736,214,52,BossTrainingPanel,Ui.Raised,true,16);
             Ui.Button(card,"출격 준비",254,736,214,52,()=>{combat=null;Show("home");},Ui.Mint,true,18);
             Ui.Label(card,"반복 작전은 최초 보상 제외 · 연습은 보상 없음",24,802,444,28,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
@@ -45,7 +44,7 @@ namespace ScrapGuard
         {
             var card=Dialog("강화 재료 모으기",p.name+" · "+GrowthDelta(p),590);
             Ui.Label(card,"부족한 골드 "+Math.Max(0,p.gold-State.gold)+"\n부족한 부품 "+Math.Max(0,p.parts-State.parts),24,137,444,73,25,Ui.Gold,TextAnchor.MiddleCenter);
-            Ui.Button(card,"무료 경로 · 반복 작전과 패스",24,238,444,53,GrowthPanel,Ui.Mint,true,18);
+            Ui.Button(card,"무료 회수 임무 · 재료와 소요 시간",24,238,444,53,SalvagePanel,Ui.Mint,true,18);
             Ui.Button(card,"선택 광고 · 골드 "+Growth.RepairGold(State)+" + 부품 "+Growth.RepairParts(State),24,308,444,53,()=>RequestReward("parts"),Ui.Raised,State.dailyRewardParts<2,17);
             Ui.Button(card,"성장 보급 구성 보기 · 구매 아님",24,378,444,53,GrowthKitPanel,Ui.Raised,true,17);
             Ui.Button(card,"돌아가기",24,478,444,51,GrowthPanel,Ui.Panel,true,18);
@@ -62,7 +61,7 @@ namespace ScrapGuard
             }
             bool can=State.dailyGrowthKits<1&&State.gems>=Growth.KitPrice&&State.gemDebt==0;
             Ui.Button(card,State.dailyGrowthKits>=1?"오늘 구매 완료":"100 보석으로 구매",24,564,444,58,()=>Change(new GameCommand("buy"){value="growth_kit"},confirmed:()=>GrowthPanel("보급 수령 · 골드 +4,500 / 부품 +40\n원하는 강화를 선택해 바로 사용할 수 있어요.")),Ui.Gold,can,20);
-            Ui.Button(card,"무료 보석 획득처 · 부족분",24,637,444,51,()=>GemSources(Growth.KitPrice,GrowthKitPanel),Ui.Raised,true,17);
+            Ui.Button(card,"보석을 아끼고 같은 재료 모으기",24,637,444,51,SalvagePanel,Ui.Raised,true,17);
             Ui.Button(card,"취소 · 성장 화면",24,705,444,51,GrowthPanel,Ui.Panel,true,17);
         }
         void ClaimGrowthReward(int tier,bool premium)

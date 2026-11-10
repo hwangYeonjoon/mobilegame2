@@ -141,7 +141,12 @@ public sealed partial class GameRepository
                 a.RunRules = Combat.RulesVersion;
                 if (command.quick) throw new ApiFault(400, "서버 작전에는 빠른 테스트를 사용할 수 없어요.");
                 string id = Guid.NewGuid().ToString("N"); a.RunSeed = RandomNumberGenerator.GetInt32(1, int.MaxValue);
-                if(Endgame.IsChallenge(command.mode))
+                if(command.mode==BossTraining.Mode)
+                {
+                    if(!string.IsNullOrEmpty(command.supportId))throw new ApiFault(400,"보스 연습은 지원 없이 진행해요.");
+                    result=e.BeginBossPractice(id,command.stage);a.RunSupport=null;
+                }
+                else if(Endgame.IsChallenge(command.mode))
                 {
                     if(!string.IsNullOrEmpty(command.supportId))throw new ApiFault(400,"주간 도전은 본인 대원으로 진행해요.");
                     result=e.BeginChallenge(id,command.mode);
@@ -167,7 +172,7 @@ public sealed partial class GameRepository
                 RecordWeekly(db,tx,a,simulation);
                 RecordSupport(db,tx,a,simulation);
                 RecordRestoration(db,tx,a,simulation);
-                result = simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
+                result = simulation.BossPractice ? e.FinishBossPractice(simulation) : simulation.Challenge ? e.FinishChallenge(simulation) : e.FinishCampaign(simulation);
                 Execute(db,tx,"UPDATE ad_claims SET status='canceled' WHERE owner=$owner AND result_id=$run AND placement='revive' AND status='pending'",("$owner",a.Id),("$run",command.id));
                 a.RunSnapshot = a.RunStarted = a.RunSupport = null;
             }

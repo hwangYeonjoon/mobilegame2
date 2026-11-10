@@ -16,7 +16,7 @@ namespace ScrapGuard.Core
             State.serviceDate = today;
             State.dailyRuns = State.dailyKills = State.dailyItemPurchases = State.dailyPartsPurchases = State.dailyGemPartsPurchases = 0;
             State.dailySupportStarts = 0;
-            State.dailyGrowthKits = 0;
+            State.dailyGrowthKits = 0; State.dailySalvageWins=0;State.salvageClaimed=false;
             State.dailyRewardGold = State.dailyRewardParts = 0; State.missionClaimed = false;
         }
         public bool CanAttend { get { return String.CompareOrdinal(State.serviceDate, State.attendanceDate) > 0; } }
@@ -167,6 +167,7 @@ namespace ScrapGuard.Core
             int gold = won ? definition.Gold : Math.Min(definition.Gold*65/100, (int)(Math.Min(seconds, 300)*(4+stage*.2f)));
             int parts = won ? definition.Parts : Math.Min(8, (int)seconds / 30);
             int gems = 0;
+            if(won&&seconds>=90&&State.clearedStages.Contains(stage))State.dailySalvageWins=Math.Min(3,State.dailySalvageWins+1);
             if (won && !State.clearedStages.Contains(stage))
             {
                 gems = 50; State.clearedStages.Add(stage); State.unlockedStage = Math.Min(Campaign.Count - 1, Math.Max(State.unlockedStage, stage + 1));

@@ -1,0 +1,192 @@
+{
+  "total": 6,
+  "passed": 6,
+  "cases": [
+    {
+      "file": "runtime-replay-boss_practice-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-boss_practice-41.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-boss_practice-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-weekly-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=36/36 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-weekly-41.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=41/41 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-weekly-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=32/32 machines=1/1 hp=0/0"
+    }
+  ],
+  "version": "0.33.0",
+  "build": 36,
+  "rules": 24,
+  "platform": "Android API 35 ARM64 IL2CPP emulator",
+  "fixture": "runtime033-fixtures.json.gz",
+  "fixtureSha256": "3266b0d9ca669fda68329b559fb1ae39d4a9bad1274f0e90fdafad85e207b026",
+  "ui": {
+    "screens": 23,
+    "errors": 0,
+    "source": "TestResults/Replay033Final/report.txt"
+  },
+  "humanTest": "not conducted",
+  "physicalDeviceTest": "not conducted",
+  "note": "Synthetic UI and level-10 replay fixtures verify behavior, not balance, purchases, retention or physical-device performance.",
+  "apks": [
+    {
+      "apk": "/Users/kd-server/IdeaProjects/mobilegame2/Builds/Android/ScrapGuard-qa.apk",
+      "bytes": 114473928,
+      "sha256": "64bffa56544a3cfb6907507243ab7a749ce1b207c0abdbb71e6f9769e5f349af",
+      "package": "io.github.hwangyeonjoon.scrapguard.qa",
+      "version": "0.33.0",
+      "versionCode": 36,
+      "minSdk": 26,
+      "targetSdk": 36,
+      "abi": "arm64-v8a",
+      "v2_signature": true,
+      "zip_16kb": true,
+      "file_provider": true,
+      "backup_disabled": true,
+      "libraries": [
+        {
+          "name": "lib/arm64-v8a/libc++_shared.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libgame.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libmain.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libunity.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libil2cpp.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libswappywrapper.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384
+          ]
+        }
+      ],
+      "device_execution": "Android API 35 emulator: 23 UI captures, zero assertions, six IL2CPP replays matched .NET"
+    },
+    {
+      "apk": "Builds/Android/ScrapGuard-playtest.apk",
+      "bytes": 111624033,
+      "sha256": "006d3e6b95246ef1923220f7b4cd77c648e51f5725951ce0c86c2f8c4e61e05d",
+      "package": "io.github.hwangyeonjoon.scrapguard.qa",
+      "version": "0.33.0",
+      "versionCode": 36,
+      "minSdk": 26,
+      "targetSdk": 36,
+      "abi": "arm64-v8a",
+      "v2_signature": true,
+      "zip_16kb": true,
+      "file_provider": true,
+      "backup_disabled": true,
+      "libraries": [
+        {
+          "name": "lib/arm64-v8a/libc++_shared.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libgame.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libil2cpp.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libmain.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libswappywrapper.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384
+          ]
+        },
+        {
+          "name": "lib/arm64-v8a/libunity.so",
+          "load_alignments": [
+            16384,
+            16384,
+            16384,
+            16384
+          ]
+        }
+      ],
+      "device_execution": "Packaging verified; manual APK not separately launched in this run"
+    }
+  ]
+}

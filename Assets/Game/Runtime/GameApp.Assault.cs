@@ -56,7 +56,7 @@ namespace ScrapGuard
             machineButton=Ui.Button(screen,"",180,899,155,49,TriggerMachine,Ui.Mint,false,16);
             var robotInput=machineButton.gameObject.AddComponent<RobotInputButton>();robotInput.Tap=TriggerMachine;robotInput.Hold=()=>RobotAssembler(robotTargetDesign);machineButton.onClick.RemoveAllListeners();machineButton.onClick.AddListener(robotInput.Click);
             salvageText=machineButton.GetComponentInChildren<Text>();machineFill=Ui.Box(machineButton.transform,0,48,0,3,Ui.Gold,false);
-            machineButton.gameObject.SetActive(!combat.Challenge);
+            machineButton.gameObject.SetActive(combat.RobotEnabled);
             for(int i=0;i<2;i++)wingDrones[i]=Ui.Robot(identityLayer,0,0,.24f,0);
             var outline=playerArt.gameObject.GetComponent<Outline>();if(outline==null)outline=playerArt.gameObject.AddComponent<Outline>();
             outline.effectColor=new Color(.55f,1,.9f,.95f);outline.effectDistance=new Vector2(2,-2);
@@ -65,7 +65,7 @@ namespace ScrapGuard
         }
         void TriggerMachine()
         {
-            if(combat==null||battlePaused||networkBusy||combat.Challenge)return;
+            if(combat==null||battlePaused||networkBusy||!combat.RobotEnabled)return;
             if(RobotPromptActive){RobotAssembler(robotPromptDesign);return;}
             if(!combat.RobotPlanned){RobotAssembler(robotTargetDesign);return;}
             if(!combat.ActivateMachine())return;recorder.Machine();dragging=false;RenderBattle();
@@ -79,7 +79,9 @@ namespace ScrapGuard
             else if(combat.WaveWarning>0)message="포위 접근 · "+BattleBearing(combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150)+" 열린 방향으로";
             else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
             else if(combat.IntroBattle&&combat.BossArenaActive)message=combat.CanActivateMachine?"아래 합체 버튼으로 보스를 공격하세요":combat.CanUltimate?"필살기 준비 완료 · 오른쪽 아래 버튼을 누르세요":"공격은 자동 · 보스의 빨간 예고 밖으로 이동하세요";
+            else if(combat.BossPractice)message="보스 패턴 연습 · 경고 밖으로 이동하세요";
             else if(combat.BossArenaActive)message="";
+            else if(combat.Mode==Endgame.WeeklyMode&&combat.Elapsed<8)message="합체 버튼 → "+RobotAssembly.Frames[combat.WeeklyFrame]+" 특화형 제작";
             else if(RobotPromptActive)message="↓ 모은 부품으로 로봇을 만들어 보세요";
             else if(combat.IntroBattle&&combat.Elapsed>8&&combat.Elapsed<14)message="포·동·장 표식 적을 부수고 부품을 회수하세요";
             else if(!combat.Challenge&&combat.Elapsed>12&&combat.Elapsed%12<(combat.IntroBattle?7:4))message=RobotRecoveryHint();
@@ -125,7 +127,7 @@ namespace ScrapGuard
                 {mineLinks[i].gameObject.SetActive(true);var from=combat.Mines[i].position;var to=combat.Mines[i+1].position;mineLinks[i].From=new Vector2(from.x,-from.y);mineLinks[i].To=new Vector2(to.x,-to.y);mineLinks[i].SetVerticesDirty();}
                 if(i<combat.Mines.Count){var p=combat.Mines[i].position;mineActors[i].anchoredPosition=new Vector2(p.x,-p.y);}
             }
-            machineButton.interactable=!combat.Challenge&&!combat.Ended&&combat.MachineTime<=0&&!combat.Choosing&&!battlePaused&&!networkBusy;
+            machineButton.interactable=combat.RobotEnabled&&!combat.Ended&&combat.MachineTime<=0&&!combat.Choosing&&!battlePaused&&!networkBusy;
             salvageText.text=combat.MachineTime>0?(RobotAssembly.Frame(combat.MachineDesign)==0?"포격":RobotAssembly.Frame(combat.MachineDesign)==1?"돌파":"철벽")+" 가동 "+Mathf.CeilToInt(combat.MachineTime)+"초":combat.MachineRecovery>0?"합체 준비 "+Mathf.CeilToInt(combat.MachineRecovery)+"초":combat.CanActivateMachine?(Application.isMobilePlatform?(combat.RobotPlanned?"즉시 탑승":"로봇 조립"):(combat.RobotPlanned?"탑승 · E":"조립 · E")):"조립 · 고철 "+combat.Salvage+"/"+combat.MachineCost;
             machineButton.image.color=combat.CanActivateMachine?Ui.Mint:Ui.Raised;
             salvageText.color=combat.CanActivateMachine?Ui.Background:Ui.Ink;

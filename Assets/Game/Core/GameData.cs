@@ -39,6 +39,7 @@ namespace ScrapGuard.Core
         public int dailyItemPurchases;
         public int dailyPartsPurchases;
         public int dailyGemPartsPurchases;
+        public int dailySalvageWins; public bool salvageClaimed;
         public int dailyGrowthKits, growthPassFree, growthPassPremium;
         public int dailyRewardGold;
         public int dailyRewardParts;

@@ -17,7 +17,7 @@ namespace ScrapGuard.Core
         public int Salvage { get; private set; }
         public int MachinesBuilt { get; private set; }
         public float MachineTime { get; private set; }
-        public bool CanActivateMachine {get{return !Challenge&&!Ended&&!Choosing&&MachineTime<=0&&MachineRecovery<=0&&Salvage>=MachineCost;}}
+        public bool CanActivateMachine {get{return RobotEnabled&&!Ended&&!Choosing&&MachineTime<=0&&MachineRecovery<=0&&Salvage>=MachineCost;}}
         public bool ActivateMachine(int design=0)
         {
             if(design==0)design=MachineDesign;
@@ -55,13 +55,13 @@ namespace ScrapGuard.Core
         }
         void UpdateAssault(float dt)
         {
-            if(Challenge)return;
-            if(WaveWarning>0)
+            if(!RobotEnabled)return;
+            if(!Challenge&&WaveWarning>0)
             {
                 WaveWarning-=dt;
                 if(WaveWarning<=0)ReleaseWave();
             }
-            else if(Elapsed>=nextWave&&!FinalBossActive)
+            else if(!Challenge&&Elapsed>=nextWave&&!FinalBossActive)
             {
                 WaveNumber++;WaveWarning=2.4f;WaveCenter=Position;
                 EscapeAngle=Facing;nextWave=Elapsed+32+(Stage%3)*6;

@@ -66,10 +66,13 @@ namespace ScrapGuard.Core
                 case "region_target": return e.SetCollectionTarget(c.stage);
                 case "region_craft": return e.CraftRegionSkin(c.stage);
                 case "core_exchange": return e.ExchangeCore(c.value);
+                case "salvage_claim": return e.ClaimSalvage();
+                case "robot_week_claim": return e.ClaimRobotWeek(c.value);
                 case "weekly_claim": return e.ClaimWeekly(c.value,c.stage);
                 case "battle_cancel": e.State.activeRun = e.State.activeMode = e.State.activeWeek = ""; return CommandResult.Ok("중단된 작전을 종료했어요.");
                 case "battle_start":
                     if (!development) return CommandResult.Fail("서버 작전 발급이 필요해요.");
+                    if(c.mode==BossTraining.Mode)return e.BeginBossPractice(c.id,c.stage);
                     if (Endgame.IsChallenge(c.mode)) return e.BeginChallenge(c.id,c.mode);
                     if (!string.IsNullOrEmpty(c.mode)) return CommandResult.Fail("없는 전투 모드예요.");
                     if (c.quick) e.State.testProgress = true;

@@ -18,12 +18,14 @@
     <Compile Include="../../Assets/Tests/EditMode/PolishSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/AssaultSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/GrowthSpecification.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/ReplayExpansionSpecification.cs" />
     <Compile Include="../../Assets/Editor/ReplayDiagnostic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BalanceAudit.cs" />
     <Compile Include="GrowthAudit.cs" />
     <Compile Include="GrowthAuditChecks.cs" />
     <Compile Include="PurchaseAudit.cs" />
+    <Compile Include="LongHorizonAudit.cs" />
     <Compile Include="PurchaseAuditChecks.cs" />
   </ItemGroup>
 </Project>

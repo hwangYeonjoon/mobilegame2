@@ -17,22 +17,34 @@ namespace ScrapGuard
         {
             string week=CurrentWeek();var progress=Endgame.Find(State,week);
             var hero=Ui.Box(screen,24,176,492,204,Ui.Panel).transform;
-            var core=Ui.Box(hero,321,26,145,146,Color.white,false);core.sprite=BattleArt.Role(4,0,true);core.preserveAspect=true;
-            Ui.Label(hero,"주간 성장 도전 / 90초",20,15,300,27,12,Ui.Mint);
-            Ui.Label(hero,"균열의 코어를 공략하세요",20,51,306,40,23);
+            RobotRigView.Draw(hero,321,26,145,RobotWeek.Frame(week)*4+1,2);
+            Ui.Label(hero,"주간 로봇 도전 / 90초",20,15,300,27,12,Ui.Mint);
+            Ui.Label(hero,"이번 주 로봇을 조립하세요",20,51,306,40,23);
             Ui.Label(hero,"이번 주 최고 기록",20,99,270,29,15,Ui.Muted);
             Ui.Label(hero,(progress==null?0:progress.bestScore).ToString("N0")+"점",20,131,290,50,35,Ui.Gold);
             Ui.Label(screen,week+" 주간 · 월요일 오전 5시 갱신",24,390,492,29,14,Ui.Muted);
-            Ui.Label(screen,"코어에 준 피해량이 점수 · 30초 이상 참여 시 기록\n본인 대원·장비로 진행 · 길드 지원 없이 도전",24,428,492,52,15,Ui.Muted);
-            Ui.Button(screen,Endgame.Unlocked(State)?"성장 도전 시작":"작전 05 완료 후 성장 도전",24,496,492,56,()=>StartBattle(4,false,Endgame.WeeklyMode),null,Endgame.Unlocked(State),19);
+            Ui.Label(screen,RobotWeek.Brief(week)+"\n시작 부품 각 4개 · 추가 부품은 표식 적에게서 회수",24,428,492,52,15,Ui.Muted);
+            Ui.Button(screen,Endgame.Unlocked(State)?"로봇 도전 시작":"작전 05 완료 후 도전",24,496,492,56,()=>StartBattle(4,false,Endgame.WeeklyMode),null,Endgame.Unlocked(State),19);
             Ui.Button(screen,"보상 없는 연습",24,566,238,50,()=>StartBattle(4,false,Endgame.PracticeMode),Ui.Raised,true,17);
             Ui.Button(screen,"이번 주 기록판",278,566,238,50,()=>{if(Online && cloudReady)StartCoroutine(LoadWeeklyBoard());else Info("서버 기록판","서버 계정의 공개 동의한 기록이 표시돼요.\n계정 화면에서 서버에 연결해 주세요.");},Ui.Raised,true,17);
-            Ui.Button(screen,"달성 보상 · 트로피",24,635,492,55,()=>WeeklyRewards(week),Ui.Gold,true,18);
+            Ui.Button(screen,"주간 로봇 과제 · 보상",24,635,492,55,()=>RobotWeekPanel(week),Ui.Gold,true,18);
             Ui.Button(screen,"내 전시대 보기",24,708,238,48,()=>TrophyRoom(Social.Build(State,Online?cloud.Session.playerId:"",!Online)),Ui.Raised,true,16);
             Ui.Button(screen,"파편 교환소",278,708,238,48,CoreExchange,Ui.Raised,true,16);
             Ui.Label(screen,Online ? "프로필 공개 시 기록판에 참여해요.\n순위 보상 없이 개인 달성 보상을 받아요." : "로컬 기록은 서버 순위에 등록되지 않아요.\n작전 05 이전에도 연습할 수 있어요.",24,775,334,65,13,Ui.Muted);
             Ui.Button(screen,"기록 카드",374,780,142,52,WeeklyRecordCard,Ui.Raised,true,16);
             Ui.Button(screen,"동일 조건 실력전 · 별도 순위",24,830,492,30,SkillTrialHub,Ui.Mint,true,14);
+        }
+        void RobotWeekPanel(string week)
+        {
+            var p=Endgame.Find(State,week);bool ready=p!=null&&p.robotContract,claimed=p!=null&&(p.claimed&16)!=0;
+            var card=Dialog("이번 주 로봇 과제",RobotWeek.Brief(week)+"\n본인 장비 사용 · 같은 조건 실력전과 별도",710);
+            RobotRigView.Draw(card,145,135,200,RobotWeek.Frame(week)*4+1,2);
+            Ui.Label(card,"주마다 목표 기체·적 구성이 바뀌어요.\n탑승한 로봇은 조립실에 기록되어 전시할 수 있어요.",24,345,444,62,17,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,"골드 3,000 · 부품 30 · 코어 파편 5\n파편은 칭호·프레임으로 교환",24,421,444,57,18,Ui.Gold,TextAnchor.MiddleCenter);
+            Ui.Button(card,claimed?"수령 완료":ready?"과제 보상 받기":"아직 미달성",24,497,444,52,()=>Change(new GameCommand("robot_week_claim"){value=week},()=>RobotWeekPanel(week)),Ui.Gold,ready&&!claimed,18);
+            Ui.Button(card,"점수 달성 보상",24,564,214,49,()=>WeeklyRewards(week),Ui.Raised,true,17);
+            Ui.Button(card,"조립실 · 전시",254,564,214,49,()=>RobotHangar(),Ui.Mint,true,17);
+            Ui.Button(card,"파편 교환소",24,629,444,44,CoreExchange,Ui.Raised,true,16);
         }
         void WeeklyRewards(string week)
         {
@@ -55,7 +67,7 @@ namespace ScrapGuard
             for(int i=0;i<State.weekly.Count;i++)
             {
                 var w=State.weekly[State.weekly.Count-1-i];
-                Ui.Button(list,w.week+" · "+w.bestScore.ToString("N0")+"점",0,i*88,444,70,()=>WeeklyRewards(w.week),Ui.Raised,true,18);
+                Ui.Button(list,w.week+" · "+w.bestScore.ToString("N0")+"점",0,i*88,444,70,()=>RobotWeekPanel(w.week),Ui.Raised,true,18);
             }
         }
         void ChallengeResult()
@@ -67,7 +79,7 @@ namespace ScrapGuard
             Ui.Label(card,skill?"모든 참가자가 같은 능력치와 스킬 후보로 겨룹니다.":practice?"장비와 대원을 키워 더 높은 기록에 도전하세요.":combat.Elapsed<30?"30초 미만이라 기록·보상이 반영되지 않았어요.":"내 전시대에서 최고 기록과 트로피를 볼 수 있어요.",24,302,444,65,17,Ui.Muted,TextAnchor.MiddleCenter);
             Ui.Button(card,"다시 도전",24,402,214,59,()=>{string mode=combat.Mode;combat=null;StartBattle(4,false,mode);});
             Ui.Button(card,"도전 로비",254,402,214,59,()=>{combat=null;Show("weekly");},Ui.Raised);
-            Ui.Button(card,"달성 보상 확인",24,483,444,56,()=>{string week=receipt==null?CurrentWeek():receipt.week;combat=null;Show("weekly");WeeklyRewards(week);},Ui.Gold,!practice&&!skill&&combat.Elapsed>=30,18);
+            Ui.Button(card,"달성 보상 확인",24,483,444,56,()=>{string week=receipt==null?CurrentWeek():receipt.week;combat=null;Show("weekly");RobotWeekPanel(week);},Ui.Gold,!practice&&!skill&&combat.Elapsed>=30,18);
             Ui.Button(card,"전투 분석",24,565,214,51,BattleAnalysis,Ui.Raised,true,17);
             Ui.Button(card,"주간 기록 카드",254,565,214,51,()=>WeeklyRecordCard(skill),Ui.Mint,!practice&&combat.Elapsed>=30,17);
             Ui.Button(card,"도전 로비로",24,677,444,45,()=>{combat=null;Show("weekly");},Ui.Raised,true,16);

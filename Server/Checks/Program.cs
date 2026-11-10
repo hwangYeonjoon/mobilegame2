@@ -131,6 +131,7 @@ try
     ExperienceChecks.Run(folder,Check);
     CommerceChecks.Run(folder,Check);
     GrowthCommerceChecks.Run(folder,Check);
+    ReplayExpansionChecks.Run(folder,Check);
     IdentityChecks.Run(folder,Check);
     RestorationChecks.Run(folder,Check);
     WardrobeChecks.Run(folder,Check);

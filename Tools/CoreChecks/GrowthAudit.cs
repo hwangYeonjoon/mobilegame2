@@ -122,9 +122,9 @@ static class GrowthAudit
         while(Act(e,j,stage,attempt,"rewarded_parts","simulated_successful_view",()=>e.ClaimDemoReward("parts","growth-parts-"+j.ledger.Count))){}
         Act(e,j,stage,attempt,"rewarded_result","simulated_successful_view",()=>e.ClaimDemoReward("result","growth-result-"+j.ledger.Count));
     }
-    internal static Combat Simulate(GameState state,int stage,string id,int seed,string policy,out ReplayRecorder record)
+    internal static Combat Simulate(GameState state,int stage,string id,int seed,string policy,out ReplayRecorder record,string mode="")
     {
-        var c=new Combat(state,stage,id,seed);record=new ReplayRecorder();bool natural=policy=="natural_legacy";
+        var c=new Combat(state,stage,id,seed,false,mode);record=new ReplayRecorder();bool natural=policy=="natural_legacy";
         for(int frame=0;frame<18000&&!c.Ended;frame++)
         {
             if(c.Choosing)
@@ -134,8 +134,9 @@ static class GrowthAudit
             }
             if(c.CanChooseTask){c.ChooseTask(1);record.Encounter(1);}
             if(c.CanAssemble){c.Assemble(2);record.Assemble(2);}
-            if(c.CanPlanRobot(5,true)){c.PlanRobot(5,true);record.RobotPlan(5,true);}
-            if(c.CanActivateMachine&&(c.Enemies.Count>=8||!natural&&c.FinalBossActive)){c.ActivateMachine();record.Machine();}
+            int design=c.Challenge?c.WeeklyFrame*4+1:5;
+            if(c.CanPlanRobot(design,true)){c.PlanRobot(design,true);record.RobotPlan(design,true);}
+            if(c.CanActivateMachine&&(c.Challenge||c.Enemies.Count>=8||!natural&&c.FinalBossActive)){c.ActivateMachine();record.Machine();}
             if(c.CanUltimate&&(c.Enemies.Count>=12||!natural&&c.FinalBossActive)){c.UseUltimate();record.Ultimate();if(c.Ended)break;}
             c.Tick(ReplayRecorder.Step,record.Move(natural?BalanceAudit.NaturalMove(c):BalanceAudit.Move(c,policy=="controlled_avoid")));
         }

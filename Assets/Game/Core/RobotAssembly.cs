@@ -70,7 +70,7 @@ namespace ScrapGuard.Core
         }
         public bool CanPlanRobot(int design,bool upgrade)
         {
-            if(Challenge||Ended||Choosing||MachineTime>0||!RobotAssembly.Valid(design))return false;
+            if(!RobotEnabled||Ended||Choosing||MachineTime>0||!RobotAssembly.Valid(design))return false;
             if(!upgrade)return RobotAvailable(design);if(RobotRank(design)>=2)return false;
             var cost=RobotRecipe(design);for(int i=0;i<3;i++)if(robotParts[i]<cost[i])return false;return true;
         }
@@ -98,7 +98,9 @@ namespace ScrapGuard.Core
             {
                 introCarrierSerial++;return introCarrierSerial%4==0?(introCarrierSerial/4-1)%3:-1;
             }
-            if(Challenge||Elapsed<25)return -1;
+            if(!RobotEnabled)return -1;
+            if(Challenge){robotSpawnSerial++;return robotSpawnSerial%3==0?(robotSpawnSerial/3+WeeklyFrame)%3:-1;}
+            if(Elapsed<25)return -1;
             robotSpawnSerial++;if(robotSpawnSerial%24!=0)return -1;
             bool cannon=!Array.Exists(Definition.Enemies,r=>r==EnemyRole.Artillery||r==EnemyRole.Bomber);
             bool armor=!Array.Exists(Definition.Enemies,r=>r==EnemyRole.Shield||r==EnemyRole.Summoner);
@@ -107,7 +109,7 @@ namespace ScrapGuard.Core
         }
         void RecoverRobotPart(Enemy enemy)
         {
-            if(Challenge)return;int type=RobotAssembly.PartFor(enemy);
+            if(!RobotEnabled)return;int type=RobotAssembly.PartFor(enemy);
             partProgress[type]+=enemy.kind>=2||enemy.salvagePart>=0?12:enemy.role==EnemyRole.Pursuer?1:3;
             if(partProgress[type]<12)return;partProgress[type]-=12;
             // Merge pickups before adding more objects to a crowded battlefield.

@@ -25,6 +25,8 @@ namespace ScrapGuard.Core
                 var history=skill?State.skillWeekly:State.weekly;
                 var progress=history.Find(w=>w.week==week);
                 if(progress==null) { progress=new WeeklyProgress {week=week};history.Add(progress); }
+                if(!skill&&combat.Elapsed>=60){var built=combat.RobotReport().Find(r=>r.rank>0&&r.builds>0&&RobotAssembly.Frame(r.design)==RobotWeek.Frame(week));if(built!=null){progress.robotContract=true;progress.robotDesign=built.design;}}
+                if(!skill)RobotAssembly.Record(State,combat.RobotReport(),-1);
                 progress.attempts++;progress.bestScore=Math.Max(progress.bestScore,combat.CoreScore);
                 if(!skill){State.totalRuns++;State.totalKills+=combat.Kills;State.dailyRuns++;State.dailyKills+=combat.Kills;}
             }
