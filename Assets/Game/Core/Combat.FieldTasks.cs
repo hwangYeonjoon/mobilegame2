@@ -12,7 +12,7 @@ namespace ScrapGuard.Core
         public int TaskChoice { get; private set; }
         public bool TaskCompleted { get; private set; }
         public bool TaskFailed { get; private set; }
-        public bool TaskActive { get { return !BossPractice&&Task!=FieldTask.None && Elapsed>=12 && Elapsed<(SpecialOperation?125:70) && !TaskCompleted && !TaskFailed; } }
+        public bool TaskActive { get { return !BossPractice&&!ApexBattle&&Task!=FieldTask.None && Elapsed>=12 && Elapsed<(SpecialOperation?125:70) && !TaskCompleted && !TaskFailed; } }
         public bool CanChooseTask { get { return !Ended && !Choosing && TaskActive && Task==FieldTask.Salvage && TaskChoice==0 && V2.Distance(Position,TaskPosition)<=100; } }
         public bool RiskActive { get { return TaskActive && TaskChoice==2; } }
         public int TaskBonusGold { get { return Won && TaskCompleted?TaskChoice==2?400:200:0; } }

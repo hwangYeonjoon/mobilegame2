@@ -66,6 +66,7 @@ namespace ScrapGuard.Core
         public static bool IsChallenge(string mode) { return mode==WeeklyMode || mode==PracticeMode || mode==SkillTrial.Mode; }
         public static void Normalize(GameState state)
         {
+            Apex.Normalize(state);
             if(state.weekly==null)state.weekly=new List<WeeklyProgress>();
             if(state.skillWeekly==null)state.skillWeekly=new List<WeeklyProgress>();
             if(state.activeMode==null)state.activeMode="";

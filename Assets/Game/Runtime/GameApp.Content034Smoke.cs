@@ -8,11 +8,12 @@ namespace ScrapGuard
     {
         IEnumerator Content034Smoke()
         {
-            Store.Change(e=>{e.State.gems=900;e.State.gold=1800;e.State.parts=30;e.State.coreShards=12;return CommandResult.Ok("Isolated cosmetics QA wallet");});
+            Store.Change(e=>{e.State.gems=RobotStyles.PackPrice;e.State.gold=1800;e.State.parts=30;e.State.coreShards=12;return CommandResult.Ok("Isolated cosmetics QA wallet");});
             RobotStylePanel();yield return Capture("24-robot-style-premium");
             RobotPackConfirm(0);yield return Capture("25-pack-preview");
-            ClickVisibleButton("900 보석 구매 · 외형 3종 적용");yield return Capture("26-pack-use-growth");
-            if(State.gems!=0||!RobotStyles.Owned(State,0,1)||State.gold!=19800)smokeErrors.Add("Robot pack UI grant mismatch");
+            ClickVisibleButton("600 보석 구매 · 외형 3종 적용");yield return Capture("26-pack-cosmetic-equipped");
+            if(State.gems!=0||!RobotStyles.Owned(State,0,1)||State.gold!=1800)smokeErrors.Add("Robot pack UI grant mismatch");
+            GrowthPathPanel("보유 재료로 별도 강화 · 외형 구매는 재료를 지급하지 않아요.");
             var q=GrowthPaths.Quote(State,0);int attack=Catalog.Attack(State);
             ClickVisibleButton("골드 "+q.gold+" · 부품 "+q.parts+" 사용해 "+q.count+"단계 강화");yield return Capture("27-bulk-confirm");
             ClickVisibleButton("골드 "+q.gold+" · 부품 "+q.parts+" 사용");yield return Capture("28-bulk-applied");
@@ -38,6 +39,7 @@ namespace ScrapGuard
                 // Above is an isolated render fixture. Cancel without claiming unverifiable input.
                 CloseModal();Store.Change(e=>{e.State.activeRun=e.State.activeMode=e.State.activeWeek="";return CommandResult.Ok("Close render fixture");});combat=null;
             }
+            yield return ApexSmoke();
             foreach(int stage in new[]{42,47,48,53,54,59})
             {
                 var s=GameState.New();s.tutorialCompleted=true;s.heroes[0].level=30;foreach(var item in s.items){item.level=20;item.rarity=2;}

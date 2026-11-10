@@ -1,0 +1,11 @@
+{
+  "version": "0.35.0",
+  "build": 38,
+  "device": "ScrapGuard_QA_API35 / emulator-5556",
+  "qa_install": "success",
+  "runtime": "incomplete",
+  "observed": "Android System UI is not responding; no GrowthUI results created",
+  "human_test": "not run",
+  "physical_device": "not run",
+  "evidence": "android-system-ui-anr.png"
+}

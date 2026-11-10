@@ -12,7 +12,9 @@ namespace ScrapGuard.Core
         }
         bool ExpansionBossPattern(Enemy boss)
         {
-            float delay=2,last=delay;var center=BossArenaCenter;
+            float delay=ApexBattle?(Stage==47?1.8f:1.5f):2,last=delay;var center=BossArenaCenter;
+            bool finale=Campaign.IsRegionFinal(Definition);
+            bool followup=ApexBattle||(finale&&boss.hp<boss.maxHp*.5f);
             if(Definition.Region==7)
             {
                 // Magnetic jaws leave a wide central passage, then strike the marked center.
@@ -42,6 +44,14 @@ namespace ScrapGuard.Core
                     Warn(p,0,delay+i*1.1f,200,horizontal?420:62,horizontal?62:500,DamageCause.Laser,DamageSource.Boss);
                 }
                 Effects.Add(new BattleEffect{position=Position,kind=10,text="모함 발사 · 첫 레일이 꺼진 뒤 이동"});
+            }
+            if(followup)
+            {
+                // Mark the current position after the lane attack has ended. This never
+                // fills the arena and retains a complete warning before impact.
+                last+=ApexBattle?.8f:1.2f;
+                Warn(Position,ApexBattle?(Stage==47?85:100):75,last,ApexBattle?240:200,0,0,DamageCause.Boss,DamageSource.Boss);
+                Effects.Add(new BattleEffect{position=Position,kind=10,text="후속 표적 · 통로를 빠져나온 뒤 원 밖으로"});
             }
             boss.attackFlash=.6f;ReserveBossAction(boss,false,last);return true;
         }

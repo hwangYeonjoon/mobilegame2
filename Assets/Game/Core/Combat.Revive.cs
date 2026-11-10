@@ -5,7 +5,7 @@ namespace ScrapGuard.Core
     {
         public bool Revived { get; private set; }
         float reviveGuard;
-        public bool CanRevive { get { return !Challenge&&!BossPractice&&!Revived&&Ended&&!Won&&Hp<=0&&Elapsed>=20&&endCause!=DamageCause.Timeout&&endCause!=DamageCause.Abandoned; } }
+        public bool CanRevive { get { return !Challenge&&!BossPractice&&!ApexBattle&&!Revived&&Ended&&!Won&&Hp<=0&&Elapsed>=20&&endCause!=DamageCause.Timeout&&endCause!=DamageCause.Abandoned; } }
         public bool Revive()
         {
             if(!CanRevive)return false;

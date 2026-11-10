@@ -46,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 25;
+        public const int RulesVersion = 26;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -96,11 +96,12 @@ namespace ScrapGuard.Core
         public Combat(GameState state, int stage, string runId, int seed = 123, bool quick = false, string mode = "", SupportSnapshot support = null)
         {
             Mode=mode??"";
-            if(Mode!="" && !Endgame.IsChallenge(Mode)&&!BossPractice)throw new ArgumentException("Unknown combat mode");
-            if(support!=null && (Challenge || BossPractice || support.hero<0 || support.hero>=HeroCatalog.Count || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
+            if(Mode!="" && !Endgame.IsChallenge(Mode)&&!BossPractice&&!ApexBattle)throw new ArgumentException("Unknown combat mode");
+            if(support!=null && (Challenge || BossPractice || ApexBattle || support.hero<0 || support.hero>=HeroCatalog.Count || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
             Support=support;
             GuildAtStart=state.activeGuild;
             Definition=Campaign.Get(stage);
+            if(ApexBattle&&Array.IndexOf(Apex.Stages,stage)<0)throw new ArgumentException("Unknown apex operation");
             Condition=OperationConditions.Select(Definition.Region,seed,Challenge);
             FieldVariant=Definition.Region==0?0:(int)((uint)seed%3);
             Blocks=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Blocks(Definition));

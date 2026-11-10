@@ -43,7 +43,8 @@ namespace ScrapGuard
             Ui.Label(card,RobotAssembly.RegionAdvice(stage),24,555,444,45,16,Ui.Mint);
             Ui.Label(card,(id+1)%6==0?"지역 최종 작전 · 장비 강화와 보스 경고를 확인하세요":"기체 선택은 자유 · 역할에 맞춰 이동해 보세요",24,603,444,32,14,Ui.Muted);
             Ui.Button(card,unlocked?"이 작전 선택":"이전 작전을 완료하세요",24,643,444,57,()=>{selectedStage=id;CloseModal();Show("home");},null,unlocked,19);
-            Ui.Button(card,"지역 지도로",24,711,444,42,()=>CampaignMap(stage.Region),Ui.Raised,true,16);
+            if(System.Array.IndexOf(Apex.Stages,id)>=0)Ui.Button(card,"극한 작전 · 별도 도전",24,711,444,42,()=>ApexConfirm(id),Ui.Gold,cleared,16);
+            else Ui.Button(card,"지역 지도로",24,711,444,42,()=>CampaignMap(stage.Region),Ui.Raised,true,16);
         }
     }
 }

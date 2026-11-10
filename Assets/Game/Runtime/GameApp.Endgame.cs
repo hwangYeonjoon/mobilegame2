@@ -28,7 +28,7 @@ namespace ScrapGuard
             Ui.Button(screen,"보상 없는 연습",24,566,238,50,()=>StartBattle(4,false,Endgame.PracticeMode),Ui.Raised,true,17);
             Ui.Button(screen,"이번 주 기록판",278,566,238,50,()=>{if(Online && cloudReady)StartCoroutine(LoadWeeklyBoard());else Info("서버 기록판","서버 계정의 공개 동의한 기록이 표시돼요.\n계정 화면에서 서버에 연결해 주세요.");},Ui.Raised,true,17);
             Ui.Button(screen,"주간 로봇 과제 · 보상",24,635,492,55,()=>RobotWeekPanel(week),Ui.Gold,true,18);
-            Ui.Button(screen,"내 전시대 보기",24,708,238,48,()=>TrophyRoom(Social.Build(State,Online?cloud.Session.playerId:"",!Online)),Ui.Raised,true,16);
+            Ui.Button(screen,"극한 작전 · 선택 도전",24,708,238,48,ApexPanel,Ui.Mint,true,16);
             Ui.Button(screen,"파편 교환소",278,708,238,48,CoreExchange,Ui.Raised,true,16);
             Ui.Label(screen,Online ? "프로필 공개 시 기록판에 참여해요.\n순위 보상 없이 개인 달성 보상을 받아요." : "로컬 기록은 서버 순위에 등록되지 않아요.\n작전 05 이전에도 연습할 수 있어요.",24,775,334,65,13,Ui.Muted);
             Ui.Button(screen,"기록 카드",374,780,142,52,WeeklyRecordCard,Ui.Raised,true,16);

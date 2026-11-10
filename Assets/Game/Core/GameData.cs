@@ -12,7 +12,7 @@ namespace ScrapGuard.Core
         public bool locked;
     }
     [Serializable] public class HeroProgress { public int id; public int level = 1; public bool unlocked; }
-    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems;
+    [Serializable] public class Receipt { public string id; public string kind; public int gold; public int parts; public int gems; public int shards;
         public int paidGems,gemDebt;
         public bool adSkip; public bool won; public int kills; public float seconds; public int score; public string week; public int blueprints; public BattleReport report; }
     [Serializable] public class GameState
@@ -26,6 +26,7 @@ namespace ScrapGuard.Core
         public int coreShards;
         public int showcaseRobot;
         public List<int> robotStyles=new List<int>();
+        public List<ApexRecord> apexRecords=new List<ApexRecord>();
         public List<RobotRecord> robotRecords=new List<RobotRecord>();
         public int collectionVersion, enemyDiscoveries, bossDiscoveries;
         public List<RegionProgress> regions = new List<RegionProgress>();

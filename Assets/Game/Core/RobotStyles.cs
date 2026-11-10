@@ -4,7 +4,7 @@ namespace ScrapGuard.Core
 {
     public static class RobotStyles
     {
-        public const int PackPrice=900,PackGold=18000,PackParts=180;
+        public const int PackPrice=600;
         public const int CraftGold=30000,CraftParts=300,CraftShards=12;
         public const string PackKey="robot_style_astral";
         public static readonly string[] Names={"기본 기체","성운 기사","회수 선봉대"};
@@ -34,8 +34,7 @@ namespace ScrapGuard.Core
             if(State.ownedCosmetics==null)State.ownedCosmetics=new List<string>();
             State.ownedCosmetics.Add(RobotStyles.PackKey);RobotStyles.Normalize(State);
             for(int i=0;i<3;i++)State.robotStyles[i]=1;
-            State.gold+=RobotStyles.PackGold;State.parts+=RobotStyles.PackParts;
-            return CommandResult.Ok("성운 기사 기체 3종 적용 · 골드 18,000 · 부품 180 획득");
+            return CommandResult.Ok("성운 기사 기체 3종 적용 · 외형 전용 상품");
         }
         public CommandResult CraftRobotStyle(int frame)
         {

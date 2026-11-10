@@ -144,7 +144,7 @@ namespace ScrapGuard
                 ShopRow(list,110,"공용 부품 ×100","매일 1회 · 확정 수량","100 보석",()=>ConfirmBuy("parts_gems","부품 100개","보석 100"),State.dailyGemPartsPurchases<1);
                 ShopRow(list,220,"성장 보급 · 골드 + 부품","골드 4,500 · 부품 40 · 하루 1회","100 보석",GrowthKitPanel,State.dailyGrowthKits<1);
                 ShopRow(list,330,"작전 성장 패스","무료 트랙 · 추가 트랙 · 기간 만료 없음","구성 보기",GrowthPassPanel);
-                ShopRow(list,440,"성운 기사 · 로봇 외형 3종","외형 즉시 적용 · 성장 재료 포함","900 보석",()=>RobotStylePanel());
+                ShopRow(list,440,"성운 기사 · 로봇 외형 3종","외형 즉시 적용 · 성장 재료 없음","600 보석",()=>RobotStylePanel());
                 Ui.Button(list,"강화 전후 비교",0,560,238,53,GrowthPanel,Ui.Raised,true,17);
                 Ui.Button(list,"대원 성장으로 이동",254,560,238,53,()=>Show("heroes"),Ui.Raised,true,17);
                 Ui.Button(list,"무료 현장 보급 · 평소 전투 5분 합산",0,635,492,53,SalvagePanel,Ui.Mint,true,17);

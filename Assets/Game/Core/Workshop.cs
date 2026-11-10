@@ -63,7 +63,7 @@ namespace ScrapGuard.Core
         // Both app-local settlement and server replay use the same report and collection logic.
         public CommandResult FinishCampaign(Combat combat)
         {
-            if(combat==null || !combat.Ended || combat.Challenge || combat.BossPractice)return CommandResult.Fail("작전 결과가 올바르지 않아요.");
+            if(combat==null || !combat.Ended || combat.Challenge || combat.BossPractice || combat.ApexBattle)return CommandResult.Fail("작전 결과가 올바르지 않아요.");
             var result=FinishRun(combat.RunId,combat.Stage,combat.Won,combat.Kills,combat.Elapsed);
             if(!result.Success)return result;
             var receipt=State.receipts.Find(r=>r.id==combat.RunId);receipt.report=combat.Report();

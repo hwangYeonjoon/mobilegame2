@@ -17,11 +17,11 @@ namespace ScrapGuard.Core
             return firstFinale+(standard-firstFinale)*Math.Min(1,(Stage-5)/12f);
         }
         public int BossLearningTier {get{return Challenge?0:Stage<=1?1:Stage<=3?2:3;}}
-        float BossBaseHealth {get{return IntroBattle?18000:BossCurve(24000,36000,50000);}}
+        float BossBaseHealth {get{return IntroBattle?18000:BossCurve(24000,36000,50000)*(ApexBattle?(Stage==47?1.15f:1.3f):1);}}
         float BossPatternInterval {get{return BossCurve(5,4.2f,3.8f);}}
         float BossHitRecovery {get{return BossCurve(.8f,.7f,.45f);}}
         float BossContactInterval {get{return BossCurve(1.3f,1.3f,.75f);}}
-        float BossDamageScale {get{return Stage<=17?BossCurve(.45f,.56f,.6f+.4f*17/18f):.6f+.4f*Math.Min(1,Stage/18f);}}
+        float BossDamageScale {get{return (Stage<=17?BossCurve(.45f,.56f,.6f+.4f*17/18f):.6f+.4f*Math.Min(1,Stage/18f))*(ApexBattle?(Stage==47?1.35f:1.65f):1);}}
         float BossChargeSpeed {get{return BossCurve(145,170,190);}}
         float BossChargeWindup {get{return BossCurve(1.3f,1,.8f);}}
         float BossChargeRecovery {get{return BossCurve(6,5,4.5f);}}

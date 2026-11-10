@@ -1,0 +1,1033 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="164" result="Passed" total="164" passed="164" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:55:03Z" duration="49.9727202">
+  <test-suite type="TestSuite" id="1000" name="고철 수호대" fullname="고철 수호대" runstate="Runnable" testcasecount="164" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:55:03Z" duration="49.972720" total="164" passed="164" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1172" name="ScrapGuard.Tests.dll" fullname="/Users/kd-server/IdeaProjects/mobilegame2/Library/ScriptAssemblies/ScrapGuard.Tests.dll" runstate="Runnable" testcasecount="164" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:55:03Z" duration="49.967661" total="164" passed="164" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="45885" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1173" name="ScrapGuard" fullname="ScrapGuard" runstate="Runnable" testcasecount="164" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:55:03Z" duration="49.967282" total="164" passed="164" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1174" name="Tests" fullname="ScrapGuard.Tests" runstate="Runnable" testcasecount="164" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:55:03Z" duration="49.967047" total="164" passed="164" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="BattleClaritySpecification" fullname="ScrapGuard.Tests.BattleClaritySpecification" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.449015" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1006" name="AllHeroesHaveMotionFramesAndHurtHasPriority" fullname="ScrapGuard.Tests.BattleClaritySpecification.AllHeroesHaveMotionFramesAndHurtHasPriority" methodname="AllHeroesHaveMotionFramesAndHurtHasPriority" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="83656888" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.096395" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="AutomaticBudgetRecoversOnlyAfterSustainedHealthyFrames" fullname="ScrapGuard.Tests.BattleClaritySpecification.AutomaticBudgetRecoversOnlyAfterSustainedHealthyFrames" methodname="AutomaticBudgetRecoversOnlyAfterSustainedHealthyFrames" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="639379515" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.000559" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="CompactParticlesTrimExistingEffectsAndReuseCapacity" fullname="ScrapGuard.Tests.BattleClaritySpecification.CompactParticlesTrimExistingEffectsAndReuseCapacity" methodname="CompactParticlesTrimExistingEffectsAndReuseCapacity" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="2122370380" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.011972" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="GoalsReflectActualProgressWithoutMutatingTheSave" fullname="ScrapGuard.Tests.BattleClaritySpecification.GoalsReflectActualProgressWithoutMutatingTheSave" methodname="GoalsReflectActualProgressWithoutMutatingTheSave" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="289820655" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.007113" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="MaterialSoundsAreCachedAudibleAndDoNotClip" fullname="ScrapGuard.Tests.BattleClaritySpecification.MaterialSoundsAreCachedAudibleAndDoNotClip" methodname="MaterialSoundsAreCachedAudibleAndDoNotClip" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="2146993388" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.312051" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="NewEnemyAndBossAtlasesHaveEveryDistinctFrame" fullname="ScrapGuard.Tests.BattleClaritySpecification.NewEnemyAndBossAtlasesHaveEveryDistinctFrame" methodname="NewEnemyAndBossAtlasesHaveEveryDistinctFrame" classname="ScrapGuard.Tests.BattleClaritySpecification" runstate="Runnable" seed="1321432606" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:13Z" duration="0.012052" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1008" name="BattlePresentationSpecification" fullname="ScrapGuard.Tests.BattlePresentationSpecification" classname="ScrapGuard.Tests.BattlePresentationSpecification" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:15Z" duration="1.747193" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1012" name="ChallengeHasDistinctFloorAndNoCampaignObstacles" fullname="ScrapGuard.Tests.BattlePresentationSpecification.ChallengeHasDistinctFloorAndNoCampaignObstacles" methodname="ChallengeHasDistinctFloorAndNoCampaignObstacles" classname="ScrapGuard.Tests.BattlePresentationSpecification" runstate="Runnable" seed="1399420519" result="Passed" start-time="2026-11-10 04:54:13Z" end-time="2026-11-10 04:54:14Z" duration="0.022728" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="EnemyPoolResetsHitAndRageFeedback" fullname="ScrapGuard.Tests.BattlePresentationSpecification.EnemyPoolResetsHitAndRageFeedback" methodname="EnemyPoolResetsHitAndRageFeedback" classname="ScrapGuard.Tests.BattlePresentationSpecification" runstate="Runnable" seed="362848928" result="Passed" start-time="2026-11-10 04:54:14Z" end-time="2026-11-10 04:54:14Z" duration="0.006512" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="EveryCampaignLayoutUsesTheSimulationFootprints" fullname="ScrapGuard.Tests.BattlePresentationSpecification.EveryCampaignLayoutUsesTheSimulationFootprints" methodname="EveryCampaignLayoutUsesTheSimulationFootprints" classname="ScrapGuard.Tests.BattlePresentationSpecification" runstate="Runnable" seed="1540699361" result="Passed" start-time="2026-11-10 04:54:14Z" end-time="2026-11-10 04:54:15Z" duration="1.714040" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="ParticleBudgetAndLifetimeStayBounded" fullname="ScrapGuard.Tests.BattlePresentationSpecification.ParticleBudgetAndLifetimeStayBounded" methodname="ParticleBudgetAndLifetimeStayBounded" classname="ScrapGuard.Tests.BattlePresentationSpecification" runstate="Runnable" seed="585907375" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000535" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1013" name="GameTests" fullname="ScrapGuard.Tests.GameTests" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" testcasecount="149" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:55:03Z" duration="47.749385" total="149" passed="149" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1154" name="AllCharacterArtVariantsAreAvailable" fullname="ScrapGuard.Tests.GameTests.AllCharacterArtVariantsAreAvailable" methodname="AllCharacterArtVariantsAreAvailable" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="60114307" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.006412" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1155" name="AllSixteenEnemyAnimationFramesAreAvailable" fullname="ScrapGuard.Tests.GameTests.AllSixteenEnemyAnimationFramesAreAvailable" methodname="AllSixteenEnemyAnimationFramesAreAvailable" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="282411250" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.003821" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1150" name="BrokenSavesArePreserved" fullname="ScrapGuard.Tests.GameTests.BrokenSavesArePreserved" methodname="BrokenSavesArePreserved" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1938020108" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.013035" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Profile read failed: ArgumentException
+]]></output>
+            </test-case>
+            <test-case id="1153" name="CloudEndpointRequiresHttpsOutsideLoopback" fullname="ScrapGuard.Tests.GameTests.CloudEndpointRequiresHttpsOutsideLoopback" methodname="CloudEndpointRequiresHttpsOutsideLoopback" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="753127793" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.002926" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1152" name="CloudJournalSurvivesClientRestart" fullname="ScrapGuard.Tests.GameTests.CloudJournalSurvivesClientRestart" methodname="CloudJournalSurvivesClientRestart" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1715285958" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.001999" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1148" name="CoreRules" fullname="ScrapGuard.Tests.GameTests.CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" testcasecount="125" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:55:03Z" duration="47.543656" total="125" passed="125" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1023" name="CoreRules(&quot;AttendanceBoundary&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AttendanceBoundary&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="813600231" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000414" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1024" name="CoreRules(&quot;AttendanceCannotRepeat&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AttendanceCannotRepeat&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1714949771" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000244" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1025" name="CoreRules(&quot;AttendanceSkipAndCycle&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AttendanceSkipAndCycle&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="394922475" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000285" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1026" name="CoreRules(&quot;ClockBackwards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ClockBackwards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="432673265" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000125" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1027" name="CoreRules(&quot;InsufficientFunds&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;InsufficientFunds&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1877798353" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000633" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1028" name="CoreRules(&quot;ShopLimitsAndReset&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ShopLimitsAndReset&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="31446262" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000229" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1029" name="CoreRules(&quot;RareLifetimeLimit&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RareLifetimeLimit&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="306493994" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000395" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1030" name="CoreRules(&quot;SellGuards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SellGuards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1481664611" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000133" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="CoreRules(&quot;TransferConservesLevels&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;TransferConservesLevels&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1848300825" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000246" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="CoreRules(&quot;HeroUnlock&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;HeroUnlock&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1431480973" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000185" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="CoreRules(&quot;DuplicateBattle&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;DuplicateBattle&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1436454692" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000854" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="CoreRules(&quot;WrongStage&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;WrongStage&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="523616266" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000093" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1035" name="CoreRules(&quot;FirstClearOnlyOnce&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FirstClearOnlyOnce&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="567562876" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000115" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1036" name="CoreRules(&quot;AbandonNoDailyCredit&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AbandonNoDailyCredit&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="301446254" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000077" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1037" name="CoreRules(&quot;RewardCaps&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RewardCaps&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="577185700" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000433" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1038" name="CoreRules(&quot;RewardReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RewardReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="751301030" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000113" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1039" name="CoreRules(&quot;OldResultCannotFarm&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;OldResultCannotFarm&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1913956474" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000124" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1040" name="CoreRules(&quot;MissionClaimOnce&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;MissionClaimOnce&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="86785561" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000153" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1041" name="CoreRules(&quot;CombatPausesForChoices&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CombatPausesForChoices&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1396043845" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.009862" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1042" name="CoreRules(&quot;InvalidSkillRejected&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;InvalidSkillRejected&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="763330687" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000226" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1043" name="CoreRules(&quot;CharacterStats&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CharacterStats&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1858464926" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000099" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1044" name="CoreRules(&quot;CombatDeath&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CombatDeath&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1645486577" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.002396" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1045" name="CoreRules(&quot;BossVictory&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;BossVictory&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="241884529" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:15Z" duration="0.000693" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1046" name="CoreRules(&quot;SpawnBudget&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SpawnBudget&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2098497837" result="Passed" start-time="2026-11-10 04:54:15Z" end-time="2026-11-10 04:54:16Z" duration="0.285160" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1047" name="CoreRules(&quot;ShowcaseMigration&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ShowcaseMigration&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1492651676" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:16Z" duration="0.000225" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1048" name="CoreRules(&quot;CosmeticsDoNotAffectStats&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CosmeticsDoNotAffectStats&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="137175464" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:16Z" duration="0.000549" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1049" name="CoreRules(&quot;ShowcaseOwnership&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ShowcaseOwnership&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="937393143" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:16Z" duration="0.000906" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1050" name="CoreRules(&quot;NicknameValidation&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;NicknameValidation&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1262714255" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:16Z" duration="0.001744" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1051" name="CoreRules(&quot;ShowcaseSoldItem&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ShowcaseSoldItem&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="263244328" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:16Z" duration="0.000175" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1052" name="CoreRules(&quot;ReplayRoundTrip&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ReplayRoundTrip&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="384042048" result="Passed" start-time="2026-11-10 04:54:16Z" end-time="2026-11-10 04:54:17Z" duration="0.995736" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1053" name="CoreRules(&quot;ReplayRejectsInvalidInput&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ReplayRejectsInvalidInput&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="23977066" result="Passed" start-time="2026-11-10 04:54:17Z" end-time="2026-11-10 04:54:17Z" duration="0.000427" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1054" name="CoreRules(&quot;UltimateRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;UltimateRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="488149228" result="Passed" start-time="2026-11-10 04:54:17Z" end-time="2026-11-10 04:54:17Z" duration="0.004392" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1055" name="CoreRules(&quot;UltimateHeroGeometry&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;UltimateHeroGeometry&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1345399360" result="Passed" start-time="2026-11-10 04:54:17Z" end-time="2026-11-10 04:54:17Z" duration="0.004992" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1056" name="CoreRules(&quot;UltimateReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;UltimateReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1657055912" result="Passed" start-time="2026-11-10 04:54:17Z" end-time="2026-11-10 04:54:18Z" duration="1.711671" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1057" name="CoreRules(&quot;UltimateRejectsForgery&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;UltimateRejectsForgery&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2136235119" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:18Z" duration="0.000735" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1058" name="CoreRules(&quot;WeeklyBoundary&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;WeeklyBoundary&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1381059031" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:18Z" duration="0.004835" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1059" name="CoreRules(&quot;ChallengeReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ChallengeReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="319279234" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:18Z" duration="0.075453" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1060" name="CoreRules(&quot;WeeklyRewardRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;WeeklyRewardRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1722692696" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:18Z" duration="0.063047" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1061" name="CoreRules(&quot;CoreExchangeRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CoreExchangeRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="824150823" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:18Z" duration="0.000431" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1062" name="CoreRules(&quot;SupportReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SupportReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1108557696" result="Passed" start-time="2026-11-10 04:54:18Z" end-time="2026-11-10 04:54:19Z" duration="0.207623" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1063" name="CoreRules(&quot;SupportGuards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SupportGuards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1481581608" result="Passed" start-time="2026-11-10 04:54:19Z" end-time="2026-11-10 04:54:19Z" duration="0.000528" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1064" name="CoreRules(&quot;CampaignProgression&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CampaignProgression&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="925535830" result="Passed" start-time="2026-11-10 04:54:19Z" end-time="2026-11-10 04:54:19Z" duration="0.000632" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1065" name="CoreRules(&quot;CampaignMigration&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CampaignMigration&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1956931606" result="Passed" start-time="2026-11-10 04:54:19Z" end-time="2026-11-10 04:54:19Z" duration="0.000767" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1066" name="CoreRules(&quot;CampaignReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CampaignReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="6137045" result="Passed" start-time="2026-11-10 04:54:19Z" end-time="2026-11-10 04:54:38Z" duration="19.456934" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1067" name="CoreRules(&quot;CampaignTerrain&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CampaignTerrain&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2132408755" result="Passed" start-time="2026-11-10 04:54:38Z" end-time="2026-11-10 04:54:38Z" duration="0.005039" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1068" name="CoreRules(&quot;CampaignEnemyRoles&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CampaignEnemyRoles&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2142364131" result="Passed" start-time="2026-11-10 04:54:38Z" end-time="2026-11-10 04:54:38Z" duration="0.001238" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1069" name="CoreRules(&quot;ModGeometry&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ModGeometry&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1489964045" result="Passed" start-time="2026-11-10 04:54:38Z" end-time="2026-11-10 04:54:38Z" duration="0.004495" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1070" name="CoreRules(&quot;ModReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ModReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1158766363" result="Passed" start-time="2026-11-10 04:54:38Z" end-time="2026-11-10 04:54:39Z" duration="0.531983" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1071" name="CoreRules(&quot;BattleDamageReport&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;BattleDamageReport&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2063215808" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.000931" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1072" name="CoreRules(&quot;CollectionMigration&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CollectionMigration&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="487327091" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.000440" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1073" name="CoreRules(&quot;RegionRewardsAndCraft&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RegionRewardsAndCraft&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="760962322" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.001765" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1074" name="CoreRules(&quot;ExpansionMigration&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpansionMigration&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1673194230" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.001188" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1075" name="CoreRules(&quot;ExpansionRecruitment&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpansionRecruitment&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1651682323" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.000934" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1076" name="CoreRules(&quot;ExpansionHeroCombat&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpansionHeroCombat&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1206988611" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:39Z" duration="0.002849" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1077" name="CoreRules(&quot;ExpansionReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpansionReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1065336952" result="Passed" start-time="2026-11-10 04:54:39Z" end-time="2026-11-10 04:54:40Z" duration="1.764809" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1078" name="CoreRules(&quot;ExpansionTerrainAndRewards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpansionTerrainAndRewards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1315597301" result="Passed" start-time="2026-11-10 04:54:40Z" end-time="2026-11-10 04:54:40Z" duration="0.002002" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1079" name="CoreRules(&quot;OutfitOwnership&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;OutfitOwnership&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1473065242" result="Passed" start-time="2026-11-10 04:54:40Z" end-time="2026-11-10 04:54:40Z" duration="0.000650" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1080" name="CoreRules(&quot;OutfitReplayEquality&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;OutfitReplayEquality&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="443908285" result="Passed" start-time="2026-11-10 04:54:40Z" end-time="2026-11-10 04:54:41Z" duration="0.121006" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1081" name="CoreRules(&quot;GuideProofAndMigration&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;GuideProofAndMigration&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1087505236" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.001485" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1082" name="CoreRules(&quot;EarlyBattleProgression&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EarlyBattleProgression&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1740622889" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.003217" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1083" name="CoreRules(&quot;FieldTaskChoiceGuards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FieldTaskChoiceGuards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1241536766" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.000724" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1084" name="CoreRules(&quot;FieldTaskReplayAndRewards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FieldTaskReplayAndRewards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1191263386" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.086564" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1085" name="CoreRules(&quot;FieldTaskDefenseAndEscort&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FieldTaskDefenseAndEscort&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1218420283" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.004745" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1086" name="CoreRules(&quot;ExpandedModMechanics&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpandedModMechanics&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1464258777" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.000473" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1087" name="CoreRules(&quot;FairTrialIgnoresGrowth&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FairTrialIgnoresGrowth&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1407503907" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.031027" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1088" name="CoreRules(&quot;FairTrialNoRewardLeak&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FairTrialNoRewardLeak&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="948305464" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.007896" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1089" name="CoreRules(&quot;PremiumWalletRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;PremiumWalletRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1325700553" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.000316" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1090" name="CoreRules(&quot;PriceCatalogRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;PriceCatalogRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1057990611" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.003987" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1091" name="CoreRules(&quot;AssemblyGuardsAndReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AssemblyGuardsAndReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="312694782" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.066025" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1092" name="CoreRules(&quot;HeroEngineeringMechanics&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;HeroEngineeringMechanics&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1343610316" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.001829" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1093" name="CoreRules(&quot;FieldRouteAndCollectionTarget&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FieldRouteAndCollectionTarget&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="432021796" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.003474" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1094" name="CoreRules(&quot;RailOutfitOwnershipAndParity&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RailOutfitOwnershipAndParity&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="191263778" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.061655" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1095" name="CoreRules(&quot;ModeCopyAndRestorationStages&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ModeCopyAndRestorationStages&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1410118385" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.000513" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1096" name="CoreRules(&quot;WardrobeMigrationAndTargets&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;WardrobeMigrationAndTargets&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="287486149" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.000623" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1097" name="CoreRules(&quot;NewOutfitsHaveNoPower&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;NewOutfitsHaveNoPower&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1429232726" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.506448" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1098" name="CoreRules(&quot;RemainingHeroEngineering&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RemainingHeroEngineering&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="932929096" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:41Z" duration="0.002992" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1099" name="CoreRules(&quot;ConditionsAndNewModuleReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ConditionsAndNewModuleReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1836038618" result="Passed" start-time="2026-11-10 04:54:41Z" end-time="2026-11-10 04:54:42Z" duration="0.678970" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1100" name="CoreRules(&quot;MemorialThresholds&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;MemorialThresholds&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="235747484" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.000245" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1101" name="CoreRules(&quot;ReleaseCompatibilityRules&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ReleaseCompatibilityRules&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2113572729" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.002087" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1102" name="CoreRules(&quot;ReleaseValidationAndStoreLink&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ReleaseValidationAndStoreLink&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1497771192" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.000224" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1103" name="CoreRules(&quot;UpdatePreservesPendingTransactions&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;UpdatePreservesPendingTransactions&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="794695066" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.000173" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1104" name="CoreRules(&quot;ShowcaseThemeOwnership&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ShowcaseThemeOwnership&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1926110427" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.000394" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1105" name="CoreRules(&quot;NewOperationGoals&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;NewOperationGoals&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1346982094" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.005460" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1106" name="CoreRules(&quot;TacticalBuilds&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;TacticalBuilds&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1923400884" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.001727" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1107" name="CoreRules(&quot;HeroIdentityActions&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;HeroIdentityActions&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1770563373" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:42Z" duration="0.004448" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1108" name="CoreRules(&quot;PolishReplayCompatibility&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;PolishReplayCompatibility&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="498266483" result="Passed" start-time="2026-11-10 04:54:42Z" end-time="2026-11-10 04:54:44Z" duration="1.964423" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1109" name="CoreRules(&quot;ExpandedWorldAndHordes&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ExpandedWorldAndHordes&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="983950552" result="Passed" start-time="2026-11-10 04:54:44Z" end-time="2026-11-10 04:54:44Z" duration="0.011102" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1110" name="CoreRules(&quot;ArsenalAndMachineAssembly&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ArsenalAndMachineAssembly&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="138410749" result="Passed" start-time="2026-11-10 04:54:44Z" end-time="2026-11-10 04:54:44Z" duration="0.002432" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1111" name="CoreRules(&quot;EvolutionChoices&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EvolutionChoices&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="591718960" result="Passed" start-time="2026-11-10 04:54:44Z" end-time="2026-11-10 04:54:44Z" duration="0.000978" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1112" name="CoreRules(&quot;AssaultReplayRoundTrip&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AssaultReplayRoundTrip&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="820637818" result="Passed" start-time="2026-11-10 04:54:44Z" end-time="2026-11-10 04:54:45Z" duration="0.877405" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1113" name="CoreRules(&quot;ReviveReplayAuthorization&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ReviveReplayAuthorization&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2055477436" result="Passed" start-time="2026-11-10 04:54:45Z" end-time="2026-11-10 04:54:46Z" duration="0.831716" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1114" name="CoreRules(&quot;SpatialCollisionAcrossCells&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SpatialCollisionAcrossCells&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2022854596" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000618" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1115" name="CoreRules(&quot;CrowdSpacingAndSharedQueries&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;CrowdSpacingAndSharedQueries&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="635187460" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000638" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1116" name="CoreRules(&quot;AttackEvolutionMechanics&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;AttackEvolutionMechanics&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1231011581" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.003450" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1117" name="CoreRules(&quot;MachineInputGuards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;MachineInputGuards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2014504577" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000593" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1118" name="CoreRules(&quot;MachineRecoveryAndTelemetry&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;MachineRecoveryAndTelemetry&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="290318222" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.017501" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1119" name="CoreRules(&quot;BossArenaSafety&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;BossArenaSafety&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1854599194" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.004902" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1120" name="CoreRules(&quot;EarlyEvolutionAndGrowthTail&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EarlyEvolutionAndGrowthTail&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="492672829" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000454" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1121" name="CoreRules(&quot;DamageSourceAccountingAndStackGuard&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;DamageSourceAccountingAndStackGuard&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="746116785" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.001690" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1122" name="CoreRules(&quot;OpeningThreatBudget&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;OpeningThreatBudget&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1184103291" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.042948" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1123" name="CoreRules(&quot;MachineRescueAndBurst&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;MachineRescueAndBurst&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="816663578" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000642" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1124" name="CoreRules(&quot;EquipmentGrowthAndFixedChallenge&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EquipmentGrowthAndFixedChallenge&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="431973434" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000279" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1125" name="CoreRules(&quot;IntroBossScopeAndLearning&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;IntroBossScopeAndLearning&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="846071581" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000942" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1126" name="CoreRules(&quot;HealingSourcesAndLowHealthTime&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;HealingSourcesAndLowHealthTime&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="719605492" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.000326" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1127" name="CoreRules(&quot;RobotPartsAndDistinctFrames&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RobotPartsAndDistinctFrames&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="55305295" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:46Z" duration="0.001305" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1128" name="CoreRules(&quot;RobotReplayAndCollection&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RobotReplayAndCollection&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="569698544" result="Passed" start-time="2026-11-10 04:54:46Z" end-time="2026-11-10 04:54:49Z" duration="3.370667" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1129" name="CoreRules(&quot;IntroRobotRecoveryScope&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;IntroRobotRecoveryScope&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="263075845" result="Passed" start-time="2026-11-10 04:54:49Z" end-time="2026-11-10 04:54:49Z" duration="0.009194" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1130" name="CoreRules(&quot;EarlyBossLessonsAndDamageAccounting&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EarlyBossLessonsAndDamageAccounting&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1364196174" result="Passed" start-time="2026-11-10 04:54:49Z" end-time="2026-11-10 04:54:49Z" duration="0.002436" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1131" name="CoreRules(&quot;EarlyBossReplayRoundTrip&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;EarlyBossReplayRoundTrip&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1925239532" result="Passed" start-time="2026-11-10 04:54:49Z" end-time="2026-11-10 04:54:52Z" duration="3.069625" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1132" name="CoreRules(&quot;ContinuousBossCurve&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ContinuousBossCurve&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="132407856" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.005465" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1133" name="CoreRules(&quot;BossAttackCoordination&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;BossAttackCoordination&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1627042330" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.033972" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1134" name="CoreRules(&quot;GrowthPreviewAndCampaignImpact&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;GrowthPreviewAndCampaignImpact&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1237317758" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.002860" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1135" name="CoreRules(&quot;ModuleUpgradeHasCombatEffect&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ModuleUpgradeHasCombatEffect&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="477819203" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.001629" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1136" name="CoreRules(&quot;GrowthKitAndDailyLimits&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;GrowthKitAndDailyLimits&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1737217691" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.001161" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1137" name="CoreRules(&quot;GrowthPassRightsAndClaims&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;GrowthPassRightsAndClaims&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="945927823" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.001194" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1138" name="CoreRules(&quot;FreeGrowthRecovery&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;FreeGrowthRecovery&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1462909986" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.000522" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1139" name="CoreRules(&quot;VectorGridPrecision&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;VectorGridPrecision&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1991764939" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.000184" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1140" name="CoreRules(&quot;BossPracticeIsolation&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;BossPracticeIsolation&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1442503046" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.008185" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1141" name="CoreRules(&quot;SalvageSupplyGuards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;SalvageSupplyGuards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1841179051" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.000586" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1142" name="CoreRules(&quot;WeeklyRobotReplayAndRewards&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;WeeklyRobotReplayAndRewards&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="909237424" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.056529" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1143" name="CoreRules(&quot;LastDamageCoaching&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;LastDamageCoaching&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2111838559" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.000228" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1144" name="CoreRules(&quot;RobotStyleCommerceAndGrowth&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;RobotStyleCommerceAndGrowth&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1187289804" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:52Z" duration="0.002250" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1145" name="CoreRules(&quot;Expansion034BossReplay&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;Expansion034BossReplay&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="466271651" result="Passed" start-time="2026-11-10 04:54:52Z" end-time="2026-11-10 04:54:53Z" duration="0.141976" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1146" name="CoreRules(&quot;ApexUnlockSettlementAndIsolation&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ApexUnlockSettlementAndIsolation&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1639540611" result="Passed" start-time="2026-11-10 04:54:53Z" end-time="2026-11-10 04:54:53Z" duration="0.002174" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1147" name="CoreRules(&quot;ApexReplayAndFinaleScope&quot;)" fullname="ScrapGuard.Tests.GameTests.CoreRules(&quot;ApexReplayAndFinaleScope&quot;)" methodname="CoreRules" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1435616527" result="Passed" start-time="2026-11-10 04:54:53Z" end-time="2026-11-10 04:55:03Z" duration="10.300959" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1021" name="FieldAndSupportPresentationDataRoundTrip" fullname="ScrapGuard.Tests.GameTests.FieldAndSupportPresentationDataRoundTrip" methodname="FieldAndSupportPresentationDataRoundTrip" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="306226146" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.026445" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1161" name="FontContainsKoreanGlyphs" fullname="ScrapGuard.Tests.GameTests.FontContainsKoreanGlyphs" methodname="FontContainsKoreanGlyphs" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1100727829" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.029519" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1018" name="FullWardrobeAndMemorialRoundTrip" fullname="ScrapGuard.Tests.GameTests.FullWardrobeAndMemorialRoundTrip" methodname="FullWardrobeAndMemorialRoundTrip" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1287964817" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.013434" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1164" name="LegacyThreeHeroSaveMigratesAndPersistsNewRecruit" fullname="ScrapGuard.Tests.GameTests.LegacyThreeHeroSaveMigratesAndPersistsNewRecruit" methodname="LegacyThreeHeroSaveMigratesAndPersistsNewRecruit" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2030494732" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.015190" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1022" name="OutfitAndGuideRoundTrip" fullname="ScrapGuard.Tests.GameTests.OutfitAndGuideRoundTrip" methodname="OutfitAndGuideRoundTrip" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="485154844" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.001104" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="RailOutfitAtlasAndSaveRoundTrip" fullname="ScrapGuard.Tests.GameTests.RailOutfitAtlasAndSaveRoundTrip" methodname="RailOutfitAtlasAndSaveRoundTrip" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="457459980" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000497" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1163" name="RegionPaintAndReportsSurviveUnityJson" fullname="ScrapGuard.Tests.GameTests.RegionPaintAndReportsSurviveUnityJson" methodname="RegionPaintAndReportsSurviveUnityJson" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="150428556" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.002457" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="ReleaseWireRoundTrip" fullname="ScrapGuard.Tests.GameTests.ReleaseWireRoundTrip" methodname="ReleaseWireRoundTrip" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2101274743" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000954" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1151" name="RemoteCacheDoesNotAdvanceServerDay" fullname="ScrapGuard.Tests.GameTests.RemoteCacheDoesNotAdvanceServerDay" methodname="RemoteCacheDoesNotAdvanceServerDay" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1378981639" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.002178" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="ResearchConsentRetentionAndPrivacy" fullname="ScrapGuard.Tests.GameTests.ResearchConsentRetentionAndPrivacy" methodname="ResearchConsentRetentionAndPrivacy" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="585499235" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.019162" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1160" name="RobotArtworkIsLoadableAs2DTexture" fullname="ScrapGuard.Tests.GameTests.RobotArtworkIsLoadableAs2DTexture" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.034482" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1157" name="RobotArtworkIsLoadableAs2DTexture(&quot;artillery&quot;)" fullname="ScrapGuard.Tests.GameTests.RobotArtworkIsLoadableAs2DTexture(&quot;artillery&quot;)" methodname="RobotArtworkIsLoadableAs2DTexture" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="433552695" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.001683" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1158" name="RobotArtworkIsLoadableAs2DTexture(&quot;walker&quot;)" fullname="ScrapGuard.Tests.GameTests.RobotArtworkIsLoadableAs2DTexture(&quot;walker&quot;)" methodname="RobotArtworkIsLoadableAs2DTexture" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="871090983" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000830" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1159" name="RobotArtworkIsLoadableAs2DTexture(&quot;fortress&quot;)" fullname="ScrapGuard.Tests.GameTests.RobotArtworkIsLoadableAs2DTexture(&quot;fortress&quot;)" methodname="RobotArtworkIsLoadableAs2DTexture" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1499117720" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.001424" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1014" name="RobotStylesRoundTripAndAtlasBounds" fullname="ScrapGuard.Tests.GameTests.RobotStylesRoundTripAndAtlasBounds" methodname="RobotStylesRoundTripAndAtlasBounds" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1732619341" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.002508" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1162" name="RoleAndBossArtHasAllStates" fullname="ScrapGuard.Tests.GameTests.RoleAndBossArtHasAllStates" methodname="RoleAndBossArtHasAllStates" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1750303161" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.002047" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1149" name="SaveRoundTripAndBackupRecovery" fullname="ScrapGuard.Tests.GameTests.SaveRoundTripAndBackupRecovery" methodname="SaveRoundTripAndBackupRecovery" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="114615996" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.006302" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Profile read failed: ArgumentException
+]]></output>
+            </test-case>
+            <test-case id="1015" name="ScheduledContentRoundTripAndBoundaries" fullname="ScrapGuard.Tests.GameTests.ScheduledContentRoundTripAndBoundaries" methodname="ScheduledContentRoundTripAndBoundaries" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="2100942333" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000856" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1156" name="ServerNullSupportDoesNotBecomeAGhostCompanion" fullname="ScrapGuard.Tests.GameTests.ServerNullSupportDoesNotBecomeAGhostCompanion" methodname="ServerNullSupportDoesNotBecomeAGhostCompanion" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="851115817" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000510" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="UpdateCachePreservesSessionAndPendingJournal" fullname="ScrapGuard.Tests.GameTests.UpdateCachePreservesSessionAndPendingJournal" methodname="UpdateCachePreservesSessionAndPendingJournal" classname="ScrapGuard.Tests.GameTests" runstate="Runnable" seed="1606847236" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.006348" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1165" name="PresentationTests" fullname="ScrapGuard.Tests.PresentationTests" classname="ScrapGuard.Tests.PresentationTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.014381" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1167" name="AppearanceComparisonRestoresBaseSpriteAndRemovesOrnaments" fullname="ScrapGuard.Tests.PresentationTests.AppearanceComparisonRestoresBaseSpriteAndRemovesOrnaments" methodname="AppearanceComparisonRestoresBaseSpriteAndRemovesOrnaments" classname="ScrapGuard.Tests.PresentationTests" runstate="Runnable" seed="1462092506" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.008110" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1166" name="PooledProjectilesResetAndPreserveSpecialAttackIdentity" fullname="ScrapGuard.Tests.PresentationTests.PooledProjectilesResetAndPreserveSpecialAttackIdentity" methodname="PooledProjectilesResetAndPreserveSpecialAttackIdentity" classname="ScrapGuard.Tests.PresentationTests" runstate="Runnable" seed="537154037" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.004726" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1168" name="ServiceTests" fullname="ScrapGuard.Tests.ServiceTests" classname="ScrapGuard.Tests.ServiceTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.005943" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1170" name="AdReplyCannotReplaceAnotherAccountOrNewerRevision" fullname="ScrapGuard.Tests.ServiceTests.AdReplyCannotReplaceAnotherAccountOrNewerRevision" methodname="AdReplyCannotReplaceAnotherAccountOrNewerRevision" classname="ScrapGuard.Tests.ServiceTests" runstate="Runnable" seed="1690552555" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.001783" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1171" name="PublicServiceLinksRejectPlaceholdersAndCredentials" fullname="ScrapGuard.Tests.ServiceTests.PublicServiceLinksRejectPlaceholdersAndCredentials" methodname="PublicServiceLinksRejectPlaceholdersAndCredentials" classname="ScrapGuard.Tests.ServiceTests" runstate="Runnable" seed="688291773" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000877" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1169" name="UnconfiguredBuildDoesNotRequestAdvertising" fullname="ScrapGuard.Tests.ServiceTests.UnconfiguredBuildDoesNotRequestAdvertising" methodname="UnconfiguredBuildDoesNotRequestAdvertising" classname="ScrapGuard.Tests.ServiceTests" runstate="Runnable" seed="445071108" result="Passed" start-time="2026-11-10 04:55:03Z" end-time="2026-11-10 04:55:03Z" duration="0.000445" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: /Users/kd-server/IdeaProjects/mobilegame2/TestResults/edit035.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

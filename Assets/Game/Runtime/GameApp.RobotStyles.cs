@@ -31,9 +31,9 @@ namespace ScrapGuard
             RobotRigView.Draw(card,116,185,260,frame*4+1,2,style);
             Ui.Label(card,RobotStyles.Names[style],24,450,444,36,25,Ui.Gold,TextAnchor.MiddleCenter);
             for(int i=0;i<3;i++){int v=i;Ui.Button(card,RobotStyles.Names[i],24+i*150,503,144,43,()=>RobotStylePanel(frame,v),style==i?Ui.Mint:Ui.Raised,true,16);}
-            string details=style==1?"기체 외형 3종 + 골드 18,000 + 부품 180\n900 보석 · 계정당 1회 · 구매하면 외형 즉시 적용\n재료를 사용한 강화는 별도 선택 · 최대 레벨은 동일":style==2?"선택한 기체 1종을 재료로 제작하고 적용\n작전 42 완료 · 골드 30,000 · 부품 300\n코어 파편 12개 · 주간 도전에서 획득":"기본 외형으로 돌아갑니다.";
+            string details=style==1?"기체 외형 3종 · 600 보석 · 계정당 1회\n구매하면 3기체 외형을 즉시 적용\n성장 재료 없음 · 공격력과 체력은 그대로":style==2?"선택한 기체 1종을 재료로 제작하고 적용\n작전 42 완료 · 골드 30,000 · 부품 300\n코어 파편 12개 · 주간 도전에서 획득":"기본 외형으로 돌아갑니다.";
             Ui.Label(card,details,24,566,444,99,17,Ui.Ink,TextAnchor.MiddleCenter);
-            string button=owned?(RobotStyles.Active(State,frame)==style?"적용 중":"이 기체에 적용"):style==1?"성운 기사 팩 구성·강화 미리보기":"재료를 사용해 제작";
+            string button=owned?(RobotStyles.Active(State,frame)==style?"적용 중":"이 기체에 적용"):style==1?"성운 기사 팩 · 외형 구성 확인":"재료를 사용해 제작";
             Ui.Button(card,button,24,685,444,54,()=>{
                 if(owned)Change(new GameCommand("robot_style_equip"){frame=frame,skin=style},confirmed:()=>RobotStylePanel(frame,style));
                 else if(style==1)RobotPackConfirm(frame);
@@ -41,22 +41,22 @@ namespace ScrapGuard
             },Ui.Gold,!(owned&&RobotStyles.Active(State,frame)==style),18);
             Ui.Button(card,"집중 강화",24,762,214,50,()=>GrowthPathPanel(),Ui.Mint,true,18);
             Ui.Button(card,"로봇 전시",254,762,214,50,()=>RobotHangar(),Ui.Raised,true,18);
-            Ui.Label(card,"부품 외형은 매판 조립한 기체에 적용 · 재료는 성장에 영향",24,829,444,32,13,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,"능력치는 동일 · 매판 조립한 기체와 전시에 적용",24,829,444,32,13,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void RobotPackConfirm(int frame)
         {
-            var card=Dialog("성운 기사 팩 · 구매 확인","900 보석 · 외형 3종 즉시 적용\n골드 18,000 + 부품 180 · 강화는 직접 선택",730);
-            Ui.Label(card,"구매 후 강화 · 보유 재료 포함 · 한 경로 기준",24,141,444,34,18,Ui.Mint);
-            for(int slot=0;slot<4;slot++)
+            var card=Dialog("성운 기사 팩 · 구매 확인","600 보석 · 외형 전용 · 계정당 1회\n포격·돌파·철벽 외형을 즉시 적용",720);
+            for(int i=0;i<3;i++)
             {
-                var q=GrowthPaths.Quote(State,slot,30,RobotStyles.PackGold,RobotStyles.PackParts);
-                string t=q==null?new[]{"무기","방어구","모듈","대원"}[slot]+" · 최대 레벨 (재료로 추가 강화 불가)":q.name+" Lv."+q.from+" → "+q.to+"\n"+(slot==2?Growth.ModuleEffect(State.items.Find(i=>i.id==q.id),q.count):"공격 "+Catalog.Attack(State)+" → "+q.attack+" · 체력 "+Catalog.Health(State)+" → "+q.health);
-                Ui.Label(card,t,24,196+slot*75,444,64,17,Ui.Ink);
+                RobotRigView.Draw(card,26+i*150,160,140,i*4+1,2,1);
+                Ui.Label(card,RobotAssembly.Frames[i],24+i*150,310,144,36,15,Ui.Gold,TextAnchor.MiddleCenter);
             }
-            Ui.Label(card,"보유 보석 "+State.gems+" → "+(State.gems-RobotStyles.PackPrice)+"\n무료 보석도 사용 가능 · 모든 경로가 함께 강화되지는 않아요.",24,504,444,56,16,Ui.Muted);
-            Ui.Button(card,"900 보석 구매 · 외형 3종 적용",24,579,444,55,()=>Change(new GameCommand("buy"){value="robot_astral_pack"},confirmed:()=>GrowthPathPanel("성운 기사 적용 완료 · 받은 재료로 강화할 경로를 고르세요.")),Ui.Gold,!RobotStyles.Owned(State,0,1)&&State.gems>=900&&State.gemDebt==0,18);
-            Ui.Button(card,"취소",24,656,214,47,()=>RobotStylePanel(frame,1),Ui.Raised,true,18);
-            Ui.Button(card,"보석 획득·충전",254,656,214,47,()=>GemSources(900,()=>RobotPackConfirm(frame)),Ui.Raised,true,17);
+            Ui.Label(card,"실루엣 · 공격 강조색 · 합체 등장 연출\n전투와 내 로봇 전시에 함께 적용돼요.",24,371,444,70,20,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,"골드·부품 제공 없음 · 능력치 변화 없음\n성장 보급과 별개의 상품이에요.",24,465,444,60,18,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,"보유 보석 "+State.gems+" · 가격 "+RobotStyles.PackPrice,24,535,444,36,18,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Button(card,"600 보석 구매 · 외형 3종 적용",24,582,444,55,()=>Change(new GameCommand("buy"){value="robot_astral_pack"},confirmed:()=>RobotStylePanel(frame,1)),Ui.Gold,!RobotStyles.Owned(State,0,1)&&State.gems>=RobotStyles.PackPrice&&State.gemDebt==0,18);
+            Ui.Button(card,"취소",24,654,214,47,()=>RobotStylePanel(frame,1),Ui.Raised,true,18);
+            Ui.Button(card,"보석 획득·충전",254,654,214,47,()=>GemSources(RobotStyles.PackPrice,()=>RobotPackConfirm(frame)),Ui.Raised,true,17);
         }
     }
 }

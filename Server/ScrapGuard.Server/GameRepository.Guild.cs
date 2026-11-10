@@ -114,7 +114,7 @@ public sealed partial class GameRepository
     }
     void RecordRestoration(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
     {
-        if(combat.Challenge || combat.BossPractice || !combat.Won || !combat.TaskCompleted || combat.Elapsed<30 || account.State.testProgress)return;
+        if(combat.Challenge || combat.BossPractice || combat.ApexBattle || !combat.Won || !combat.TaskCompleted || combat.Elapsed<30 || account.State.testProgress)return;
         string guild=GuildId(db,tx,account.Id);
         if(string.IsNullOrEmpty(guild) || guild!=combat.GuildAtStart)return;
         string day=Catalog.ServiceDate(clock());
@@ -128,7 +128,7 @@ public sealed partial class GameRepository
     void RecordSupport(SqliteConnection db,SqliteTransaction tx,Account account,Combat combat)
     {
         var support=combat.Support;
-        if(combat.Challenge || combat.BossPractice || !combat.SupportUsed || combat.Elapsed<30 || support==null || string.IsNullOrEmpty(support.guild))return;
+        if(combat.Challenge || combat.BossPractice || combat.ApexBattle || !combat.SupportUsed || combat.Elapsed<30 || support==null || string.IsNullOrEmpty(support.guild))return;
         if(GuildId(db,tx,account.Id)!=support.guild || GuildId(db,tx,support.owner)!=support.guild || Blocked(db,tx,account.Id,support.owner))return;
         // Only verified calls count. Abandoned runs may count as use, never as a helped clear.
         Execute(db,tx,"INSERT OR IGNORE INTO support_runs(run,week,guild,owner,borrower,won) VALUES($run,$week,$guild,$owner,$borrower,$won)",

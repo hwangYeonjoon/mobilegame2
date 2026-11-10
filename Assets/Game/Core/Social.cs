@@ -21,8 +21,8 @@ namespace ScrapGuard.Core
     [Serializable] public class BlockList { public List<string> ids = new List<string>(); }
     public static class Social
     {
-        public static readonly string[] Titles = { "새내기 정비사", "첫 구역의 수호자", "꾸준한 발걸음", "천 대의 증인", "코어 정복자", "균열의 개척자" };
-        public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "작전 5개 클리어", "코어 파편 12개 교환" };
+        public static readonly string[] Titles = { "새내기 정비사", "첫 구역의 수호자", "꾸준한 발걸음", "천 대의 증인", "코어 정복자", "균열의 개척자", "극한의 조립사" };
+        public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "작전 5개 클리어", "코어 파편 12개 교환", "극한 작전 3종 완료" };
         public static readonly string[] Frames = { "작업대", "첫 승리", "푸른 궤적", "태양의 테두리", "코어 궤도" };
         public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛", "번개의 황금빛", "용광로의 홍옥빛", "자력의 청동빛", "폭풍의 푸른빛", "궤도의 별빛" };
         public static void Normalize(GameState s)
@@ -49,7 +49,7 @@ namespace ScrapGuard.Core
         }
         public static bool HasTitle(GameState s, int id)
         {
-            switch (id) { case 0: return true; case 1: return s.clearedStages.Count > 0; case 2: return s.attendanceCount >= 7; case 3: return s.totalKills >= 1000; case 4: return s.clearedStages.Count >= 5; case 5: return s.ownedCosmetics!=null && s.ownedCosmetics.Contains("title_rift"); default: return false; }
+            switch (id) { case 0: return true; case 1: return s.clearedStages.Count > 0; case 2: return s.attendanceCount >= 7; case 3: return s.totalKills >= 1000; case 4: return s.clearedStages.Count >= 5; case 5: return s.ownedCosmetics!=null && s.ownedCosmetics.Contains("title_rift"); case 6: return Apex.Mastered(s); default: return false; }
         }
         public static bool HasFrame(GameState s, int id)
         {

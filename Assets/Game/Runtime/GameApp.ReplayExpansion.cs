@@ -53,7 +53,7 @@ namespace ScrapGuard
         void SalvagePanel()
         {
             int left=Math.Max(0,300-State.dailySupplySeconds);
-            var card=Dialog("진행하며 받는 현장 보급","새 작전·재도전·주간 도전의 전투 시간 합산\n승패 무관 · 하루 한 번 · 보석과 광고 불필요",700);
+            var card=Dialog("진행하며 받는 현장 보급","일반·극한·주간 도전의 전투 시간 합산\n승패 무관 · 하루 한 번 · 보석과 광고 불필요",700);
             Ui.Label(card,"골드 4,500 + 공용 부품 40",24,146,444,42,26,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(card,"이미 깬 작전을 반복할 필요 없어요.\n60초 이상 진행한 전투만 정산 후 합산돼요.",24,210,444,64,18,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"오늘 "+(300-left)+" / 300초",24,294,444,38,22,Ui.Mint,TextAnchor.MiddleCenter);

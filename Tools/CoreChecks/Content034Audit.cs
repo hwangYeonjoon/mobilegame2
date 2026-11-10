@@ -21,6 +21,7 @@ static class Content034Audit
     static object Metrics(Combat c)=>new{c.Won,c.Elapsed,c.Kills,c.Hp,c.MaxHp,c.Damage,c.DamageDealt,c.DamageReceived,c.BossCombatSeconds,c.BossPatterns,c.PeakBossWarnings,c.MachineActiveSeconds,c.LowHealthSeconds};
     public static int Run(string input,string output)
     {
+        int currentRules=Combat.RulesVersion;if(currentRules!=25)throw new InvalidOperationException("0.34 audit is historical. Use commit 34657f3 or content035 audit for current rules.");
         var source=JsonSerializer.Deserialize<Input>(File.ReadAllText(input),GrowthAudit.Json);var purchases=new List<object>();var journeys=new List<object>();
         foreach(var p in source.profiles)
         {

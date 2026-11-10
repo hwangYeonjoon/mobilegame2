@@ -11,8 +11,9 @@ namespace ScrapGuard.Tests
         [Test]
         public void RobotStylesRoundTripAndAtlasBounds()
         {
-            var s=GameState.New();s.gems=900;var e=new Economy(s,()=>DateTimeOffset.UtcNow);Assert.That(e.BuyRobotStylePack().Success,Is.True);
+            var s=GameState.New();s.apexRecords.Add(new ApexRecord{stage=47,wins=1,bestSeconds=271});s.gems=RobotStyles.PackPrice;var e=new Economy(s,()=>DateTimeOffset.UtcNow);Assert.That(e.BuyRobotStylePack().Success,Is.True);
             var restored=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));ScrapGuard.Core.Social.Normalize(restored);
+            Assert.That(Apex.Find(restored,47).bestSeconds,Is.EqualTo(271));
             var seen=new System.Collections.Generic.HashSet<Rect>();
             for(int style=1;style<=2;style++)for(int frame=0;frame<3;frame++)
             {
