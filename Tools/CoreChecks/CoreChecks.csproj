@@ -23,6 +23,7 @@
     <Compile Include="../../Assets/Tests/EditMode/Content034Specification.cs" />
     <Compile Include="Content034Audit.cs" />
     <Compile Include="Content035Audit.cs" />
+    <Compile Include="GrowthValueAudit.cs" />
     <Compile Include="../../Assets/Tests/EditMode/ApexSpecification.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BalanceAudit.cs" />

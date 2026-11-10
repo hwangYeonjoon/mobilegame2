@@ -39,10 +39,10 @@ static class PurchaseAudit
     {
         bool pass=j.cohort.StartsWith("pass_")||j.cohort.StartsWith("both_");
         bool kit=j.cohort.StartsWith("kit_")||j.cohort.StartsWith("both_");
-        bool needsPass=pass&&!Growth.PassOwned(e.State),needsKit=kit&&e.State.dailyGrowthKits==0;
+        bool needsPass=pass&&!Growth.PassOwned(e.State),needsKit=kit&&e.State.dailyGrowthKits==0&&Growth.KitAddsGrowth(e.State,Growth.CurrentKit(e.State).id);
         if(j.cohort==KitFirst&&needsKit&&e.State.gems>=Growth.KitPrice)
         {
-            if(!GrowthAudit.Act(e,work,stage,attempt,"buy_kit","growth_kit",()=>e.Buy("growth_kit")))throw new Exception("Affordable kit-first purchase rejected");
+            if(!GrowthAudit.Act(e,work,stage,attempt,"buy_kit",Growth.CurrentKit(e.State).id,()=>e.Buy(Growth.CurrentKit(e.State).id)))throw new Exception("Affordable kit-first purchase rejected");
             needsKit=false;
         }
         int wanted=(needsPass?Growth.PassPrice:0)+(needsKit?Growth.KitPrice:0);
@@ -66,7 +66,7 @@ static class PurchaseAudit
         if(needsKit)
         {
             if(e.State.gems<Growth.KitPrice){j.decisions.Add(new Decision{day=day,gems=e.State.gems,required=Growth.KitPrice,outcome="kit_unaffordable"});return;}
-            if(!GrowthAudit.Act(e,work,stage,attempt,"buy_kit","growth_kit",()=>e.Buy("growth_kit")))throw new Exception("Affordable daily kit rejected");
+            if(!GrowthAudit.Act(e,work,stage,attempt,"buy_kit",Growth.CurrentKit(e.State).id,()=>e.Buy(Growth.CurrentKit(e.State).id)))throw new Exception("Affordable daily kit rejected");
         }
     }
     internal static Journey Play(int index,int seed,string cohort,string policy,int days,int maxStage,int slots)

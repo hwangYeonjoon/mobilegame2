@@ -17,8 +17,13 @@ namespace ScrapGuard
             if(Catalog.Attack(State)<=attack||State.gold!=1500)smokeErrors.Add("Upgrade preview/action mismatch");
             string before=JsonUtility.ToJson(State);GrowthKitPanel();yield return Capture("04-kit-preview");
             if(before!=JsonUtility.ToJson(State))smokeErrors.Add("Kit preview mutated wallet");
-            ClickVisibleButton("100 보석으로 구매");yield return Capture("05-kit-use-now");
-            if(State.gold!=6000||State.parts!=68||State.gems!=1900)smokeErrors.Add("Kit grant mismatch");
+            var kit=Growth.KitQuote(State,Growth.CurrentKit(State).id,0);int kitGold=State.gold,kitParts=State.parts;
+            GrowthKitConfirm(kit.offer.id,0);yield return Capture("04b-kit-confirm");
+            ClickVisibleButton("100 보석 구매 · "+kit.after.count+"단계 강화");yield return Capture("05-kit-use-now");
+            if(State.gold!=kitGold+kit.offer.gold-kit.after.gold||State.parts!=kitParts+kit.offer.parts-kit.after.parts||State.gems!=1900||Catalog.Attack(State)!=kit.after.attack)smokeErrors.Add("Kit atomic upgrade mismatch");
+            ClickVisibleButton("이 장비로 1작전 출격");yield return null;
+            if(combat==null||combat.Stage!=0||combat.Damage!=Catalog.Attack(State))smokeErrors.Add("Purchased stats not used in retry");
+            battlePaused=true;RenderBattle();yield return Capture("05b-kit-retry");combat.Abandon();FinishBattle();combat=null;
             GrowthPassPanel();yield return Capture("06-pass-free-and-premium");
             ClickVisibleButton("추가 트랙 900 보석 · 구성 확인");yield return Capture("07-pass-confirmation");
             ClickVisibleButton("900 보석으로 해금");yield return Capture("08-pass-owned");
@@ -46,6 +51,9 @@ namespace ScrapGuard
             combat.Abandon();FinishBattle();combat=null;
             Store.Change(e=>{for(int i=0;i<Campaign.Count;i++)if(!e.State.clearedStages.Contains(i))e.State.clearedStages.Add(i);e.State.unlockedStage=Campaign.Count-1;return CommandResult.Ok("Completed campaign UI fixture only");});
             Show("home");yield return Capture("23-campaign-complete-home");
+            GrowthKitPanel();yield return Capture("42-late-kit-comparison");
+            GrowthKitCatalog();yield return Capture("43-kit-public-catalog");
+            GrowthKitConfirm(Growth.CurrentKit(State).id,3);yield return Capture("44-late-kit-confirm");
             yield return Content034Smoke();
             yield return ReplayExpansionCapture();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));

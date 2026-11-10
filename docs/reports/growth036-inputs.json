@@ -1,0 +1,3486 @@
+{
+  "source": "docs/reports/long033-calendar.json.gz",
+  "note": "Archived earned equipped snapshots; day-1 progression is not rerun. A fresh service day and unclaimed field supply are assumed. Other inventory/daily rewards not restored.",
+  "profiles": [
+    {
+      "seed": 17,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1230,
+          "parts": 155,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 800,
+          "parts": 230,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 877,
+          "parts": 445,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1230,
+          "parts": 155,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 1000,
+          "parts": 232,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 3157,
+          "parts": 450,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1430,
+          "parts": 157,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 1000,
+          "parts": 232,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 70,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 1359,
+          "parts": 441,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 830,
+          "parts": 151,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 600,
+          "parts": 228,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 1907,
+          "parts": 444,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 830,
+          "parts": 151,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 600,
+          "parts": 228,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 483,
+        "health": 3709,
+        "heroLevel": 20,
+        "unlockedStage": 31,
+        "totalRuns": 75,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 4677,
+          "parts": 485,
+          "gems": 2240
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1030,
+          "parts": 153,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 800,
+          "parts": 230,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 70,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 5678,
+          "parts": 472,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 19,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1230,
+          "parts": 155,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 800,
+          "parts": 230,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 1000,
+          "parts": 442,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1430,
+          "parts": 157,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 1200,
+          "parts": 234,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 470,
+        "health": 3598,
+        "heroLevel": 18,
+        "unlockedStage": 31,
+        "totalRuns": 69,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 8627,
+          "parts": 491,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1030,
+          "parts": 153,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 800,
+          "parts": 230,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 2248,
+          "parts": 449,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "controlled_avoid",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 1030,
+          "parts": 153,
+          "gems": 440
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 9,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "controlled_avoid",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 600,
+          "parts": 228,
+          "gems": 800
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "controlled_avoid",
+      "stage": 31,
+      "snapshot": {
+        "attack": 477,
+        "health": 3653,
+        "heroLevel": 19,
+        "unlockedStage": 31,
+        "totalRuns": 71,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 993,
+          "parts": 442,
+          "gems": 2110
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 530,
+          "parts": 177,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 354,
+        "health": 2777,
+        "heroLevel": 13,
+        "unlockedStage": 13,
+        "totalRuns": 33,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 167,
+          "parts": 267,
+          "gems": 980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 14,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 14,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 497,
+        "health": 3820,
+        "heroLevel": 22,
+        "unlockedStage": 31,
+        "totalRuns": 81,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 3436,
+          "parts": 582,
+          "gems": 2320
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 530,
+          "parts": 177,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 29,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 318,
+          "parts": 252,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 517,
+        "health": 3987,
+        "heroLevel": 25,
+        "unlockedStage": 31,
+        "totalRuns": 94,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 12329,
+          "parts": 744,
+          "gems": 2430
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 330,
+          "parts": 175,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 29,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 281,
+          "parts": 251,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 510,
+        "health": 3931,
+        "heroLevel": 24,
+        "unlockedStage": 31,
+        "totalRuns": 89,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 7548,
+          "parts": 688,
+          "gems": 2400
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 530,
+          "parts": 177,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 354,
+        "health": 2687,
+        "heroLevel": 13,
+        "unlockedStage": 13,
+        "totalRuns": 33,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 3305,
+          "parts": 290,
+          "gems": 980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 14,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 530,
+        "health": 4098,
+        "heroLevel": 27,
+        "unlockedStage": 31,
+        "totalRuns": 101,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 6182,
+          "parts": 714,
+          "gems": 2510
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 530,
+          "parts": 177,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 3000,
+          "parts": 272,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 497,
+        "health": 3820,
+        "heroLevel": 22,
+        "unlockedStage": 31,
+        "totalRuns": 83,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 7674,
+          "parts": 595,
+          "gems": 2320
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 330,
+          "parts": 175,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 2800,
+          "parts": 270,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 523,
+        "health": 4043,
+        "heroLevel": 26,
+        "unlockedStage": 31,
+        "totalRuns": 95,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 1360,
+          "parts": 675,
+          "gems": 2430
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 330,
+          "parts": 175,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 29,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 18,
+          "parts": 250,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 510,
+        "health": 3931,
+        "heroLevel": 24,
+        "unlockedStage": 31,
+        "totalRuns": 88,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 6940,
+          "parts": 679,
+          "gems": 2400
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 130,
+          "parts": 173,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 2600,
+          "parts": 268,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 530,
+        "health": 4098,
+        "heroLevel": 27,
+        "unlockedStage": 31,
+        "totalRuns": 100,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 5446,
+          "parts": 706,
+          "gems": 2510
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 730,
+          "parts": 179,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 28,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 2800,
+          "parts": 270,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 12,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 497,
+        "health": 3820,
+        "heroLevel": 22,
+        "unlockedStage": 31,
+        "totalRuns": 82,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 5267,
+          "parts": 581,
+          "gems": 2320
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "natural_legacy",
+      "stage": 7,
+      "snapshot": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 7,
+        "totalRuns": 16,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "wallet": {
+          "gold": 530,
+          "parts": 177,
+          "gems": 490
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "\uac15\ucca0 \uc678\uace8\uaca9"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "natural_legacy",
+      "stage": 13,
+      "snapshot": {
+        "attack": 335,
+        "health": 2641,
+        "heroLevel": 12,
+        "unlockedStage": 13,
+        "totalRuns": 29,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "wallet": {
+          "gold": 408,
+          "parts": 253,
+          "gems": 850
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 13,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 13,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "natural_legacy",
+      "stage": 31,
+      "snapshot": {
+        "attack": 523,
+        "health": 4043,
+        "heroLevel": 26,
+        "unlockedStage": 31,
+        "totalRuns": 95,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "wallet": {
+          "gold": 4245,
+          "parts": 682,
+          "gems": 2430
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ucda9\uaca9 \ubc1c\uc0ac\uae30"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "\uacbd\ub7c9 \ubcf4\ud638\ubcf5"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "\ub4dc\ub860 \ubaa8\ub4c8"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -55,7 +55,7 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if (offer == "robot_astral_pack")return BuyRobotStylePack();
-            if (offer == "growth_kit")return BuyGrowthKit();
+            if (Growth.FindKit(offer)!=null)return BuyGrowthKit(offer);
             if (offer == "growth_pass")return BuyGrowthPass();
             if (offer == "hero")
             {

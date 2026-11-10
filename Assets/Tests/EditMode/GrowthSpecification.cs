@@ -48,6 +48,38 @@ namespace ScrapGuard.Tests
             now=now.AddDays(-1);Check(!e.Buy("growth_kit").Success,"backwards clock never reopens kit");
             s.gemDebt=1;now=now.AddDays(2);Check(!e.Buy("growth_kit").Success&&s.gems==100,"refund debt blocks premium spending");
         }
+        public static void GrowthKitTiersAndIncrementalValue()
+        {
+            var e=New();var s=e.State;s.gems=500;
+            Check(Growth.CurrentKit(s).id=="growth_kit"&&!e.Buy("growth_kit_field").Success,"future tier cannot be bought");
+            s.clearedStages.Add(11);Check(Growth.CurrentKit(s).gold==9000,"12 clear unlocks fixed 9000/80 pack");
+            s.clearedStages.Add(29);Check(Growth.CurrentKit(s).gold==15000,"30 clear unlocks fixed 15000/120 pack");
+            foreach(var item in s.items)item.level=16;s.heroes[0].level=16;s.gold=s.parts=0;
+            var old=Growth.KitQuote(s,"growth_kit",0);var next=Growth.KitQuote(s,"growth_kit_frontier",0);
+            Check(old.ExtraLevels==0&&next.ExtraLevels==2&&next.before.to==16&&next.after.to==18,"late pack funds real two-step growth where base funds none");
+            Check(e.Buy("growth_kit_frontier").Success&&s.gold==15000&&s.parts==120&&s.gems==400,"tier has exact public price and grant");
+            Check(!e.Buy("growth_kit_field").Success&&s.gems==400,"shared daily cap cannot be bypassed by tier");
+            var rich=New();rich.State.gems=500;rich.State.gold=1000000;rich.State.parts=1000000;
+            Check(!Growth.KitAddsGrowth(rich.State,"growth_kit")&&!rich.Buy("growth_kit").Success&&rich.State.gems==500,"cannot sell redundant materials when wallet already funds all equipped growth");
+        }
+        public static void GrowthKitAtomicUpgrade()
+        {
+            var e=New();var s=e.State;s.gems=100;var q=Growth.KitQuote(s,"growth_kit",0);int gold=s.gold,parts=s.parts;
+            Check(q.ExtraLevels==q.after.to-q.before.to&&q.ExtraLevels>0,"paid delta excludes existing wallet");
+            Check(!e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count,q.after.id,q.after.from+1,0).Success&&s.gems==100&&s.gold==gold,"stale upgrade cannot debit or grant");
+            Check(!e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count+1,q.after.id,q.after.from,0).Success&&s.dailyGrowthKits==0,"forged count is atomic failure");
+            Check(!e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count,q.after.id,q.after.from,1).Success,"changed hero rejected");
+            s.gemDebt=1;Check(!e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count,q.after.id,q.after.from,0).Success&&s.gold==gold,"refund debt cannot upgrade");s.gemDebt=0;
+            Check(e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count,q.after.id,q.after.from,0).Success,"atomic purchase and upgrade");
+            Check(s.gems==0&&s.gold==gold+4500-q.after.gold&&s.parts==parts+40-q.after.parts&&Catalog.Attack(s)==q.after.attack,"exact debit, material remainder, real stats");
+            Check(!e.BuyGrowthKitAndUpgrade("growth_kit",0,q.after.count,q.after.id,q.after.from,0).Success,"duplicate cannot upgrade again");
+            for(int slot=1;slot<4;slot++)
+            {
+                var other=New();other.State.gems=100;var k=Growth.KitQuote(other.State,"growth_kit",slot);
+                Check(other.BuyGrowthKitAndUpgrade("growth_kit",slot,k.after.count,k.after.id,k.after.from,0).Success,"each growth route applies");
+                Check(Catalog.Health(other.State)==k.after.health&&Catalog.Attack(other.State)==k.after.attack,"route quote agrees with actual stats");
+            }
+        }
         public static void GrowthPassRightsAndClaims()
         {
             var e=New();var s=e.State;s.gems=1000;

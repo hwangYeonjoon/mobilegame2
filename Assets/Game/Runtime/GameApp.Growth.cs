@@ -52,19 +52,60 @@ namespace ScrapGuard
         }
         void GrowthKitPanel()
         {
-            var card=Dialog("성장 보급 · 하루 1회","골드 4,500 + 공용 부품 40개 · 확정 구성",800);
-            Ui.Label(card,"100 보석 사용 · 보유 "+State.gems+"개",24,139,444,37,23,Ui.Gold,TextAnchor.MiddleCenter);
-            Ui.Label(card,"구매 후 가능한 강화 1회씩의 미리보기\n각 행은 별도 선택이며 모두 동시 적용되는 것은 아니에요.",24,194,444,58,16,Ui.Muted,TextAnchor.MiddleCenter);
-            var steps=Growth.Steps(State,Growth.KitGold,Growth.KitParts);
-            for(int i=0;i<steps.Count;i++)
+            var kit=Growth.CurrentKit(State);
+            var card=Dialog(kit.name+" · 성장 경로 선택","골드 "+kit.gold.ToString("N0")+" · 부품 "+kit.parts+" · 100 보석\n모든 보급 합쳐 하루 1회 · 원하는 경로 하나를 선택",850);
+            Ui.Label(card,"보유 재료로 가능한 강화와 구매 효과를 비교해요.",24,142,444,32,16,Ui.Muted);
+            for(int slot=0;slot<4;slot++)
             {
-                var p=steps[i];Ui.Label(card,p.name+" · "+GrowthDelta(p)+"\n"+(p.affordable?"구매 후 강화 가능":"추가 재료 필요")+" · 골드 "+p.gold+" / 부품 "+p.parts,24,273+i*66,444,60,16,p.affordable?Ui.Mint:Ui.Muted);
+                int choice=slot;var q=Growth.KitQuote(State,kit.id,slot);float y=190+slot*112;
+                string label=q==null?new[]{"공격 · 무기","생존 · 방어구","모듈","대원"}[slot]+" · 최대 레벨":q.after.name+" · 현재 Lv."+q.after.from+"\n보유 재료로 Lv."+q.before.to+" → 구매하면 Lv."+q.after.to+"\n"+(q.ExtraLevels>0?"구매로 추가 "+q.ExtraLevels+"단계 · 효과 확인":"추가 강화 없음 · 보유 재료 먼저 사용");
+                Ui.Button(card,label,24,y,444,101,()=>GrowthKitConfirm(kit.id,choice),q!=null&&q.ExtraLevels>0?Ui.Raised:Ui.Background,q!=null&&q.ExtraLevels>0&&State.dailyGrowthKits<1,17);
             }
-            if(steps.Count==0)Ui.Label(card,"현재 대원과 장비가 최대 레벨이에요.\n이 보급으로 추가 강화할 수 없어 구매를 잠시 막았어요.",24,310,444,100,19,Ui.Muted,TextAnchor.MiddleCenter);
-            bool can=steps.Count>0&&State.dailyGrowthKits<1&&State.gems>=Growth.KitPrice&&State.gemDebt==0;
-            Ui.Button(card,State.dailyGrowthKits>=1?"오늘 구매 완료":"100 보석으로 구매",24,564,444,58,()=>Change(new GameCommand("buy"){value="growth_kit"},confirmed:()=>GrowthPathPanel("보급 수령 · 원하는 강화 경로 하나를 선택하세요.")),Ui.Gold,can,20);
-            Ui.Button(card,"보석을 아끼고 같은 재료 모으기",24,637,444,51,SalvagePanel,Ui.Raised,true,17);
-            Ui.Button(card,"취소 · 성장 화면",24,705,444,51,GrowthPanel,Ui.Panel,true,17);
+            Ui.Button(card,State.dailyGrowthKits>0?"오늘 구매 완료 · 보유 재료 강화":"보유 재료로 집중 강화",24,651,444,48,()=>GrowthPathPanel(),Ui.Mint,true,17);
+            Ui.Button(card,"무료 보급·구간별 상품 구성",24,718,444,47,GrowthKitCatalog,Ui.Raised,true,17);
+            Ui.Button(card,"돌아가기",24,784,444,44,GrowthPanel,Ui.Raised,true,17);
+        }
+        string KitPathEffect(GrowthPath p)
+        {
+            if(p.slot==2)return Growth.ModuleEffect(State.items.Find(i=>i.id==p.id),p.to-p.from);
+            return p.slot==0?"공격 "+p.attack:p.slot==1?"체력 "+p.health:"공격 "+p.attack+" · 체력 "+p.health;
+        }
+        void GrowthKitConfirm(string offer,int slot)
+        {
+            var q=Growth.KitQuote(State,offer,slot);if(q==null||q.ExtraLevels<=0){GrowthKitPanel();return;}
+            int hero=State.selectedHero,retry=selectedStage;
+            if(combat!=null&&combat.Ended&&!combat.Won&&string.IsNullOrEmpty(combat.Mode))retry=combat.Stage;
+            string from=slot==2?Growth.ModuleEffect(State.items.Find(i=>i.id==q.after.id)):slot==0?"공격 "+Catalog.Attack(State):slot==1?"체력 "+Catalog.Health(State):"공격 "+Catalog.Attack(State)+" · 체력 "+Catalog.Health(State);
+            string to=KitPathEffect(q.after);
+            var card=Dialog("보급 구매와 강화 확인",q.offer.name+" · "+q.after.name+"\n골드 "+q.offer.gold.ToString("N0")+" · 부품 "+q.offer.parts+" 지급",780);
+            Ui.Label(card,"보유 재료만 사용: Lv."+q.before.from+" → "+q.before.to+"\n"+KitPathEffect(q.before),24,148,444,65,19,Ui.Muted);
+            Ui.Label(card,"구매 후 사용: Lv."+q.after.from+" → "+q.after.to+"\n"+to+"\n이 구매로 추가 강화 "+q.ExtraLevels+"단계",24,237,444,100,21,Ui.Mint);
+            Ui.Label(card,"기존 재료와 받은 재료를 합쳐 사용해요.\n강화 비용: 골드 "+q.after.gold.ToString("N0")+" · 부품 "+q.after.parts+"\n강화 후 잔액: 골드 "+(State.gold+q.offer.gold-q.after.gold).ToString("N0")+" · 부품 "+(State.parts+q.offer.parts-q.after.parts),24,362,444,96,17,Ui.Ink);
+            Ui.Label(card,"보석 "+State.gems+" → "+(State.gems>=100?(State.gems-100).ToString():"부족")+"\n선택한 경로만 강화 · 승리 보장 없음",24,481,444,60,17,Ui.Muted);
+            Ui.Button(card,"100 보석 구매 · "+q.after.count+"단계 강화",24,566,444,56,()=>Change(new GameCommand("growth_kit_upgrade",q.after.id){value=offer,stage=slot,count=q.after.count,level=q.after.from,hero=hero},confirmed:()=>GrowthKitApplied(q,from,to,retry)),Ui.Gold,State.gems>=100&&State.gemDebt==0&&State.dailyGrowthKits<1,18);
+            Ui.Button(card,"취소",24,649,214,47,GrowthKitPanel,Ui.Raised,true,17);
+            Ui.Button(card,"보석 획득·충전",254,649,214,47,()=>GemSources(100,()=>GrowthKitConfirm(offer,slot)),Ui.Raised,true,16);
+        }
+        void GrowthKitApplied(GrowthKitQuote q,string from,string to,int retry)
+        {
+            var card=Dialog("강화 완료 · 다시 도전하세요",q.after.name+" Lv."+q.after.from+" → "+q.after.to,610);
+            Ui.Label(card,from+"\n↓\n"+to,24,157,444,115,26,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Label(card,"보급 구매로 추가 "+q.ExtraLevels+"단계 가능해졌어요.\n남은 골드 "+State.gold.ToString("N0")+" · 부품 "+State.parts,24,303,444,65,18,Ui.Muted,TextAnchor.MiddleCenter);
+            int stage=Mathf.Clamp(retry,0,State.unlockedStage);
+            Ui.Button(card,"이 장비로 "+(stage+1)+"작전 출격",24,412,444,58,()=>{combat=null;CloseModal();StartBattle(stage);},Ui.Gold,true,19);
+            Ui.Button(card,"다른 성장 확인",24,495,214,48,()=>GrowthPathPanel(),Ui.Raised,true,17);
+            Ui.Button(card,"출격 준비",254,495,214,48,()=>{combat=null;Show("home");},Ui.Mint,true,17);
+        }
+        void GrowthKitCatalog()
+        {
+            var card=Dialog("성장 보급 · 공개 구성","가격은 모두 100 보석 · 종류를 합쳐 하루 1회\n작전 진행으로 더 큰 고정 구성이 열립니다.",700);
+            for(int i=0;i<Growth.Kits.Length;i++)
+            {
+                var k=Growth.Kits[i];Ui.Label(card,k.name+" · "+(k.clear==0?"처음부터":k.clear+"작전 완료 후")+"\n골드 "+k.gold.ToString("N0")+" · 부품 "+k.parts,24,148+i*103,444,75,20,Growth.KitUnlocked(State,k)?Ui.Mint:Ui.Muted);
+            }
+            Ui.Label(card,"무료 현장 보급: 전투 합산 5분, 하루 한 번\n골드 4,500 · 부품 40 · 구매 여부와 무관\n추가 강화가 없으면 구매할 수 없어요.",24,469,444,88,17,Ui.Ink);
+            Ui.Button(card,"무료 현장 보급",24,588,214,50,SalvagePanel,Ui.Mint,true,17);
+            Ui.Button(card,"보급 효과 비교",254,588,214,50,GrowthKitPanel,Ui.Raised,true,17);
         }
         void ClaimGrowthReward(int tier,bool premium)
         {

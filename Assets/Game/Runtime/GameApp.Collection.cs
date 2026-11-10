@@ -142,7 +142,7 @@ namespace ScrapGuard
                 var list=ShopScroll(501,MenuBottom-501,790,0);
                 ShopRow(list,0,"공용 부품 ×20","매일 1회 · 골드로 성장 재료 보충","2,000 골드",()=>ConfirmBuy("parts_gold","부품 20개","골드 2,000"),State.dailyPartsPurchases<1);
                 ShopRow(list,110,"공용 부품 ×100","매일 1회 · 확정 수량","100 보석",()=>ConfirmBuy("parts_gems","부품 100개","보석 100"),State.dailyGemPartsPurchases<1);
-                ShopRow(list,220,"성장 보급 · 골드 + 부품","골드 4,500 · 부품 40 · 하루 1회","100 보석",GrowthKitPanel,State.dailyGrowthKits<1);
+                ShopRow(list,220,Growth.CurrentKit(State).name+" · 강화 효과 비교","골드 "+Growth.CurrentKit(State).gold.ToString("N0")+" · 부품 "+Growth.CurrentKit(State).parts+" · 하루 1회","100 보석",GrowthKitPanel,State.dailyGrowthKits<1);
                 ShopRow(list,330,"작전 성장 패스","무료 트랙 · 추가 트랙 · 기간 만료 없음","구성 보기",GrowthPassPanel);
                 ShopRow(list,440,"성운 기사 · 로봇 외형 3종","외형 즉시 적용 · 성장 재료 없음","600 보석",()=>RobotStylePanel());
                 Ui.Button(list,"강화 전후 비교",0,560,238,53,GrowthPanel,Ui.Raised,true,17);

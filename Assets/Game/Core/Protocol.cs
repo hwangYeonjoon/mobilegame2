@@ -61,6 +61,7 @@ namespace ScrapGuard.Core
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);
                 case "robot_style_craft": return e.CraftRobotStyle(c.frame);
                 case "robot_style_equip": return RobotStyles.Equip(e.State,c.frame,c.skin);
+                case "growth_kit_upgrade": return e.BuyGrowthKitAndUpgrade(c.value,c.stage,c.count,c.id,c.level,c.hero);
                 case "upgrade_path": return e.UpgradePath(c.stage,c.count,c.id,c.level);
                 case "robot_showcase": return RobotAssembly.Showcase(e.State,c.stage);
                 case "showcase_equipment": e.State.showcaseItems = new List<string>(e.State.equipped); return CommandResult.Ok("현재 장비를 전시했어요.");

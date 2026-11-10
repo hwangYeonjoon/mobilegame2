@@ -49,6 +49,19 @@ static class GrowthCommerceChecks
         repo=new GameRepository(path,()=>now);check(RobotStyles.Active(repo.Bootstrap(secondKey).state,0)==1,"robot style survives server restart");
         repo.RevokePurchase("robot-test");var robotRefund=repo.Bootstrap(secondKey).state;
         check(robotRefund.gems==0&&robotRefund.gemDebt==600,"robot pack uses existing refund debt accounting");
+        string atomicKey=Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+','-').Replace('/','_');var atom=repo.Register(atomicKey);
+        provider.Binding=repo.Commerce(atomicKey,true).accountBinding;
+        repo.VerifyPurchase(atomicKey,new PurchaseRequest{productId="gems_300",purchaseToken="atomic-growth-test"},provider).GetAwaiter().GetResult();
+        var atomicState=repo.Bootstrap(atomicKey).state;var aq=Growth.KitQuote(atomicState,"growth_kit",0);
+        var ac=new GameCommand("growth_kit_upgrade",aq.after.id){value="growth_kit",stage=0,count=aq.after.count,level=aq.after.from,hero=0,revision=repo.Bootstrap(atomicKey).revision};
+        var forged=new GameCommand("growth_kit_upgrade",aq.after.id){value="growth_kit_frontier",stage=0,count=aq.after.count,level=aq.after.from,hero=0,revision=ac.revision};
+        try{repo.Apply(atomicKey,forged);throw new Exception("locked pack accepted");}catch(ApiFault f){check(f.Status==400&&repo.Bootstrap(atomicKey).state.gems==300,"locked tier cannot debit gems or grant growth");}
+        var ar=repo.Apply(atomicKey,ac);check(ar.state.gems==200&&ar.state.gold==1800+4500-aq.after.gold&&Catalog.Attack(ar.state)==aq.after.attack,"atomic kit exact purchase delta and equipped stats");
+        var again=repo.Apply(atomicKey,ac);check(again.state.gold==ar.state.gold&&again.state.gems==200,"atomic network retry is idempotent");
+        repo=new GameRepository(path,()=>now);check(Catalog.Attack(repo.Bootstrap(atomicKey).state)==aq.after.attack,"atomic upgraded equipment survives restart");
+        repo.RevokePurchase("atomic-growth-test");check(repo.Bootstrap(atomicKey).state.gemDebt==100,"atomic kit uses verified refund accounting");
+        now=now.AddDays(1);var debt=repo.Bootstrap(atomicKey);var dq=Growth.KitQuote(debt.state,"growth_kit",1);
+        try{repo.Apply(atomicKey,new GameCommand("growth_kit_upgrade",dq.after.id){value="growth_kit",stage=1,count=dq.after.count,level=dq.after.from,hero=0,revision=debt.revision});throw new Exception("debt purchase accepted");}catch(ApiFault f){check(f.Status==400&&Catalog.Health(repo.Bootstrap(atomicKey).state)==Catalog.Health(debt.state),"refund debt cannot gain atomic growth");}
         var old=new Combat(GameState.New(),4,"same",17,false,SkillTrial.Mode);var paid=new Combat(refunded,4,"same",17,false,SkillTrial.Mode);
         check(old.Damage==paid.Damage&&old.MaxHp==paid.MaxHp,"verified purchases and pass cannot alter fixed trial power");
     }

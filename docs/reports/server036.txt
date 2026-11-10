@@ -1,0 +1,406 @@
+/Users/kd-server/IdeaProjects/mobilegame2/Server/Checks/ReleaseChecks.cs(8,162): warning CS8632: nullable 참조 형식에 대한 주석은 코드에서 '#nullable' 주석 컨텍스트 내에만 사용되어야 합니다. [/Users/kd-server/IdeaProjects/mobilegame2/Server/Checks/Checks.csproj]
+/Users/kd-server/IdeaProjects/mobilegame2/Server/Checks/CommerceChecks.cs(11,58): warning CS0649: 'CommerceChecks.Provider.Canceled' 필드에는 할당되지 않으므로 항상 false 기본값을 사용합니다. [/Users/kd-server/IdeaProjects/mobilegame2/Server/Checks/Checks.csproj]
+PASS isolated accounts, private by default
+PASS registration retry preserves account
+PASS unknown bearer rejected
+PASS idempotent attendance receipt
+PASS request ID content collision rejected
+PASS stale revision rejected
+PASS no test gems on server
+PASS no mock ad claims on server
+PASS missing offer rejected without crash
+PASS rejected commands preserve balance
+PASS private profile hidden
+PASS opt-in gallery
+PASS public DTO excludes wallet and credentials
+PASS like set is idempotent
+PASS self like denied
+PASS report reason allowlist
+PASS blocked profile omitted
+PASS block also suppresses direct lookup
+PASS unblock restores view without old likes
+PASS stale combat request rejected after client compatibility gate
+PASS ticket identifies combat rules
+PASS mismatched rules cannot settle
+PASS fast-forwarded battle rejected by server time
+PASS server replay exercises ultimate
+PASS replayed results override forged score and stage
+PASS battle reward retry cannot double pay
+PASS illegal skill replay rejected
+PASS interrupted run can be cancelled
+PASS quick test blocked on server
+PASS cosmetic purchase spends gems without power increase
+PASS duplicate cosmetic purchase rejected
+PASS earned and owned display selection persisted
+PASS SQLite survives repository restart
+PASS currency ledger recorded
+PASS reports deduplicate
+SQLite 3.53.4
+PASS invitation required
+PASS wrong invitation rejected
+PASS valid invitation accepted
+PASS public guest registration does not require the retained invite
+PASS public signup still respects registration shutdown
+PASS registration can close
+PASS maintenance flag parsed
+PASS proxy trust restricted to explicit address
+PASS online backup restores committed state including WAL
+PASS readiness checks existing database without creating missing file
+PASS backup cannot overwrite a previous snapshot
+PASS old database migrates active run to legacy version
+PASS legacy active run cannot receive new-rule rewards
+PASS legacy run remains cancellable
+PASS deleted bearer revoked
+PASS deleted public profile removed
+PASS account deletion cascades social and economy rows
+PASS unknown challenge mode rejected
+PASS server enforces fifth-stage unlock
+PASS practice cannot create ranked or rewarded progress
+PASS idempotent guild creation
+PASS unknown guild code rejected
+PASS invited member joins guild
+PASS single membership enforced
+PASS locked hero cannot be registered
+PASS outsider cannot borrow guild support
+PASS self support rejected
+PASS blocked member omitted from support roster
+PASS blocked supporter cannot be borrowed
+PASS server snapshots supporter and reserves daily allowance
+PASS issued support remains deterministic after donor leaves
+PASS three daily support starts maximum including abandoned runs
+PASS support allowance resets at service day
+PASS departing leader transfers ownership
+PASS last member deletion disbands guild
+PASS weekly support event rejected by replay
+PASS ranked fixture survives and damages core
+PASS weekly score comes only from verified simulation
+PASS private profile excluded from leaderboard
+PASS opt-in score and own rank visible
+PASS leaderboard respects mutual blocking
+PASS shard claim idempotent across request retries
+PASS new request cannot claim same tier twice
+PASS shards cannot be purchased through ordinary shop
+PASS insufficient shard exchange rejected
+PASS exclusive title spends only earned shard balance
+PASS public exhibition includes earned trophy and exclusive title
+PASS weekly board resets without deleting permanent trophy
+PASS earned trophy survives week rollover
+PASS account deletion removes ranking identity
+PASS weekly score row cascades on deletion
+PASS server migrates former final clear without granting gems again
+PASS server issues new sixth operation
+PASS server denies locked late operation
+PASS server terrain replay matches operation 7
+PASS new operation settlement retry remains idempotent 7
+PASS server terrain replay matches operation 13
+PASS new operation settlement retry remains idempotent 13
+PASS server terrain replay matches operation 19
+PASS new operation settlement retry remains idempotent 19
+PASS server terrain replay matches operation 25
+PASS new operation settlement retry remains idempotent 25
+PASS server terrain replay matches operation 30
+PASS new operation settlement retry remains idempotent 30
+PASS server craft and retry grants exactly one paint
+PASS new request cannot recraft owned paint
+PASS other region blueprints cannot be spent
+PASS exclusive regional paint is not a shop offer
+PASS craft is audited once in blueprint ledger
+PASS unbuilt robot cannot be published
+PASS guide progression comes from server-verified movement ultimate and mod
+PASS server verifies earned mods and ignores forged client result
+PASS report uses authoritative replay damage
+PASS blueprints require verified campaign success
+PASS settlement retry cannot duplicate blueprints
+PASS server settles replay-authorized robot collection
+PASS blueprint completion rank comes from replay, not submitted state
+PASS settlement retry cannot duplicate constructed robots
+PASS built robot is exposed through public profile
+PASS robot choice survives repository restart
+PASS blueprint completion ranks survive persistence
+PASS public support snapshots earned appearance and title
+PASS private support arrival strips showcase metadata
+PASS blocked supporter cannot issue an arrival card
+PASS crafted paint survives restart
+PASS client cannot forge recruitment clear
+PASS locked new hero cannot be selected
+PASS server preserves v0.6 heroes and unlocks stage 31
+PASS server recruits new hero once without charging 3
+PASS duplicate new recruit rejected 3
+PASS server recruits new hero once without charging 4
+PASS duplicate new recruit rejected 4
+PASS new support appears in guild roster 3
+PASS new support is reserved authoritatively 3
+PASS new hero/support/terrain replay ignores forged victory 3
+PASS expanded damage sources match server replay 3
+PASS expanded settlement retry is idempotent 3
+PASS new region cosmetic can be showcased 5
+PASS new support appears in guild roster 4
+PASS new support is reserved authoritatively 4
+PASS new hero/support/terrain replay ignores forged victory 4
+PASS expanded damage sources match server replay 4
+PASS expanded settlement retry is idempotent 4
+PASS new region cosmetic can be showcased 6
+PASS expanded ownership and selection survive restart
+PASS unowned outfit rejected by server
+PASS server requires full outfit price
+PASS theme retry debits once
+PASS owned theme survives server storage and DTO
+PASS theme dashboard counts authoritative ownership and application once
+PASS unearned memorial is absent from ownership metrics
+PASS unearned theme cannot be forged
+PASS purchase retry grants and charges once
+PASS second purchase request rejected
+PASS public profile displays equipped outfit
+PASS outfit debit audited once
+PASS guild roster shows outfit
+PASS public support snapshots outfit
+PASS reserved support does not change with owner equipment
+PASS private support hides premium outfit
+PASS weekly leaderboard stores outfit at run start
+PASS record costume survives later unequip
+PASS opening guide cannot forge achievements
+PASS outfit ownership and score survive restart
+PASS legacy weekly rows migrate without deleting scores or inventing outfits
+PASS support snapshot binds originating guild
+PASS reservation alone does not earn support credit
+PASS fixture wins with actual field recovery and support call
+PASS server derives field rewards from replay, ignores reported outcome
+PASS verified clear credits provider exactly once on retry
+PASS weekly featured guardian comes from verified helped members
+PASS support hall survives restart and schema reinitialization
+PASS repeat clear with same borrower never inflates helped-member count
+PASS uncalled support and client win flag earn no credit
+PASS blocked relationship excluded from support hall
+PASS unblock restores existing verified counts without duplicating them
+PASS new week has no fabricated featured guardian
+PASS disabled commerce cannot grant
+PASS pending purchase grants nothing
+PASS license-test server rejects real payment
+PASS purchase must bind to authenticated account
+PASS unsupported multi-quantity order rejected
+PASS verified test credit has paid provenance and test marker
+PASS repeat token grants once
+PASS free gems consumed before purchase balance
+PASS refund removes remaining purchase and tracks spent debt
+PASS refund callback is idempotent
+PASS revoked purchase cannot restore credit
+PASS next credit settles refund adjustment without negative balance
+PASS verified permanent right granted
+PASS verified ad skip uses common daily quota
+PASS refund removes permanent right
+PASS refund before grant leaves tombstone
+PASS purchase provenance survives database restart
+PASS skill trial cannot earn growth rewards
+PASS skill leaderboard is separate and server derived
+PASS skill settlement retry is idempotent
+PASS verified purchase funds growth kit with exact resources
+PASS network retry cannot duplicate growth kit or charge twice
+PASS second daily kit rejected
+PASS server rejects unearned pass milestone
+PASS server rejects duplicate pass purchase
+PASS server grants earned final pass outfit
+PASS retry cannot duplicate premium milestone payout
+PASS pass ownership and claims survive restart
+PASS spent kit and pass participate in existing refund debt accounting
+PASS refund debt cannot fund another growth purchase
+PASS server pure cosmetic pack leaves materials unchanged and equips immediately
+PASS pack retry does not duplicate grant
+PASS server batch matches displayed stats and cost
+PASS batch request retry is idempotent
+PASS robot style survives server restart
+PASS robot pack uses existing refund debt accounting
+PASS locked tier cannot debit gems or grant growth
+PASS atomic kit exact purchase delta and equipped stats
+PASS atomic network retry is idempotent
+PASS atomic upgraded equipment survives restart
+PASS atomic kit uses verified refund accounting
+PASS refund debt cannot gain atomic growth
+PASS verified purchases and pass cannot alter fixed trial power
+PASS server refuses unearned salvage
+PASS server refuses unearned robot contract
+PASS server refuses locked boss practice
+PASS server replay accepts boss_practice
+PASS finish retry idempotent boss_practice
+PASS practice cannot pay or advance campaign
+PASS server replay accepts weekly
+PASS finish retry idempotent weekly
+PASS server derives weekly robot contract and collection from replay
+PASS robot contract exact payout
+PASS contract retry cannot duplicate payout
+PASS contract second request rejected
+PASS salvage retry idempotent
+PASS salvage remains claimed after restart
+PASS new day requires new verified victories
+PASS server rejects locked apex
+PASS server refuses non-finale apex
+PASS server rejects apex support
+PASS server issues distinct apex ticket
+PASS forged victory cannot override apex replay
+PASS abandoned apex has no first clear or campaign payout
+PASS apex finish retry is idempotent
+PASS apex record survives restart
+PASS verified Unity win pays first apex reward exactly once 0
+PASS verified win retry cannot duplicate apex shards 0
+PASS verified Unity win pays first apex reward exactly once 1
+PASS verified win retry cannot duplicate apex shards 1
+PASS repeated verified victories survive restart
+PASS invalid Google signature adapter cannot link
+PASS verified identity links existing account
+PASS login challenge cannot replay
+PASS same Google identity cannot merge two accounts
+PASS recovery nonce binds new secret
+PASS Google recovery preserves server progression
+PASS Google recovery revokes old bearer
+PASS new secret authenticates recovered account
+PASS account deletion removes Google link
+PASS verified assembly bot completes campaign
+PASS restoration transaction and retry award once
+PASS server report preserves verified field assembly
+PASS daily contribution cap across repeated clears
+PASS daily reset preserves weekly construction
+PASS mid-battle guild switch cannot move contribution
+PASS test progress cannot build official guild facility
+PASS forged win with no replay earns no construction
+PASS weekly discovery includes ordinary public player
+PASS blocking suppresses discovery and contributor identity
+PASS private profile cannot be featured
+PASS restoration survives restart
+PASS new week starts fresh construction
+PASS server persists collection target
+PASS verified 30th contribution creates permanent memorial
+PASS 60 points upgrades one weekly memorial
+PASS 120 point stretch memorial
+PASS weekly reset and restart retain permanent guild achievement
+PASS earned anonymous guild memorial survives contributor deletion
+PASS legacy completed week backfills once
+PASS backfill is idempotent
+PASS guild dissolution removes memorials
+PASS server saving goal never charges
+PASS new outfit retry charges once and fulfills target
+PASS server wardrobe migration and independent equips survive restart
+PASS new outfit appears in public profile
+PASS server clears only selected hero
+PASS invalid wardrobe command cannot mutate wallet
+PASS new collection purchase is idempotent and visible 5
+PASS new collection purchase is idempotent and visible 6
+PASS new collection purchase is idempotent and visible 7
+PASS new collection purchase is idempotent and visible 8
+PASS new collection purchase is idempotent and visible 9
+PASS new collection purchase is idempotent and visible 10
+PASS multiple looks per hero persist without losing earlier ownership
+PASS old collection re-equip only changes its hero
+PASS release defaults match packaged app and unpublished Play state
+PASS matching build and rules accepted
+PASS legacy or invalid build header rejected 
+PASS legacy or invalid build header rejected -1
+PASS legacy or invalid build header rejected 0
+PASS legacy or invalid build header rejected 13
+PASS legacy or invalid build header rejected 14,15
+PASS legacy or invalid build header rejected 2147483648
+PASS incompatible rules rejected before account mutation
+PASS rollout can recommend while retaining minimum
+PASS typed 426 response describes required update
+PASS invalid rollout configuration fails server startup
+PASS release health and account deletion remain reachable
+PASS commands registration and commerce cannot bypass version gate
+PASS commerce disabled without external configuration
+PASS real payments require explicit release gate
+PASS invalid commerce mode fails closed
+PASS production can stop one product without disabling verification
+PASS verified production payment preserves ordinary progression
+PASS production retry cannot grant twice
+PASS production rejects license-test receipts
+PASS production refund uses same durable ledger
+PASS sales pause retains receipt restoration availability
+PASS signed console placeholder can verify configuration without granting rewards
+PASS console probes require test mode and explicit non-game identifiers
+PASS stale console probes are rejected
+PASS production cannot accept console placeholder probes
+PASS unconfigured ads cannot create reward claims
+PASS production ads cannot use sample units
+PASS claim request retries reuse reservation
+PASS parallel ad requests cannot reserve same placement
+PASS other account cannot inspect ad claim
+PASS SSV must match reserved account
+PASS SSV must match game ad unit
+PASS SSV amount cannot control game economy
+PASS stale SSV timestamp rejected
+PASS duplicate SSV grants once with persisted receipt
+PASS test ad rewards mark test progression
+PASS test progress cannot mix with production purchases
+PASS test account sees production sales disabled
+PASS transaction cannot be reused across claims
+PASS canceled reward cannot grant later
+PASS expired reservation releases slot
+PASS expired callback cannot consume released quota
+PASS SSV daily parts quota enforced
+PASS cancellation and expiry do not consume completed quota
+PASS verified skip uses reserved server reward without an ad impression
+PASS skip retry shares exactly-once grant
+PASS refunded skip cannot bypass disabled ads
+PASS refund reconciliation failure becomes observable
+PASS successful reconciliation clears alert
+PASS valid ECDSA DER SSV signature accepted
+PASS tampered signed claim rejected
+PASS unsigned trailing parameters rejected
+PASS duplicate signed parameters rejected
+PASS only provider callback bypasses client version headers
+PASS moderated account is removed from public gallery
+PASS moderated user cannot immediately republish
+PASS moderated user cannot replace reviewed name
+PASS support compensation retry is idempotent
+PASS audit request collision rejected
+PASS operator compensation capped
+PASS operator action requires a reason
+PASS support export omits credentials and purchase tokens
+PASS unhide preserves user choice to remain private
+PASS reviewed user may opt back into gallery
+PASS operator summary aggregates economic changes
+PASS operator audit survives account deletion without credentials
+PASS revive requires an active campaign run
+PASS actual defeat reaches eligible revive state
+PASS server rejects forged revive without SSV
+PASS revive claim binds exact run and grants no currency
+PASS revive reservation is idempotent
+PASS parallel revive claims rejected
+PASS duplicate callback retains one run entitlement
+PASS second granted revive for same run rejected
+PASS server accepts and records verified revive replay
+PASS revive does not consume unrelated ad quotas
+PASS old grant cannot masquerade as current run in recovery UI
+PASS late SSV cannot revive a canceled run
+PASS only one durable revive grant receipt exists
+PASS schedule request collision rejected
+PASS timezone required for schedules
+PASS empty schedule interval rejected
+PASS future outfit cannot charge
+PASS scheduled rejection preserves balance
+PASS preview requires separate consent
+PASS purchase retry after scheduled end does not charge again
+PASS paused sale keeps owned outfit usable
+PASS preview deduplication and purchase conversion count once
+PASS dashboard counts current ownership and equip
+PASS dashboard uses authoritative gem ledger
+PASS aggregate contains no account credentials or player IDs
+PASS opting out deletes historical previews
+PASS retention expires old previews without new gameplay or a report
+PASS dashboard excludes test progress by default
+PASS account deletion cascades through metric events
+PASS RTDN rejects invalid provider identity
+PASS RTDN rejects other package
+PASS malformed push rejected
+PASS purchase token stored encrypted
+PASS backup restores both database and decryptable key ring
+PASS RTDN receipt deduplicates durably
+PASS RTDN message collision cannot overwrite token
+PASS eventual API cancellation retries without premature revocation
+PASS durable inbox survives restart and revokes once
+PASS completed refunds erase decryptable tokens
+PASS stored token recovers refund beyond 30-day list window
+PASS individual recovery continues when voided list fails without advancing cursor
+PASS API failure keeps entitlement and exposes verification failure
+PASS binding mismatch cannot revoke account purchase
+PASS early refund tombstone prevents later grant
+PASS deleting account clears queued and stored tokens
+PASS Google push bypasses game build headers
+402 checks passed

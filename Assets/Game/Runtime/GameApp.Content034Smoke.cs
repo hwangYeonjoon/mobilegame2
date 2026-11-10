@@ -8,7 +8,7 @@ namespace ScrapGuard
     {
         IEnumerator Content034Smoke()
         {
-            Store.Change(e=>{e.State.gems=RobotStyles.PackPrice;e.State.gold=1800;e.State.parts=30;e.State.coreShards=12;return CommandResult.Ok("Isolated cosmetics QA wallet");});
+            Store.Change(e=>{e.State.gems=RobotStyles.PackPrice;e.State.gold=1800;e.State.parts=30;e.State.coreShards=12;e.State.items.Find(i=>i.id==e.State.equipped[0]).level=1;return CommandResult.Ok("Isolated cosmetics QA wallet and Lv.1 weapon");});
             RobotStylePanel();yield return Capture("24-robot-style-premium");
             RobotPackConfirm(0);yield return Capture("25-pack-preview");
             ClickVisibleButton("600 보석 구매 · 외형 3종 적용");yield return Capture("26-pack-cosmetic-equipped");

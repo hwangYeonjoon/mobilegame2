@@ -1,0 +1,21 @@
+PASS no purchase control gets no fabricated funds
+PASS free path waits rather than receiving imaginary gems
+PASS earned gems buy actual kit without becoming paid gems
+PASS paid path uses catalog pack and retains excess gems
+PASS same day cannot repurchase or unnecessarily top up
+PASS next day spends remaining paid balance before another top up
+PASS free-first spending preserves correct paid/free provenance
+PASS combined purchase funds planned total with smallest sufficient default pack
+PASS buying a pass does not grant unearned milestones
+PASS both-free reservation policy is explicit
+PASS kit-first sensitivity spends earned gems on kit before saving for pass
+PASS earned free pass is available without purchase and claims once
+PASS progression seeds pair independently of cohort and farm uses separate stream
+PASS purchase ledger reconciles total and paid balances
+PASS corrupt paid provenance rejected
+PASS study adds artificial free gems and preserves source and paid balance
+PASS study leaves all progression and consent fields unchanged
+PASS study refuses output overwrite
+PASS unmarked profile cannot enter study clone
+PASS active battle cannot enter study clone
+Purchase audit checks: 20 passed
