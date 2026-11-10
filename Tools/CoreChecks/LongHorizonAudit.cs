@@ -18,7 +18,7 @@ static class LongHorizonAudit
     }
     internal sealed class Journey
     {
-        public int seed;public string cohort,policy;public int first42Day,paidGranted,paidSpent,paidLeft,proposedWon,freeSpent,freeEarned;
+        public int seed;public string cohort,policy;public int first42Day, firstCampaignDay,paidGranted,paidSpent,paidLeft,proposedWon,freeSpent,freeEarned;
         public float minutes;public List<Run> runs=new List<Run>();public List<Day> days=new List<Day>();public List<GrowthAudit.Entry> ledger=new List<GrowthAudit.Entry>();
     }
     static Journey Play(int seed,string cohort,string policy,int days,int slots)
@@ -31,7 +31,7 @@ static class LongHorizonAudit
         void Claims()
         {
             PurchaseAudit.Claims(e,w,s.unlockedStage,1);
-            if(!s.salvageClaimed&&s.dailySalvageWins>=3)Act("salvage_claim","",e.ClaimSalvage);
+            if(!s.salvageClaimed&&s.dailySupplySeconds>=300)Act("salvage_claim","",e.ClaimSalvage);
             foreach(var week in s.weekly)
             {
                 for(int tier=0;tier<4;tier++)if(week.attempts>0&&week.bestScore>=Endgame.Goals[tier]&&(week.claimed&(1<<tier))==0){int t=tier;Act("weekly_claim",week.week+":"+t,()=>e.ClaimWeekly(week.week,t));}
@@ -48,8 +48,8 @@ static class LongHorizonAudit
                 if((cohort=="kit_free"||cohort=="both_paid")&&Growth.Steps(s).Count>0)PurchaseAudit.Purchases(e,w,funding,day,s.unlockedStage,1);
                 Claims();GrowthAudit.Prepare(e,w,s.unlockedStage,1);
                 string week=Endgame.Week(now);bool weekly=Endgame.Unlocked(s)&&!attemptedWeeks.Contains(week);
-                bool repeat=!weekly&&s.dailySalvageWins<3&&Growth.SalvageStage(s)>=0;
-                if(!weekly&&!repeat&&s.clearedStages.Count==42)break;
+                bool repeat=!weekly&&s.clearedStages.Count==Campaign.Count&&s.dailySupplySeconds<300;
+                if(!weekly&&!repeat&&s.clearedStages.Count==Campaign.Count)break;
                 int stage=weekly?4:repeat?Growth.SalvageStage(s):s.unlockedStage;string mode=weekly?Endgame.WeeklyMode:"";
                 if(weekly)attemptedWeeks.Add(week);
                 string key=mode+":"+stage;int attempt=attempts.TryGetValue(key,out var n)?n+1:1;attempts[key]=attempt;
@@ -60,7 +60,8 @@ static class LongHorizonAudit
                 now=now.AddSeconds(c.Elapsed+30);j.minutes+=(c.Elapsed+30)/60;
                 Act("battle_finish",id,()=>weekly?e.FinishChallenge(c):e.FinishCampaign(c));
                 j.runs.Add(new Run{day=day,slot=slot,stage=stage+1,seed=combatSeed,mode=mode,won=c.Won,repeat=repeat,seconds=c.Elapsed,machines=c.MachinesBuilt,score=c.CoreScore,before=before,after=GrowthAudit.Capture(s)});
-                if(s.clearedStages.Count==42&&j.first42Day==0)j.first42Day=day;
+                if(s.clearedStages.Count>=42&&j.first42Day==0)j.first42Day=day;
+                if(s.clearedStages.Count==Campaign.Count&&j.firstCampaignDay==0)j.firstCampaignDay=day;
                 Claims();
             }
             PurchaseAudit.Totals(funding);j.days.Add(new Day{day=day,cleared=s.clearedStages.Count,paid=s.paidGems,paidSpent=funding.paidSpent,freeSpent=funding.freeSpent,state=GrowthAudit.Capture(s)});
@@ -75,10 +76,10 @@ static class LongHorizonAudit
         var jobs=new List<(int seed,string cohort,string policy)>();foreach(string c in cohorts)foreach(string p in policies)for(int i=0;i<seeds;i++)jobs.Add((17+i*37,c,p));
         var results=new List<Journey>();Parallel.ForEach(jobs,new ParallelOptions{MaxDegreeOfParallelism=4},x=>{var j=Play(x.seed,x.cohort,x.policy,days,slots);lock(results)results.Add(j);Console.WriteLine(x.cohort+" "+x.policy+" seed="+x.seed+" clear="+j.days.Last().cleared+" day42="+j.first42Day+" runs="+j.runs.Count);});
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(output)));
-        File.WriteAllText(output,JsonSerializer.Serialize(new{kind="long_horizon_not_human",schema=1,build=AppRelease.Build,rules=Combat.RulesVersion,seeds,days,slots,cohorts,policies,
-            assumptions=new[]{"All cohorts first attempt the actual weekly robot challenge once per service week, then prioritize three qualifying repeat wins per day before campaign progression. Failures consume slots. This is one deliberately material-seeking policy, not average behavior.",
+        File.WriteAllText(output,JsonSerializer.Serialize(new{kind="long_horizon_not_human",schema=2,campaignCount=Campaign.Count,build=AppRelease.Build,rules=Combat.RulesVersion,seeds,days,slots,cohorts,policies,
+            assumptions=new[]{"All cohorts attempt the weekly challenge, then advance the campaign. Ordinary verified battles totaling 300 seconds (minimum 60 per run) earn field supply without repeat-only obligations. After the campaign only, repeat until the field supply is earned.",
                 "All use actual earned attendance, missions, free pass, salvage and weekly rewards. No ad income. Cosmetic cohort buys the 600-gem heavy engineer outfit once and never buys growth. Reserve keeps gems. Paid uses free gems first and catalog proposal prices.",
-                "Continue after operation 42 to the calendar horizon; stop a day after the weekly attempt and three repeat wins. Stop buying growth if all equipped growth steps are capped. No fabricated campaign beyond 42.",
+                "Continue through the packaged campaign to the calendar horizon. Stop a day after campaign completion and field supply. Stop buying growth if all equipped growth steps are capped. first42Day remains a historical milestone; firstCampaignDay records the current finale.",
                 "Paired stage/attempt seeds within policy; weekly seed shared by calendar. Natural and avoid are not movement-matched controls. All snapshots contain only actually earned gear. No injected progression or real payments."},journeys=results.OrderBy(x=>x.cohort).ThenBy(x=>x.policy).ThenBy(x=>x.seed).ToArray()},GrowthAudit.Json));return 0;
     }
 }

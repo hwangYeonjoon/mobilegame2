@@ -9,6 +9,21 @@ namespace ScrapGuard.Tests
     public class GameTests
     {
         [Test]
+        public void RobotStylesRoundTripAndAtlasBounds()
+        {
+            var s=GameState.New();s.gems=900;var e=new Economy(s,()=>DateTimeOffset.UtcNow);Assert.That(e.BuyRobotStylePack().Success,Is.True);
+            var restored=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));ScrapGuard.Core.Social.Normalize(restored);
+            var seen=new System.Collections.Generic.HashSet<Rect>();
+            for(int style=1;style<=2;style++)for(int frame=0;frame<3;frame++)
+            {
+                var art=ArenaArt.Cell("RobotStyles-v1",3,2,frame,style-1);Assert.That(art,Is.Not.Null);seen.Add(art.rect);
+                Assert.That(art.rect.xMin,Is.GreaterThanOrEqualTo(0));Assert.That(art.rect.yMin,Is.GreaterThanOrEqualTo(0));Assert.That(art.rect.xMax,Is.LessThanOrEqualTo(art.texture.width));Assert.That(art.rect.yMax,Is.LessThanOrEqualTo(art.texture.height));
+                Assert.That(RobotStyles.Active(restored,frame),Is.EqualTo(1));
+            }
+            Assert.That(seen.Count,Is.EqualTo(6));
+            var command=new GameCommand("upgrade_path","gear"){stage=1,count=3,level=4};var copy=JsonUtility.FromJson<GameCommand>(JsonUtility.ToJson(command));Assert.That(copy.count,Is.EqualTo(3));Assert.That(copy.level,Is.EqualTo(4));
+        }
+        [Test]
         public void ScheduledContentRoundTripAndBoundaries()
         {
             var now=new DateTimeOffset(2026,11,4,0,0,0,TimeSpan.Zero);

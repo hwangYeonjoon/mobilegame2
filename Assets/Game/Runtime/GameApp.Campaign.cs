@@ -9,11 +9,9 @@ namespace ScrapGuard
         {
             if(region<0)region=Campaign.Get(selectedStage).Region;
             var card=Dialog("작전 지도", "정복 "+State.clearedStages.Count+" / "+Campaign.Count+" · 지역별 전투 규칙",820);
-            for(int r=0;r<Campaign.Regions.Length;r++)
-            {
-                int choice=r;
-                Ui.Button(card,(r+1).ToString(),24+r*(450f/Campaign.Regions.Length),122,450f/Campaign.Regions.Length-6,44,()=>CampaignMap(choice),r==region?Ui.Mint:Ui.Raised,true,18);
-            }
+            Ui.Button(card,"이전",24,122,86,44,()=>CampaignMap(region-1),Ui.Raised,region>0,17);
+            Ui.Label(card,(region+1)+" / "+Campaign.Regions.Length+" 지역",120,122,250,44,21,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Button(card,"다음",382,122,86,44,()=>CampaignMap(region+1),Ui.Raised,region<Campaign.Regions.Length-1,17);
             Ui.Label(card,Campaign.Regions[region],24,179,444,35,25,Ui.Ink);
             Ui.Label(card,Campaign.Mechanics[region],24,220,444,32,15,Ui.Muted);
             int row=0;

@@ -24,13 +24,13 @@ namespace ScrapGuard.Tests
         {
             var now=Now;var s=GameState.New();var e=new Economy(s,()=>now);
             Check(!e.ClaimSalvage().Success,"no unearned salvage");
-            e.BeginRun("first",0);e.FinishRun("first",0,true,100,180);Check(s.dailySalvageWins==0,"first clear excluded");
-            e.BeginRun("short",0);e.FinishRun("short",0,true,100,40);Check(s.dailySalvageWins==0,"quick battle excluded");
-            e.BeginRun("loss",0);e.FinishRun("loss",0,false,100,180);Check(s.dailySalvageWins==0,"defeat excluded");
+            e.BeginRun("first",0);e.FinishRun("first",0,true,100,180);Check(s.dailySupplySeconds==180,"first clear contributes without repeating");
+            e.BeginRun("short",0);e.FinishRun("short",0,true,100,40);Check(s.dailySupplySeconds==180,"short battle excluded");
+            e.BeginRun("loss",0);e.FinishRun("loss",0,false,100,180);Check(s.dailySupplySeconds==300,"defeat contributes and daily time caps");
             for(int i=0;i<3;i++){string id="repeat"+i;e.BeginRun(id,0);Check(e.FinishRun(id,0,true,100,180).Success,"repeat settles");Check(!e.FinishRun(id,0,true,100,180).Success,"repeat receipt cannot count twice");}
             int gold=s.gold,parts=s.parts,gems=s.gems;
             Check(e.ClaimSalvage().Success&&s.gold==gold+4500&&s.parts==parts+40&&s.gems==gems,"same materials as kit without gems");
-            Check(!e.ClaimSalvage().Success,"daily claim capped");now=now.AddDays(1);e.RefreshDay();Check(s.dailySalvageWins==0&&!s.salvageClaimed&&!e.ClaimSalvage().Success,"next day must earn again");
+            Check(!e.ClaimSalvage().Success,"daily claim capped");now=now.AddDays(1);e.RefreshDay();Check(s.dailySupplySeconds==0&&!s.salvageClaimed&&!e.ClaimSalvage().Success,"next day must earn again");
             now=now.AddDays(-1);e.RefreshDay();Check(!e.ClaimSalvage().Success,"clock rollback cannot reopen reward");
         }
         public static void WeeklyRobotReplayAndRewards()

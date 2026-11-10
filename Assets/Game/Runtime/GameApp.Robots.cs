@@ -70,7 +70,7 @@ namespace ScrapGuard
             bool craft=combat.CanPlanRobot(design,true),available=combat.RobotAvailable(design),board=combat.CanActivateMachine;
             var card=Dialog("어떤 로봇을 만들까요?",RobotSituation(main),800);
             var close=card.GetChild(2).GetComponent<Button>();close.onClick.RemoveAllListeners();close.onClick.AddListener(()=>{FinishRobotMenu("close",design);battlePaused=false;CloseModal();});
-            RobotRigView.Draw(card,24,120,176,design,rank);
+            RobotRigView.Draw(card,24,120,176,design,rank,RobotStyles.Active(State,main));
             Ui.Label(card,RobotAssembly.Frames[main],212,132,256,35,23,RobotRigView.Accent(main));
             Ui.Label(card,RobotAssembly.Role(main)+"\n"+RobotAssembly.Tradeoff(main),212,178,256,76,16,Ui.Ink);
             Ui.Label(card,rank==0?(design==RobotAssembly.DefaultDesign?"기본형 사용 가능":"미제작"):rank==1?"특화형 보유":"완성형 보유",212,267,256,26,16,Ui.Gold);
@@ -109,11 +109,12 @@ namespace ScrapGuard
             RobotAssembly.Normalize(State);
             var records=currentRun&&combat!=null?combat.RobotReport():State.robotRecords;
             var card=Dialog(currentRun?"이번 판에 조립한 로봇":"나의 로봇 조립실",currentRun?"조합별 활약을 비교하고 다음 판의 로봇을 골라보세요.":"전투에서 조립한 모습이 남아요 · 능력치는 다음 판에 이월되지 않아요.",870);
-            var list=Ui.Scroll(card,24,134,444,650,9*226+50);
+            Ui.Button(card,"로봇 외형 공방 · 제작과 꾸미기",24,129,444,48,()=>RobotStylePanel(),Ui.Gold,true,18);
+            var list=Ui.Scroll(card,24,194,444,590,9*226+50);
             for(int i=1;i<=9;i++)
             {
                 int id=i;var record=records.Find(r=>r!=null&&r.design==id);bool built=record!=null&&record.builds>0;float y=(i-1)*226;
-                var row=Ui.Box(list,0,y,444,214,Ui.Background).transform;RobotRigView.Draw(row,8,14,136,id,record==null?1:record.rank);
+                var row=Ui.Box(list,0,y,444,214,Ui.Background).transform;RobotRigView.Draw(row,8,14,136,id,record==null?1:record.rank,RobotStyles.Active(State,RobotAssembly.Frame(id)));
                 Ui.Label(row,RobotAssembly.Name(id)+(built?" ✓":""),153,12,277,36,20,built?Ui.Mint:Ui.Muted);
                 Ui.Label(row,RobotAssembly.Detail(id),153,54,277,74,14,Ui.Ink);
                 Ui.Label(row,built?(record.rank>=2?"완성형":record.rank==1?"특화형":"기본형")+" · 탑승 "+record.builds+"회 · 처치 "+record.kills+"\n누적 피해 "+Mathf.RoundToInt(record.damage).ToString("N0"):"아직 만들지 않은 조합 · 다음 출격에서 도전",14,159,280,43,14,Ui.Muted);

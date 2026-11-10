@@ -34,7 +34,7 @@ namespace ScrapGuard
             CloseModal();shopTab=2;Show("shop");yield return Capture("14-repair-ad-offer");
             GrowthPanel();ClickVisibleButton("보스 패턴 무료 연습");yield return Capture("15-boss-selector");
             StartBattle(1,false,BossTraining.Mode);yield return null;
-            if(combat==null||!combat.BossPractice||!combat.BossArenaActive||combat.Damage!=Catalog.Attack(State)*1.6f)smokeErrors.Add("Practice preset/start mismatch");
+            if(combat==null||!combat.BossPractice||!combat.BossArenaActive||combat.Skills[4]!=3||Mathf.Abs(combat.Damage-Catalog.Attack(State)*1.6f)>.001f)smokeErrors.Add("Practice preset/start mismatch: damage="+(combat==null?"missing":combat.Damage.ToString("R"))+" expected="+(Catalog.Attack(State)*1.6f).ToString("R"));
             battlePaused=true;RenderBattle();yield return Capture("16-boss-practice");
             combat.Abandon();FinishBattle();yield return Capture("17-practice-result");combat=null;
             SalvagePanel();yield return Capture("18-free-salvage");
@@ -44,8 +44,9 @@ namespace ScrapGuard
             ConfirmRobotPlan(design,true);battlePaused=true;RenderBattle();yield return Capture("22-weekly-machine");
             if(combat.MachineTime<=0||combat.RobotRank(design)!=1)smokeErrors.Add("Weekly robot control failed");
             combat.Abandon();FinishBattle();combat=null;
-            Store.Change(e=>{for(int i=0;i<Campaign.Count;i++)if(!e.State.clearedStages.Contains(i))e.State.clearedStages.Add(i);e.State.unlockedStage=41;return CommandResult.Ok("Completed campaign UI fixture only");});
+            Store.Change(e=>{for(int i=0;i<Campaign.Count;i++)if(!e.State.clearedStages.Contains(i))e.State.clearedStages.Add(i);e.State.unlockedStage=Campaign.Count-1;return CommandResult.Ok("Completed campaign UI fixture only");});
             Show("home");yield return Capture("23-campaign-complete-home");
+            yield return Content034Smoke();
             yield return ReplayExpansionCapture();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
             Debug.Log("GROWTH_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);

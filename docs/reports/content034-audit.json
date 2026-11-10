@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "policy": "controlled_avoid",
+      "completed": 10,
+      "runs": 18.0,
+      "minutes": 80.1834215,
+      "attackPercent": 23.214285714285722,
+      "winBefore": 10,
+      "winAfter": 10,
+      "gainWins": 0,
+      "lostWins": 0
+    },
+    {
+      "policy": "natural_legacy",
+      "completed": 10,
+      "runs": 23.5,
+      "minutes": 102.62087966666668,
+      "attackPercent": 27.857142857142847,
+      "winBefore": 9,
+      "winAfter": 9,
+      "gainWins": 1,
+      "lostWins": 1
+    }
+  ],
+  "battles": 467,
+  "sha256": "7194e3f20e75df7963f7a8dc266730e66c8ea7ccacd6174a786f4b31409b5268"
+}

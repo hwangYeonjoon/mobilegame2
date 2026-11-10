@@ -36,6 +36,19 @@ static class GrowthCommerceChecks
         repo.RevokePurchase("growth-test");var refunded=repo.Bootstrap(key).state;
         check(refunded.gems==0&&refunded.gemDebt==1000,"spent kit and pass participate in existing refund debt accounting");
         now=now.AddDays(1);Reject(new GameCommand("buy"){value="growth_kit"},"refund debt cannot fund another growth purchase");
+        string secondKey=Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+','-').Replace('/','_');
+        repo.Register(secondKey);provider.Binding=repo.Commerce(secondKey,true).accountBinding;
+        repo.VerifyPurchase(secondKey,new PurchaseRequest{productId="gems_1200",purchaseToken="robot-test"},provider).GetAwaiter().GetResult();
+        ServerReply StyleApply(GameCommand c){c.revision=repo.Bootstrap(secondKey).revision;return repo.Apply(secondKey,c);}
+        var pack=new GameCommand("buy"){value="robot_astral_pack"};var robot=StyleApply(pack);
+        check(robot.state.gems==300&&robot.state.gold==19800&&RobotStyles.Active(robot.state,2)==1,"server pack exact grant and immediate visual equip");
+        check(repo.Apply(secondKey,pack).state.gold==19800,"pack retry does not duplicate grant");
+        var quote=GrowthPaths.Quote(robot.state,0);var batch=new GameCommand("upgrade_path",quote.id){stage=0,count=quote.count,level=quote.from};
+        var upgraded=StyleApply(batch);check(Catalog.Attack(upgraded.state)==quote.attack&&upgraded.state.gold==19800-quote.gold,"server batch matches displayed stats and cost");
+        check(repo.Apply(secondKey,batch).state.gold==upgraded.state.gold,"batch request retry is idempotent");
+        repo=new GameRepository(path,()=>now);check(RobotStyles.Active(repo.Bootstrap(secondKey).state,0)==1,"robot style survives server restart");
+        repo.RevokePurchase("robot-test");var robotRefund=repo.Bootstrap(secondKey).state;
+        check(robotRefund.gems==0&&robotRefund.gemDebt==900,"robot pack uses existing refund debt accounting");
         var old=new Combat(GameState.New(),4,"same",17,false,SkillTrial.Mode);var paid=new Combat(refunded,4,"same",17,false,SkillTrial.Mode);
         check(old.Damage==paid.Damage&&old.MaxHp==paid.MaxHp,"verified purchases and pass cannot alter fixed trial power");
     }

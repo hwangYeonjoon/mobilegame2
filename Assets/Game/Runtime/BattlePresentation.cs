@@ -51,7 +51,7 @@ namespace ScrapGuard
             bool moving=initialized && time-movedAt<.12f && enemy.freezeTime<=0;
             Pose=enemy.windup>0?1:enemy.attackFlash>0||enemy.dash>0?2:moving && (int)(time*9+enemy.id)%2==1?3:0;
             float size=enemy.Radius*(boss?4.1f:enemy.kind==2?3.4f:2.7f);
-            body.sprite=BattleArt.Role(enemy.core?7:boss?region:(int)enemy.role,Pose,boss);
+            body.sprite=BattleArt.Role(enemy.core?10:boss?region:(int)enemy.role,Pose,boss);
             body.rectTransform.sizeDelta=new Vector2(size,size);
             float bounce=moving?Mathf.Abs(Mathf.Sin(time*10+enemy.id))*2:0;
             body.rectTransform.anchoredPosition=new Vector2(0,6+bounce+(Pose==1?-2:Pose==2?3:0));
@@ -86,7 +86,7 @@ namespace ScrapGuard
             var shape=Ui.Rect(root,"Outfit projectile",-34,-7,38,14);
             v.signature=shape.gameObject.AddComponent<OutfitMark>();v.signature.raycastTarget=false;return root;
         }
-        public void Render(Bullet bullet,int level,int outfit,float time,bool compact=false)
+        public void Render(Bullet bullet,int level,int outfit,float time,bool compact=false,int robotStyle=0)
         {
             var root=(RectTransform)transform;
             bool styled=Outfits.Valid(outfit)&&!bullet.mod&&!bullet.drone;
@@ -96,7 +96,8 @@ namespace ScrapGuard
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
             var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
-            float length=bullet.visual>0?48:bullet.pierce>0?35:bullet.mod?30:15+level*2;
+            if(robotStyle>0)tint=robotStyle==1?Ui.Gold:Ui.Mint;
+            float length=robotStyle==1?42:bullet.visual>0?48:bullet.pierce>0?35:bullet.mod?30:15+level*2;
             trail.rectTransform.sizeDelta=new Vector2(length,bullet.blast?7:4);
             trail.rectTransform.anchoredPosition=new Vector2(-length,bullet.blast?3.5f:2);
             trail.color=new Color(tint.r,tint.g,tint.b,.7f);head.color=Color.Lerp(tint,Color.white,.65f);
@@ -104,6 +105,7 @@ namespace ScrapGuard
             head.rectTransform.anchoredPosition=new Vector2(-4,bullet.blast?5.5f:3);
             core.rectTransform.sizeDelta=new Vector2(bullet.pierce>0?18:9,2);
             core.color=Color.white;
+            if(robotStyle==1){head.rectTransform.sizeDelta=new Vector2(15,10);core.rectTransform.sizeDelta=new Vector2(27,3);}
             if(bullet.visual==4){head.rectTransform.sizeDelta=new Vector2(22,7);root.localEulerAngles=new Vector3(0,0,time*550);}
             else if(bullet.visual==1)core.rectTransform.sizeDelta=new Vector2(30,5);
             else if(bullet.visual==2)head.rectTransform.sizeDelta=new Vector2(15,11);

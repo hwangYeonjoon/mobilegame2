@@ -103,7 +103,7 @@ namespace ScrapGuard
             ObserveRobotExperience();
             machineActor.gameObject.SetActive(combat.MachineTime>0);
             float arrival=combat.MachineActiveDuration-combat.MachineTime;
-            battleRobot.SetDesign(combat.MachineDesign,combat.RobotRank(combat.MachineDesign));battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f,combat.MachineTime>0?arrival:-1);
+            battleRobot.SetDesign(combat.MachineDesign,combat.RobotRank(combat.MachineDesign),RobotStyles.Active(State,RobotAssembly.Frame(combat.MachineDesign)));battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f,combat.MachineTime>0?arrival:-1);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
             float unfold=Mathf.Clamp01(arrival/.18f);
             bool clearer=PlayerPrefs.GetInt("scrapguard.robot.clear",1)==1;
@@ -112,7 +112,7 @@ namespace ScrapGuard
             battleRobot.SetBattleClarity(nearby);
             bossFence.gameObject.SetActive(combat.BossArenaActive);
             bossFence.anchoredPosition=new Vector2(combat.BossArenaCenter.x-235,-combat.BossArenaCenter.y+300);
-            machineAura.GetComponent<CombatRing>().color=new Color(.6f,1,.8f,combat.FinalBossActive?.1f:.3f);
+            var robotAccent=RobotStyles.Active(State,RobotAssembly.Frame(combat.MachineDesign))==1?Ui.Gold:Ui.Mint;robotAccent.a=combat.FinalBossActive?.1f:.3f;machineAura.GetComponent<CombatRing>().color=robotAccent;
             machineAura.localScale=Vector3.one*(1+.04f*Mathf.Sin(combat.Elapsed*5));
             machineRotor.localEulerAngles=new Vector3(0,0,-combat.Elapsed*260);
             escapeArrow.gameObject.SetActive(combat.WaveWarning>0);

@@ -51,7 +51,9 @@ namespace ScrapGuard
         {
             Workshop.Normalize(State);var progress=Workshop.Region(State,region);int skin=region+3;bool owned=Social.HasSkin(State,skin);
             var card=Dialog("지역 수집 · 전용 도색","작전 완료마다 확정 설계도 · 뽑기 없음",850);
-            for(int i=0;i<Campaign.Regions.Length;i++){int r=i;Ui.Button(card,(r+1).ToString(),24+i*(450f/Campaign.Regions.Length),128,450f/Campaign.Regions.Length-6,42,()=>RegionCollection(r),r==region?Ui.Mint:Ui.Raised,true,17);}
+            Ui.Button(card,"이전",24,128,86,42,()=>RegionCollection(region-1),Ui.Raised,region>0,17);
+            Ui.Label(card,(region+1)+" / "+Campaign.Regions.Length+" 지역",120,128,250,42,20,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Button(card,"다음",382,128,86,42,()=>RegionCollection(region+1),Ui.Raised,region<Campaign.Regions.Length-1,17);
             Ui.Label(card,Campaign.Regions[region],24,187,444,39,25);
             CharacterArt.Draw(card,35,247,144,155,State.showcaseHero,skin);
             Ui.Label(card,Social.Skins[skin],195,251,270,38,23,CharacterArt.Tint(skin));

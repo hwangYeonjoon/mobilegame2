@@ -24,12 +24,13 @@ def last_week(j,days):
     return dict(freeChange=(end['state']['wallet']['gems']-end['paid'])-(start['state']['wallet']['gems']-start['paid']),kits=sum(x['action']=='buy_kit' and x['serviceDate']>=cutoff for x in j['ledger']),completedBefore=start['cleared']==42)
 def fmt(s):return '—' if s is None else f"{s['median']:.1f} [{s['min']:.1f}–{s['max']:.1f}]"
 def summarize(d):
-    need(d['kind']=='long_horizon_not_human' and d['schema']==1,'schema')
+    need(d['kind']=='long_horizon_not_human' and d['schema'] in (1,2),'schema')
+    campaign_count=d.get("campaignCount",42);need(42<=campaign_count<=120,"campaign bound")
     groups=defaultdict(list);seen=set()
     for j in d['journeys']:
         key=(j['cohort'],j['policy'],j['seed']);need(key not in seen,'duplicate journey');seen.add(key);groups[key[:2]].append(j)
         need(key[0] in COHORTS and key[1] in ('natural_legacy','controlled_avoid'),'cohort/policy')
-        wallet={'gold':1800,'parts':30,'gems':0};paid=pin=pout=fin=fout=won=0;counts=Counter();claims=set();started=None;ri=0;cleared=set();daily_wins=Counter();weekly_scores={};robot_eligible=set();owned_pass=False;end_wallets={}
+        wallet={'gold':1800,'parts':30,'gems':0};paid=pin=pout=fin=fout=won=0;counts=Counter();claims=set();started=None;ri=0;cleared=set();daily_wins=Counter();daily_seconds=Counter();weekly_scores={};robot_eligible=set();owned_pass=False;end_wallets={}
         for seq,x in enumerate(j['ledger'],1):
             need(x['sequence']==seq and x['before']==wallet and x['paidBefore']==paid,'wallet continuity')
             after={k:wallet[k]+x['delta'][k] for k in wallet};need(after==x['after'] and min(after.values())>=0,'delta')
@@ -42,7 +43,7 @@ def summarize(d):
             else:need(dp<=0,'paid mint')
             if x['delta']['gems']<0:need(x['paidAfter']==paid-max(0,-x['delta']['gems']-(wallet['gems']-paid)),'free-first')
             if a in ('salvage_claim','buy_kit','attendance','missions'):need(counts[(date,a)]<=1,'daily cap')
-            if a=='salvage_claim':need(daily_wins[date]>=3 and x['delta']==dict(gold=4500,parts=40,gems=0),'unearned salvage')
+            if a=='salvage_claim':need((daily_wins[date]>=3 if d['schema']==1 else daily_seconds[date]>=300) and x['delta']==dict(gold=4500,parts=40,gems=0),'unearned salvage')
             if a=='buy_kit':need(j['cohort'] in ('kit_free','both_paid') and x['delta']==dict(gold=4500,parts=40,gems=-100),'kit')
             if a=='buy_pass':need(j['cohort']=='both_paid' and x['delta']==dict(gold=0,parts=0,gems=-900),'pass');owned_pass=True
             if a=='cosmetic_buy':need(j['cohort']=='cosmetic_free' and x['delta']==dict(gold=0,parts=0,gems=-600),'cosmetic')
@@ -63,6 +64,7 @@ def summarize(d):
                 need(r['mode']=='weekly' or (r['stage'] in cleared if r['repeat'] else r['stage']==len(cleared)+1),'future progression');started=x['target']
             if a=='battle_finish':
                 need(started is not None and started==x['target'],'settlement');r=j['runs'][ri];need(r['after']['wallet']==after,'receipt')
+                if d['schema']==2 and r['seconds']>=60:daily_seconds[date]=min(300,daily_seconds[date]+int(min(300,r['seconds'])))
                 if not r['mode']:
                     need(x['delta']['gems']==(50 if r['won'] and not r['repeat'] else 0),'first-clear gems')
                     if r['won']:
@@ -86,6 +88,9 @@ def summarize(d):
             past=[r for r in j['runs'] if r['day']<=day];need(x['cleared']==sum(not r['mode'] and not r['repeat'] and r['won'] for r in past),'checkpoint progression')
         completion=next((r['day'] for r in j['runs'] if not r['mode'] and not r['repeat'] and r['stage']==42 and r['won']),0)
         need(completion==j['first42Day'],'completion/censoring')
+        if d['schema']==2:
+            final=next((r['day'] for r in j['runs'] if not r['mode'] and not r['repeat'] and r['stage']==campaign_count and r['won']),0)
+            need(final==j['firstCampaignDay'],'campaign completion/censoring')
     need(len(groups)==8,'missing cohort')
     need(len({tuple(sorted(j['seed'] for j in js)) for js in groups.values()})==1 and all(len(js)==d['seeds'] for js in groups.values()),'unpaired seeds')
     rows=[];pairs=[]
@@ -99,12 +104,13 @@ def summarize(d):
             base={j['seed']:j for j in groups[('reserve',p)]}
             for j in js:
                 b=base[j['seed']];pairs.append(dict(cohort=c,policy=p,seed=j['seed'],stageDifference=j['days'][-1]['cleared']-b['days'][-1]['cleared'],daysSaved=b['first42Day']-j['first42Day'] if b['first42Day'] and j['first42Day'] else None))
-    return dict(rows=rows,pairs=pairs,journeys=len(seen),battles=sum(len(j['runs']) for j in d['journeys']),days=d['days'],seeds=d['seeds'])
+    return dict(campaignCount=campaign_count,finalCompletions=sum(j.get("firstCampaignDay",j["first42Day"])>0 for j in d["journeys"]),rows=rows,pairs=pairs,journeys=len(seen),battles=sum(len(j['runs']) for j in d['journeys']),days=d['days'],seeds=d['seeds'])
 def main():
     p=argparse.ArgumentParser();p.add_argument('input');p.add_argument('--json',required=True);p.add_argument('--markdown',required=True);a=p.parse_args();raw=Path(a.input).read_bytes()
     if a.input.endswith('.gz'):raw=gzip.decompress(raw)
     d=json.loads(raw);s=summarize(d);s['sha256']=hashlib.sha256(raw).hexdigest();Path(a.json).write_text(json.dumps(s,ensure_ascii=False,indent=2)+'\n')
-    lines=['# 0.33 28일 성장·구매 관찰','',f"{s['journeys']}경로 / {s['battles']}판 · 조건당 시드 {s['seeds']}개 · {s['days']}일. 사람 결과가 아님.",'','| 조작 | 경로 | 42 완료 | 최종 작전 | 완료 일수(도달자만) | 전체 활동 분 | 충전 제안가 | 유료 소비 | 무료 보석 잔액 | 의상 구매 | 회수 보상 횟수 | 로봇 주간 과제 |','|---|---|---|---|---|---|---|---|---|---|---|---|']
+    lines=['# 성장·구매 달력 관찰 (42작전 체크포인트 비교)' ,'',f"{s['journeys']}경로 / {s['battles']}판 · 조건당 시드 {s['seeds']}개 · {s['days']}일. 사람 결과가 아님.",'','| 조작 | 경로 | 42 완료 | 최종 작전 | 완료 일수(도달자만) | 전체 활동 분 | 충전 제안가 | 유료 소비 | 무료 보석 잔액 | 의상 구매 | 회수 보상 횟수 | 로봇 주간 과제 |','|---|---|---|---|---|---|---|---|---|---|---|---|']
+    if d['schema']==2:lines += ['',f"현재 캠페인 {s['campaignCount']}작전 전체 완료: {s['finalCompletions']}/{s['journeys']}. 아래 42 완료·시간은 과거 비교용 중간 체크포인트이며 최종 콘텐츠 완료가 아니다. 현장 보급은 전투 300초 합산 정책이다.",'']
     for x in s['rows']:lines.append(f"| {x['policy']} | {x['cohort']} | {x['clear42']}/{x['n']} | {fmt(x['cleared'])} | {fmt(x['day42'])} | {fmt(x['minutes'])} | {fmt(x['won'])} | {fmt(x['paidSpent'])} | {fmt(x['freeLeft'])} | {x['cosmeticOwners']}/{x['n']} | {fmt(x['salvageClaims'])} | {fmt(x['weeks'])} |")
     lines+=['','## 완료 전후 시간 분리','','최초 42작전 승리까지와 그 직후부터의 활동 시간이다. 완료 전에도 회수·주간 도전·실패·매 판 메뉴 30초를 포함한다. 보유 콘텐츠의 순수 길이나 사람의 실제 이용 시간이 아니다. 미완료 경로는 제외한다.','','| 조작 | 경로 | 최초 완료까지 분 | 완료 후 분 |','|---|---|---|---|']
     for x in s['rows']:lines.append(f"| {x['policy']} | {x['cohort']} | {fmt(x['completionMinutes'])} | {fmt(x['postCompletionMinutes'])} |")

@@ -20,6 +20,8 @@
     <Compile Include="../../Assets/Tests/EditMode/GrowthSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/ReplayExpansionSpecification.cs" />
     <Compile Include="../../Assets/Editor/ReplayDiagnostic.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/Content034Specification.cs" />
+    <Compile Include="Content034Audit.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BalanceAudit.cs" />
     <Compile Include="GrowthAudit.cs" />

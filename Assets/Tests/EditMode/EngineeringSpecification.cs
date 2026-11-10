@@ -50,7 +50,7 @@ namespace ScrapGuard.Tests
             }
             Check(positions.Count==3,"three field routes beyond first region");
             var e=New();Check(e.SetCollectionTarget(6).Success && e.State.collectionTarget==6,"target selection");
-            Check(!e.SetCollectionTarget(7).Success && e.State.collectionTarget==6,"invalid target cannot overwrite");
+            Check(!e.SetCollectionTarget(Campaign.Regions.Length).Success && e.State.collectionTarget==6,"invalid target cannot overwrite");
             Check(e.SetCollectionTarget(-1).Success && e.State.collectionTarget==-1,"target removal");
             Check(new Combat(s,0,"intro").Task==FieldTask.Salvage,"first operation teaches recovery");
         }

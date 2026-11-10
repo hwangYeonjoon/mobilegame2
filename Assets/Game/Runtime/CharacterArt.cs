@@ -49,7 +49,7 @@ namespace ScrapGuard
         public static Color Tint(int skin)
         {
             if(skin<3 || skin>=ScrapGuard.Core.Social.Skins.Length)return Color.white;
-            return new[]{Ui.Hex("FFD1A4"),Ui.Hex("FFBA83"),Ui.Hex("A8F7B4"),Ui.Hex("B8E6FF"),Ui.Hex("E9B4FF"),Ui.Hex("FFF0A3"),Ui.Hex("FFA59B")}[skin-3];
+            return new[]{Ui.Hex("FFD1A4"),Ui.Hex("FFBA83"),Ui.Hex("A8F7B4"),Ui.Hex("B8E6FF"),Ui.Hex("E9B4FF"),Ui.Hex("FFF0A3"),Ui.Hex("FFA59B"),Ui.Hex("88DDD2"),Ui.Hex("88BAFF"),Ui.Hex("CCB2FF")}[skin-3];
         }
         public static Image Draw(Transform parent, float x, float y, float width, float height, int hero, int skin, int outfit = 0)
         {

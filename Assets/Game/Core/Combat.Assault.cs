@@ -93,6 +93,7 @@ namespace ScrapGuard.Core
             if(Challenge){Warn(Position,65,1.4f,200,0,0,DamageCause.Boss,DamageSource.Boss);return true;}
             var boss=Enemies.Find(e=>e.finalBoss&&e.hp>0);if(boss==null||!BossActionReady(boss,false))return false;
             bossPattern++;BossPatterns++;
+            if(Definition.Region>=7)return ExpansionBossPattern(boss);
             float delay=BossWarningDelay,last=delay;
             int pattern=bossPattern%(BossLearningTier==1?2:BossLearningTier==2?2:3);
             if(pattern==1)

@@ -24,8 +24,8 @@ namespace ScrapGuard.Core
     // Shared packaged content: add a region/operation here, then ship the same rules to app and server.
     public static class Campaign
     {
-        public static readonly string[] Regions = { "고철 정비소", "폐철도", "오염 처리장", "냉각 시설", "중앙 공장", "고압 발전소", "심층 용광로" };
-        public static readonly string[] Mechanics = { "작업대를 돌아 이동", "철로 포격 예고를 피하세요", "오염 웅덩이를 피하세요", "냉각 바닥에서는 관성 이동", "컨베이어 이동 · 레이저 예고", "번갈아 켜지는 전기 격자를 피하세요", "분출 예고 후 용광로 통로를 벗어나세요" };
+        public static readonly string[] Regions = { "고철 정비소", "폐철도", "오염 처리장", "냉각 시설", "중앙 공장", "고압 발전소", "심층 용광로", "자력 선별장", "폭풍 송전탑", "궤도 조립항" };
+        public static readonly string[] Mechanics = { "작업대를 돌아 이동", "철로 포격 예고를 피하세요", "오염 웅덩이를 피하세요", "냉각 바닥에서는 관성 이동", "컨베이어 이동 · 레이저 예고", "번갈아 켜지는 전기 격자를 피하세요", "분출 예고 후 용광로 통로를 벗어나세요", "자력 레일의 좌우 흐름과 압착 예고", "바람 통로 이동 · 순차 낙뢰를 피하세요", "발사 레일 사이 안전 통로를 찾으세요" };
         public static readonly StageDefinition[] Stages = Build();
         public static int Count { get { return Stages.Length; } }
         public static StageDefinition Get(int id) { if(id<0 || id>=Count)throw new ArgumentOutOfRangeException("id");return Stages[id]; }
@@ -45,9 +45,12 @@ namespace ScrapGuard.Core
                 new[]{"냉각실 입구","얼어붙은 배관","냉기 경보","빙결 저장소","차가운 추격","극저온 수호기"},
                 new[]{"멈춰버린 공장","조립 컨베이어","생산 라인 봉쇄","레이저 격자","코어 접근로","중앙 제어 코어"},
                 new[]{"변전소 진입","축전기 통로","전류 봉쇄선","송전 격자","과부하 경보","뇌전 제어기"},
-                new[]{"제련로 입구","열교환 통로","화염 봉쇄선","용융 운반로","압력 폭주","심층 주조왕"}
+                new[]{"제련로 입구","열교환 통로","화염 봉쇄선","용융 운반로","압력 폭주","심층 주조왕"},
+                new[]{"선별장 진입","자석 운반로","극성 봉쇄선","압착 분류실","인력의 중심","자력 집게왕"},
+                new[]{"송전탑 기슭","폭풍 통로","피뢰침 방어","전하 이동로","천둥의 계단","폭풍 지휘자"},
+                new[]{"궤도 접안장","화물 발사로","조립항 봉쇄","위성 해체장","출항 경보","궤도 조립모함"}
             };
-            string[] bosses={"정비소 분쇄기","철도 파괴자","폐수 폭파기","빙결 방패기","중앙 제어 코어","뇌전 제어기","심층 주조왕"};
+            string[] bosses={"정비소 분쇄기","철도 파괴자","폐수 폭파기","빙결 방패기","중앙 제어 코어","뇌전 제어기","심층 주조왕","자력 집게왕","폭풍 지휘자","궤도 조립모함"};
             EnemyRole[][] pools={
                 new[]{EnemyRole.Pursuer,EnemyRole.Charger},
                 new[]{EnemyRole.Charger,EnemyRole.Artillery},
@@ -55,7 +58,10 @@ namespace ScrapGuard.Core
                 new[]{EnemyRole.Shield,EnemyRole.Charger,EnemyRole.Artillery},
                 new[]{EnemyRole.Shield,EnemyRole.Summoner,EnemyRole.Artillery,EnemyRole.Bomber},
                 new[]{EnemyRole.Charger,EnemyRole.Artillery,EnemyRole.Summoner},
-                new[]{EnemyRole.Bomber,EnemyRole.Shield,EnemyRole.Charger,EnemyRole.Summoner}
+                new[]{EnemyRole.Bomber,EnemyRole.Shield,EnemyRole.Charger,EnemyRole.Summoner},
+                new[]{EnemyRole.Shield,EnemyRole.Charger,EnemyRole.Artillery},
+                new[]{EnemyRole.Artillery,EnemyRole.Charger,EnemyRole.Bomber},
+                new[]{EnemyRole.Summoner,EnemyRole.Shield,EnemyRole.Artillery,EnemyRole.Charger}
             };
             var stages=new List<StageDefinition>();
             for(int region=0;region<names.Length;region++)for(int local=0;local<names[region].Length;local++)
@@ -71,11 +77,11 @@ namespace ScrapGuard.Core
         }
         public static StageDefinition FinalStage(int region) { return Array.FindLast(Stages,s=>s.Region==region); }
         public static bool IsRegionFinal(StageDefinition stage) { return FinalStage(stage.Region).Id==stage.Id; }
-        public static EnemyRole BossRole(int region) { return new[]{EnemyRole.Charger,EnemyRole.Artillery,EnemyRole.Bomber,EnemyRole.Shield,EnemyRole.Summoner,EnemyRole.Artillery,EnemyRole.Charger}[region]; }
+        public static EnemyRole BossRole(int region) { return new[]{EnemyRole.Charger,EnemyRole.Artillery,EnemyRole.Bomber,EnemyRole.Shield,EnemyRole.Summoner,EnemyRole.Artillery,EnemyRole.Charger,EnemyRole.Shield,EnemyRole.Shield,EnemyRole.Shield}[region]; }
         public static void Normalize(GameState state)
         {
             if(state.clearedStages==null)state.clearedStages=new List<int>();
-            // Keep existing IDs/rewards. A completed old final stage now unlocks operation 6.
+            // Preserve previous IDs/rewards; a cleared old finale unlocks the next packaged operation.
             int next=0;while(next<Count-1 && state.clearedStages.Contains(next))next++;
             state.unlockedStage=Math.Max(next,Math.Max(0,Math.Min(Count-1,state.unlockedStage)));
         }
@@ -95,6 +101,9 @@ namespace ScrapGuard.Core
                 case 3:return new[]{new MapRect(74,380+offset,88,38),new MapRect(378,590-offset,88,38)};
                 case 5:return new[]{new MapRect(84,355,68,68),new MapRect(388,585,68,68)};
                 case 6:return new[]{new MapRect(65,302,94,42),new MapRect(381,674,94,42)};
+                case 7:return new[]{new MapRect(60,380,60,110),new MapRect(420,490,60,110)};
+                case 8:return new[]{new MapRect(75,300,70,70),new MapRect(395,640,70,70)};
+                case 9:return new[]{new MapRect(38,350,80,44),new MapRect(422,610,80,44)};
                 default:return new[]{new MapRect(35,330+offset,100,50),new MapRect(405,620-offset,100,50)};
             }
         }
@@ -109,6 +118,9 @@ namespace ScrapGuard.Core
                 case 4:return new[]{new MapRect(153,220,76,550),new MapRect(311,220,76,550)};
                 case 5:return new[]{new MapRect(190,195,46,610),new MapRect(304,195,46,610)};
                 case 6:return new[]{new MapRect(28,380+offset,484,52),new MapRect(28,580-offset,484,52)};
+                case 7:return new[]{new MapRect(135,300,270,42),new MapRect(135,620,270,42)};
+                case 8:return new[]{new MapRect(154,270,64,450),new MapRect(322,270,64,450)};
+                case 9:return new[]{new MapRect(80,230,44,470),new MapRect(416,230,44,470)};
                 default:return new MapRect[0];
             }
         }

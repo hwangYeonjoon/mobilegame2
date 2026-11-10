@@ -1,0 +1,2585 @@
+{
+  "source": "long033-calendar.json.gz, reserve cohort, day 3 and first end-of-day 42 clear; no future-day gear",
+  "profiles": [
+    {
+      "seed": 17,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 9977,
+          "parts": 742,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2700,
+          "parts": 163,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 12457,
+          "parts": 749,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2900,
+          "parts": 165,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 95,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 10259,
+          "parts": 736,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2900,
+          "parts": 165,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 11007,
+          "parts": 741,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2500,
+          "parts": 161,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "controlled_avoid",
+      "day": 17,
+      "late": {
+        "attack": 544,
+        "health": 4210,
+        "heroLevel": 29,
+        "unlockedStage": 42,
+        "totalRuns": 100,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 9277,
+          "parts": 755,
+          "gems": 3060
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2500,
+          "parts": 161,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 95,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 8878,
+          "parts": 729,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2700,
+          "parts": 163,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 10300,
+          "parts": 741,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2900,
+          "parts": 165,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 94,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 8727,
+          "parts": 734,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 3100,
+          "parts": 167,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 10948,
+          "parts": 742,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2700,
+          "parts": 163,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "controlled_avoid",
+      "day": 16,
+      "late": {
+        "attack": 537,
+        "health": 4154,
+        "heroLevel": 28,
+        "unlockedStage": 42,
+        "totalRuns": 96,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 10093,
+          "parts": 739,
+          "gems": 2980
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 2500,
+          "parts": 161,
+          "gems": 540
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 17,
+      "policy": "natural_legacy",
+      "day": 18,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 107,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 18093,
+          "parts": 834,
+          "gems": 3140
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4700,
+          "parts": 203,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 54,
+      "policy": "natural_legacy",
+      "day": 21,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 125,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 71573,
+          "parts": 1268,
+          "gems": 3330
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4900,
+          "parts": 205,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 91,
+      "policy": "natural_legacy",
+      "day": 19,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 114,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 36006,
+          "parts": 987,
+          "gems": 3170
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4500,
+          "parts": 201,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 128,
+      "policy": "natural_legacy",
+      "day": 21,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 125,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 69282,
+          "parts": 1270,
+          "gems": 3330
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4700,
+          "parts": 203,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 165,
+      "policy": "natural_legacy",
+      "day": 19,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 113,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 35280,
+          "parts": 983,
+          "gems": 3170
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4900,
+          "parts": 205,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 202,
+      "policy": "natural_legacy",
+      "day": 20,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 120,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 53684,
+          "parts": 1099,
+          "gems": 3300
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4700,
+          "parts": 203,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 239,
+      "policy": "natural_legacy",
+      "day": 19,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 112,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 32740,
+          "parts": 972,
+          "gems": 3170
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4700,
+          "parts": 203,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 276,
+      "policy": "natural_legacy",
+      "day": 21,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 126,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 75231,
+          "parts": 1280,
+          "gems": 3330
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4500,
+          "parts": 201,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 313,
+      "policy": "natural_legacy",
+      "day": 19,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 113,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 36855,
+          "parts": 983,
+          "gems": 3170
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4900,
+          "parts": 205,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    },
+    {
+      "seed": 350,
+      "policy": "natural_legacy",
+      "day": 20,
+      "late": {
+        "attack": 550,
+        "health": 4265,
+        "heroLevel": 30,
+        "unlockedStage": 42,
+        "totalRuns": 120,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42
+        ],
+        "wallet": {
+          "gold": 56990,
+          "parts": 1105,
+          "gems": 3300
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 20,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 8,
+            "rarity": 2,
+            "level": 20,
+            "name": "경량 보호복"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 20,
+            "name": "드론 모듈"
+          }
+        ]
+      },
+      "early": {
+        "attack": 280,
+        "health": 2172,
+        "heroLevel": 9,
+        "unlockedStage": 9,
+        "totalRuns": 18,
+        "clearedStages": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ],
+        "wallet": {
+          "gold": 4900,
+          "parts": 205,
+          "gems": 590
+        },
+        "equipped": [
+          {
+            "slot": 0,
+            "definition": 2,
+            "rarity": 2,
+            "level": 10,
+            "name": "충격 발사기"
+          },
+          {
+            "slot": 1,
+            "definition": 7,
+            "rarity": 1,
+            "level": 10,
+            "name": "강철 외골격"
+          },
+          {
+            "slot": 2,
+            "definition": 10,
+            "rarity": 2,
+            "level": 10,
+            "name": "드론 모듈"
+          }
+        ]
+      }
+    }
+  ]
+}

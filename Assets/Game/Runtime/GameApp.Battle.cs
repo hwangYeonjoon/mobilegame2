@@ -268,7 +268,7 @@ namespace ScrapGuard
                     else view=BulletVisual.Create(bulletLayer);
                     view.gameObject.SetActive(true); bulletViews[b.id] = view;
                 }
-                view.GetComponent<BulletVisual>().Render(b,combat.Skills[0],battleOutfit,combat.Elapsed,visualBudget.Compact);
+                view.GetComponent<BulletVisual>().Render(b,combat.Skills[0],battleOutfit,combat.Elapsed,visualBudget.Compact,b.machine?RobotStyles.Active(State,RobotAssembly.Frame(b.robotDesign)):0);
             }
             Recycle(bulletViews, bulletPool); alive.Clear();
             foreach (var p in combat.Pickups)
@@ -328,7 +328,8 @@ namespace ScrapGuard
                 if(effect.kind==7 || effect.kind==10)continue;
                 if(effect.kind==3 && boss!=null && effect.text==combat.Definition.Boss+" 출현!")continue;
                 if(effect.kind==5)particles.Burst(effect.position,effect.radius>=23?10:5,Ui.Hex("FFF2B0"),130,5);
-                if(effect.kind==2||effect.kind>=11)particles.Burst(effect.position,12,Ui.Hex("FFBF72"),130,3);
+                int robotStyle=effect.robot?RobotStyles.Active(State,RobotAssembly.Frame(combat.MachineDesign)):0;
+                if(effect.kind==2||effect.kind>=11)particles.Burst(effect.position,12,robotStyle==1?Ui.Gold:robotStyle==2?Ui.Mint:Ui.Hex("FFBF72"),130,robotStyle==1?5:3);
                 if (floating.Count >= visualBudget.FloatingLimit) continue;
                 RectTransform visual;
                 if(effect.kind==8)
@@ -347,6 +348,7 @@ namespace ScrapGuard
                 {
                     visual=TakeEffect(0);visual.sizeDelta=Vector2.one*Mathf.Max(8,effect.radius*2);
                     var ring=visual.GetComponent<CombatRing>();ring.color=effect.kind>=11?new Color(.65f,1,.95f,combat.FinalBossActive?.18f:.6f):effect.kind==4?new Color(.4f,.86f,1,combat.FinalBossActive?.1f:.3f):new Color(1,.72f,.3f,.25f);
+                    if(robotStyle>0){var tint=robotStyle==1?Ui.Gold:Ui.Mint;tint.a=combat.FinalBossActive?.12f:.4f;ring.color=tint;}
                     ring.Thickness=effect.kind==4?.022f:.04f;ring.SetVerticesDirty();
                     visual.anchoredPosition=new Vector2(effect.position.x,-effect.position.y);
                 }

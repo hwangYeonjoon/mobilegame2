@@ -28,6 +28,8 @@ namespace ScrapGuard.Core
             velocity=ice?velocity+(target-velocity)*Math.Min(1,dt*3):target;
             V2 drift=new V2();
             if(!Challenge && !BossArenaActive && Definition.Region==4)for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position))drift.y=i%2==0?-55:55;
+            if(!Challenge&&!BossArenaActive&&(Definition.Region==7||Definition.Region==8))
+                for(int i=0;i<Zones.Length;i++)if(Zones[i].Contains(Position)){if(Definition.Region==7)drift.x=i%2==0?45:-45;else drift.y=i%2==0?-40:40;}
             Position=Slide(Position,(velocity+drift)*dt,14);
         }
         void UpdateTerrain(float dt)
@@ -39,6 +41,7 @@ namespace ScrapGuard.Core
                 foreach(var zone in Zones)if(zone.Contains(Position)){Hurt(65+Definition.Region*15,DamageCause.Poison,DamageSource.Terrain);poisonTimer=.8f;break;}
             }
             terrainTimer-=dt;
+            if(Definition.Region>=7){UpdateExpansionTerrain();return;}
             if(terrainTimer>0 || (Definition.Region!=1 && Definition.Region!=4 && Definition.Region!=5 && Definition.Region!=6))return;
             if(Definition.Region>=5)
             {

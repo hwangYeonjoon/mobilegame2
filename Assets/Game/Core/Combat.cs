@@ -43,10 +43,10 @@ namespace ScrapGuard.Core
     }
     public class Pickup { public int id, xp, part=-1, partCount=1; public V2 position; public bool heal; }
     public class Hazard { public int id; public V2 position; public float delay, radius, width, height, damage; public DamageCause cause; public DamageSource source; }
-    public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; }
+    public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 24;
+        public const int RulesVersion = 25;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;

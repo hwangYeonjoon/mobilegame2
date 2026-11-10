@@ -12,7 +12,7 @@ namespace ScrapGuard.Core
     {
         public string id, name;
         public int hero, heroLevel, title, frame, skin, outfit, attack, health, kills, stages, attendance, likes;
-        public int theme, robotDesign, robotRank;
+        public int theme, robotDesign, robotRank, robotStyle;
         public int coreBest, trophy = -1;
         public bool local, test, liked;
         public List<ShowcaseItem> items = new List<ShowcaseItem>();
@@ -24,7 +24,7 @@ namespace ScrapGuard.Core
         public static readonly string[] Titles = { "새내기 정비사", "첫 구역의 수호자", "꾸준한 발걸음", "천 대의 증인", "코어 정복자", "균열의 개척자" };
         public static readonly string[] TitleGoals = { "처음부터 사용 가능", "구역 1개 클리어", "누적 출석 7일", "적 1,000마리 처치", "작전 5개 클리어", "코어 파편 12개 교환" };
         public static readonly string[] Frames = { "작업대", "첫 승리", "푸른 궤적", "태양의 테두리", "코어 궤도" };
-        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛", "번개의 황금빛", "용광로의 홍옥빛" };
+        public static readonly string[] Skins = { "기본 도색", "앰버 에디션", "서리 도색", "정비소의 동빛", "철로의 황혼", "정화의 녹빛", "극저온 은빛", "코어의 자주빛", "번개의 황금빛", "용광로의 홍옥빛", "자력의 청동빛", "폭풍의 푸른빛", "궤도의 별빛" };
         public static void Normalize(GameState s)
         {
             HeroCatalog.Normalize(s); Campaign.Normalize(s); Endgame.Normalize(s); Workshop.Normalize(s);
@@ -35,7 +35,7 @@ namespace ScrapGuard.Core
             if (!HasTitle(s, s.showcaseTitle)) s.showcaseTitle = 0;
             if (!HasFrame(s, s.showcaseFrame)) s.showcaseFrame = 0;
             if (!HasSkin(s, s.selectedSkin)) s.selectedSkin = 0;
-            Outfits.Normalize(s);
+            Outfits.Normalize(s);RobotStyles.Normalize(s);
             if(!ShowcaseThemes.Owned(s,s.showcaseTheme))s.showcaseTheme=0;
             if(s.collectionTarget < -1 || s.collectionTarget>=Campaign.Regions.Length)s.collectionTarget=-1;
             StarterGuide.Normalize(s);
@@ -89,7 +89,7 @@ namespace ScrapGuard.Core
         {
             Normalize(s);RobotAssembly.Normalize(s);
             var p = new PublicProfile { id = id, name = s.displayName, hero = s.showcaseHero, heroLevel = s.heroes[s.showcaseHero].level,
-                robotDesign=s.showcaseRobot,robotRank=s.robotRecords.Find(r=>r.design==s.showcaseRobot)?.rank??0,theme=s.showcaseTheme, title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
+                robotDesign=s.showcaseRobot,robotStyle=RobotStyles.Active(s,RobotAssembly.Frame(s.showcaseRobot)),robotRank=s.robotRecords.Find(r=>r.design==s.showcaseRobot)?.rank??0,theme=s.showcaseTheme, title = s.showcaseTitle, frame = s.showcaseFrame, skin = s.selectedSkin, outfit = Outfits.Active(s,s.showcaseHero), kills = s.totalKills, stages = s.clearedStages.Count,
                 attendance = s.attendanceCount, local = local, test = s.testProgress };
             for (int slot = 0; slot < 3; slot++)
             {

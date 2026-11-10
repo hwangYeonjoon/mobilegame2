@@ -6,6 +6,7 @@ class Program
 {
     static int Main(string[] args)
     {
+        if(args.Length==3&&args[0]=="--content034-audit")return Content034Audit.Run(args[1],args[2]);
         if(args.Length>=2&&args[0]=="--long-audit")return LongHorizonAudit.Execute(args[1],args.Length>2?int.Parse(args[2]):10,args.Length>3?int.Parse(args[3]):28,args.Length>4?int.Parse(args[4]):6);
         if(args.Length==1&&args[0]=="--purchase-audit-checks")return PurchaseAuditChecks.Run();
         if(args.Length>=2&&args[0]=="--purchase-audit")return PurchaseAudit.Run(args[1],args.Length>2?int.Parse(args[2]):3,args.Length>3?int.Parse(args[3]):14,args.Length>4?int.Parse(args[4]):42,args.Length>5?int.Parse(args[5]):6,args.Length>6?args[6]:null);

@@ -1,0 +1,25 @@
+{
+  "version": "0.34.0",
+  "build": 37,
+  "device": "ScrapGuard_QA_API35 / emulator-5556",
+  "resolution": "540x960",
+  "physical_device": false,
+  "result": "incomplete",
+  "attempts": [
+    {
+      "gpu": "swiftshader",
+      "result": "System UI ANR and application ANR; no completed GrowthUI report"
+    },
+    {
+      "gpu": "host",
+      "result": "System UI ANR; no completed GrowthUI report"
+    }
+  ],
+  "limits": [
+    "Android build, signing and alignment passed; Android gameplay execution did not pass.",
+    "macOS UI/replay results are separate and do not establish Android frame rate, heat or touch usability.",
+    "Existing logged-in emulator-5554 was not cleared or used for QA."
+  ],
+  "attempted_qa_sha256": "f4df7fa202c2e43a3c9fba6517c4ab2d2341a40a4891c434a24f66d9522e2053",
+  "final_rebuild_execution": "not run after sprite-rect and QA numeric-comparison fixes"
+}

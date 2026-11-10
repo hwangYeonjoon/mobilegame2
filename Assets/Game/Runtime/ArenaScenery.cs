@@ -17,13 +17,24 @@ namespace ScrapGuard
             if(texture==null)return null;
             float w=texture.width/(float)columns,h=texture.height/(float)rows;
             // One texel inset stops bilinear sampling from borrowing the neighboring cell.
-            sprite=Sprite.Create(texture,new Rect(column*w+1,texture.height-(row+1)*h+1,w-2,h-2),new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
+            var rect=new Rect(column*w+1,texture.height-(row+1)*h+1,w-2,h-2);
+            if(name=="RobotStyles-v1")
+            {
+                // Chassis silhouettes use unequal gutters. Keep neighboring tank barrels out
+                // of the walker cell and preserve the lower row's tall radio aerial.
+                float x=column==0?0:column==1?550:1040;
+                float right=column==0?535:column==1?1024:1536;
+                float top=row==0?0:490,bottom=row==0?486:1024;
+                rect=new Rect(x*texture.width/1536f,(1024-bottom)*texture.height/1024f,(right-x)*texture.width/1536f,(bottom-top)*texture.height/1024f);
+            }
+            sprite=Sprite.Create(texture,rect,new Vector2(.5f,.5f),100,0,SpriteMeshType.FullRect);
             sprites[key]=sprite;return sprite;
         }
-        public static Sprite Floor(int region) { return Cell("ArenaFloors-v2",4,2,region%4,region/4); }
-        public static Sprite Landmark(int region){return Cell("Landmarks-v2",4,2,region%4,region/4);}
-        public static Sprite Prop(int region) { return Cell("ArenaProps-v3",4,2,region%4,region/4); }
-        public static Sprite Surface(int region) { int cell=region-1;return Cell("TerrainDetails-v2",4,2,cell%4,cell/4); }
+        static int BaseRegion(int region){return region<7?region:region==7?0:region==8?5:region==9?4:7;}
+        public static Sprite Floor(int region) { return Cell("ArenaFloors-v2",4,2,BaseRegion(region)%4,BaseRegion(region)/4); }
+        public static Sprite Landmark(int region){return Cell("Landmarks-v2",4,2,BaseRegion(region)%4,BaseRegion(region)/4);}
+        public static Sprite Prop(int region) { return Cell("ArenaProps-v3",4,2,BaseRegion(region)%4,BaseRegion(region)/4); }
+        public static Sprite Surface(int region) { int cell=(region>=7?(region==7?4:region==8?5:1):region)-1;return Cell("TerrainDetails-v2",4,2,cell%4,cell/4); }
     }
 
     // The tagged root is the exact shared simulation rectangle; the roof may overhang upwards.
@@ -36,7 +47,7 @@ namespace ScrapGuard
 
     public sealed class ArenaScenery : MonoBehaviour
     {
-        public static readonly Color[] Accents={Ui.Hex("F3B968"),Ui.Hex("F5CF77"),Ui.Hex("A4D76B"),Ui.Hex("92E4FA"),Ui.Hex("BD9AF6"),Ui.Hex("FFE68A"),Ui.Hex("FFAA70"),Ui.Hex("B4ACFF")};
+        public static readonly Color[] Accents={Ui.Hex("F3B968"),Ui.Hex("F5CF77"),Ui.Hex("A4D76B"),Ui.Hex("92E4FA"),Ui.Hex("BD9AF6"),Ui.Hex("FFE68A"),Ui.Hex("FFAA70"),Ui.Hex("6DDDD5"),Ui.Hex("7EBBFF"),Ui.Hex("C59BFF"),Ui.Hex("B4ACFF")};
         readonly List<AmbientLight> lights=new List<AmbientLight>();
         readonly List<Image> lamps=new List<Image>();
         readonly List<RectTransform> rotors=new List<RectTransform>();
@@ -50,7 +61,7 @@ namespace ScrapGuard
         {
             var root=Ui.Rect(parent,"Regional scenery",0,0,540,960);
             var scene=root.gameObject.AddComponent<ArenaScenery>();
-            scene.region=challenge?7:Campaign.Get(stage).Region;
+            scene.region=challenge?10:Campaign.Get(stage).Region;
             int region=scene.region;var accent=Accents[region];
             float floorX=challenge?0:-540,floorY=challenge?164:-480,floorW=challenge?540:1620,floorH=challenge?652:1960;
             var floor=Ui.Rect(root,"Continuous floor",floorX,floorY,floorW,floorH).gameObject.AddComponent<RawImage>();
@@ -102,6 +113,7 @@ namespace ScrapGuard
                     surface.sprite=ArenaArt.Surface(region);
                 }
                 Ui.Box(zone,0,0,z.W,z.H,new Color(0,0,0,region==3?.38f:.28f),false);
+                if(region>=7)for(int n=0;n<5;n++){var ring=CombatRing.Create(zone,region==7?22:12,new Color(accent.r,accent.g,accent.b,.45f),region==7?.22f:.08f);ring.anchoredPosition=new Vector2(horizontal?28+n*48:z.W/2,horizontal?-z.H/2:-40-n*82);scene.rotors.Add(ring);}
                 if(region==2)for(int i=0;i<5;i++)
                 {
                     var bubble=CombatRing.Create(zone,5+i%3*3,new Color(.73f,1,.44f,.4f),.14f);

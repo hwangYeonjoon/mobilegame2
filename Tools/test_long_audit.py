@@ -3,6 +3,12 @@ from pathlib import Path
 from summarize_long_audit import summarize,completion_minutes,last_week
 def fixture():return json.loads(gzip.decompress((Path(__file__).resolve().parents[1]/'docs/reports/long033-pilot.json.gz').read_bytes()))
 class LongAuditTests(unittest.TestCase):
+    def test_new_schema_separates_finale(self):
+        d=fixture();d["schema"]=2;d["campaignCount"]=60
+        for j in d["journeys"]:j["firstCampaignDay"]=0
+        s=summarize(d);self.assertEqual(s["campaignCount"],60);self.assertEqual(s["finalCompletions"],0)
+        d["journeys"][0]["firstCampaignDay"]=1
+        with self.assertRaisesRegex(ValueError,"campaign completion"):summarize(d)
     def test_real_pilot_and_censoring(self):
         s=summarize(fixture());self.assertEqual((s['journeys'],s['battles']),(8,96))
         self.assertTrue(all(x['daysSaved'] is None for x in s['pairs']))

@@ -8,7 +8,7 @@ namespace ScrapGuard.Core
         public string requestId = Guid.NewGuid().ToString("N");
         public long revision;
         public string type, id, other, value, mode, supportId;
-        public int hero, title, frame, skin, stage, kills, seed, rulesVersion;
+        public int hero, title, frame, skin, stage, kills, seed, rulesVersion, count, level;
         public float seconds;
         public bool enabled, won, quick;
         public List<ReplayStep> replay;
@@ -59,6 +59,9 @@ namespace ScrapGuard.Core
                 case "outfit_equip": return Outfits.Equip(e.State,c.skin);
                 case "guide_seen": e.State.guideIntroSeen=true; return CommandResult.Ok("안내는 정비소에서 다시 볼 수 있어요.");
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);
+                case "robot_style_craft": return e.CraftRobotStyle(c.frame);
+                case "robot_style_equip": return RobotStyles.Equip(e.State,c.frame,c.skin);
+                case "upgrade_path": return e.UpgradePath(c.stage,c.count,c.id,c.level);
                 case "robot_showcase": return RobotAssembly.Showcase(e.State,c.stage);
                 case "showcase_equipment": e.State.showcaseItems = new List<string>(e.State.equipped); return CommandResult.Ok("현재 장비를 전시했어요.");
                 case "visibility": e.State.publicProfile = c.enabled; return CommandResult.Ok(c.enabled ? "프로필을 공개했어요." : "프로필을 비공개로 바꿨어요.");

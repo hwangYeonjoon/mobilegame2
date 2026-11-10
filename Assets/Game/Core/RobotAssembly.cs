@@ -134,7 +134,7 @@ namespace ScrapGuard.Core
             if(frame==0)
             {
                 var target=Nearest(Position);if(target!=null&&V2.Distance(target.position,Position)<640)center=target.position;
-                Effects.Add(new BattleEffect{position=Position,end=center,kind=8});
+                Effects.Add(new BattleEffect{position=Position,end=center,kind=8,robot=true});
             }
             float power=frame==0?7:frame==1?4.2f:3.6f;
             foreach(var enemy in Enemies)if(enemy.hp>0&&V2.Distance(enemy.position,center)<radius)
@@ -153,7 +153,7 @@ namespace ScrapGuard.Core
                     Bullets.Add(new Bullet{id=nextId++,position=Position,velocity=shot*600,damage=Damage*(count==1?2:.8f)*quality,life=1.2f,pierce=8,mod=true,machine=true,robotDesign=MachineDesign});}
                 }
             }
-            Effects.Add(new BattleEffect{position=center,kind=frame==0?11:4,radius=radius});
+            Effects.Add(new BattleEffect{position=center,kind=frame==0?11:4,radius=radius,robot=true});
         }
     }
 }

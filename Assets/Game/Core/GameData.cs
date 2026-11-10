@@ -25,6 +25,7 @@ namespace ScrapGuard.Core
         public bool adSkip;
         public int coreShards;
         public int showcaseRobot;
+        public List<int> robotStyles=new List<int>();
         public List<RobotRecord> robotRecords=new List<RobotRecord>();
         public int collectionVersion, enemyDiscoveries, bossDiscoveries;
         public List<RegionProgress> regions = new List<RegionProgress>();
@@ -40,6 +41,7 @@ namespace ScrapGuard.Core
         public int dailyPartsPurchases;
         public int dailyGemPartsPurchases;
         public int dailySalvageWins; public bool salvageClaimed;
+        public int dailySupplySeconds;
         public int dailyGrowthKits, growthPassFree, growthPassPremium;
         public int dailyRewardGold;
         public int dailyRewardParts;

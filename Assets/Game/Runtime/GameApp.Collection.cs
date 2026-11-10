@@ -139,14 +139,15 @@ namespace ScrapGuard
                 CurrencyArt.Draw(panel,2,16,22,98);
                 Ui.Label(panel,"다음 작전을 위한 정비",130,20,338,36,23);
                 Ui.Label(panel,"골드와 부품으로 장비·대원을 강화해요.\n구매한 재료는 보유량에 바로 더해져요.",130,65,338,57,16,Ui.Muted);
-                var list=ShopScroll(501,MenuBottom-501,620,0);
+                var list=ShopScroll(501,MenuBottom-501,790,0);
                 ShopRow(list,0,"공용 부품 ×20","매일 1회 · 골드로 성장 재료 보충","2,000 골드",()=>ConfirmBuy("parts_gold","부품 20개","골드 2,000"),State.dailyPartsPurchases<1);
                 ShopRow(list,110,"공용 부품 ×100","매일 1회 · 확정 수량","100 보석",()=>ConfirmBuy("parts_gems","부품 100개","보석 100"),State.dailyGemPartsPurchases<1);
                 ShopRow(list,220,"성장 보급 · 골드 + 부품","골드 4,500 · 부품 40 · 하루 1회","100 보석",GrowthKitPanel,State.dailyGrowthKits<1);
                 ShopRow(list,330,"작전 성장 패스","무료 트랙 · 추가 트랙 · 기간 만료 없음","구성 보기",GrowthPassPanel);
-                Ui.Button(list,"강화 전후 비교",0,450,238,53,GrowthPanel,Ui.Raised,true,17);
-                Ui.Button(list,"대원 성장으로 이동",254,450,238,53,()=>Show("heroes"),Ui.Raised,true,17);
-                Ui.Label(list,"무료 부품은 보석 · 광고 탭에서 받을 수 있어요.",0,525,492,43,15,Ui.Muted,TextAnchor.MiddleCenter);
+                ShopRow(list,440,"성운 기사 · 로봇 외형 3종","외형 즉시 적용 · 성장 재료 포함","900 보석",()=>RobotStylePanel());
+                Ui.Button(list,"강화 전후 비교",0,560,238,53,GrowthPanel,Ui.Raised,true,17);
+                Ui.Button(list,"대원 성장으로 이동",254,560,238,53,()=>Show("heroes"),Ui.Raised,true,17);
+                Ui.Button(list,"무료 현장 보급 · 평소 전투 5분 합산",0,635,492,53,SalvagePanel,Ui.Mint,true,17);
                 return;
             }
             var gearList=ShopScroll(340,MenuBottom-340,1670,1);

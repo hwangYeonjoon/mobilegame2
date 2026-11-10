@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "date": "2026-11-10",
+  "assets": [
+    {
+      "asset": "ExpansionBosses-v3.png",
+      "source": "exec-267f276f-52c6-4bb5-957e-1076e25c3d7c.png",
+      "layout": "4 columns, 3 rows; each row idle/windup/attack/movement",
+      "direction": "Chunky industrial pixel-painted top-down bosses. Magnetic crab with red-blue jaws; cobalt storm biped with yellow lightning coils; violet orbital carrier with four construction arms. Transparent background."
+    },
+    {
+      "asset": "RobotStyles-v1.png",
+      "source": "exec-8add6590-19c1-4afa-bd1e-2fdb3df7915f.png",
+      "layout": "3 columns artillery/walker/fortress; 2 rows astral/reclaimer",
+      "direction": "Complete robot chassis, distinct silhouettes. Astral: ivory ceramic, cobalt, golden physical fins and cyan star reactor. Reclaimer: worn teal copper, reclaimed riveted panels, amber lamps, utility winches. Transparent alpha, 12 percent clear margin, no text or floor."
+    }
+  ]
+}

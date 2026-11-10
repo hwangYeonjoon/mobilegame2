@@ -35,11 +35,13 @@ namespace ScrapGuard.Core
             State.activeRun=State.activeMode=State.activeWeek="";
             return CommandResult.Ok("보스 연습 완료 · 재화·작전 진행·일일 임무에 반영되지 않아요.");
         }
+        void CreditFieldSupply(float seconds)
+        {if(seconds>=60&&!float.IsNaN(seconds)&&!float.IsInfinity(seconds))State.dailySupplySeconds=Math.Min(300,State.dailySupplySeconds+(int)Math.Min(seconds,300));}
         public CommandResult ClaimSalvage()
         {
-            RefreshDay();if(State.salvageClaimed||State.dailySalvageWins<3)return CommandResult.Fail("완료 작전에서 90초 이상 전투 후 3회 승리하면 받을 수 있어요.");
+            RefreshDay();if(State.salvageClaimed||State.dailySupplySeconds<300)return CommandResult.Fail("작전 또는 주간 도전의 전투 시간 5분을 채우세요. 60초 이상 전투만 합산해요.");
             State.salvageClaimed=true;State.gold+=Growth.KitGold;State.parts+=Growth.KitParts;
-            return CommandResult.Ok("회수 임무 완료 · 골드 4,500 · 부품 40");
+            return CommandResult.Ok("현장 보급 수령 · 골드 4,500 · 부품 40");
         }
         public CommandResult ClaimRobotWeek(string week)
         {

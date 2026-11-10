@@ -57,6 +57,7 @@ namespace ScrapGuard.Core
         public CommandResult BuyGrowthKit()
         {
             RefreshDay();
+            if(Growth.Steps(State).Count==0)return CommandResult.Fail("장착 장비와 대원이 최대 레벨이에요. 다른 성장 대상을 먼저 선택하세요.");
             if(State.dailyGrowthKits>=1)return CommandResult.Fail("성장 보급은 하루 1회 구매할 수 있어요.");
             if(!PremiumWallet.Spend(State,Growth.KitPrice))return CommandResult.Fail("보석 잔액 또는 환불 조정 내역을 확인해 주세요.");
             State.gold+=Growth.KitGold;State.parts+=Growth.KitParts;State.dailyGrowthKits++;

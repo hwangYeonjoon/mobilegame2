@@ -10,13 +10,15 @@ namespace ScrapGuard.Core
         public Economy(GameState state, Func<DateTimeOffset> clock, bool refresh = true) { State = state; HeroCatalog.Normalize(state); Campaign.Normalize(state); Endgame.Normalize(state); Workshop.Normalize(state); StarterGuide.Normalize(state); this.clock = clock; if (refresh) RefreshDay(); }
         public void RefreshDay()
         {
+            // Carry forward already earned 0.33 progress once; claimed rights are preserved.
+            if(State.dailySalvageWins>0){State.dailySupplySeconds=Math.Max(State.dailySupplySeconds,Math.Min(3,State.dailySalvageWins)*100);State.dailySalvageWins=0;}
             string today = Catalog.ServiceDate(clock());
             // A backwards clock must not reopen an already used daily allowance.
             if (String.CompareOrdinal(today, State.serviceDate) <= 0) return;
             State.serviceDate = today;
             State.dailyRuns = State.dailyKills = State.dailyItemPurchases = State.dailyPartsPurchases = State.dailyGemPartsPurchases = 0;
             State.dailySupportStarts = 0;
-            State.dailyGrowthKits = 0; State.dailySalvageWins=0;State.salvageClaimed=false;
+            State.dailySupplySeconds=0;State.dailyGrowthKits = 0; State.dailySalvageWins=0;State.salvageClaimed=false;
             State.dailyRewardGold = State.dailyRewardParts = 0; State.missionClaimed = false;
         }
         public bool CanAttend { get { return String.CompareOrdinal(State.serviceDate, State.attendanceDate) > 0; } }
@@ -52,6 +54,7 @@ namespace ScrapGuard.Core
         public CommandResult Buy(string offer)
         {
             RefreshDay();
+            if (offer == "robot_astral_pack")return BuyRobotStylePack();
             if (offer == "growth_kit")return BuyGrowthKit();
             if (offer == "growth_pass")return BuyGrowthPass();
             if (offer == "hero")
@@ -167,7 +170,7 @@ namespace ScrapGuard.Core
             int gold = won ? definition.Gold : Math.Min(definition.Gold*65/100, (int)(Math.Min(seconds, 300)*(4+stage*.2f)));
             int parts = won ? definition.Parts : Math.Min(8, (int)seconds / 30);
             int gems = 0;
-            if(won&&seconds>=90&&State.clearedStages.Contains(stage))State.dailySalvageWins=Math.Min(3,State.dailySalvageWins+1);
+            CreditFieldSupply(seconds);
             if (won && !State.clearedStages.Contains(stage))
             {
                 gems = 50; State.clearedStages.Add(stage); State.unlockedStage = Math.Min(Campaign.Count - 1, Math.Max(State.unlockedStage, stage + 1));

@@ -52,15 +52,14 @@ namespace ScrapGuard
         }
         void SalvagePanel()
         {
-            int stage=Growth.SalvageStage(State),left=Math.Max(0,3-State.dailySalvageWins);
-            var card=Dialog("보석을 아끼는 회수 임무","완료한 작전에서 90초 이상 전투 후 3회 승리\n하루 한 번 · 광고나 보석 사용 없이 획득",700);
+            int left=Math.Max(0,300-State.dailySupplySeconds);
+            var card=Dialog("진행하며 받는 현장 보급","새 작전·재도전·주간 도전의 전투 시간 합산\n승패 무관 · 하루 한 번 · 보석과 광고 불필요",700);
             Ui.Label(card,"골드 4,500 + 공용 부품 40",24,146,444,42,26,Ui.Gold,TextAnchor.MiddleCenter);
-            Ui.Label(card,"성장 보급 1개의 재료와 같아요.\n작전 자체의 반복 보상도 함께 받아요.",24,210,444,64,18,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(card,"오늘 "+State.dailySalvageWins+" / 3회 승리",24,294,444,38,22,Ui.Mint,TextAnchor.MiddleCenter);
-            string estimate=stage<0?"먼저 첫 작전을 완료하세요.":"추천: 작전 "+(stage+1)+" · "+Campaign.Get(stage).Objective+"\n남은 "+left+"회 전투 약 "+Math.Ceiling(left*(Campaign.Get(stage).Duration+(Campaign.Get(stage).Mission==Mission.Eliminate?30:0))/60f)+"분 + 선택·메뉴 시간\n패배하면 시간이 더 필요해요.";
-            Ui.Label(card,estimate,24,351,444,91,16,Ui.Muted,TextAnchor.MiddleCenter);
-            Ui.Button(card,State.salvageClaimed?"오늘 수령 완료":"회수 보상 받기",24,464,444,54,()=>Change(new GameCommand("salvage_claim"),confirmed:()=>GrowthPanel("회수 보급 수령 · 원하는 장비를 강화하세요.")),Ui.Gold,!State.salvageClaimed&&left==0,19);
-            Ui.Button(card,"추천 작전 반복",24,535,214,53,()=>{combat=null;StartBattle(stage);},Ui.Mint,stage>=0,18);
+            Ui.Label(card,"이미 깬 작전을 반복할 필요 없어요.\n60초 이상 진행한 전투만 정산 후 합산돼요.",24,210,444,64,18,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,"오늘 "+(300-left)+" / 300초",24,294,444,38,22,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Label(card,"남은 전투 시간 "+(left/60)+"분 "+(left%60)+"초\n보스 연습·실력전·짧은 중단은 제외\n메뉴와 일시정지 시간은 포함되지 않아요.",24,351,444,91,16,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,State.salvageClaimed?"오늘 수령 완료":"현장 보급 받기",24,464,444,54,()=>Change(new GameCommand("salvage_claim"),confirmed:()=>GrowthPathPanel("현장 보급 수령 · 강화 경로를 선택하세요.")),Ui.Gold,!State.salvageClaimed&&left==0,19);
+            Ui.Button(card,"작전 이어가기",24,535,214,53,()=>{combat=null;StartBattle(State.unlockedStage);},Ui.Mint,true,18);
             Ui.Button(card,"주간 로봇 과제",254,535,214,53,()=>{combat=null;Show("weekly");},Ui.Raised,true,17);
             Ui.Button(card,"성장 화면",24,611,444,45,GrowthPanel,Ui.Raised,true,17);
         }

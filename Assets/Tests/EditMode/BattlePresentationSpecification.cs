@@ -72,7 +72,7 @@ namespace ScrapGuard.Tests
                 var scenery=ArenaScenery.Build(root.transform,4,true);
                 Assert.That(scenery.GetComponentsInChildren<ArenaGeometryTag>(),Is.Empty);
                 var seen=new System.Collections.Generic.HashSet<Rect>();
-                for(int region=0;region<8;region++){var sprite=ArenaArt.Floor(region);Assert.That(sprite,Is.Not.Null);seen.Add(sprite.rect);Assert.That(ArenaArt.Prop(region),Is.Not.Null);Assert.That(ArenaArt.Landmark(region),Is.Not.Null);}
+                foreach(int region in new[]{0,1,2,3,4,5,6,10}){var sprite=ArenaArt.Floor(region);Assert.That(sprite,Is.Not.Null);seen.Add(sprite.rect);Assert.That(ArenaArt.Prop(region),Is.Not.Null);Assert.That(ArenaArt.Landmark(region),Is.Not.Null);}
                 Assert.That(seen.Count,Is.EqualTo(8));
             }
             finally{Object.DestroyImmediate(root);}
