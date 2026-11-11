@@ -1,0 +1,28 @@
+{
+  "build": 40,
+  "rules": 27,
+  "core": "129/129",
+  "summary_tests": "4/4",
+  "regional_before": 800,
+  "regional_after": 800,
+  "android_runtime": {
+    "package": "io.github.hwangyeonjoon.scrapguard.qa",
+    "graphics": [
+      "swiftshader",
+      "host"
+    ],
+    "completed_runs": 2,
+    "errors": 0,
+    "real_time_seconds_per_run": 360,
+    "frames_files_per_run": 6,
+    "unity_dotnet_replays": "15/15",
+    "physical_device": false,
+    "human_playtest": false,
+    "real_google_purchase": false
+  },
+  "notes": [
+    "Runtime fixtures are separate from earned-loadout balance runs.",
+    "Current price/reward amounts and combat rules unchanged.",
+    "No production/Play deployment."
+  ]
+}

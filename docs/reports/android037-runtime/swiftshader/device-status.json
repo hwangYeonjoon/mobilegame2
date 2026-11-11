@@ -1,0 +1,21 @@
+{
+  "status": "emulator_only",
+  "emulator": true,
+  "model": "sdk_gphone64_arm64",
+  "samples": [
+    {
+      "elapsed_seconds": 2.61,
+      "app_running": true
+    },
+    {
+      "elapsed_seconds": 61.18,
+      "app_running": true
+    },
+    {
+      "elapsed_seconds": 122.28,
+      "app_running": true
+    }
+  ],
+  "android_sdk": "35",
+  "limits": "Manual review required. Unity GL frames may not be covered by gfxinfo; compare in-game frame samples. Touch, pause/resume, heat and sustained gameplay still need observation."
+}

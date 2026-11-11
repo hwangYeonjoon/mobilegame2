@@ -7,7 +7,7 @@ namespace ScrapGuard
 {
     public partial class GameApp
     {
-        IEnumerator GrowthSmokeRoutine()
+        IEnumerator GrowthSmokeRoutine(bool regionalRuntime=false)
         {
             DismissTitleScreen();CloseModal();
             Store.Change(e=>{e.State.gems=2000;e.State.gold=1800;e.State.parts=30;e.State.testProgress=true;return CommandResult.Ok("Isolated UI fixture, not human or balance evidence");});
@@ -56,6 +56,7 @@ namespace ScrapGuard
             GrowthKitConfirm(Growth.CurrentKit(State).id,3);yield return Capture("44-late-kit-confirm");
             yield return Content034Smoke();
             yield return ReplayExpansionCapture();
+            if(regionalRuntime)yield return RegionalRuntimeRoutine();
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
             Debug.Log("GROWTH_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);
         }

@@ -1,0 +1,19 @@
+{
+    "kind": "synthetic_render_load_not_balance_or_physical_device",
+    "device": "Google sdk_gphone64_arm64",
+    "gpu": "Android Emulator OpenGL ES Translator (ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver-5.0.0))",
+    "phase": "opening",
+    "build": 40,
+    "rules": 27,
+    "stage": 19,
+    "frames": 1268,
+    "peakEnemies": 40,
+    "regionalActions": 26,
+    "kills": 223,
+    "wallSeconds": 60.05933380126953,
+    "simulationSeconds": 54.632843017578128,
+    "p50Ms": 33.333335876464847,
+    "p95Ms": 100.0,
+    "p99Ms": 233.33331298828126,
+    "unityBytes": 89445474
+}
