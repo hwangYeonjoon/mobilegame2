@@ -6,6 +6,7 @@ class Program
 {
     static int Main(string[] args)
     {
+        if(args.Length==3&&args[0]=="--regional-audit")return RegionalAudit.Run(args[1],args[2]);
         if(args.Length==3&&args[0]=="--growth-value-audit")return GrowthValueAudit.Run(args[1],args[2]);
         if(args.Length>=3&&args[0]=="--content035-audit")return Content035Audit.Run(args[1],args[2],args.Length>3);
         if(args.Length==3&&args[0]=="--content034-audit")return Content034Audit.Run(args[1],args[2]);

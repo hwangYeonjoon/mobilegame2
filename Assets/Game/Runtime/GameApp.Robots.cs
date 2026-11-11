@@ -102,7 +102,7 @@ namespace ScrapGuard
             foreach(var pickup in combat.Pickups)if(pickup.part==needed)return BattleBearing(pickup.position)+" 떨어진 "+RobotAssembly.Parts[needed]+" 회수 · "+(cost[needed]-stock[needed])+"개 더 필요";
             Enemy target=null;float nearest=float.MaxValue;
             foreach(var enemy in combat.Enemies)if(enemy.hp>0&&RobotAssembly.PartFor(enemy)==needed){float d=V2.Distance(combat.Position,enemy.position);if(d<nearest){nearest=d;target=enemy;}}
-            return (target==null?"":BattleBearing(target.position)+" ")+RobotAssembly.Parts[needed]+" "+(cost[needed]-stock[needed])+"개 더 · "+(needed==0?"포격·자폭 / 포 표식":needed==1?"추격·돌진 적":"방패·소환 / 장 표식");
+            return (target==null?"":BattleBearing(target.position)+" "+(target.salvagePart>=0?"부품 운반 적":RegionalEnemies.Name(combat.Definition.Region,target.role))+" · ")+RobotAssembly.Parts[needed]+" "+(cost[needed]-stock[needed])+"개 더 · "+(needed==0?"포격·자폭 / 포 표식":needed==1?"추격·돌진 적":"방패·소환 / 장 표식");
         }
         void RobotHangar(bool currentRun=false)
         {

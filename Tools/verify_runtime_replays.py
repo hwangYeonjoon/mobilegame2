@@ -1,6 +1,8 @@
 """Verify Unity-produced replay fixtures with the authoritative .NET simulation."""
 import argparse
 import json
+import gzip
+import tempfile
 from pathlib import Path
 import subprocess
 
@@ -12,13 +14,18 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
     dll = root / 'Tools/CoreChecks/bin/Debug/net10.0/CoreChecks.dll'
-    files = sorted(set(args.folder.glob('probe-*.json')) | set(args.folder.glob('runtime-replay-*.json')))
+    files = sorted(set(args.folder.glob('probe-*.json')) | set(args.folder.glob('runtime-replay-*.json')) | set(args.folder.glob('runtime-replay-*.json.gz')))
     if not files or not dll.is_file():
         parser.error('Build Tools/CoreChecks and supply a folder containing Unity replay fixtures.')
     results = []
     for path in files:
-        run = subprocess.run(['dotnet', str(dll), '--verify-replay', str(path.resolve())],
-                             capture_output=True, text=True, timeout=90)
+        with tempfile.TemporaryDirectory(prefix='scrap-replay-') as temp:
+            replay_path = path.resolve()
+            if path.suffix == '.gz':
+                replay_path = Path(temp) / path.stem
+                replay_path.write_bytes(gzip.decompress(path.read_bytes()))
+            run = subprocess.run(['dotnet', str(dll), '--verify-replay', str(replay_path)],
+                                 capture_output=True, text=True, timeout=90)
         detail = (run.stdout + run.stderr).strip()
         results.append(dict(file=path.name, passed=run.returncode == 0, detail=detail))
         print(path.name + ': ' + detail)

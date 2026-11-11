@@ -6,6 +6,28 @@ namespace ScrapGuard.Tests
 {
     public class PresentationTests
     {
+        [Test] public void RegionalAtlasAndPooledVisualsUseCorrectFamily()
+        {
+            var root=new GameObject("regional-fixture",typeof(RectTransform));
+            try
+            {
+                var v=EnemyVisual.Create(root.transform).GetComponent<EnemyVisual>();
+                var sprites=new System.Collections.Generic.HashSet<Sprite>();
+                for(int region=0;region<10;region++)for(int role=0;role<6;role++)
+                {
+                    var sprite=BattleArt.Regional(region,(EnemyRole)role);
+                    Assert.That(sprite,Is.Not.Null);Assert.That(sprites.Add(sprite),Is.True);
+                    Assert.That(sprite.rect.xMin,Is.GreaterThanOrEqualTo(0));Assert.That(sprite.rect.yMin,Is.GreaterThanOrEqualTo(0));
+                    Assert.That(sprite.rect.xMax,Is.LessThanOrEqualTo(sprite.texture.width));Assert.That(sprite.rect.yMax,Is.LessThanOrEqualTo(sprite.texture.height));
+                    var enemy=new Enemy{role=(EnemyRole)role,position=new V2(200,300),hp=100,maxHp=100};string before=JsonUtility.ToJson(enemy);
+                    v.Render(enemy,region,0);Assert.That(JsonUtility.ToJson(enemy),Is.EqualTo(before));
+                    Assert.That(System.Array.Exists(v.GetComponentsInChildren<Image>(),i=>i.sprite==sprite),Is.True);
+                    v.ResetState();
+                }
+                Assert.That(BattleArt.Regional(-1,EnemyRole.Artillery),Is.SameAs(BattleArt.Role(2,0)));
+            }
+            finally{Object.DestroyImmediate(root);}
+        }
         [Test] public void PooledProjectilesResetAndPreserveSpecialAttackIdentity()
         {
             var root=new GameObject("fixture",typeof(RectTransform));

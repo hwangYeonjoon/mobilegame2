@@ -11,17 +11,23 @@ PACKS={'gems_300':(300,2200),'gems_600':(600,3900),'gems_1200':(1200,7500),'gems
 def need(b,msg):
     if not b:raise ValueError(msg)
 def stat(xs):return None if not xs else dict(median=median(xs),min=min(xs),max=max(xs))
-def completion_minutes(j):
+def completion_minutes(j,target=42):
     total=0
     for r in j['runs']:
         total+=(r['seconds']+30)/60
-        if not r['mode'] and not r['repeat'] and r['stage']==42 and r['won']:return total
+        if not r['mode'] and not r['repeat'] and r['stage']==target and r['won']:return total
     return None
+def kit_delta(build,target,cleared):
+    offers={'growth_kit':(4500,40,0)}
+    if build>=39:offers.update(growth_kit_field=(9000,80,12),growth_kit_frontier=(15000,120,30))
+    need(target in offers,'unknown kit tier');gold,parts,unlock=offers[target]
+    need(unlock==0 or unlock in cleared,'unearned kit tier')
+    return dict(gold=gold,parts=parts,gems=-100)
 def last_week(j,days):
     if days<8:return None
     start,end=j['days'][-8],j['days'][-1]
     cutoff=(Date.fromisoformat(j['ledger'][0]['serviceDate'])+timedelta(days=days-7)).isoformat()
-    return dict(freeChange=(end['state']['wallet']['gems']-end['paid'])-(start['state']['wallet']['gems']-start['paid']),kits=sum(x['action']=='buy_kit' and x['serviceDate']>=cutoff for x in j['ledger']),completedBefore=start['cleared']==42)
+    return dict(freeChange=(end['state']['wallet']['gems']-end['paid'])-(start['state']['wallet']['gems']-start['paid']),kits=sum(x['action']=='buy_kit' and x['serviceDate']>=cutoff for x in j['ledger']),completedBefore=start['cleared']>=42)
 def fmt(s):return '—' if s is None else f"{s['median']:.1f} [{s['min']:.1f}–{s['max']:.1f}]"
 def summarize(d):
     need(d['kind']=='long_horizon_not_human' and d['schema'] in (1,2),'schema')
@@ -44,7 +50,7 @@ def summarize(d):
             if x['delta']['gems']<0:need(x['paidAfter']==paid-max(0,-x['delta']['gems']-(wallet['gems']-paid)),'free-first')
             if a in ('salvage_claim','buy_kit','attendance','missions'):need(counts[(date,a)]<=1,'daily cap')
             if a=='salvage_claim':need((daily_wins[date]>=3 if d['schema']==1 else daily_seconds[date]>=300) and x['delta']==dict(gold=4500,parts=40,gems=0),'unearned salvage')
-            if a=='buy_kit':need(j['cohort'] in ('kit_free','both_paid') and x['delta']==dict(gold=4500,parts=40,gems=-100),'kit')
+            if a=='buy_kit':need(j['cohort'] in ('kit_free','both_paid') and x['delta']==kit_delta(d.get('build',36),x['target'],cleared),'kit')
             if a=='buy_pass':need(j['cohort']=='both_paid' and x['delta']==dict(gold=0,parts=0,gems=-900),'pass');owned_pass=True
             if a=='cosmetic_buy':need(j['cohort']=='cosmetic_free' and x['delta']==dict(gold=0,parts=0,gems=-600),'cosmetic')
             if a in ('pass_free_claim','pass_premium_claim'):

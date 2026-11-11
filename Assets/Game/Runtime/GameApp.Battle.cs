@@ -243,7 +243,7 @@ namespace ScrapGuard
                     else view=EnemyVisual.Create(enemyLayer);
                     enemyViews[e.id] = view;
                 }
-                var actor=view.GetComponent<EnemyVisual>();actor.Render(e,combat.Definition.Region,combat.Elapsed);
+                var actor=view.GetComponent<EnemyVisual>();actor.Render(e,combat.Challenge?-1:combat.Definition.Region,combat.Elapsed);
                 if(actor.JustHit){particles.Burst(e.position,3,Ui.Gold,65,2);HitFeedback();}
                 if((e.finalBoss||e.core) && presentedBoss!=e.id)
                 {

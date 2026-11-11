@@ -136,6 +136,15 @@ namespace ScrapGuard.Editor
         static void Build(BuildTarget target, string path,BuildOptions options=BuildOptions.Development,string[] extraDefines=null)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(path));
+            if(target==BuildTarget.Android && path.EndsWith(".apk",System.StringComparison.OrdinalIgnoreCase))
+            {
+                // AGP incremental APK replacement can leave the old libil2cpp payload as
+                // unreferenced ZIP bytes. Invalidate only the generated packaging output;
+                // keep compiled code caches and the last deliverable if this build fails.
+                string flavor=(options&BuildOptions.Development)!=0?"debug":"release";
+                string packed=Path.Combine("Library/Bee/Android/Prj/IL2CPP/Gradle/launcher/build/outputs/apk",flavor,"launcher-"+flavor+".apk");
+                if(File.Exists(packed))File.Delete(packed);
+            }
             var report = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { ScenePath }, target = target, locationPathName = path, options = options,extraScriptingDefines=extraDefines });
             if (report.summary.result != BuildResult.Succeeded) throw new BuildFailedException("Build failed: " + report.summary.result);
             Debug.Log("BUILD_READY " + Path.GetFullPath(path));

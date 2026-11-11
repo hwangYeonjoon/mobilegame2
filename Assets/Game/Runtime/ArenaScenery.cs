@@ -18,6 +18,14 @@ namespace ScrapGuard
             float w=texture.width/(float)columns,h=texture.height/(float)rows;
             // One texel inset stops bilinear sampling from borrowing the neighboring cell.
             var rect=new Rect(column*w+1,texture.height-(row+1)*h+1,w-2,h-2);
+            if(name=="RegionalEnemies-B-v1")
+            {
+                // Generated families have uneven vertical gutters. Slice between the actual
+                // silhouettes so the orbital antennae never appear beneath storm enemies.
+                float[] edges={0,222,442,653,895,1145};
+                float top=edges[row]*texture.height/1145f,bottom=edges[row+1]*texture.height/1145f;
+                rect=new Rect(column*w+1,texture.height-bottom+1,w-2,bottom-top-2);
+            }
             if(name=="RobotStyles-v1")
             {
                 // Chassis silhouettes use unequal gutters. Keep neighboring tank barrels out

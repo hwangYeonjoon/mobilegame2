@@ -24,7 +24,7 @@ namespace ScrapGuard.Editor
         {
             // Small battlefield/UI cells; keep store portraits, outfits and animation sheets at full resolution.
             string name=System.IO.Path.GetFileNameWithoutExtension(path);
-            return name=="SkillIcons-v1"||name=="EquipmentIcons-v1"||name=="CurrencyIcons-v1"||name=="EnemyRoles-v4"||name=="TerrainDetails-v2"||name=="ArenaProps-v3";
+            return name.StartsWith("RegionalEnemies-")||name=="SkillIcons-v1"||name=="EquipmentIcons-v1"||name=="CurrencyIcons-v1"||name=="EnemyRoles-v4"||name=="TerrainDetails-v2"||name=="ArenaProps-v3";
         }
         public static void ReimportCompactAtlases()
         {

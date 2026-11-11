@@ -1,8 +1,13 @@
 import copy,gzip,json,unittest
 from pathlib import Path
-from summarize_long_audit import summarize,completion_minutes,last_week
+from summarize_long_audit import summarize,completion_minutes,last_week,kit_delta
 def fixture():return json.loads(gzip.decompress((Path(__file__).resolve().parents[1]/'docs/reports/long033-pilot.json.gz').read_bytes()))
 class LongAuditTests(unittest.TestCase):
+    def test_tiers_are_versioned_and_earned(self):
+        self.assertEqual(kit_delta(39,'growth_kit_field',{12}),dict(gold=9000,parts=80,gems=-100))
+        self.assertEqual(kit_delta(39,'growth_kit_frontier',{30}),dict(gold=15000,parts=120,gems=-100))
+        for build,cleared in [(38,{30}),(39,{29})]:
+            with self.assertRaises(ValueError):kit_delta(build,'growth_kit_frontier',cleared)
     def test_new_schema_separates_finale(self):
         d=fixture();d["schema"]=2;d["campaignCount"]=60
         for j in d["journeys"]:j["firstCampaignDay"]=0

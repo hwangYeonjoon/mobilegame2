@@ -1,0 +1,56 @@
+{
+  "total": 10,
+  "passed": 10,
+  "cases": [
+    {
+      "file": "runtime-replay-region-0.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=206/206 machines=0/0 hp=2711/2711"
+    },
+    {
+      "file": "runtime-replay-region-1.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=210/210 machines=0/0 hp=3443.8774/3443.8774"
+    },
+    {
+      "file": "runtime-replay-region-2.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=213/213 machines=0/0 hp=2580.3462/2580.3462"
+    },
+    {
+      "file": "runtime-replay-region-3.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=238/238 machines=0/0 hp=2515.56/2515.56"
+    },
+    {
+      "file": "runtime-replay-region-4.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=286/286 machines=0/0 hp=1558.5203/1558.5203"
+    },
+    {
+      "file": "runtime-replay-region-5.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=210/210 machines=0/0 hp=2130.0002/2130.0002"
+    },
+    {
+      "file": "runtime-replay-region-6.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=282/282 machines=0/0 hp=2522.5005/2522.5005"
+    },
+    {
+      "file": "runtime-replay-region-7.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=204/204 machines=0/0 hp=1399.8927/1399.8937"
+    },
+    {
+      "file": "runtime-replay-region-8.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=293/293 machines=0/0 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-region-9.json.gz",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=173/173 machines=0/0 hp=1887.4839/1887.4839"
+    }
+  ]
+}

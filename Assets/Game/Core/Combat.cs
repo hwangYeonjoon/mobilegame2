@@ -46,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 26;
+        public const int RulesVersion = 27;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -374,7 +374,7 @@ namespace ScrapGuard.Core
                 damage=(float)Math.Round(damage,MidpointRounding.AwayFromZero);
                 CoreScore+=Math.Max(0,(int)Math.Min(Math.Max(0,e.hp),damage));
             }
-            if(e.role==EnemyRole.Shield && !e.core && V2.Distance(Position,e.position)>125)damage*=.45f;
+            if(e.role==EnemyRole.Shield && !e.core)damage*=RegionalShieldDamage(e);
             damage=(float)(Math.Round(damage*256d)/256d);
             float effective=Math.Min(Math.Max(0,e.hp),Math.Max(0,damage));DamageDealt+=effective;if(machine){MachineDamage+=effective;int design=robotDesign==0?MachineDesign:robotDesign;if(RobotAssembly.Valid(design))this.robotDamage[design-1]+=effective;}
             if(MachineTime>0)DamageDuringMachine+=effective;

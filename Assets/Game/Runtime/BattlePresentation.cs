@@ -22,6 +22,7 @@ namespace ScrapGuard
     public sealed class EnemyVisual : MonoBehaviour
     {
         Image body,shadow;
+        RectTransform heading;
         Text mark;
         Vector2 previous;
         float lastFlash,movedAt=-1;
@@ -37,6 +38,7 @@ namespace ScrapGuard
             visual.body=Ui.Box(root,0,0,60,60,Color.white,false);visual.body.preserveAspect=true;
             visual.body.rectTransform.pivot=new Vector2(.5f,.5f);
             var outline=visual.body.gameObject.AddComponent<Outline>();outline.effectColor=new Color(.025f,.045f,.07f,.9f);outline.effectDistance=new Vector2(1.25f,-1.25f);
+            visual.heading=Ui.Box(root,0,0,20,3,Ui.Hex("8DE8FA"),false).rectTransform;visual.heading.pivot=new Vector2(0,.5f);
             visual.mark=Ui.Label(root,"",-22,-45,44,24,18,Ui.Gold,TextAnchor.MiddleCenter);
             return root;
         }
@@ -51,7 +53,16 @@ namespace ScrapGuard
             bool moving=initialized && time-movedAt<.12f && enemy.freezeTime<=0;
             Pose=enemy.windup>0?1:enemy.attackFlash>0||enemy.dash>0?2:moving && (int)(time*9+enemy.id)%2==1?3:0;
             float size=enemy.Radius*(boss?4.1f:enemy.kind==2?3.4f:2.7f);
-            body.sprite=BattleArt.Role(enemy.core?10:boss?region:(int)enemy.role,Pose,boss);
+            body.sprite=boss?BattleArt.Role(enemy.core?10:region,Pose,true):BattleArt.Regional(region,enemy.role,Pose);
+            bool braced=!boss&&region==3&&enemy.role==EnemyRole.Shield&&enemy.windup>0;
+            bool charging=!boss&&enemy.role==EnemyRole.Charger&&enemy.windup>0;
+            heading.gameObject.SetActive(braced||charging);
+            if(braced||charging)
+            {
+                heading.anchoredPosition=new Vector2(enemy.direction.x*enemy.Radius,-enemy.direction.y*enemy.Radius);
+                heading.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(enemy.direction.y,enemy.direction.x)*Mathf.Rad2Deg);
+                heading.GetComponent<Image>().color=braced?Ui.Blue:Ui.Red;
+            }
             body.rectTransform.sizeDelta=new Vector2(size,size);
             float bounce=moving?Mathf.Abs(Mathf.Sin(time*10+enemy.id))*2:0;
             body.rectTransform.anchoredPosition=new Vector2(0,6+bounce+(Pose==1?-2:Pose==2?3:0));
@@ -60,11 +71,11 @@ namespace ScrapGuard
             JustHit=enemy.flash>lastFlash+.005f;lastFlash=enemy.flash;
             bool rage=boss && !enemy.core && enemy.hp<enemy.maxHp*.5f;
             JustRaged=rage&&!raging;raging=rage;
-            body.color=enemy.flash>0?new Color(1,1,.9f):enemy.freezeTime>0?Ui.Hex("7CEAFF"):enemy.slowTime>0?Ui.Hex("BAEFFF"):rage?new Color(1,.87f,.81f):new Color(.82f,.86f,.9f);
+            body.color=enemy.flash>0?new Color(1,1,.9f):enemy.freezeTime>0?Ui.Hex("7CEAFF"):enemy.slowTime>0?Ui.Hex("BAEFFF"):rage?new Color(1,.87f,.81f):!boss&&region>=0?Color.white:new Color(.82f,.86f,.9f);
             shadow.rectTransform.sizeDelta=new Vector2(enemy.Radius*2,enemy.Radius*.58f);
             shadow.rectTransform.anchoredPosition=new Vector2(-enemy.Radius,enemy.Radius*.12f);
             shadow.color=new Color(0,0,0,enemy.windup>0?.5f:.32f);
-            mark.text=enemy.windup>0?"!":rage?"Ⅱ":enemy.kind==2?"◆":enemy.salvagePart==0?"포":enemy.salvagePart==1?"동":enemy.salvagePart==2?"장":"";
+            mark.text=braced?"방어":enemy.windup>0?"!":rage?"Ⅱ":enemy.kind==2?"◆":enemy.salvagePart==0?"포":enemy.salvagePart==1?"동":enemy.salvagePart==2?"장":"";
             mark.color=enemy.windup>0?Ui.Red:Ui.Gold;
             mark.rectTransform.anchoredPosition=new Vector2(-22,size*.5f+16);
             ((RectTransform)transform).anchoredPosition=position;

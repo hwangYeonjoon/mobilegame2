@@ -93,14 +93,16 @@ namespace ScrapGuard.Core
             e.slowTime=Math.Max(0,e.slowTime-dt);e.freezeTime=Math.Max(0,e.freezeTime-dt);
             if(e.freezeTime>0)return;
             e.cooldown-=dt;float speed=e.speed;
+            if(RegionalHold(e,dt,distance,direction))return;
             if(e.role==EnemyRole.Charger)
             {
                 if(e.windup>0)
                 {
-                    e.windup-=dt;if(e.windup<=0){e.dash=.65f;e.attackFlash=.65f;}return;
+                    e.windup-=dt;if(e.windup<=0){e.dash=Regional(e,1)?.8f:Regional(e,7)?.45f:.65f;e.attackFlash=e.dash;}return;
                 }
-                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?BossChargeSpeed:240;}
-                else if(e.cooldown<=0 && distance<330 && BossActionReady(e,true)){e.direction=direction;e.windup=e.finalBoss?BossChargeWindup:.8f;e.cooldown=e.finalBoss?BossChargeRecovery:4.5f;
+                if(e.dash>0){e.dash-=dt;direction=e.direction;speed=e.finalBoss?BossChargeSpeed:Regional(e,7)?285:240;}
+                else if(e.cooldown<=0 && distance<330 && BossActionReady(e,true)){e.direction=RegionalChargeDirection(e,direction);e.windup=e.finalBoss?BossChargeWindup:Regional(e,1)||Regional(e,7)?1.15f:.8f;e.cooldown=e.finalBoss?BossChargeRecovery:Regional(e,7)?5.5f:4.5f;
+                    if(Regional(e,1)||Regional(e,7))RegionalActions++;
                     ReserveBossAction(e,true,e.windup+.65f);
                     if(e.finalBoss && Definition.Region==6)Warn(Position,75,1.8f,220,0,0,DamageCause.Heat,DamageSource.Boss);
                     return;}
@@ -117,7 +119,7 @@ namespace ScrapGuard.Core
                         Warn(Position,0,delay,185,400,28,DamageCause.Electricity,DamageSource.Boss);
                         if(e.hp<e.maxHp*.5f){last=delay+.8f;Warn(Position,0,last,185,28,400,DamageCause.Electricity,DamageSource.Boss);}
                     }
-                    else Warn(Position,e.finalBoss?72:43,delay,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
+                    else if(!RegionalArtillery(e))Warn(Position,e.finalBoss?72:43,delay,e.finalBoss?190:100,0,0,DamageCause.Artillery,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack);
                     if(e.finalBoss && Definition.Region>1 && e.hp<e.maxHp*.5f && BossExtraWarnings>0)
                     { last=delay+.6f;Warn(Position+new V2(100,0),50,last,130,0,0,DamageCause.Artillery,DamageSource.Boss);if(BossExtraWarnings>=2)Warn(Position-new V2(100,0),50,last,130,0,0,DamageCause.Artillery,DamageSource.Boss); }
                     ReserveBossAction(e,true,last);
@@ -133,8 +135,11 @@ namespace ScrapGuard.Core
                 }
                 if(distance<(e.finalBoss?150:85) && e.cooldown<=0 && BossActionReady(e,true))
                 {
-                    if(Warn(e.position,e.finalBoss?120:82,e.finalBoss?BossWarningDelay:1.05f,e.finalBoss?230:150,0,0,DamageCause.Explosion,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
-                    {e.cooldown=5;e.windup=e.finalBoss?BossWarningDelay:1.65f;ReserveBossAction(e,true,e.windup);}
+                    float delay=e.finalBoss?BossWarningDelay:Regional(e,2)||Regional(e,6)?2:1.65f;
+                    float radius=e.finalBoss?120:Regional(e,2)?70:Regional(e,6)?96:82;
+                    var cause=Regional(e,2)?DamageCause.Poison:Regional(e,6)?DamageCause.Heat:DamageCause.Explosion;
+                    if(Warn(e.position,radius,delay,e.finalBoss?230:Regional(e,6)?140:150,0,0,cause,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
+                    {if(Regional(e,2)||Regional(e,6))RegionalActions++;e.cooldown=5;e.windup=delay;ReserveBossAction(e,true,e.windup);}
                     else e.cooldown=.3f;
                     return;
                 }
@@ -147,9 +152,16 @@ namespace ScrapGuard.Core
                 if(Enemies.Count<EnemyLimit-5)
                 {
                     var p=e.position+new V2(0,55);
-                    if(!IsBlocked(p))Enemies.Add(new Enemy {id=nextId++,kind=1,role=EnemyRole.Pursuer,position=p,hp=90*Definition.Difficulty,maxHp=90*Definition.Difficulty,speed=68});
+                    if(!IsBlocked(p))
+                    {
+                        var child=Regional(e,4)?EnemyRole.Shield:Regional(e,9)?EnemyRole.Charger:EnemyRole.Pursuer;
+                        float hp=(child==EnemyRole.Shield?70:90)*Definition.Difficulty;
+                        Enemies.Add(new Enemy {id=nextId++,kind=1,role=child,position=p,hp=hp,maxHp=hp,speed=child==EnemyRole.Shield?48:68,cooldown=child==EnemyRole.Charger?2:0});
+                        if(Regional(e,4)||Regional(e,9))RegionalActions++;
+                    }
                 }
             }
+            if(Regional(e,7)&&e.role==EnemyRole.Charger&&e.dash<=0&&distance>100)direction=(direction+new V2(-direction.y,direction.x)*.35f).Normal;
             if(e.slowTime>0)speed*=e.finalBoss?.85f:.7f;
             var before=e.position;
             e.position=Slide(e.position,direction*(speed*dt),Math.Min(e.Radius,20));

@@ -7,12 +7,21 @@ namespace ScrapGuard
         static Texture2D enemies;
         static readonly Sprite[,] frames = new Sprite[4,4];
         static readonly Sprite[,] roleFrames=new Sprite[6,4],bossFrames=new Sprite[11,4];
+        static readonly Sprite[,] regionalFrames=new Sprite[10,6];
         public static Sprite Role(int role,int state,bool boss=false)
         {
             role=Mathf.Clamp(role,0,boss?10:5);state=Mathf.Clamp(state,0,3);
             var cache=boss?bossFrames:roleFrames;
             if(cache[role,state]==null)cache[role,state]=boss?(role>=7&&role<=9?ArenaArt.Cell("ExpansionBosses-v3",4,3,state,role-7):ArenaArt.Cell("RegionBosses-v3",4,8,state,role==10?7:role)):ArenaArt.Cell("EnemyRoles-v4",6,4,role,state);
             return cache[role,state];
+        }
+        public static Sprite Regional(int region,ScrapGuard.Core.EnemyRole role,int pose=0)
+        {
+            if(region<0||region>=ScrapGuard.Core.Campaign.Regions.Length)return Role((int)role,pose);
+            // Do not construct atlas dictionary keys for every enemy on every frame.
+            int index=(int)role;
+            if(regionalFrames[region,index]==null)regionalFrames[region,index]=ArenaArt.Cell(region<5?"RegionalEnemies-A-v1":"RegionalEnemies-B-v1",6,5,index,region%5);
+            return regionalFrames[region,index];
         }
         public static Sprite Enemy(int kind,int frame)
         {
