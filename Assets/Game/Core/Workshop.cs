@@ -4,9 +4,14 @@ using System.Collections.Generic;
 namespace ScrapGuard.Core
 {
     public enum DamageCause { None, Contact, Charge, Artillery, Explosion, Poison, Rail, Laser, Boss, Timeout, Abandoned, Electricity, Heat }
+    [Serializable] public sealed class DamageHit
+    {
+        public float seconds,damage; public int cause,source;
+    }
     [Serializable] public sealed class BattleReport
     {
         public float[] damage = new float[13];
+        public List<DamageHit> recentHits=new List<DamageHit>();
         public int lastCause,lastSource; public float lastHitTime,lastHitDamage;
         public int cause, mods, task, taskChoice, fieldModule, hero;
         public bool taskCompleted, revived;
@@ -63,7 +68,7 @@ namespace ScrapGuard.Core
         // Both app-local settlement and server replay use the same report and collection logic.
         public CommandResult FinishCampaign(Combat combat)
         {
-            if(combat==null || !combat.Ended || combat.Challenge || combat.BossPractice || combat.ApexBattle)return CommandResult.Fail("작전 결과가 올바르지 않아요.");
+            if(combat==null || !combat.Ended || combat.Challenge || combat.Practice || combat.ApexBattle)return CommandResult.Fail("작전 결과가 올바르지 않아요.");
             var result=FinishRun(combat.RunId,combat.Stage,combat.Won,combat.Kills,combat.Elapsed);
             if(!result.Success)return result;
             var receipt=State.receipts.Find(r=>r.id==combat.RunId);receipt.report=combat.Report();

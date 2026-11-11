@@ -1,0 +1,19 @@
+{
+    "kind": "synthetic_render_load_not_balance_or_physical_device",
+    "device": "Google sdk_gphone64_arm64",
+    "gpu": "Android Emulator OpenGL ES Translator (Apple M1)",
+    "phase": "opening",
+    "build": 41,
+    "rules": 28,
+    "stage": 55,
+    "frames": 2720,
+    "peakEnemies": 240,
+    "regionalActions": 85,
+    "kills": 416,
+    "wallSeconds": 60.0289306640625,
+    "simulationSeconds": 55.732826232910159,
+    "p50Ms": 16.666667938232423,
+    "p95Ms": 33.333335876464847,
+    "p99Ms": 149.99998474121095,
+    "unityBytes": 94561228
+}

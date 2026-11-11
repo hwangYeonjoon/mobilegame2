@@ -80,8 +80,8 @@ namespace ScrapGuard.Core
             {
                 int count=0;foreach(var h in Hazards)if(h.source==DamageSource.EnemyAttack)count++;
                 if(enemyWarningRecovery>0||count>=(Elapsed<25?2:3))return false;
-                enemyWarningRecovery=.8f;PeakEnemyWarnings=Math.Max(PeakEnemyWarnings,count+1);
-                delay=Math.Max(delay,1.6f);
+                enemyWarningRecovery=Definition.Region==2?1.15f:Definition.Region==4?1f:.8f;PeakEnemyWarnings=Math.Max(PeakEnemyWarnings,count+1);
+                delay=Math.Max(delay,Definition.Region==2?2.1f:Definition.Region==4?1.9f:1.6f);
             }
             Hazards.Add(new Hazard {id=nextId++,position=position,radius=radius,delay=delay,damage=damage,width=width,height=height,cause=cause,source=source});return true;
         }
@@ -136,6 +136,7 @@ namespace ScrapGuard.Core
                 if(distance<(e.finalBoss?150:85) && e.cooldown<=0 && BossActionReady(e,true))
                 {
                     float delay=e.finalBoss?BossWarningDelay:Regional(e,2)||Regional(e,6)?2:1.65f;
+                    if(!e.finalBoss&&!Challenge)delay=Math.Max(delay,Definition.Region==2?2.1f:Definition.Region==4?1.9f:1.6f);
                     float radius=e.finalBoss?120:Regional(e,2)?70:Regional(e,6)?96:82;
                     var cause=Regional(e,2)?DamageCause.Poison:Regional(e,6)?DamageCause.Heat:DamageCause.Explosion;
                     if(Warn(e.position,radius,delay,e.finalBoss?230:Regional(e,6)?140:150,0,0,cause,e.finalBoss?DamageSource.Boss:DamageSource.EnemyAttack))
@@ -148,15 +149,15 @@ namespace ScrapGuard.Core
             else if(e.role==EnemyRole.Shield)speed*=.7f;
             else if(e.role==EnemyRole.Summoner && e.cooldown<=0 && BossActionReady(e,true))
             {
-                e.cooldown=e.finalBoss?5:9;e.attackFlash=.5f;ReserveBossAction(e,true,.5f);
-                if(Enemies.Count<EnemyLimit-5)
+                e.cooldown=e.finalBoss?5:Regional(e,4)?11:9;e.attackFlash=.5f;ReserveBossAction(e,true,.5f);
+                if(Enemies.Count<EnemyLimit-5&&(!Regional(e,4)||Enemies.FindAll(x=>x.hp>0&&x.summoned).Count<8))
                 {
                     var p=e.position+new V2(0,55);
                     if(!IsBlocked(p))
                     {
                         var child=Regional(e,4)?EnemyRole.Shield:Regional(e,9)?EnemyRole.Charger:EnemyRole.Pursuer;
-                        float hp=(child==EnemyRole.Shield?70:90)*Definition.Difficulty;
-                        Enemies.Add(new Enemy {id=nextId++,kind=1,role=child,position=p,hp=hp,maxHp=hp,speed=child==EnemyRole.Shield?48:68,cooldown=child==EnemyRole.Charger?2:0});
+                        float hp=(child==EnemyRole.Shield?50:90)*Definition.Difficulty;
+                        Enemies.Add(new Enemy {id=nextId++,kind=1,role=child,summoned=true,position=p,hp=hp,maxHp=hp,speed=child==EnemyRole.Shield?48:68,cooldown=child==EnemyRole.Charger?2:0});
                         if(Regional(e,4)||Regional(e,9))RegionalActions++;
                     }
                 }

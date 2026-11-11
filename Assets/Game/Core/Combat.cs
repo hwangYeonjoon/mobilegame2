@@ -26,7 +26,7 @@ namespace ScrapGuard.Core
         public int id, kind, chillStacks;
         public V2 position;
         public float hp, maxHp, speed, cooldown, flash;
-        public bool finalBoss, core, killedByMachine; public int robotDesign;
+        public bool finalBoss, core, killedByMachine, summoned; public int robotDesign;
         public EnemyRole role; public int salvagePart=-1;
         public V2 direction;
         public float windup, dash, attackFlash, slowTime, freezeTime;
@@ -46,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 27;
+        public const int RulesVersion = 28;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -96,8 +96,8 @@ namespace ScrapGuard.Core
         public Combat(GameState state, int stage, string runId, int seed = 123, bool quick = false, string mode = "", SupportSnapshot support = null)
         {
             Mode=mode??"";
-            if(Mode!="" && !Endgame.IsChallenge(Mode)&&!BossPractice&&!ApexBattle)throw new ArgumentException("Unknown combat mode");
-            if(support!=null && (Challenge || BossPractice || ApexBattle || support.hero<0 || support.hero>=HeroCatalog.Count || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
+            if(Mode!="" && !Endgame.IsChallenge(Mode)&&!Practice&&!ApexBattle)throw new ArgumentException("Unknown combat mode");
+            if(support!=null && (Challenge || Practice || ApexBattle || support.hero<0 || support.hero>=HeroCatalog.Count || support.power<1 || support.power>350))throw new ArgumentException("Invalid support snapshot");
             Support=support;
             GuildAtStart=state.activeGuild;
             Definition=Campaign.Get(stage);
@@ -109,16 +109,17 @@ namespace ScrapGuard.Core
             if(Mode==SkillTrial.Mode)state=SkillTrial.Loadout();
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
             WeeklyFrame=RobotWeek.Frame(seed);
-            IntroBattle=!Challenge&&!BossPractice&&stage==0&&!state.tutorialCompleted;
+            IntroBattle=!Challenge&&!Practice&&stage==0&&!state.tutorialCompleted;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
             module = state.items.Find(i => i.id == state.equipped[2]).definition;
             moduleGrowth=Mode==SkillTrial.Mode?0:state.items.Find(i=>i.id==state.equipped[2]).level-1;
             baseDamage = Catalog.Attack(state,Mode==SkillTrial.Mode); MaxHp = Hp = Catalog.Health(state,Mode==SkillTrial.Mode);MinimumHp=Hp;
             baseSpeed = HeroCatalog.All[hero].Speed * (armor == 8 ? 1.08f : 1);
-            Duration = BossPractice ? 90 : Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
+            Duration = SurvivalPractice ? 60 : BossPractice ? 90 : Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
             Skills[0] = 1;
             if(BossPractice)InitializeBossPractice();
+            if(SurvivalPractice)InitializeSurvivalPractice();
             if(hero==3)Skills[2]=1;
             if(Challenge)
             {
@@ -134,7 +135,7 @@ namespace ScrapGuard.Core
             dt = Math.Max(0, Math.Min(.05f, dt)); Elapsed += dt;
             if(Hp<MaxHp*.5f)LowHealthSeconds+=dt;
             areaHitRecovery=Math.Max(0,areaHitRecovery-dt);bossHitRecovery=Math.Max(0,bossHitRecovery-dt);bossActionRecovery=Math.Max(0,bossActionRecovery-dt);enemyWarningRecovery=Math.Max(0,enemyWarningRecovery-dt);
-            if(BossPractice&&Elapsed>=Duration){Ended=true;Won=false;endCause=DamageCause.Timeout;return;}
+            if(Practice&&Elapsed>=Duration){Ended=true;Won=SurvivalPractice&&Hp>0;endCause=Won?DamageCause.None:DamageCause.Timeout;return;}
             if(Challenge && Elapsed>=Duration) { Elapsed=Duration;Ended=true;Won=Hp>0;return; }
             LastMovement = movement;
             UltimateCharge = Math.Min(100,UltimateCharge + dt*2);
@@ -158,10 +159,10 @@ namespace ScrapGuard.Core
             spawnTimer -= dt;
             if (spawnTimer <= 0 && !BossArenaActive)
             {
-                spawnTimer = Math.Max(.25f, (Challenge?.85f:Definition.SpawnInterval) - Elapsed / Duration * (Challenge?.58f:.48f));
+                spawnTimer = Math.Max(.25f, (Challenge?.85f:Definition.SpawnInterval) - SpawnProgress * (Challenge?.58f:.48f));
                 if(!Challenge && Definition.Region==0)spawnTimer*=(int)(Elapsed/22)%2==0?1.2f:.72f;
                 if(RiskActive)spawnTimer*=.75f;
-                int group=Challenge?1:Elapsed<25?2:Math.Min(6,2+(int)(Elapsed/45)+Definition.Region/2);
+                int group=Challenge?1:Elapsed<25?2:Math.Min(6,2+(int)(SpawnElapsed/45)+Definition.Region/2);
                 for(int n=0;n<group && Enemies.Count<EnemyLimit;n++) Spawn(random.NextDouble() < (Challenge?.36:.18 + Definition.Region * .035) ? 1 : 0, false);
             }
             if (!eliteSpawned && Elapsed > Duration * .46f) { eliteSpawned = true; Spawn(2, false); }
@@ -202,7 +203,7 @@ namespace ScrapGuard.Core
         void Spawn(int kind, bool final)
         {
             V2 p=final&&BossArenaActive?BossArenaCenter+new V2(0,-190):SpawnPoint(kind>=2?360:330);
-            float difficulty = (Challenge?2.12f:Definition.Difficulty) + Elapsed / Duration * .55f;
+            float difficulty = (Challenge?2.12f:Definition.Difficulty) + SpawnProgress * .55f;
             float hp = (kind == 3 ? (Challenge?7000:BossBaseHealth) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
             var role=Challenge?(RobotEnabled&&kind==1?(WeeklyFrame==0?EnemyRole.Pursuer:WeeklyFrame==1?EnemyRole.Charger:EnemyRole.Artillery):EnemyRole.Pursuer):Definition.Enemies[random.Next(Definition.Enemies.Length)];
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
@@ -255,10 +256,10 @@ namespace ScrapGuard.Core
                 if(area&&areaHitRecovery>0)return;
                 if(area)areaHitRecovery=.55f;
                 if(source==DamageSource.Terrain)damage*=.35f;
-                else if(source==DamageSource.EnemyAttack)damage*=.8f*(1+Stage*.022f);
+                else if(source==DamageSource.EnemyAttack)damage*=.8f*(1+Stage*.022f)*(Definition.Region==2?.85f:Definition.Region==4?.9f:1);
                 else if(source==DamageSource.Contact)damage*=1+Stage*.022f;
                 if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
-                if((area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
+                if(!SurvivalPractice&&(area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }
             if(RobotDamageReduction>0)damage*=1-RobotDamageReduction*(source==DamageSource.Boss?.5f:1);
             if(RiskActive)damage*=1.2f;
@@ -268,7 +269,7 @@ namespace ScrapGuard.Core
             IdentityShieldHit(absorbed);
             float actual=Math.Min(Hp,Math.Max(0,damage-absorbed));
             if((int)cause>0 && (int)cause<damageTaken.Length)damageTaken[(int)cause]+=actual;
-            if(actual>0){lastCause=(int)cause;lastSource=(int)source;lastHitTime=Elapsed;lastHitDamage=actual;}
+            if(actual>0){lastCause=(int)cause;lastSource=(int)source;lastHitTime=Elapsed;lastHitDamage=actual;RecordRecentHit(actual,cause,source);}
             DamageReceived+=actual;damageBySource[(int)source]+=actual;
             if(source==DamageSource.Boss){if(cause==DamageCause.Contact||cause==DamageCause.Charge)BossContactDamage+=actual;else BossWarningDamage+=actual;}
             Hp -= damage - absorbed;MinimumHp=Math.Min(MinimumHp,Math.Max(0,Hp));

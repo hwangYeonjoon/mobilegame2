@@ -37,7 +37,7 @@ namespace ScrapGuard
             Store.Change(e=>{e.State.gold=0;e.State.parts=0;return CommandResult.Ok("Shortage fixture");});RefreshWallet();
             GrowthPanel();ClickVisibleButton("부족분");yield return Capture("13-free-and-optional-paths");
             CloseModal();shopTab=2;Show("shop");yield return Capture("14-repair-ad-offer");
-            GrowthPanel();ClickVisibleButton("보스 패턴 무료 연습");yield return Capture("15-boss-selector");
+            GrowthPanel();ClickVisibleButton("작전 패턴 무료 연습");yield return Capture("15-boss-selector");
             StartBattle(1,false,BossTraining.Mode);yield return null;
             if(combat==null||!combat.BossPractice||!combat.BossArenaActive||combat.Skills[4]!=3||Mathf.Abs(combat.Damage-Catalog.Attack(State)*1.6f)>.001f)smokeErrors.Add("Practice preset/start mismatch: damage="+(combat==null?"missing":combat.Damage.ToString("R"))+" expected="+(Catalog.Attack(State)*1.6f).ToString("R"));
             battlePaused=true;RenderBattle();yield return Capture("16-boss-practice");
@@ -56,7 +56,7 @@ namespace ScrapGuard
             GrowthKitConfirm(Growth.CurrentKit(State).id,3);yield return Capture("44-late-kit-confirm");
             yield return Content034Smoke();
             yield return ReplayExpansionCapture();
-            if(regionalRuntime)yield return RegionalRuntimeRoutine();
+            if(regionalRuntime){yield return SurvivalSmokeRoutine();yield return RegionalRuntimeRoutine();}
             File.WriteAllText(Path.Combine(smokeOutput,"report.txt"),"Growth UI errors: "+smokeErrors.Count+"\n"+string.Join("\n",smokeErrors));
             Debug.Log("GROWTH_SMOKE_COMPLETE errors="+smokeErrors.Count);Application.Quit(smokeErrors.Count==0?0:1);
         }

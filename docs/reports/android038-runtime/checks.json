@@ -1,0 +1,21 @@
+{
+  "build": 41,
+  "rules": 28,
+  "core_checks": 132,
+  "unity_editmode": 172,
+  "server_checks": 407,
+  "regional_summary_checks": 4,
+  "summary_rejection_probes": 6,
+  "physical_device_tested": false,
+  "human_playtest_completed": false,
+  "production_deployed": false,
+  "android_ui_errors": 0,
+  "android_screenshots": 73,
+  "android_runtime_replays": 18,
+  "android_frame_windows": 6,
+  "survival_practices": [
+    15,
+    27,
+    57
+  ]
+}

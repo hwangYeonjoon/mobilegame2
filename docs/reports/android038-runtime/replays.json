@@ -1,0 +1,96 @@
+{
+  "total": 18,
+  "passed": 18,
+  "cases": [
+    {
+      "file": "runtime-replay-apex-47.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=4373/4373 machines=6/6 hp=2782.975/2782.975"
+    },
+    {
+      "file": "runtime-replay-apex-53.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=4643/4643 machines=6/6 hp=3869/3869"
+    },
+    {
+      "file": "runtime-replay-apex-59.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=384/384 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-boss_practice-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-boss_practice-41.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-boss_practice-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2158/2158"
+    },
+    {
+      "file": "runtime-replay-new-boss-42.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=3435/3435"
+    },
+    {
+      "file": "runtime-replay-new-boss-47.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=3141.8/3141.8"
+    },
+    {
+      "file": "runtime-replay-new-boss-48.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=3545/3545"
+    },
+    {
+      "file": "runtime-replay-new-boss-53.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=3275/3275"
+    },
+    {
+      "file": "runtime-replay-new-boss-54.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=3433/3433"
+    },
+    {
+      "file": "runtime-replay-new-boss-59.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1/1 machines=0/0 hp=2697/2697"
+    },
+    {
+      "file": "runtime-replay-survival-14.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=413/413 machines=0/0 hp=4234.521/4234.521"
+    },
+    {
+      "file": "runtime-replay-weekly-17.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=36/36 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-weekly-41.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=41/41 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-weekly-71.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=32/32 machines=1/1 hp=0/0"
+    },
+    {
+      "file": "runtime-replay-survival-26.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=619/619 machines=0/0 hp=4265/4265"
+    },
+    {
+      "file": "runtime-replay-survival-56.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=1001/1001 machines=0/0 hp=4265/4265"
+    }
+  ]
+}

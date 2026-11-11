@@ -37,7 +37,7 @@ namespace ScrapGuard
             Ui.Button(card,"로봇 외형 공방",254,606,214,51,()=>RobotStylePanel(),Ui.Gold,true,18);
             int farm=Growth.FarmStage(State);
             Ui.Button(card,"진행하며 받는 무료 현장 보급",24,671,444,52,SalvagePanel,Ui.Raised,true,17);
-            Ui.Button(card,"보스 패턴 무료 연습",24,736,214,52,BossTrainingPanel,Ui.Raised,true,16);
+            Ui.Button(card,"작전 패턴 무료 연습",24,736,214,52,BossTrainingPanel,Ui.Raised,true,16);
             Ui.Button(card,"출격 준비",254,736,214,52,()=>{combat=null;Show("home");},Ui.Mint,true,18);
             Ui.Label(card,"반복 작전은 최초 보상 제외 · 연습은 보상 없음",24,802,444,28,14,Ui.Muted,TextAnchor.MiddleCenter);
         }

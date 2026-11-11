@@ -8,6 +8,17 @@ namespace ScrapGuard.Core
         public static string Brief(string week){return RobotAssembly.Frames[Frame(week)]+" 특화형으로 탑승하고 60초 생존";}
         public const int Gold=3000, Parts=30, Shards=5;
     }
+    public static class SurvivalTraining
+    {
+        public const string Mode="survival_practice";
+        public static bool Available(GameState s,int stage){return stage>=0&&stage<Campaign.Count&&stage<=s.unlockedStage&&Campaign.Get(stage).Mission==Mission.Survive;}
+    }
+    public static class CombatTraining
+    {
+        public static string ModeFor(int stage){return Campaign.Get(stage).Mission==Mission.Survive?SurvivalTraining.Mode:BossTraining.Mode;}
+        public static bool Available(GameState s,int stage){return BossTraining.Available(s,stage)||SurvivalTraining.Available(s,stage);}
+        public static string SourceName(int source){return source==(int)DamageSource.Boss?"보스":source==(int)DamageSource.EnemyAttack?"일반 적 공격":source==(int)DamageSource.Terrain?"지형":source==(int)DamageSource.Contact?"적 접촉":source==(int)DamageSource.Condition?"지역 조건":"기타";}
+    }
     public static class BossTraining
     {
         public const string Mode="boss_practice";
@@ -18,6 +29,13 @@ namespace ScrapGuard.Core
             if(r.lastSource==(int)DamageSource.Boss&&r.lastCause==(int)DamageCause.Contact)return "보스와 맞닿았어요. 보스 몸체에서 거리를 벌리세요.";
             if(r.lastSource==(int)DamageSource.Boss&&r.lastCause==(int)DamageCause.Charge)return "보스 돌진에 맞았어요. 진행 방향 옆으로 피하세요.";
             if(r.lastSource==(int)DamageSource.Boss)return "보스 예고 공격에 맞았어요. 원 밖이나 십자의 빈 모서리로 이동하세요.";
+            if(r.lastSource==(int)DamageSource.EnemyAttack)
+            {
+                if(r.lastCause==(int)DamageCause.Poison||r.lastCause==(int)DamageCause.Explosion||r.lastCause==(int)DamageCause.Heat)return "폭발을 준비하는 적에게 맞았어요. 적 주변 예고 원에서 먼저 벗어나세요.";
+                if(r.lastCause==(int)DamageCause.Electricity)return "적 포대의 방전에 맞았어요. 길게 표시된 예고 띠 옆으로 피하세요.";
+                if(r.lastCause==(int)DamageCause.Laser)return "절단 공격에 맞았어요. 멈춰 선 적 주변의 예고를 벗어나세요.";
+                return "일반 적 포격에 맞았어요. 예고 원 밖으로 이동하며 포대를 먼저 정리해 보세요.";
+            }
             return Workshop.Advice[Workshop.MainCause(r)];
         }
     }
@@ -30,10 +48,20 @@ namespace ScrapGuard.Core
         }
         public CommandResult FinishBossPractice(Combat c)
         {
-            if(c==null||!c.Ended||!c.BossPractice||State.activeMode!=BossTraining.Mode||State.activeRun!=c.RunId||State.activeStage!=c.Stage||State.receipts.Exists(r=>r.id==c.RunId))return CommandResult.Fail("유효하지 않은 연습 기록이에요.");
-            State.receipts.Add(new Receipt{id=c.RunId,kind=BossTraining.Mode,seconds=c.Elapsed,kills=c.Kills,won=c.Won,report=c.Report()});
+            if(c==null||!c.BossPractice)return CommandResult.Fail("유효하지 않은 보스 연습이에요.");
+            return FinishPractice(c);
+        }
+        public CommandResult BeginSurvivalPractice(string id,int stage)
+        {
+            if(!SurvivalTraining.Available(State,stage))return CommandResult.Fail("열린 생존 작전만 연습할 수 있어요.");
+            var result=BeginRun(id,stage);if(result.Success)State.activeMode=SurvivalTraining.Mode;return result;
+        }
+        public CommandResult FinishPractice(Combat c)
+        {
+            if(c==null||!c.Ended||!c.Practice||State.activeMode!=c.Mode||State.activeRun!=c.RunId||State.activeStage!=c.Stage||!CombatTraining.Available(State,c.Stage)||State.receipts.Exists(r=>r.id==c.RunId))return CommandResult.Fail("유효하지 않은 연습 기록이에요.");
+            State.receipts.Add(new Receipt{id=c.RunId,kind=c.Mode,seconds=c.Elapsed,kills=c.Kills,won=c.Won,report=c.Report()});
             State.activeRun=State.activeMode=State.activeWeek="";
-            return CommandResult.Ok("보스 연습 완료 · 재화·작전 진행·일일 임무에 반영되지 않아요.");
+            return CommandResult.Ok("연습 완료 · 재화·작전 진행·일일 임무에 반영되지 않아요.");
         }
         void CreditFieldSupply(float seconds)
         {if(seconds>=60&&!float.IsNaN(seconds)&&!float.IsInfinity(seconds))State.dailySupplySeconds=Math.Min(300,State.dailySupplySeconds+(int)Math.Min(seconds,300));}
@@ -54,9 +82,24 @@ namespace ScrapGuard.Core
     public sealed partial class Combat
     {
         public bool BossPractice {get{return Mode==BossTraining.Mode;}}
-        public bool RobotEnabled {get{return Mode!=SkillTrial.Mode&&!BossPractice;}}
+        public bool SurvivalPractice {get{return Mode==SurvivalTraining.Mode;}}
+        public bool Practice {get{return BossPractice||SurvivalPractice;}}
+        public bool RobotEnabled {get{return Mode!=SkillTrial.Mode&&!Practice;}}
         public readonly int WeeklyFrame;
         int lastCause,lastSource;float lastHitTime,lastHitDamage;
+        readonly System.Collections.Generic.List<DamageHit> recentHits=new System.Collections.Generic.List<DamageHit>();
+        void RecordRecentHit(float damage,DamageCause cause,DamageSource source)
+        {
+            recentHits.RemoveAll(h=>h.seconds<Elapsed-8);
+            if(recentHits.Count>=32)recentHits.RemoveAt(0);
+            recentHits.Add(new DamageHit{seconds=Elapsed,damage=damage,cause=(int)cause,source=(int)source});
+        }
+        void InitializeSurvivalPractice()
+        {
+            if(Definition.Mission!=Mission.Survive)throw new ArgumentException("Survival practice requires a survival operation");
+            Skills[0]=3;Skills[1]=2;Skills[4]=1;Skills[7]=1;Level=8;reviveGuard=3;eliteSpawned=true;
+            for(int i=0;i<Definition.Enemies.Length;i++){Spawn(1,false);Enemies[Enemies.Count-1].role=Definition.Enemies[i];}
+        }
         void InitializeBossPractice()
         {
             // Preset build for pattern practice, not a campaign win-rate simulation.

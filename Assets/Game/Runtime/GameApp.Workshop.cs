@@ -102,8 +102,15 @@ namespace ScrapGuard
             Ui.Label(card,(report.cause>0?"종료 원인  ":"주요 피해  ")+Workshop.CauseNames[cause],24,128,444,40,24,Ui.Gold);
             Ui.Label(card,BossTraining.Advice(report),24,184,444,69,18);
             Ui.Label(card,report.bossRemaining<0?"보스 잔여 체력: 미등장 또는 해당 없음":"보스 잔여 체력  "+Mathf.CeilToInt(report.bossRemaining*100)+"%",24,269,444,35,18,Ui.Mint);
-            string damage="";for(int i=1;i<Math.Min(Workshop.CauseNames.Length,report.damage.Length);i++)if(report.damage[i]>0)damage+=Workshop.CauseNames[i]+"  "+Mathf.CeilToInt(report.damage[i])+"\n";
-            Ui.Label(card,"피해 합계 · 마지막 피격 "+report.lastHitTime.ToString("0.0")+"초 / −"+Mathf.CeilToInt(report.lastHitDamage),24,325,444,28,15,Ui.Muted);
+            string damage="";
+            if(report.recentHits!=null&&report.recentHits.Count>0)
+            {
+                var totals=new float[6];foreach(var hit in report.recentHits)if(hit.source>=0&&hit.source<totals.Length)totals[hit.source]+=hit.damage;
+                damage="최근 8초 · 피해 출처\n";for(int i=0;i<totals.Length;i++)if(totals[i]>0)damage+=CombatTraining.SourceName(i)+"  "+Mathf.CeilToInt(totals[i])+"\n";
+                damage+="\n전투 전체 · 피해 종류\n";
+            }
+            for(int i=1;i<Math.Min(Workshop.CauseNames.Length,report.damage.Length);i++)if(report.damage[i]>0)damage+=Workshop.CauseNames[i]+"  "+Mathf.CeilToInt(report.damage[i])+"\n";
+            Ui.Label(card,"마지막 피격 · "+CombatTraining.SourceName(report.lastSource)+" · −"+Mathf.CeilToInt(report.lastHitDamage),24,325,444,28,15,Ui.Muted);
             var list=Ui.Scroll(card,24,363,444,147,Math.Max(147,damage.Split('\n').Length*29));Ui.Label(list,damage.Length==0?"체력 피해 없음":damage,12,0,420,Math.Max(147,damage.Split('\n').Length*29),17);
             string mods=report.fieldModule>0?FieldEngineering.Name(report.fieldModule,report.hero)+" (현장 장착)\n":"";for(int i=0;i<Workshop.ModNames.Length;i++)if((report.mods&(1<<i))!=0)mods+=Workshop.ModNames[i]+"\n";
             for(int i=0;i<12;i++)if((report.skillEvolutions&(1<<i))!=0)mods+=Combat.EvolutionTitle(i)+"\n";
@@ -113,7 +120,7 @@ namespace ScrapGuard
             Ui.Label(card,"고철 합체 "+report.machines+"회 · 웨이브 "+report.waves+" · "+(report.evolution==0?"진화 미완성":report.evolution==1?"중장 진화":"분산 진화")+(report.revived?" · 긴급 수리 사용":""),24,716,444,30,13,Ui.Mint);
             Ui.Button(card,"결과로",24,760,214,53,ShowResult,Ui.Raised,true,18);
             int practiceStage=combat.Stage;
-            Ui.Button(card,"이 보스 연습",254,760,214,53,()=>{combat=null;StartBattle(practiceStage,false,BossTraining.Mode);},Ui.Mint,!combat.Challenge&&BossTraining.Available(State,practiceStage),18);
+            Ui.Button(card,Campaign.Get(practiceStage).Mission==Mission.Survive?"이 지역 무료 연습":"이 보스 무료 연습",254,760,214,53,()=>{combat=null;StartBattle(practiceStage,false,CombatTraining.ModeFor(practiceStage));},Ui.Mint,!combat.Challenge&&CombatTraining.Available(State,practiceStage),17);
         }
         void RenderModEffects()
         {
