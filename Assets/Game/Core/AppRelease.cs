@@ -3,8 +3,8 @@ namespace ScrapGuard.Core
 {
     public static class AppRelease
     {
-        public const int Build=41, MinimumBuild=19;
-        public const string Version="0.38.0", Package="io.github.hwangyeonjoon.scrapguard";
+        public const int Build=42, MinimumBuild=19;
+        public const string Version="0.39.0", Package="io.github.hwangyeonjoon.scrapguard";
         public const string BuildHeader="X-Scrap-Build", RulesHeader="X-Scrap-Rules";
     }
     [Serializable] public class ReleasePolicy

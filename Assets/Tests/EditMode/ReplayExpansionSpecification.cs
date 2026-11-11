@@ -4,6 +4,26 @@ namespace ScrapGuard.Tests
 {
     public static partial class CoreSpecification
     {
+        public static void FailureWindowPractice()
+        {
+            var e=New();var s=e.State;s.unlockedStage=14;s.tutorialCompleted=true;
+            Check(!e.BeginSurvivalPractice("no-history",14,true).Success,"pressure training requires earned failure");
+            s.receipts.Add(new Receipt{id="old",kind="battle",won=false,seconds=200,report=new BattleReport()});
+            Check(!SurvivalTraining.PressureAvailable(s,14),"legacy report cannot imply operation zero");
+            s.receipts.Add(new Receipt{id="failed",kind="battle",won=false,seconds=200,report=new BattleReport{operation=15,enemies=45,cause=(int)DamageCause.Artillery,skills=new[]{4,3,2,1,2,1,0,2,1,0,0,0}}});
+            Check(SurvivalTraining.Offset(s,14,true)==170&&CombatTraining.RetryMode(s,14)==SurvivalTraining.PressureMode,"failure centered in bounded sixty-second window");
+            Check(!e.BeginSurvivalPractice("wrong-operation",8,true).Success,"cannot use another operation failure");
+            Check(e.BeginSurvivalPractice("pressure",14,true).Success,"earned pressure practice starts");
+            var c=new Combat(s,14,"pressure",71,false,SurvivalTraining.PressureMode);var input=new ReplayRecorder();
+            Check(c.PracticeOffset==170&&c.Enemies.Count==45&&c.Skills[0]==4&&c.Skills[1]==3&&!c.RobotEnabled,"density and failed skills restored without robot rights");
+            for(int i=0;i<1900&&!c.Ended;i++){if(c.Choosing){int pick=c.Choices[0];c.Choose(pick);input.Choose(pick);}c.Tick(ReplayRecorder.Step,input.Move(V2.Angle(i*.013)));}
+            var replay=ReplayRecorder.Verify(s,14,c.RunId,71,input.Steps,65,SurvivalTraining.PressureMode);
+            Check(replay.Hp==c.Hp&&replay.Kills==c.Kills,"pressure practice authoritative replay");
+            int gold=s.gold,parts=s.parts,runs=s.totalRuns;
+            Check(e.FinishPractice(replay).Success&&!e.FinishPractice(replay).Success&&s.gold==gold&&s.parts==parts&&s.totalRuns==runs&&s.dailySupplySeconds==0,"pressure practice settles once without growth rewards");
+            s.receipts[s.receipts.Count-2].seconds=230;
+            Check(SurvivalTraining.Offset(s,14,true)==174,"late loss window remains inside operation duration");
+        }
         public static void FactoryMinionsAndFinaleScope()
         {
             var s=GameState.New();s.tutorialCompleted=true;var c=new Combat(s,24,"factory",17);c.Elapsed=30;c.Position=new V2(270,600);

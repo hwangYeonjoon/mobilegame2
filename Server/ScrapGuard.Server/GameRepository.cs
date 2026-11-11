@@ -146,10 +146,10 @@ public sealed partial class GameRepository
                     if(!string.IsNullOrEmpty(command.supportId))throw new ApiFault(400,"극한 작전은 지원 없이 진행해요.");
                     result=e.BeginApex(id,command.stage);a.RunSupport=null;
                 }
-                else if(command.mode==BossTraining.Mode||command.mode==SurvivalTraining.Mode)
+                else if(command.mode==BossTraining.Mode||SurvivalTraining.IsMode(command.mode))
                 {
                     if(!string.IsNullOrEmpty(command.supportId))throw new ApiFault(400,"연습은 지원 없이 진행해요.");
-                    result=command.mode==SurvivalTraining.Mode?e.BeginSurvivalPractice(id,command.stage):e.BeginBossPractice(id,command.stage);a.RunSupport=null;
+                    result=SurvivalTraining.IsMode(command.mode)?e.BeginSurvivalPractice(id,command.stage,command.mode==SurvivalTraining.PressureMode):e.BeginBossPractice(id,command.stage);a.RunSupport=null;
                 }
                 else if(Endgame.IsChallenge(command.mode))
                 {

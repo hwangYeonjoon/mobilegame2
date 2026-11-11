@@ -11,10 +11,21 @@ namespace ScrapGuard.Core
     public static class SurvivalTraining
     {
         public const string Mode="survival_practice";
+        public const string PressureMode="survival_pressure";
+        public static bool IsMode(string mode){return mode==Mode||mode==PressureMode;}
         public static bool Available(GameState s,int stage){return stage>=0&&stage<Campaign.Count&&stage<=s.unlockedStage&&Campaign.Get(stage).Mission==Mission.Survive;}
+        public static Receipt Failure(GameState s,int stage){return s.receipts.FindLast(r=>r.kind=="battle"&&!r.won&&r.seconds>=30&&r.report!=null&&r.report.operation==stage+1&&r.report.cause!=(int)DamageCause.Abandoned);}
+        public static bool PressureAvailable(GameState s,int stage){return Available(s,stage)&&Failure(s,stage)!=null;}
+        public static float Offset(GameState s,int stage,bool pressure)
+        {
+            if(!pressure)return Campaign.Get(stage).Duration*.4f;
+            var failure=Failure(s,stage);if(failure==null)throw new ArgumentException("Verified failure required for pressure practice");
+            return Math.Max(0,Math.Min(Campaign.Get(stage).Duration-60,failure.seconds-30));
+        }
     }
     public static class CombatTraining
     {
+        public static string RetryMode(GameState s,int stage){return SurvivalTraining.PressureAvailable(s,stage)?SurvivalTraining.PressureMode:ModeFor(stage);}
         public static string ModeFor(int stage){return Campaign.Get(stage).Mission==Mission.Survive?SurvivalTraining.Mode:BossTraining.Mode;}
         public static bool Available(GameState s,int stage){return BossTraining.Available(s,stage)||SurvivalTraining.Available(s,stage);}
         public static string SourceName(int source){return source==(int)DamageSource.Boss?"보스":source==(int)DamageSource.EnemyAttack?"일반 적 공격":source==(int)DamageSource.Terrain?"지형":source==(int)DamageSource.Contact?"적 접촉":source==(int)DamageSource.Condition?"지역 조건":"기타";}
@@ -51,10 +62,10 @@ namespace ScrapGuard.Core
             if(c==null||!c.BossPractice)return CommandResult.Fail("유효하지 않은 보스 연습이에요.");
             return FinishPractice(c);
         }
-        public CommandResult BeginSurvivalPractice(string id,int stage)
+        public CommandResult BeginSurvivalPractice(string id,int stage,bool pressure=false)
         {
-            if(!SurvivalTraining.Available(State,stage))return CommandResult.Fail("열린 생존 작전만 연습할 수 있어요.");
-            var result=BeginRun(id,stage);if(result.Success)State.activeMode=SurvivalTraining.Mode;return result;
+            if(!SurvivalTraining.Available(State,stage)||pressure&&!SurvivalTraining.PressureAvailable(State,stage))return CommandResult.Fail("열린 생존 작전과 해당 작전의 실패 기록이 필요해요.");
+            var result=BeginRun(id,stage);if(result.Success)State.activeMode=pressure?SurvivalTraining.PressureMode:SurvivalTraining.Mode;return result;
         }
         public CommandResult FinishPractice(Combat c)
         {
@@ -82,7 +93,9 @@ namespace ScrapGuard.Core
     public sealed partial class Combat
     {
         public bool BossPractice {get{return Mode==BossTraining.Mode;}}
-        public bool SurvivalPractice {get{return Mode==SurvivalTraining.Mode;}}
+        public bool SurvivalPractice {get{return SurvivalTraining.IsMode(Mode);}}
+        public bool PressurePractice {get{return Mode==SurvivalTraining.PressureMode;}}
+        public readonly float PracticeOffset;
         public bool Practice {get{return BossPractice||SurvivalPractice;}}
         public bool RobotEnabled {get{return Mode!=SkillTrial.Mode&&!Practice;}}
         public readonly int WeeklyFrame;
@@ -94,11 +107,15 @@ namespace ScrapGuard.Core
             if(recentHits.Count>=32)recentHits.RemoveAt(0);
             recentHits.Add(new DamageHit{seconds=Elapsed,damage=damage,cause=(int)cause,source=(int)source});
         }
-        void InitializeSurvivalPractice()
+        void InitializeSurvivalPractice(GameState state)
         {
             if(Definition.Mission!=Mission.Survive)throw new ArgumentException("Survival practice requires a survival operation");
             Skills[0]=3;Skills[1]=2;Skills[4]=1;Skills[7]=1;Level=8;reviveGuard=3;eliteSpawned=true;
-            for(int i=0;i<Definition.Enemies.Length;i++){Spawn(1,false);Enemies[Enemies.Count-1].role=Definition.Enemies[i];}
+            var failure=PressurePractice?SurvivalTraining.Failure(state,Stage):null;
+            if(failure!=null&&failure.report.skills!=null)for(int i=0;i<Math.Min(Skills.Length,failure.report.skills.Length);i++)Skills[i]=Math.Max(0,Math.Min(5,failure.report.skills[i]));
+            Skills[0]=Math.Max(1,Skills[0]);
+            int count=failure==null?Definition.Enemies.Length:Math.Min(EnemyLimit,Math.Max(12,failure.report.enemies));
+            for(int i=0;i<count;i++){Spawn(failure==null?1:random.NextDouble()<.18+Definition.Region*.035?1:0,false);Enemies[Enemies.Count-1].role=Definition.Enemies[i%Definition.Enemies.Length];}
         }
         void InitializeBossPractice()
         {

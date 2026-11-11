@@ -1,0 +1,25 @@
+Applications Graphics Acceleration Info:
+Uptime: 11088202 Realtime: 11088202
+
+** Graphics info for pid 6342 [io.github.hwangyeonjoon.scrapguard.qa] **
+GraphicBufferAllocator buffers:
+        Handle |        Size |     W (Stride) x H | Layers |   Format |      Usage | Requestor
+0xb400007cf4162f10 |     unknown |  540 (   0) x  960 |      1 |        1 | 0x     b00 | SurfaceView[io.github.hwangyeonjoon.scrapguard.qa/com.unity3d.player.UnityPlayerGameActivity]#1(BLAST Consumer)1
+0xb400007cf4167950 | 2025.00 KiB |  540 ( 540) x  960 |      1 |        1 | 0x     933 | VRI[UnityPlayerGameActivity]#0(BLAST Consumer)0
+0xb400007cf4169330 | 2025.00 KiB |  540 ( 540) x  960 |      1 |        1 | 0x     933 | VRI[UnityPlayerGameActivity]#0(BLAST Consumer)0
+0xb400007cf417aeb0 |     unknown |  540 (   0) x  960 |      1 |        1 | 0x     b00 | SurfaceView[io.github.hwangyeonjoon.scrapguard.qa/com.unity3d.player.UnityPlayerGameActivity]#1(BLAST Consumer)1
+0xb400007cf4180700 |     unknown |  540 (   0) x  960 |      1 |        1 | 0x     b00 | SurfaceView[io.github.hwangyeonjoon.scrapguard.qa/com.unity3d.player.UnityPlayerGameActivity]#1(BLAST Consumer)1
+Total allocated by GraphicBufferAllocator (estimate): 4050.00 KB
+GoldfishAllocator::dumpDebugInfo is not implemented
+Profile data in ms:
+
+	io.github.hwangyeonjoon.scrapguard.qa/com.unity3d.player.UnityPlayerGameActivity/android.view.ViewRootImpl@1c5c705 (visibility=0)
+View hierarchy:
+
+  io.github.hwangyeonjoon.scrapguard.qa/com.unity3d.player.UnityPlayerGameActivity/android.view.ViewRootImpl@1c5c705
+  9 views, 11.32 kB of render nodes
+
+
+Total ViewRootImpl   : 1
+Total attached Views : 9
+Total RenderNode     : 11.32 kB (used) / 11.32 kB (capacity)

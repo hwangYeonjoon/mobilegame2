@@ -36,7 +36,7 @@ namespace ScrapGuard.Tests
                 c.Bullets.Add(new Bullet{id=10000,position=enemy.position,velocity=new V2(),damage=100,life=1});
                 c.Tick(.05f,new V2());return 10000-enemy.hp;
             }
-            Check(HitFrom(new V2(-1,0))==45&&HitFrom(new V2(1,0))==100,"braced shield rewards flank instead of distance alone");
+            Check(HitFrom(new V2(-1,0))==60&&HitFrom(new V2(1,0))==100,"braced shield rewards flank instead of distance alone");
             for(int region=0;region<10;region++)
             {
                 var s=GameState.New();s.tutorialCompleted=true;s.heroes[0].level=30;

@@ -1,0 +1,24 @@
+{
+  "baseline_commits": {
+    "0.37": "499814b",
+    "0.38": "618df7a"
+  },
+  "patched_entry_files": {
+    "Assets/Editor/ProjectBuilder.cs": "b347328fa3a1301b365dd92eb8127f9a7671b15ca53d0424852dcc0f2bfa32f3",
+    "Assets/Game/Runtime/GameApp.cs": "c357af3f64385cf4eae5da26ec7741cce3f8c8efbcbb9894e3d56c26947493d9",
+    "Assets/Game/Runtime/GameApp.Smoke.cs": "14b68d591d071813cd2f2e3129d8a6bc8833b75a0c4732b59cdbef1e6aaa239b",
+    "Assets/Game/Runtime/GameApp.PerformanceSmoke.cs": "2be70d6c22f39b8ccd96c324684b6d7c76573ddf11ed4105f25cbe133849d065"
+  },
+  "apks": {
+    "0.37": {
+      "file": "ScrapGuard-perf037.apk",
+      "bytes": 118426185,
+      "sha256": "3c7da4d5e8ad6772720e1ee1773bb59cd6014b4d69d7ea5f1f7c1d53d960d077"
+    },
+    "0.38": {
+      "file": "ScrapGuard-perf038.apk",
+      "bytes": 118435409,
+      "sha256": "26a33048fc03e870ba47a903daeb5d29515b1d207c63d1d67cb268f099d83fa7"
+    }
+  }
+}

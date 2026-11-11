@@ -10,10 +10,10 @@ namespace ScrapGuard
         {
             CloseModal();soakDriving=true;
             // Isolated loss UI fixture. Not included in balance or replay evidence.
-            StartBattle(14);battlePaused=true;combat.Elapsed=40;combat.Hp=1;
+            StartBattle(14);battlePaused=true;combat.Elapsed=190;combat.Hp=1;
             combat.Hazards.Add(new Hazard{position=combat.Position,radius=100,damage=1000,delay=0,cause=DamageCause.Poison,source=DamageSource.EnemyAttack});
             combat.Tick(ReplayRecorder.Step,new V2());FinishBattle();yield return Capture("45-survival-loss");
-            BattleAnalysis();yield return Capture("46-recent-damage");CloseModal();ShowResult();
+            BattleAnalysis();yield return Capture("46-recent-damage");CloseModal();SurvivalPracticeOptions(14);yield return Capture("46b-failure-options");CloseModal();ShowResult();
             foreach(int stage in new[]{14,26,56})
             {
                 int gold=State.gold,parts=State.parts,gems=State.gems,runs=State.totalRuns,supply=State.dailySupplySeconds;
@@ -21,7 +21,7 @@ namespace ScrapGuard
                 if(stage==14)
                 {
                     // Exercise the same button offered by the loss screen.
-                    ClickVisibleButton("이 지역 60초 무료 연습");
+                    ClickVisibleButton("실패 구간 60초 무료 연습");
                 }
                 else StartBattle(stage,false,SurvivalTraining.Mode);
                 if(combat==null||!combat.SurvivalPractice){smokeErrors.Add("Survival practice route failed "+stage);yield break;}

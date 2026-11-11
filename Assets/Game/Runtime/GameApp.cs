@@ -45,6 +45,8 @@ namespace ScrapGuard
             args=new[]{"-smoke","-assaultSmoke","-withNatural","-smokeOutput",Path.Combine(Application.persistentDataPath,"AssaultUI")};
 #elif SCRAP_QA_BOSS
             args=new[]{"-smoke","-naturalCombat","-bossProgression","-smokeOutput",Path.Combine(Application.persistentDataPath,"BossProgression")};
+#elif SCRAP_QA_PERFORMANCE
+            args=new[]{"-smoke","-performanceSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"PerformanceCompare")};
 #elif SCRAP_QA_REGIONAL
             args=new[]{"-smoke","-growthSmoke","-regionalRuntime","-smokeOutput",Path.Combine(Application.persistentDataPath,"RegionalRuntime")};
 #elif SCRAP_QA_GROWTH
@@ -55,7 +57,7 @@ namespace ScrapGuard
             args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
 #endif
 #endif
-#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL
+#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL || SCRAP_QA_PERFORMANCE
             profile=Path.Combine(Application.persistentDataPath,"qa-growth-"+Guid.NewGuid().ToString("N")+".json");
 #endif
             Store = new ProfileStore(profile);

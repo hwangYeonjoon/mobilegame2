@@ -17,13 +17,15 @@ namespace ScrapGuard.Core
             return firstFinale+(standard-firstFinale)*Math.Min(1,(Stage-5)/12f);
         }
         public int BossLearningTier {get{return Challenge?0:Stage<=1?1:Stage<=3?2:3;}}
-        float FinalePressure {get{return Challenge||ApexBattle?0:Definition.Region==9?.08f+.16f*(Stage%6)/5f:Definition.Region>=5&&Stage%6==5?.08f+.04f*(Definition.Region-5):0;}}
-        float SpawnElapsed {get{return SurvivalPractice?Definition.Duration*.4f+Elapsed:Elapsed;}}
+        float FinalePressure {get{return Challenge||ApexBattle?0:Definition.Region==9?.04f+.06f*(Stage%6)/5f:Definition.Region>=5&&Stage%6==5?.08f+.04f*(Definition.Region-5):0;}}
+        float SpawnElapsed {get{return SurvivalPractice?PracticeOffset+Elapsed:Elapsed;}}
         float SpawnProgress {get{return SurvivalPractice?SpawnElapsed/Definition.Duration:Elapsed/Duration;}}
         float BossBaseHealth {get{return IntroBattle?18000:BossCurve(24000,36000,50000)*(1+FinalePressure)*(ApexBattle?(Stage==47?1.15f:1.3f):1);}}
         float BossPatternInterval {get{return BossCurve(5,4.2f,3.8f);}}
         float BossHitRecovery {get{return BossCurve(.8f,.7f,.45f);}}
-        float BossContactInterval {get{return BossCurve(1.3f,1.3f,.75f);}}
+        bool ContactRecoveryLesson {get{return !Challenge&&!ApexBattle&&(Definition.Region==3||Definition.Region==4||Stage==59);}}
+        float FinalApproachScale {get{return !Challenge&&!ApexBattle&&Definition.Region==9?1-.1f*(Stage%6)/5f:1;}}
+        float BossContactInterval {get{return ContactRecoveryLesson?1.1f:BossCurve(1.3f,1.3f,.75f);}}
         float BossDamageScale {get{return (Stage<=17?BossCurve(.45f,.56f,.6f+.4f*17/18f):.6f+.4f*Math.Min(1,Stage/18f))*(1+FinalePressure*.5f)*(ApexBattle?(Stage==47?1.35f:1.65f):1);}}
         float BossChargeSpeed {get{return BossCurve(145,170,190);}}
         float BossChargeWindup {get{return BossCurve(1.3f,1,.8f);}}

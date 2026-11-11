@@ -57,7 +57,7 @@ namespace ScrapGuard.Core
         }
         public BattleReport Report()
         {
-            var result=new BattleReport {recentHits=recentHits.FindAll(h=>h.seconds>=Elapsed-8),lastCause=lastCause,lastSource=lastSource,lastHitTime=lastHitTime,lastHitDamage=lastHitDamage,robots=RobotReport(),cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,fieldModule=FieldModule,hero=Hero,machines=MachinesBuilt,waves=WaveNumber,evolution=WeaponEvolution,skillEvolutions=EvolutionMask,revived=Revived,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
+            var result=new BattleReport {operation=Stage+1,enemies=Enemies.FindAll(e=>e.hp>0).Count,recentHits=recentHits.FindAll(h=>h.seconds>=Elapsed-8),lastCause=lastCause,lastSource=lastSource,lastHitTime=lastHitTime,lastHitDamage=lastHitDamage,robots=RobotReport(),cause=(int)endCause,mods=Mods,task=(int)Task,taskChoice=TaskChoice,taskCompleted=TaskCompleted,fieldModule=FieldModule,hero=Hero,machines=MachinesBuilt,waves=WaveNumber,evolution=WeaponEvolution,skillEvolutions=EvolutionMask,revived=Revived,skills=(int[])Skills.Clone(),damage=(float[])damageTaken.Clone()};
             if(bossSpawned && !Challenge)
             {
                 result.bossRemaining=Won?0:-1;

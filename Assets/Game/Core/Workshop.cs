@@ -10,6 +10,7 @@ namespace ScrapGuard.Core
     }
     [Serializable] public sealed class BattleReport
     {
+        public int operation,enemies;
         public float[] damage = new float[13];
         public List<DamageHit> recentHits=new List<DamageHit>();
         public int lastCause,lastSource; public float lastHitTime,lastHitDamage;

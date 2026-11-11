@@ -71,7 +71,7 @@ namespace ScrapGuard.Core
             if(Regional(e,3))
             {
                 var toPlayer=(Position-e.position).Normal;
-                return e.windup>0&&toPlayer.x*e.direction.x+toPlayer.y*e.direction.y>.25f?.45f:1;
+                return e.windup>0&&toPlayer.x*e.direction.x+toPlayer.y*e.direction.y>.25f?.6f:1;
             }
             return V2.Distance(Position,e.position)>125?.45f:1;
         }

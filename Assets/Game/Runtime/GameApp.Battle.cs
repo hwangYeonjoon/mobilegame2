@@ -486,7 +486,7 @@ namespace ScrapGuard
             Ui.Button(card, won&&stage==Campaign.Count-1?"주간 로봇 도전":"다시 출격", 24, 519, 214, 62, () => { combat = null;if(won&&stage==Campaign.Count-1)Show("weekly");else StartBattle(stage); });
             Ui.Button(card, Growth.CanUpgrade(State)?"강화하고 재도전":"성장 경로 확인", 254, 519, 214, 62, () => { combat = null; GrowthPanel(); }, Ui.Raised);
             if(won&&!showSupport && StarterGuide.Next(State)<5)Ui.Button(card,"다음 목표 · "+StarterGuide.Names[StarterGuide.Next(State)],24,591,444,34,()=>{combat=null;Show("home");GuidePanel();},Ui.Raised,true,14);
-            if(!won)Ui.Button(card,Campaign.Get(stage).Mission==Mission.Survive?"이 지역 60초 무료 연습":"이 보스 무료 연습",24,591,444,34,()=>{combat=null;StartBattle(stage,false,CombatTraining.ModeFor(stage));},Ui.Mint,true,15);
+            if(!won)Ui.Button(card,SurvivalTraining.PressureAvailable(State,stage)?"실패 구간 60초 무료 연습":Campaign.Get(stage).Mission==Mission.Survive?"이 지역 60초 무료 연습":"이 보스 무료 연습",24,591,444,34,()=>{combat=null;StartBattle(stage,false,CombatTraining.RetryMode(State,stage));},Ui.Mint,true,15);
             Ui.Button(card, "정비소로 돌아가기", 24, 632, 444, 51, () => { combat = null; Show("home"); }, Ui.Panel, true, 16);
             Ui.Button(card,ratedRun==combat.RunId?"플레이 의견 저장 완료":"플레이 의견 남기기 · 선택",24,693,444,32,CombatOpinion,Ui.Panel,ratedRun!=combat.RunId,15);
             card.GetChild(2).gameObject.SetActive(false);

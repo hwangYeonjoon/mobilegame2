@@ -1,0 +1,310 @@
+{
+  "sources": [
+    "curve039-inputs.json.gz",
+    "curve038-paid-inputs.json.gz"
+  ],
+  "stage": 60,
+  "policy": "natural_legacy",
+  "rows": [
+    {
+      "seed": 17,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 54,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 91,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 128,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 165,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 202,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 239,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 276,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 313,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    },
+    {
+      "seed": 350,
+      "all_combat_fields_equal": true,
+      "attack": 550,
+      "health": 4265,
+      "heroLevel": 30,
+      "equipped": [
+        {
+          "slot": 0,
+          "definition": 2,
+          "rarity": 2,
+          "level": 20,
+          "name": "충격 발사기"
+        },
+        {
+          "slot": 1,
+          "definition": 8,
+          "rarity": 2,
+          "level": 20,
+          "name": "경량 보호복"
+        },
+        {
+          "slot": 2,
+          "definition": 10,
+          "rarity": 2,
+          "level": 20,
+          "name": "드론 모듈"
+        }
+      ]
+    }
+  ]
+}

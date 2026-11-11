@@ -79,7 +79,7 @@ namespace ScrapGuard.Core
             if(!Challenge&&source==DamageSource.EnemyAttack)
             {
                 int count=0;foreach(var h in Hazards)if(h.source==DamageSource.EnemyAttack)count++;
-                if(enemyWarningRecovery>0||count>=(Elapsed<25?2:3))return false;
+                if(enemyWarningRecovery>0||count>=(SpawnElapsed<25?2:3))return false;
                 enemyWarningRecovery=Definition.Region==2?1.15f:Definition.Region==4?1f:.8f;PeakEnemyWarnings=Math.Max(PeakEnemyWarnings,count+1);
                 delay=Math.Max(delay,Definition.Region==2?2.1f:Definition.Region==4?1.9f:1.6f);
             }

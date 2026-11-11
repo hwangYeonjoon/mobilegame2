@@ -1,0 +1,70 @@
+{
+  "apk": "Builds/Android/ScrapGuard-playtest.apk",
+  "bytes": 118440645,
+  "sha256": "7238b10f572442ca9f1b5c1c32637634433230b09e48f063195c10c3d60244a2",
+  "package": "io.github.hwangyeonjoon.scrapguard.qa",
+  "version": "0.39.0",
+  "versionCode": 42,
+  "minSdk": 26,
+  "targetSdk": 36,
+  "abi": "arm64-v8a",
+  "v2_signature": true,
+  "zip_16kb": true,
+  "file_provider": true,
+  "backup_disabled": true,
+  "libraries": [
+    {
+      "name": "lib/arm64-v8a/libc++_shared.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libgame.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libil2cpp.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libmain.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libswappywrapper.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libunity.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    }
+  ],
+  "device_execution": "not tested"
+}

@@ -1,0 +1,29 @@
+{
+  "core": {
+    "passed": 133,
+    "failed": 0
+  },
+  "unity_editmode": {
+    "passed": 173,
+    "failed": 0
+  },
+  "server": {
+    "passed": 411,
+    "failed": 0
+  },
+  "android_replays": {
+    "passed": 18,
+    "failed": 0
+  },
+  "android_ui_errors": 0,
+  "screenshots": 74,
+  "render_windows": 6,
+  "physical_device_tested": false,
+  "human_tested": false,
+  "production_deployed": false,
+  "notes": [
+    "No new 28-day economy simulation",
+    "0.39 orbital crowded mean 34.7 FPS and p99 250ms; performance is NOT approved",
+    "One real-time sample per region/phase; matched baseline comparison is separately archived"
+  ]
+}

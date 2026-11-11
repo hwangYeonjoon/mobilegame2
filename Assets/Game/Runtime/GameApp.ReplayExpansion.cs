@@ -35,18 +35,29 @@ namespace ScrapGuard
             {
                 int stage=i;if(!CombatTraining.Available(State,stage))continue;
                 bool survival=Campaign.Get(stage).Mission==Mission.Survive;
-                Ui.Button(list,"작전 "+(stage+1)+" · "+(survival?"일반 적 60초":Campaign.Get(stage).Boss),0,row++*60,444,50,()=>{combat=null;StartBattle(stage,false,CombatTraining.ModeFor(stage));},Ui.Raised,true,17);
+                Ui.Button(list,"작전 "+(stage+1)+" · "+(survival?"일반 적 60초":Campaign.Get(stage).Boss),0,row++*60,444,50,()=>{if(survival)SurvivalPracticeOptions(stage);else{combat=null;StartBattle(stage,false,BossTraining.Mode);}},Ui.Raised,true,17);
             }
             Ui.Button(card,"성장 화면",24,752,444,48,GrowthPanel,Ui.Mint,true,18);
         }
+        void SurvivalPracticeOptions(int stage)
+        {
+            var failure=SurvivalTraining.Failure(State,stage);bool available=SurvivalTraining.PressureAvailable(State,stage);
+            var card=Dialog("생존 작전 연습","작전 "+(stage+1)+" · 입장료·보상 없음",620);
+            Ui.Label(card,"기본 연습은 익숙해질 시간을 줘요.\n실패 구간은 당시 스킬과 적 수, 시간대의 밀도로\n연습해요. 적의 위치와 배치는 달라요.",24,145,444,100,18);
+            Ui.Button(card,"기본 패턴 · 60초",24,270,444,60,()=>{combat=null;StartBattle(stage,false,SurvivalTraining.Mode);},Ui.Raised,true,20);
+            string range=available?TimeLabel(SurvivalTraining.Offset(State,stage,true))+"~"+TimeLabel(SurvivalTraining.Offset(State,stage,true)+60):"이 작전의 새 실패 기록이 필요해요";
+            Ui.Label(card,available?"최근 실패 "+TimeLabel(failure.seconds)+" · 연습 시간대 "+range:range,24,355,444,52,16,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Button(card,"실패 구간 · 60초",24,428,444,60,()=>{combat=null;StartBattle(stage,false,SurvivalTraining.PressureMode);},Ui.Mint,available,20);
+            Ui.Button(card,"작전 선택",24,525,444,45,BossTrainingPanel,Ui.Raised,true,18);
+        }
         void BossPracticeResult()
         {
-            int stage=combat.Stage;var report=combat.Report();bool survival=combat.SurvivalPractice;
-            var card=Dialog(survival?"생존 연습 결과":"보스 연습 결과",(survival?Campaign.Regions[Campaign.Get(stage).Region]:Campaign.Get(stage).Boss)+" · 재화·작전 진행에 반영되지 않아요.",650);
+            int stage=combat.Stage;string mode=combat.Mode;var report=combat.Report();bool survival=combat.SurvivalPractice;
+            var card=Dialog(combat.PressurePractice?"실패 구간 연습 결과":survival?"생존 연습 결과":"보스 연습 결과",(survival?Campaign.Regions[Campaign.Get(stage).Region]:Campaign.Get(stage).Boss)+" · 재화·작전 진행에 반영되지 않아요.",650);
             Ui.Label(card,combat.Won?(survival?"60초 연습 완료":"패턴 연습 성공"):combat.Elapsed>=combat.Duration?"연습 완료":"다시 연습할 수 있어요",24,141,444,45,26,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(card,BossTraining.Advice(report),24,203,444,78,19,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,report.lastHitDamage>0?CombatTraining.SourceName(report.lastSource)+" · "+report.lastHitTime.ToString("0.0")+"초 · 체력 −"+Mathf.CeilToInt(report.lastHitDamage):"받은 체력 피해 없음",24,297,444,40,17,Ui.Muted,TextAnchor.MiddleCenter);
-            Ui.Button(card,survival?"같은 지역 다시 연습":"같은 보스 다시 연습",24,369,444,54,()=>{combat=null;StartBattle(stage,false,CombatTraining.ModeFor(stage));},Ui.Mint,true,18);
+            Ui.Button(card,survival?"같은 지역 다시 연습":"같은 보스 다시 연습",24,369,444,54,()=>{combat=null;StartBattle(stage,false,mode);},Ui.Mint,true,18);
             Ui.Button(card,"실제 작전에 도전",24,438,444,54,()=>{combat=null;StartBattle(stage);},Ui.Raised,true,18);
             Ui.Button(card,"다른 작전 연습",24,511,214,52,BossTrainingPanel,Ui.Raised,true,16);
             Ui.Button(card,"정비소",254,511,214,52,()=>{combat=null;Show("home");},Ui.Raised,true,18);

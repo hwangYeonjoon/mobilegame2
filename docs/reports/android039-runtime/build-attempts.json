@@ -1,0 +1,6 @@
+{
+  "qa_first_attempt": "failed: shared Gradle daemon received stop while a baseline project build also ran",
+  "qa_retry": "passed: single Unity build, process exit 0",
+  "manual_playtest": "passed: subsequent single Unity build, process exit 0",
+  "runtime_performance_windows": "six windows completed after manual build exited; no Unity build or large .NET simulation running"
+}

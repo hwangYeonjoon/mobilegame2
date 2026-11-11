@@ -46,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 28;
+        public const int RulesVersion = 29;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -119,8 +119,9 @@ namespace ScrapGuard.Core
             Duration = SurvivalPractice ? 60 : BossPractice ? 90 : Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
             Skills[0] = 1;
             if(BossPractice)InitializeBossPractice();
-            if(SurvivalPractice)InitializeSurvivalPractice();
-            if(hero==3)Skills[2]=1;
+            PracticeOffset=SurvivalPractice?SurvivalTraining.Offset(state,stage,PressurePractice):0;
+            if(SurvivalPractice)InitializeSurvivalPractice(state);
+            if(hero==3)Skills[2]=Math.Max(1,Skills[2]);
             if(Challenge)
             {
                 if(RobotEnabled){Salvage=40;for(int i=0;i<3;i++)robotParts[i]=4;}
@@ -162,7 +163,7 @@ namespace ScrapGuard.Core
                 spawnTimer = Math.Max(.25f, (Challenge?.85f:Definition.SpawnInterval) - SpawnProgress * (Challenge?.58f:.48f));
                 if(!Challenge && Definition.Region==0)spawnTimer*=(int)(Elapsed/22)%2==0?1.2f:.72f;
                 if(RiskActive)spawnTimer*=.75f;
-                int group=Challenge?1:Elapsed<25?2:Math.Min(6,2+(int)(SpawnElapsed/45)+Definition.Region/2);
+                int group=Challenge?1:SpawnElapsed<25?2:Math.Min(6,2+(int)(SpawnElapsed/45)+Definition.Region/2);
                 for(int n=0;n<group && Enemies.Count<EnemyLimit;n++) Spawn(random.NextDouble() < (Challenge?.36:.18 + Definition.Region * .035) ? 1 : 0, false);
             }
             if (!eliteSpawned && Elapsed > Duration * .46f) { eliteSpawned = true; Spawn(2, false); }
@@ -240,7 +241,7 @@ namespace ScrapGuard.Core
                 if (V2.Distance(Position, e.position) < 15 + e.Radius && contactTimer <= 0)
                 {
                     Hurt(e.kind == 3 ? 170 : e.kind == 2 ? 110 : 70,e.dash>0?DamageCause.Charge:DamageCause.Contact,e.finalBoss?DamageSource.Boss:DamageSource.Contact);e.attackFlash=.25f; contactTimer = e.finalBoss&&!Challenge?BossContactInterval:.65f;
-                    if(!e.core)e.position=Slide(e.position,(e.position - Position).Normal * 22,Math.Min(e.Radius,20));
+                    if(!e.core)e.position=Slide(e.position,(e.position - Position).Normal * (e.finalBoss&&ContactRecoveryLesson?55:22),Math.Min(e.Radius,20));
                 }
             }
         }
@@ -256,8 +257,10 @@ namespace ScrapGuard.Core
                 if(area&&areaHitRecovery>0)return;
                 if(area)areaHitRecovery=.55f;
                 if(source==DamageSource.Terrain)damage*=.35f;
-                else if(source==DamageSource.EnemyAttack)damage*=.8f*(1+Stage*.022f)*(Definition.Region==2?.85f:Definition.Region==4?.9f:1);
+                else if(source==DamageSource.EnemyAttack)damage*=.8f*(1+Stage*.022f)*(Definition.Region==2?.85f:Definition.Region==3?.9f:Definition.Region==4?.85f:1);
                 else if(source==DamageSource.Contact)damage*=1+Stage*.022f;
+                if(source==DamageSource.EnemyAttack||source==DamageSource.Contact)damage*=FinalApproachScale;
+                if(source==DamageSource.Boss&&cause==DamageCause.Contact&&ContactRecoveryLesson)damage*=Stage==59?.6f:.75f;
                 if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
                 if(!SurvivalPractice&&(area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }

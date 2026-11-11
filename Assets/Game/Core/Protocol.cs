@@ -78,7 +78,7 @@ namespace ScrapGuard.Core
                     if (!development) return CommandResult.Fail("서버 작전 발급이 필요해요.");
                     if(c.mode==Apex.Mode)return e.BeginApex(c.id,c.stage);
                     if(c.mode==BossTraining.Mode)return e.BeginBossPractice(c.id,c.stage);
-                    if(c.mode==SurvivalTraining.Mode)return e.BeginSurvivalPractice(c.id,c.stage);
+                    if(SurvivalTraining.IsMode(c.mode))return e.BeginSurvivalPractice(c.id,c.stage,c.mode==SurvivalTraining.PressureMode);
                     if (Endgame.IsChallenge(c.mode)) return e.BeginChallenge(c.id,c.mode);
                     if (!string.IsNullOrEmpty(c.mode)) return CommandResult.Fail("없는 전투 모드예요.");
                     if (c.quick) e.State.testProgress = true;

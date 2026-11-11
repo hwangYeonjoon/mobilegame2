@@ -22,9 +22,11 @@ static class ReplayExpansionChecks
         Fixture(s=>{s.unlockedStage=5;for(int i=0;i<5;i++)s.clearedStages.Add(i);s.heroes[0].level=20;foreach(var item in s.items){item.level=20;item.rarity=2;}});
         Reject(new GameCommand("battle_start"){stage=20,mode=SurvivalTraining.Mode},"server refuses locked survival practice");
         Reject(new GameCommand("battle_start"){stage=1,mode=SurvivalTraining.Mode},"server refuses survival practice on boss operation");
-        foreach(string mode in new[]{BossTraining.Mode,SurvivalTraining.Mode,Endgame.WeeklyMode})
+        Reject(new GameCommand("battle_start"){stage=2,mode=SurvivalTraining.PressureMode},"server refuses pressure practice without verified history");
+        Fixture(s=>s.receipts.Add(new Receipt{id="failure-fixture",kind="battle",seconds=200,report=new BattleReport{operation=3,enemies=35,cause=(int)DamageCause.Artillery,skills=new[]{3,2,0,0,1,0,0,1,0,0,0,0}}}));
+        foreach(string mode in new[]{BossTraining.Mode,SurvivalTraining.Mode,SurvivalTraining.PressureMode,Endgame.WeeklyMode})
         {
-            var before=repo.Bootstrap(key).state;var reply=Apply(new GameCommand("battle_start"){stage=mode==SurvivalTraining.Mode?2:1,mode=mode});var t=reply.ticket;
+            var before=repo.Bootstrap(key).state;var reply=Apply(new GameCommand("battle_start"){stage=SurvivalTraining.IsMode(mode)?2:1,mode=mode});var t=reply.ticket;
             var c=new Combat(reply.state,t.stage,t.id,t.seed,false,t.mode);var recorder=new ReplayRecorder();
             int design=c.WeeklyFrame*4+1;
             if(c.CanPlanRobot(design,true)){c.PlanRobot(design,true);recorder.RobotPlan(design,true);c.ActivateMachine();recorder.Machine();}
@@ -39,7 +41,7 @@ static class ReplayExpansionChecks
             var command=new GameCommand("battle_finish",t.id){replay=recorder.Steps};var done=Apply(command);
             check(done.state.receipts.Last().won==c.Won,"server replay accepts "+mode);
             check(repo.Apply(key,command).state.receipts.Count==done.state.receipts.Count,"finish retry idempotent "+mode);
-            if(mode==BossTraining.Mode||mode==SurvivalTraining.Mode)
+            if(mode==BossTraining.Mode||SurvivalTraining.IsMode(mode))
             {
                 check(done.state.gold==before.gold&&done.state.gems==before.gems&&done.state.parts==before.parts&&done.state.totalRuns==before.totalRuns&&done.state.clearedStages.Count==before.clearedStages.Count&&done.state.dailySupplySeconds==before.dailySupplySeconds&&done.state.robotRecords.Count==before.robotRecords.Count,"practice cannot pay or advance campaign");
             }

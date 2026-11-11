@@ -120,7 +120,7 @@ namespace ScrapGuard
             Ui.Label(card,"고철 합체 "+report.machines+"회 · 웨이브 "+report.waves+" · "+(report.evolution==0?"진화 미완성":report.evolution==1?"중장 진화":"분산 진화")+(report.revived?" · 긴급 수리 사용":""),24,716,444,30,13,Ui.Mint);
             Ui.Button(card,"결과로",24,760,214,53,ShowResult,Ui.Raised,true,18);
             int practiceStage=combat.Stage;
-            Ui.Button(card,Campaign.Get(practiceStage).Mission==Mission.Survive?"이 지역 무료 연습":"이 보스 무료 연습",254,760,214,53,()=>{combat=null;StartBattle(practiceStage,false,CombatTraining.ModeFor(practiceStage));},Ui.Mint,!combat.Challenge&&CombatTraining.Available(State,practiceStage),17);
+            Ui.Button(card,Campaign.Get(practiceStage).Mission==Mission.Survive?"이 지역 무료 연습":"이 보스 무료 연습",254,760,214,53,()=>{combat=null;StartBattle(practiceStage,false,CombatTraining.RetryMode(State,practiceStage));},Ui.Mint,!combat.Challenge&&CombatTraining.Available(State,practiceStage),17);
         }
         void RenderModEffects()
         {

@@ -44,7 +44,7 @@ public sealed partial class GameRepository
             if(!policy.Enabled&&!a.State.adSkip)throw new ApiFault(503,"현재 광고 보상을 이용할 수 없어요.");
             if(request.value=="revive")
             {
-                if(string.IsNullOrEmpty(a.State.activeRun)||(Endgame.IsChallenge(a.State.activeMode)||a.State.activeMode==BossTraining.Mode||a.State.activeMode==SurvivalTraining.Mode||a.State.activeMode==Apex.Mode)||a.RunRules!=Combat.RulesVersion)throw new ApiFault(409,"진행 중인 일반 작전에서만 부활할 수 있어요.");
+                if(string.IsNullOrEmpty(a.State.activeRun)||(Endgame.IsChallenge(a.State.activeMode)||a.State.activeMode==BossTraining.Mode||SurvivalTraining.IsMode(a.State.activeMode)||a.State.activeMode==Apex.Mode)||a.RunRules!=Combat.RulesVersion)throw new ApiFault(409,"진행 중인 일반 작전에서만 부활할 수 있어요.");
                 if(HasRunRevive(db,tx,a.Id,a.State.activeRun))throw new ApiFault(409,"이 작전의 부활 권리는 이미 지급했어요. 보상 내역에서 확인해 주세요.");
             }
             else if(!string.IsNullOrEmpty(a.State.activeRun))throw new ApiFault(409,"출격을 마친 뒤 보상을 받아 주세요.");
@@ -68,7 +68,7 @@ public sealed partial class GameRepository
         if(day!=a.State.serviceDate)throw new ApiFault(409,"보상 일자가 지났어요.");
         if(placement=="revive")
         {
-            if(a.State.activeRun!=result||(Endgame.IsChallenge(a.State.activeMode)||a.State.activeMode==BossTraining.Mode||a.State.activeMode==SurvivalTraining.Mode||a.State.activeMode==Apex.Mode)||HasRunRevive(db,tx,a.Id,result))throw new ApiFault(409,"종료됐거나 이미 부활 권리를 받은 작전이에요.");
+            if(a.State.activeRun!=result||(Endgame.IsChallenge(a.State.activeMode)||a.State.activeMode==BossTraining.Mode||SurvivalTraining.IsMode(a.State.activeMode)||a.State.activeMode==Apex.Mode)||HasRunRevive(db,tx,a.Id,result))throw new ApiFault(409,"종료됐거나 이미 부활 권리를 받은 작전이에요.");
         }
         else if(placement=="parts") {if(a.State.dailyRewardParts>=2)throw new ApiFault(409,"오늘 부품 보상을 모두 받았어요.");a.State.dailyRewardParts++;}
         else

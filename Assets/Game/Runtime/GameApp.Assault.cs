@@ -79,7 +79,7 @@ namespace ScrapGuard
             else if(combat.WaveWarning>0)message="포위 접근 · "+BattleBearing(combat.WaveCenter+V2.Angle(combat.EscapeAngle)*150)+" 열린 방향으로";
             else if(activeBattleNotice.Length>0&&combat.Elapsed<noticeUntil)message=activeBattleNotice;
             else if(combat.IntroBattle&&combat.BossArenaActive)message=combat.CanActivateMachine?"아래 합체 버튼으로 보스를 공격하세요":combat.CanUltimate?"필살기 준비 완료 · 오른쪽 아래 버튼을 누르세요":"공격은 자동 · 보스의 빨간 예고 밖으로 이동하세요";
-            else if(combat.SurvivalPractice)message="60초 생존 연습 · 적의 예고 밖으로 이동하세요";
+            else if(combat.SurvivalPractice)message=combat.PressurePractice?"실패 시간대 연습 · 예고를 읽고 빈 곳으로 이동하세요":"60초 생존 연습 · 적의 예고 밖으로 이동하세요";
             else if(combat.BossPractice)message="보스 패턴 연습 · 경고 밖으로 이동하세요";
             else if(combat.BossArenaActive)message="";
             else if(combat.Mode==Endgame.WeeklyMode&&combat.Elapsed<8)message="합체 버튼 → "+RobotAssembly.Frames[combat.WeeklyFrame]+" 특화형 제작";
