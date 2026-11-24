@@ -39,7 +39,7 @@ namespace ScrapGuard
                 else if(style==1)RobotPackConfirm(frame);
                 else {var confirm=Dialog("회수 선봉대 제작",details,390);Ui.Button(confirm,"골드·부품·파편 사용 후 적용",24,180,444,56,()=>Change(new GameCommand("robot_style_craft"){frame=frame},confirmed:()=>RobotStylePanel(frame,style)),Ui.Mint,true,18);Ui.Button(confirm,"취소",24,265,444,48,()=>RobotStylePanel(frame,style),Ui.Raised,true,18);}
             },Ui.Gold,!(owned&&RobotStyles.Active(State,frame)==style),18);
-            Ui.Button(card,"집중 강화",24,762,214,50,()=>GrowthPathPanel(),Ui.Mint,true,18);
+            Ui.Button(card,"폭풍 구조대",24,762,214,50,()=>StormPackPanel(),Ui.Mint,true,18);
             Ui.Button(card,"로봇 전시",254,762,214,50,()=>RobotHangar(),Ui.Raised,true,18);
             Ui.Label(card,"능력치는 동일 · 매판 조립한 기체와 전시에 적용",24,829,444,32,13,Ui.Muted,TextAnchor.MiddleCenter);
         }

@@ -13,8 +13,21 @@ namespace ScrapGuard.Editor
             ValidateWardrobe();
             if(UnityEditor.PlayerSettings.bundleVersion!=ScrapGuard.Core.AppRelease.Version || UnityEditor.PlayerSettings.Android.bundleVersionCode!=ScrapGuard.Core.AppRelease.Build)
                 throw new BuildFailedException("App release constants and PlayerSettings must match. Run Configure Project before building.");
-            if ((report.summary.options & BuildOptions.Development) == 0 && !(ProjectBuilder.InternalTestBuild && report.summary.platform==BuildTarget.Android && EditorUserBuildSettings.buildAppBundle && PlayerSettings.Android.useCustomKeystore))
-                throw new BuildFailedException("This prototype only supports Development builds. Complete production authentication, live billing verification and ad reward verification before preparing a production build.");
+            if(ProjectBuilder.ProductionBuild)ValidateProduction();
+            if ((report.summary.options & BuildOptions.Development) == 0 && !((ProjectBuilder.InternalTestBuild||ProjectBuilder.ProductionBuild) && report.summary.platform==BuildTarget.Android && EditorUserBuildSettings.buildAppBundle && PlayerSettings.Android.useCustomKeystore))
+                throw new BuildFailedException("Use an explicit signed Android bundle build method for store distribution.");
+        }
+        public static void ValidateProduction()
+        {
+            var connection=UnityEngine.Resources.Load<UnityEngine.TextAsset>("ClientConnection");
+            var endpoint=connection==null?null:UnityEngine.JsonUtility.FromJson<ClientConnection>(connection.text)?.releaseEndpoint;
+            var settings=ServiceSettings.Load();
+            if(!ServiceSettings.PublicUrl(endpoint)||!ServiceSettings.PublicUrl(settings.privacyUrl)||!ServiceSettings.PublicUrl(settings.supportUrl)||!ServiceSettings.PublicUrl(settings.deletionUrl))
+                throw new BuildFailedException("Production requires HTTPS server, privacy, support and account deletion endpoints.");
+            if(settings.adsEnabled&&!settings.productionAds)
+                throw new BuildFailedException("Production must use production advertising configuration or disable advertising. Server approval gates still control serving.");
+            if(PlayerSettings.GetApplicationIdentifier(UnityEditor.Build.NamedBuildTarget.Android)!=ScrapGuard.Core.AppRelease.Package)
+                throw new BuildFailedException("Production must use the registered Play package.");
         }
         public static void ValidateWardrobe()
         {

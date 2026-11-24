@@ -1,0 +1,26 @@
+{
+  "total": 4,
+  "passed": 4,
+  "cases": [
+    {
+      "file": "runtime-replay-storm_battery.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=168/168 machines=2/2 hp=2357.5/2357.5"
+    },
+    {
+      "file": "runtime-replay-storm_carriers.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=167/167 machines=2/2 hp=2050/2050"
+    },
+    {
+      "file": "runtime-replay-storm_preview.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=164/164 machines=2/2 hp=2050/2050"
+    },
+    {
+      "file": "runtime-replay-storm_swarm.json",
+      "passed": true,
+      "detail": "Unity -> .NET replay: PASS kills=163/163 machines=2/2 hp=2050/2050"
+    }
+  ]
+}

@@ -132,6 +132,7 @@ try
     CommerceChecks.Run(folder,Check);
     GrowthCommerceChecks.Run(folder,Check);
     ReplayExpansionChecks.Run(folder,Check);
+    RobotSeasonChecks.Run(folder,Check);
     ApexChecks.Run(folder,Check);
     IdentityChecks.Run(folder,Check);
     RestorationChecks.Run(folder,Check);

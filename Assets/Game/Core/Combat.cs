@@ -46,7 +46,7 @@ namespace ScrapGuard.Core
     public class BattleEffect { public V2 position, end; public string text; public int kind; public float radius; public bool robot; }
     public sealed partial class Combat
     {
-        public const int RulesVersion = 29;
+        public const int RulesVersion = 30;
         public static readonly string[] UltimateNames = Array.ConvertAll(HeroCatalog.All,h=>h.Ultimate);
         public int Hero { get { return hero; } }
         public float UltimateCharge { get; private set; } = 50;
@@ -106,9 +106,11 @@ namespace ScrapGuard.Core
             FieldVariant=Definition.Region==0?0:(int)((uint)seed%3);
             Blocks=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Blocks(Definition));
             Zones=Challenge?new MapRect[0]:Campaign.WorldGeometry(Campaign.Zones(Definition));
+            SeekerUnlocked=RobotSeasonBattle||RobotSeason.HasBlueprint(state);
             if(Mode==SkillTrial.Mode)state=SkillTrial.Loadout();
+            else if(RobotSeasonBattle)state=RobotSeason.Loan();
             RunId = runId; Stage = stage; random = new Random(seed); hero = state.selectedHero;
-            WeeklyFrame=RobotWeek.Frame(seed);
+            WeeklyFrame=RobotSeasonBattle?Math.Max(0,RobotSeason.Contract(Mode)):RobotWeek.Frame(seed);
             IntroBattle=!Challenge&&!Practice&&stage==0&&!state.tutorialCompleted;
             weapon = state.items.Find(i => i.id == state.equipped[0]).definition;
             armor = state.items.Find(i => i.id == state.equipped[1]).definition;
@@ -118,15 +120,16 @@ namespace ScrapGuard.Core
             baseSpeed = HeroCatalog.All[hero].Speed * (armor == 8 ? 1.08f : 1);
             Duration = SurvivalPractice ? 60 : BossPractice ? 90 : Challenge ? Endgame.Duration : quick ? 45 : !state.tutorialCompleted && stage == 0 ? 180 : Definition.Duration;
             Skills[0] = 1;
+            if(RobotSeasonBattle)InitializeRobotSeason();
             if(BossPractice)InitializeBossPractice();
             PracticeOffset=SurvivalPractice?SurvivalTraining.Offset(state,stage,PressurePractice):0;
             if(SurvivalPractice)InitializeSurvivalPractice(state);
             if(hero==3)Skills[2]=Math.Max(1,Skills[2]);
             if(Challenge)
             {
-                if(RobotEnabled){Salvage=40;for(int i=0;i<3;i++)robotParts[i]=4;}
+                if(RobotEnabled){Salvage=40;for(int i=0;i<3;i++)robotParts[i]=RobotSeasonBattle?12:4;}
                 Position=new V2(270,600);bossSpawned=true;bossTimer=3;
-                Enemies.Add(new Enemy {id=nextId++,kind=3,core=true,position=new V2(270,330),hp=10000000,maxHp=10000000,speed=0});
+                if(!RobotSeasonBattle)Enemies.Add(new Enemy {id=nextId++,kind=3,core=true,position=new V2(270,330),hp=10000000,maxHp=10000000,speed=0});
             }
         }
         public void Tick(float dt, V2 movement)
@@ -170,7 +173,7 @@ namespace ScrapGuard.Core
             UpdateBossArena();
             if (!bossSpawned && (Challenge || Definition.Mission==Mission.Eliminate) && Elapsed >= Duration - 30) { bossSpawned = true;bossTimer=1.5f; Spawn(3, true); }
             if (Elapsed > Duration + 60) { Ended = true; Won = false; endCause=DamageCause.Timeout; return; }
-            if (bossSpawned)
+            if (bossSpawned&&!RobotSeasonBattle)
             {
                 bossTimer -= dt;
                 if (bossTimer <= 0)
@@ -207,6 +210,7 @@ namespace ScrapGuard.Core
             float difficulty = (Challenge?2.12f:Definition.Difficulty) + SpawnProgress * .55f;
             float hp = (kind == 3 ? (Challenge?7000:BossBaseHealth) : kind == 2 ? 1800 : kind == 1 ? 110 : Challenge?150:65) * difficulty;
             var role=Challenge?(RobotEnabled&&kind==1?(WeeklyFrame==0?EnemyRole.Pursuer:WeeklyFrame==1?EnemyRole.Charger:EnemyRole.Artillery):EnemyRole.Pursuer):Definition.Enemies[random.Next(Definition.Enemies.Length)];
+            if(RobotSeasonBattle){int variant=RobotSeason.Contract(Mode);role=variant==0?EnemyRole.Charger:variant==1?EnemyRole.Artillery:EnemyRole.Pursuer;}
             if(Stage==0 && Elapsed<25)role=EnemyRole.Pursuer;
             if(!Challenge && Condition==1 && kind==1)role=EnemyRole.Charger;
             if(!Challenge&&!final)role=OpeningEnemyRole(role);
@@ -214,7 +218,7 @@ namespace ScrapGuard.Core
             int carrier=kind<2?NextCarrierPart():-1;
             if(IntroBattle&&Elapsed<=60&&carrier>=0)p=SpawnPoint(210);
             Enemies.Add(new Enemy { id = nextId++, kind = kind, role=role, salvagePart=carrier, cooldown=Challenge?0:2+(float)random.NextDouble()*2, finalBoss = final, position = p, hp = hp, maxHp = hp,
-                speed = kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
+                speed = RobotSeasonBattle&&RobotSeason.Contract(Mode)==0?85:kind == 3 ? 31 : kind == 2 ? 42 : kind == 1 ? 74 : 41 });
             if (kind >= 2) Effects.Add(new BattleEffect { position = Position+new V2(0,-140), text = kind == 3 ? Definition.Boss+" 출현!" : "강화 로봇 접근", kind = 3 });
         }
         void UpdateHazards(float dt)
@@ -264,6 +268,7 @@ namespace ScrapGuard.Core
                 if(Definition.Region>0&&(source==DamageSource.Terrain||source==DamageSource.EnemyAttack||source==DamageSource.Condition))damage*=RegionEntryThreat;
                 if(!SurvivalPractice&&(area||source==DamageSource.Contact)&&Elapsed<20)damage*=.25f+.75f*Math.Max(0,(Elapsed-12)/8);
             }
+            if(RobotSeasonBattle&&source==DamageSource.EnemyAttack){if(areaHitRecovery>0)return;areaHitRecovery=.55f;}
             if(RobotDamageReduction>0)damage*=1-RobotDamageReduction*(source==DamageSource.Boss?.5f:1);
             if(RiskActive)damage*=1.2f;
             if(PoweredSafety)damage*=.7f;

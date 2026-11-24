@@ -1,0 +1,21 @@
+{
+  "registration_without_invite": true,
+  "account_restore": true,
+  "save_and_retry_idempotent": true,
+  "commerce": "production",
+  "saleProducts": [
+    "gems_300"
+  ],
+  "ads": "disabled",
+  "actual_payment": "not performed",
+  "release": {
+    "schema": 1,
+    "latestBuild": 43,
+    "minimumBuild": 43,
+    "combatRules": 30,
+    "latestVersion": "0.40.0",
+    "packageName": "io.github.hwangyeonjoon.scrapguard",
+    "notes": "로봇 조립과 테마 작전, 60개 작전 및 안정성 개선. 최신 버전으로 업데이트해 주세요.",
+    "playAvailable": true
+  }
+}

@@ -63,10 +63,10 @@ namespace ScrapGuard.Core
             return 40000+(int)(date-new DateTime(2026,1,1)).TotalDays;
         }
         public static bool Unlocked(GameState state) { return state.clearedStages.Contains(4); }
-        public static bool IsChallenge(string mode) { return mode==WeeklyMode || mode==PracticeMode || mode==SkillTrial.Mode; }
+        public static bool IsChallenge(string mode) { return mode==WeeklyMode || mode==PracticeMode || mode==SkillTrial.Mode||RobotSeason.IsMode(mode); }
         public static void Normalize(GameState state)
         {
-            Apex.Normalize(state);
+            Apex.Normalize(state);RobotSeason.Normalize(state);
             if(state.weekly==null)state.weekly=new List<WeeklyProgress>();
             if(state.skillWeekly==null)state.skillWeekly=new List<WeeklyProgress>();
             if(state.activeMode==null)state.activeMode="";

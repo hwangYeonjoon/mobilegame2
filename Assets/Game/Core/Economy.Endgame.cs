@@ -7,7 +7,7 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if(!Endgame.IsChallenge(mode))return CommandResult.Fail("없는 도전이에요.");
-            if((mode==Endgame.WeeklyMode || mode==SkillTrial.Mode) && !Endgame.Unlocked(State))return CommandResult.Fail("작전 05를 완료하면 성장 도전과 실력전이 열려요.");
+            if((mode==Endgame.WeeklyMode || mode==SkillTrial.Mode || RobotSeason.IsMode(mode)&&mode!=RobotSeason.Preview) && !Endgame.Unlocked(State))return CommandResult.Fail("작전 05를 완료하면 성장 도전과 실력전이 열려요.");
             if(string.IsNullOrEmpty(id) || !string.IsNullOrEmpty(State.activeRun) || State.receipts.Exists(r=>r.id==id))return CommandResult.Fail("진행 중이거나 정산된 전투예요.");
             State.activeRun=id;State.activeStage=4;State.activeMode=mode;State.activeWeek=Endgame.Week(clock());
             return CommandResult.Ok(mode==Endgame.PracticeMode ? "보상 없는 도전 연습을 시작해요." : "이번 주 코어에 도전하세요!");
@@ -17,6 +17,7 @@ namespace ScrapGuard.Core
         {
             RefreshDay();
             if(combat==null || !combat.Ended || !Endgame.IsChallenge(State.activeMode) || combat.Mode!=State.activeMode || combat.RunId!=State.activeRun || State.receipts.Exists(r=>r.id==combat.RunId))return CommandResult.Fail("유효하지 않은 도전 결과예요.");
+            if(RobotSeason.IsMode(State.activeMode))return FinishRobotSeason(combat);
             bool skill=State.activeMode==SkillTrial.Mode;
             bool eligible=(State.activeMode==Endgame.WeeklyMode || skill) && combat.Elapsed>=30;
             string week=State.activeWeek;

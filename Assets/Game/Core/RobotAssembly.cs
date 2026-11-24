@@ -9,14 +9,14 @@ namespace ScrapGuard.Core
     }
     public static class RobotAssembly
     {
-        public const int Count=9, DefaultDesign=5;
+        public const int Count=10, DefaultDesign=5;
         public static readonly string[] Parts={"포신","구동부","장갑"};
         public static readonly string[] Frames={"포격 전차","돌파 보행기","철벽 수호기"};
         public static readonly string[] Supports={"연사","기동","방호"};
         public static bool Valid(int id){return id>=1&&id<=Count;}
-        public static int Frame(int id){return Valid(id)?(id-1)/3:1;}
-        public static int Support(int id){return Valid(id)?(id-1)%3:1;}
-        public static string Name(int id){return Valid(id)?Supports[Support(id)]+" "+Frames[Frame(id)]:"미조립";}
+        public static int Frame(int id){return id==RobotSeason.Seeker?0:Valid(id)?(id-1)/3:1;}
+        public static int Support(int id){return id==RobotSeason.Seeker?3:Valid(id)?(id-1)%3:1;}
+        public static string Name(int id){return id==RobotSeason.Seeker?"유도 포격 전차":Valid(id)?Supports[Support(id)]+" "+Frames[Frame(id)]:"미조립";}
         public static string Role(int frame){return frame==0?"떨어진 적에게 범위 포격":frame==1?"빠르게 움직이며 포위 돌파":"근접 충격파 · 받는 피해 감소";}
         public static string Tradeoff(int frame){return frame==0?"이동이 느려요":frame==1?"적 가까이 접근해야 해요":"이동과 공격 주기가 느려요";}
         public static string RegionAdvice(StageDefinition stage)
@@ -26,6 +26,7 @@ namespace ScrapGuard.Core
         }
         public static string Detail(int id)
         {
+            if(id==RobotSeason.Seeker)return "한 적을 추적해 집중 포격 · 범위 피해 없음\n느린 이동 · 흩어진 적과 단일 목표에 특화";
             string body=Frame(id)==0?"느리게 이동 · 먼 적에게 범위 포격":Frame(id)==1?"빠르게 이동 · 주변 적을 밟아 돌파":"중장 이동 · 근접 충격파와 피해 감소";
             return body+"\n"+(Support(id)==0?"보조 포신: 3갈래 관통탄":Support(id)==1?"보조 구동부: 속도·범위 증가":"보조 장갑: 탑승 시 소형 보호막");
         }
@@ -54,23 +55,23 @@ namespace ScrapGuard.Core
     }
     public sealed partial class Combat
     {
-        readonly int[] robotParts=new int[3],partProgress=new int[3],robotBuilds=new int[9],robotKills=new int[9];
-        readonly float[] robotDamage=new float[9];
-        readonly int[] robotRanks=new int[9],robotBestRank=new int[9];
+        readonly int[] robotParts=new int[3],partProgress=new int[3],robotBuilds=new int[RobotAssembly.Count],robotKills=new int[RobotAssembly.Count];
+        readonly float[] robotDamage=new float[RobotAssembly.Count];
+        readonly int[] robotRanks=new int[RobotAssembly.Count],robotBestRank=new int[RobotAssembly.Count];
         public bool RobotPlanned {get;private set;}
         public int RobotPartsSpent {get;private set;}
         public int RobotPlansBuilt {get;private set;}
         public float MachineActiveDuration {get;private set;}=10;
         public int RobotRank(int design){return RobotAssembly.Valid(design)?robotRanks[design-1]:0;}
-        public bool RobotAvailable(int design){return RobotAssembly.Valid(design)&&(design==RobotAssembly.DefaultDesign||RobotRank(design)>0);}
+        public bool RobotAvailable(int design){return RobotDesignUnlocked(design)&&(design==RobotAssembly.DefaultDesign||RobotRank(design)>0);}
         public int[] RobotRecipe(int design)
         {
             var cost=new int[3];if(!RobotAssembly.Valid(design)||RobotRank(design)>=2)return cost;
-            cost[RobotAssembly.Frame(design)]+=RobotRank(design)==0?3:5;cost[RobotAssembly.Support(design)]+=RobotRank(design)==0?1:3;return cost;
+            cost[RobotAssembly.Frame(design)]+=RobotRank(design)==0?3:5;cost[design==RobotSeason.Seeker?1:RobotAssembly.Support(design)]+=RobotRank(design)==0?1:3;return cost;
         }
         public bool CanPlanRobot(int design,bool upgrade)
         {
-            if(!RobotEnabled||Ended||Choosing||MachineTime>0||!RobotAssembly.Valid(design))return false;
+            if(!RobotEnabled||Ended||Choosing||MachineTime>0||!RobotDesignUnlocked(design))return false;
             if(!upgrade)return RobotAvailable(design);if(RobotRank(design)>=2)return false;
             var cost=RobotRecipe(design);for(int i=0;i<3;i++)if(robotParts[i]<cost[i])return false;return true;
         }
@@ -88,7 +89,7 @@ namespace ScrapGuard.Core
         public float MachineSpeed {get{return MachineTime<=0?1:(RobotAssembly.Frame(MachineDesign)==0?.65f:RobotAssembly.Frame(MachineDesign)==1?1.1f:.75f)+(RobotRank(MachineDesign)>0&&RobotAssembly.Support(MachineDesign)==1?.15f:0);}}
         public List<RobotRecord> RobotReport()
         {
-            var result=new List<RobotRecord>();for(int i=0;i<9;i++)if(robotBuilds[i]>0)result.Add(new RobotRecord{design=i+1,builds=robotBuilds[i],kills=robotKills[i],damage=robotDamage[i],rank=robotBestRank[i]});return result;
+            var result=new List<RobotRecord>();for(int i=0;i<RobotAssembly.Count;i++)if(robotBuilds[i]>0)result.Add(new RobotRecord{design=i+1,builds=robotBuilds[i],kills=robotKills[i],damage=robotDamage[i],rank=robotBestRank[i]});return result;
         }
         int robotSpawnSerial,introCarrierSerial;
         int NextCarrierPart()
@@ -129,6 +130,7 @@ namespace ScrapGuard.Core
         {
             int frame=RobotAssembly.Frame(MachineDesign),support=RobotAssembly.Support(MachineDesign);
             int rank=RobotRank(MachineDesign);float quality=rank==0?1:1+rank*.15f;
+            if(MachineDesign==RobotSeason.Seeker){FireSeeker(quality);if(FieldModule==3)Heal(MaxHp*.003f,HealingSource.Machine);return;}
             float radius=(frame==0?100:frame==1?165:190)+(rank>0&&support==1?35:0)+(FieldModule==2?35:0);
             V2 center=Position;
             if(frame==0)

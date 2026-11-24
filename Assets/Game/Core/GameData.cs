@@ -25,6 +25,9 @@ namespace ScrapGuard.Core
         public bool adSkip;
         public int coreShards;
         public int showcaseRobot;
+        public int robotSeasonClears;
+        public List<int> robotSeasonBest=new List<int>();
+        public List<string> robotSeasonWeeks=new List<string>();
         public List<int> robotStyles=new List<int>();
         public List<ApexRecord> apexRecords=new List<ApexRecord>();
         public List<RobotRecord> robotRecords=new List<RobotRecord>();

@@ -12,3 +12,5 @@ Server/**/*.db*
 Server/Deploy/.env
 Server/Deploy/backups/
 Server/Deploy/secrets/
+**/._*
+**/.DS_Store

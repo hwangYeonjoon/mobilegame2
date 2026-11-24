@@ -27,6 +27,8 @@
     <Compile Include="RegionalAudit.cs" />
     <Compile Include="../../Assets/Tests/EditMode/ApexSpecification.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="RobotSeasonAudit.cs" />
+    <Compile Include="../../Assets/Tests/EditMode/RobotSeasonSpecification.cs" />
     <Compile Include="../../Assets/Tests/EditMode/RegionalEnemySpecification.cs" />
     <Compile Include="BalanceAudit.cs" />
     <Compile Include="GrowthAudit.cs" />

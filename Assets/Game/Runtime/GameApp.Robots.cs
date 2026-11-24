@@ -17,9 +17,9 @@ namespace ScrapGuard
         {
             if(combat==null||!combat.RobotEnabled)return 0;
             var stock=combat.RobotParts;
-            for(int n=0;n<=9;n++)
+            for(int n=0;n<=RobotAssembly.Count;n++)
             {
-                int id=n==0?robotTargetDesign:n;if(combat.RobotRank(id)!=0)continue;
+                int id=n==0?robotTargetDesign:n;if(!combat.RobotDesignUnlocked(id)||combat.RobotRank(id)!=0)continue;
                 var cost=combat.RobotRecipe(id);bool enough=true;for(int i=0;i<3;i++)if(stock[i]<cost[i])enough=false;
                 if(enough)return id;
             }
@@ -39,6 +39,7 @@ namespace ScrapGuard
         }
         string RobotSituation(int frame)
         {
+            if(combat.RobotSeasonBattle)return "대여 부품 · 90초 생존 + 특화 로봇 15처치";
             if(combat.Challenge)return "이번 주 목표: "+RobotAssembly.Frames[combat.WeeklyFrame]+" 특화형 탑승 · 60초 생존";
             bool artillery=false,charger=false,crowded=false;int close=0;
             foreach(var enemy in combat.Enemies)if(enemy.hp>0)
@@ -68,16 +69,17 @@ namespace ScrapGuard
             battlePaused=true;dragging=false;robotTargetDesign=design;
             int main=RobotAssembly.Frame(design),sub=RobotAssembly.Support(design),rank=combat.RobotRank(design);var parts=combat.RobotParts;var cost=combat.RobotRecipe(design);
             bool craft=combat.CanPlanRobot(design,true),available=combat.RobotAvailable(design),board=combat.CanActivateMachine;
-            var card=Dialog("어떤 로봇을 만들까요?",RobotSituation(main),800);
+            var card=Dialog("어떤 로봇을 만들까요?",RobotSituation(main),850);
             var close=card.GetChild(2).GetComponent<Button>();close.onClick.RemoveAllListeners();close.onClick.AddListener(()=>{FinishRobotMenu("close",design);battlePaused=false;CloseModal();});
-            RobotRigView.Draw(card,24,120,176,design,rank,RobotStyles.Active(State,main));
-            Ui.Label(card,RobotAssembly.Frames[main],212,132,256,35,23,RobotRigView.Accent(main));
-            Ui.Label(card,RobotAssembly.Role(main)+"\n"+RobotAssembly.Tradeoff(main),212,178,256,76,16,Ui.Ink);
+            RobotRigView.Draw(card,24,120,176,design,rank,BattleRobotStyle(main));
+            Ui.Label(card,design==RobotSeason.Seeker?RobotAssembly.Name(design):RobotAssembly.Frames[main],212,132,256,35,23,RobotRigView.Accent(main));
+            Ui.Label(card,design==RobotSeason.Seeker?"단일 적 추적 포격\n범위 피해 없음 · 느린 이동":RobotAssembly.Role(main)+"\n"+RobotAssembly.Tradeoff(main),212,178,256,76,16,Ui.Ink);
             Ui.Label(card,rank==0?(design==RobotAssembly.DefaultDesign?"기본형 사용 가능":"미제작"):rank==1?"특화형 보유":"완성형 보유",212,267,256,26,16,Ui.Gold);
             for(int i=0;i<3;i++){int pick=i;Ui.Button(card,RobotAssembly.Frames[i],24+i*150,318,144,50,()=>RobotAssembler(pick==main?design:pick*4+1),main==i?Ui.Mint:Ui.Raised,true,16);}
-            Ui.Button(card,"보조: "+new[]{"관통탄 추가","이동·범위 증가","소형 보호막"}[sub]+(robotSupportOptions?"  ▴":"  변경 ▾"),24,386,444,42,()=>{robotSupportOptions=!robotSupportOptions;RobotAssembler(design);},Ui.Raised,true,16);
+            Ui.Button(card,"보조: "+new[]{"관통탄 추가","이동·범위 증가","소형 보호막","단일 목표 유도 포격"}[sub]+(robotSupportOptions?"  ▴":"  변경 ▾"),24,386,444,42,()=>{robotSupportOptions=!robotSupportOptions;RobotAssembler(design);},Ui.Raised,true,16);
             if(robotSupportOptions)for(int i=0;i<3;i++){int pick=i;Ui.Button(card,new[]{"관통탄","이동·범위","보호막"}[i],24+i*150,440,144,42,()=>{robotSupportOptions=false;RobotAssembler(main*3+pick+1);},sub==i?Ui.Mint:Ui.Raised,true,16);}
-            float y=robotSupportOptions?498:444;
+            if(robotSupportOptions&&main==0)Ui.Button(card,"유도 포신 · "+(combat.SeekerUnlocked?"선택":"공방에서 영구 제작"),24,487,444,36,()=>{robotSupportOptions=false;RobotAssembler(RobotSeason.Seeker);},Ui.Blue,combat.SeekerUnlocked,15);
+            float y=robotSupportOptions?535:444;
             string recipe="";for(int i=0;i<3;i++)if(cost[i]>0)recipe+=(recipe.Length>0?"\n":"")+RobotAssembly.Parts[i]+" 필요 "+cost[i]+"개 · 보유 "+parts[i]+"개";
             Ui.Label(card,rank<2?(rank==0?"특화형 제작":"완성형 강화")+"\n"+recipe:"완성형 · 재탑승에는 고철만 사용",24,y,444,76,17,craft?Ui.Mint:Ui.Gold,TextAnchor.MiddleCenter);
             string action=board?"탑승":"선택 후 전투로";
@@ -91,7 +93,7 @@ namespace ScrapGuard
             if(rank==1&&craft)Ui.Button(card,"완성형 제작하고 "+(board?"탑승":"선택"),24,y+160,444,43,()=>ConfirmRobotPlan(design,true),Ui.Gold,true,16);
             else if(rank==0&&craft&&available)Ui.Button(card,"부품을 아끼고 기본형 "+(board?"탑승":"선택"),24,y+160,444,43,()=>ConfirmRobotPlan(design,false),Ui.Raised,true,15);
             string status=board?"탑승 시 고철 "+combat.MachineCost+"개 사용":combat.MachineRecovery>0?"탑승 대기 "+Mathf.CeilToInt(combat.MachineRecovery)+"초 · 설계 선택은 지금 가능":"탑승에 고철 "+combat.MachineCost+"개 필요 · 보유 "+combat.Salvage+"개";
-            Ui.Label(card,status+"\n재탑승은 짧게 · 설계 변경은 길게 누르기",24,728,444,58,14,Ui.Muted,TextAnchor.MiddleCenter);
+            Ui.Label(card,status+"\n재탑승은 짧게 · 설계 변경은 길게 누르기",24,786,444,58,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         string RobotRecoveryHint()
         {
@@ -109,15 +111,15 @@ namespace ScrapGuard
             RobotAssembly.Normalize(State);
             var records=currentRun&&combat!=null?combat.RobotReport():State.robotRecords;
             var card=Dialog(currentRun?"이번 판에 조립한 로봇":"나의 로봇 조립실",currentRun?"조합별 활약을 비교하고 다음 판의 로봇을 골라보세요.":"전투에서 조립한 모습이 남아요 · 능력치는 다음 판에 이월되지 않아요.",870);
-            Ui.Button(card,"로봇 외형 공방 · 제작과 꾸미기",24,129,444,48,()=>RobotStylePanel(),Ui.Gold,true,18);
-            var list=Ui.Scroll(card,24,194,444,590,9*226+50);
-            for(int i=1;i<=9;i++)
+            Ui.Button(card,"테마 공방 · 새 설계와 외형 제작",24,129,444,48,RobotSeasonHub,Ui.Gold,true,18);
+            var list=Ui.Scroll(card,24,194,444,590,RobotAssembly.Count*226+50);
+            for(int i=1;i<=RobotAssembly.Count;i++)
             {
                 int id=i;var record=records.Find(r=>r!=null&&r.design==id);bool built=record!=null&&record.builds>0;float y=(i-1)*226;
                 var row=Ui.Box(list,0,y,444,214,Ui.Background).transform;RobotRigView.Draw(row,8,14,136,id,record==null?1:record.rank,RobotStyles.Active(State,RobotAssembly.Frame(id)));
                 Ui.Label(row,RobotAssembly.Name(id)+(built?" ✓":""),153,12,277,36,20,built?Ui.Mint:Ui.Muted);
                 Ui.Label(row,RobotAssembly.Detail(id),153,54,277,74,14,Ui.Ink);
-                Ui.Label(row,built?(record.rank>=2?"완성형":record.rank==1?"특화형":"기본형")+" · 탑승 "+record.builds+"회 · 처치 "+record.kills+"\n누적 피해 "+Mathf.RoundToInt(record.damage).ToString("N0"):"아직 만들지 않은 조합 · 다음 출격에서 도전",14,159,280,43,14,Ui.Muted);
+                Ui.Label(row,built?(record.rank>=2?"완성형":record.rank==1?"특화형":"기본형")+" · 탑승 "+record.builds+"회 · 처치 "+record.kills+"\n누적 피해 "+Mathf.RoundToInt(record.damage).ToString("N0"):(id==RobotSeason.Seeker&&!RobotSeason.HasBlueprint(State)?"폭풍 구조대 공방에서 설계 제작":"아직 만들지 않은 조합 · 다음 출격에서 도전"),14,159,280,43,14,Ui.Muted);
                 bool owned=State.robotRecords.Exists(r=>r.design==id&&r.builds>0);
                 Ui.Button(row,State.showcaseRobot==id?"전시 중":"전시",318,159,112,43,()=>Change(new GameCommand("robot_showcase"){stage=id},()=>RobotHangar(currentRun)),Ui.Gold,owned,16);
             }

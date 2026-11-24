@@ -6,5 +6,5 @@
   "privacyUrl": "https://api.scrapguard.win/privacy",
   "supportUrl": "https://api.scrapguard.win/support",
   "deletionUrl": "https://api.scrapguard.win/delete-account",
-  "productionAds": false
+  "productionAds": true
 }

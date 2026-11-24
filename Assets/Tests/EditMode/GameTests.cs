@@ -9,6 +9,15 @@ namespace ScrapGuard.Tests
     public class GameTests
     {
         [Test]
+        public void RobotSeasonArtAndSaveRoundTrip()
+        {
+            var s=GameState.New();s.gems=600;var e=new Economy(s,()=>DateTimeOffset.UtcNow);e.BuyStormStyle();s.robotSeasonClears=5;s.robotSeasonWeeks.Add("2026-11-09");s.robotSeasonBest=new System.Collections.Generic.List<int>{25,16,30};
+            var copy=JsonUtility.FromJson<GameState>(JsonUtility.ToJson(s));Endgame.Normalize(copy);ScrapGuard.Core.Social.Normalize(copy);
+            Assert.That(copy.robotSeasonClears,Is.EqualTo(5));Assert.That(copy.robotSeasonWeeks.Count,Is.EqualTo(1));Assert.That(copy.robotSeasonBest[2],Is.EqualTo(30));
+            for(int row=0;row<2;row++)for(int frame=0;frame<3;frame++){var art=ArenaArt.Cell("RobotRescue-v1",3,2,frame,row);Assert.That(art,Is.Not.Null);Assert.That(art.rect.xMax,Is.LessThanOrEqualTo(art.texture.width));Assert.That(art.rect.yMax,Is.LessThanOrEqualTo(art.texture.height));Assert.That(RobotStyles.Active(copy,frame),Is.EqualTo(4));}
+            Assert.That(ArenaArt.Cell("RobotSeeker-v1",1,1,0,0),Is.Not.Null);
+        }
+        [Test]
         public void RobotStylesRoundTripAndAtlasBounds()
         {
             var s=GameState.New();s.apexRecords.Add(new ApexRecord{stage=47,wins=1,bestSeconds=271});s.gems=RobotStyles.PackPrice;var e=new Economy(s,()=>DateTimeOffset.UtcNow);Assert.That(e.BuyRobotStylePack().Success,Is.True);

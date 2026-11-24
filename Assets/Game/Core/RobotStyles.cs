@@ -7,9 +7,9 @@ namespace ScrapGuard.Core
         public const int PackPrice=600;
         public const int CraftGold=30000,CraftParts=300,CraftShards=12;
         public const string PackKey="robot_style_astral";
-        public static readonly string[] Names={"기본 기체","성운 기사","회수 선봉대"};
+        public static readonly string[] Names={"기본 기체","성운 기사","회수 선봉대","구조대 정비형","폭풍 구조대"};
         public static bool Owned(GameState s,int frame,int style)
-        {return frame>=0&&frame<3&&(style==0||style==1&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains(PackKey)||style==2&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains("robot_style_reclaimer_"+frame));}
+        {return frame>=0&&frame<3&&(style==0||style==1&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains(PackKey)||style==2&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains("robot_style_reclaimer_"+frame)||style==3&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains("robot_style_rescue_"+frame)||style==4&&s.ownedCosmetics!=null&&s.ownedCosmetics.Contains(RobotSeason.Pack));}
         public static void Normalize(GameState s)
         {
             if(s.robotStyles==null)s.robotStyles=new List<int>();

@@ -45,7 +45,7 @@ namespace ScrapGuard
             if(RobotAssembly.Valid(p.robotDesign))RobotRigView.Draw(stage,100,3,255,p.robotDesign,p.robotRank,p.robotStyle);
             else {var art=CharacterArt.Draw(stage,80,p.theme==0?4:-6,296,p.theme==0?253:226,p.hero,p.skin,p.outfit);art.gameObject.AddComponent<ShowroomMotion>();}
             Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?RobotAssembly.Name(p.robotDesign):StylePresentation.Look(p.outfit,p.skin),24,409,444,30,23,p.outfit>0?OutfitVisuals.Accent(p.outfit):accent,TextAnchor.MiddleCenter);
-            Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?"전투에서 직접 조립한 로봇":"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,RobotAssembly.Valid(p.robotDesign)?RobotSeason.Badge(p.robotMastery)+" · "+p.robotMastery+"처치":"Lv."+p.heroLevel+" "+Catalog.HeroNames[p.hero],24,445,444,28,20,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"작전 정복 "+p.stages+" / "+Campaign.Count,24,478,444,29,22,accent,TextAnchor.MiddleCenter);
             string status=p.local?"로컬 체험 기록":(p.test?"테스트 · 공개 ID ":"공개 ID ")+p.id;
             Ui.Label(card,status,24,508,444,18,12,Ui.Muted,TextAnchor.MiddleCenter);

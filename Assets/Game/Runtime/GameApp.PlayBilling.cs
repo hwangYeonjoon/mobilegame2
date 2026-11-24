@@ -17,7 +17,7 @@ namespace ScrapGuard
         void ConnectPlayBilling()
         {
             if(!Online||!cloudReady){Toast("서버 계정부터 연결해 주세요.");return;}
-            if(Application.platform!=RuntimePlatform.Android){Toast("Google Play 내부 테스트로 설치한 Android 앱에서 사용해 주세요.");return;}
+            if(Application.platform!=RuntimePlatform.Android){Toast("Google Play에서 설치한 Android 앱에서 사용해 주세요.");return;}
             if(networkBusy||billingConnecting)return;
             StartCoroutine(LoadCommerceStatus());
         }
@@ -48,7 +48,7 @@ namespace ScrapGuard
                 playStore.GooglePlayStoreExtendedService.SetObfuscatedAccountId(billingAccount);
                 playStore.FetchProducts(CommerceCatalog.Offers.Select(o=>new ProductDefinition(o.Id,o.Consumable?ProductType.Consumable:ProductType.NonConsumable)).ToList());
             }
-            catch(Exception){playStore=null;billingConnecting=false;Toast("Play 연결에 실패했어요. 내부 테스트 설치 여부를 확인해 주세요.");}
+            catch(Exception){playStore=null;billingConnecting=false;Toast("Play 연결에 실패했어요. 네트워크와 Google Play 설치 여부를 확인해 주세요.");}
         }
         void PlayStorePanel()
         {

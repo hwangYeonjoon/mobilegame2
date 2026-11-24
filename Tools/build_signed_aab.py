@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the internal-test bundle using local signing secrets, never command arguments."""
+"""Build a signed Android bundle using local signing secrets, never command arguments."""
 import argparse
 import json
 import os
@@ -17,10 +17,13 @@ KEYS = ('SCRAP_KEYSTORE_PATH', 'SCRAP_KEY_ALIAS',
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true', help='Check local inputs without building')
+    parser.add_argument('--production', action='store_true', help='Build the explicitly validated production bundle')
     audio = parser.add_mutually_exclusive_group()
     audio.add_argument('--audio-baseline', action='store_true', help='Measure the previous music import settings using the same signed build')
     audio.add_argument('--audio-optimized', action='store_true', help='Reimport optimized music and measure the same signed build')
     args = parser.parse_args()
+    if args.production and (args.audio_baseline or args.audio_optimized):
+        parser.error('Production cannot use audio comparison imports.')
     env = os.environ.copy()
     if args.audio_baseline or args.audio_optimized:
         env.pop("SCRAP_AUDIO_BASELINE", None)
@@ -45,22 +48,22 @@ def main():
     unity = shutil.which('unity') or str(Path.home() / '.unity/bin/unity')
     if not Path(unity).is_file():
         raise SystemExit('Unity CLI not found.')
-    log = ROOT / 'TestResults/android-internal.log'
+    log = ROOT / ('TestResults/android-production.log' if args.production else 'TestResults/android-internal.log')
     log.parent.mkdir(parents=True, exist_ok=True)
     started = time.time()
     result = subprocess.call([unity, 'run', str(ROOT), '--no-tail', '--timeout', '1800',
                             '--log-file', str(log), '--', '-nographics', '-buildTarget',
                             'Android', '-executeMethod',
-                            ('ScrapGuard.Editor.BuildFootprint.BuildBaseline' if args.audio_baseline else 'ScrapGuard.Editor.BuildFootprint.BuildOptimized' if args.audio_optimized else 'ScrapGuard.Editor.ProjectBuilder.BuildAndroidBundle')],
+                            ('ScrapGuard.Editor.BuildFootprint.BuildBaseline' if args.audio_baseline else 'ScrapGuard.Editor.BuildFootprint.BuildOptimized' if args.audio_optimized else 'ScrapGuard.Editor.ProjectBuilder.BuildAndroidProductionBundle' if args.production else 'ScrapGuard.Editor.ProjectBuilder.BuildAndroidBundle')],
                            cwd=ROOT, env=env)
     if args.audio_baseline or args.audio_optimized:
         if log.exists():
             shutil.copy2(log, log.with_name("audio-" + ("baseline" if args.audio_baseline else "optimized") + "-build.log"))
     if result:
         return result
-    bundle = ROOT / 'Builds/Android/ScrapGuard-internal-test.aab'
+    bundle = ROOT / ('Builds/Android/ScrapGuard-production.aab' if args.production else 'Builds/Android/ScrapGuard-internal-test.aab')
     if not bundle.is_file() or bundle.stat().st_mtime < started:
-        raise SystemExit('No fresh AAB produced. Inspect TestResults/android-internal.log.')
+        raise SystemExit('No fresh AAB produced. Inspect ' + str(log))
     try:
         with zipfile.ZipFile(bundle) as archive:
             names = set(archive.namelist())
@@ -74,7 +77,7 @@ def main():
         snapshot = bundle.with_name('ScrapGuard-size-' + ('baseline' if args.audio_baseline else 'optimized') + '.aab')
         shutil.copy2(bundle, snapshot)
         print('Size comparison AAB saved:', snapshot)
-    print('Internal-test AAB created:', bundle)
+    print('Signed AAB created:', bundle)
     return 0
 
 

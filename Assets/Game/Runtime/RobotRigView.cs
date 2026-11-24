@@ -20,11 +20,11 @@ namespace ScrapGuard
         }
         public void SetDesign(int id,int level=1,int appearance=0)
         {
-            appearance=Mathf.Clamp(appearance,0,2);if(id==design&&level==rank&&style==appearance)return;design=id;rank=level;style=appearance;
-            body.sprite=style==0?ArenaArt.Cell(Art[RobotAssembly.Frame(id)],1,1,0,0):ArenaArt.Cell("RobotStyles-v1",3,2,RobotAssembly.Frame(id),style-1);
+            appearance=Mathf.Clamp(appearance,0,4);if(id==design&&level==rank&&style==appearance)return;design=id;rank=level;style=appearance;
+            body.sprite=style>=3?ArenaArt.Cell("RobotRescue-v1",3,2,RobotAssembly.Frame(id),style-3):style==0?ArenaArt.Cell(id==RobotSeason.Seeker?"RobotSeeker-v1":Art[RobotAssembly.Frame(id)],1,1,0,0):ArenaArt.Cell("RobotStyles-v1",3,2,RobotAssembly.Frame(id),style-1);
             if(body.sprite==null)Debug.LogError("Missing 2D robot artwork: "+Art[RobotAssembly.Frame(id)]);
             socket.GetComponent<Graphic>().color=Accent(RobotAssembly.Support(id));socket.gameObject.SetActive(level>0);
-            outline.effectColor=Accent(RobotAssembly.Frame(id));
+            outline.effectColor=style>=3?StyleAccent(style):Accent(RobotAssembly.Frame(id));
             rankRing.gameObject.SetActive(level>=2);body.color=level==0?new Color(.84f,.88f,.88f,1):Color.white;
         }
         public void SetBattleClarity(bool nearbyEnemy)
@@ -36,8 +36,9 @@ namespace ScrapGuard
             body.rectTransform.anchoredPosition=new Vector2(0,moving&&frame==1?Mathf.Abs(cycle)*size*.012f:0);
             socket.localScale=Vector3.one*(1+Mathf.Sin(time*8)*.1f);
             bool entering=arrival>=0&&arrival<.65f;arrivalRing.gameObject.SetActive(entering);
-            if(entering){float t=arrival/.65f;arrivalRing.localScale=Vector3.one*(.85f+t*(style==1?.8f:.45f));var color=style==1?Ui.Gold:style==2?Ui.Mint:Accent(frame);color.a=(1-t)*.8f;arrivalRing.GetComponent<Graphic>().color=color;}
+            if(entering){float t=arrival/.65f;arrivalRing.localScale=Vector3.one*(.85f+t*(style==1?.8f:.45f));var color=style>0?StyleAccent(style):Accent(frame);color.a=(1-t)*.8f;arrivalRing.GetComponent<Graphic>().color=color;}
         }
+        public static Color StyleAccent(int appearance){return appearance==4?Ui.Hex("65DBFF"):appearance==3?Ui.Hex("FFFAE5"):appearance==1?Ui.Gold:Ui.Mint;}
         public static Color Accent(int part){return part==0?Ui.Blue:part==1?Ui.Mint:Ui.Gold;}
     }
 }

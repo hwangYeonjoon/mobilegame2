@@ -76,7 +76,7 @@ namespace ScrapGuard.Core
                 if(count>=BossWarningLimit)return false;
                 PeakBossWarnings=Math.Max(PeakBossWarnings,count+1);
             }
-            if(!Challenge&&source==DamageSource.EnemyAttack)
+            if((!Challenge||RobotSeasonBattle)&&source==DamageSource.EnemyAttack)
             {
                 int count=0;foreach(var h in Hazards)if(h.source==DamageSource.EnemyAttack)count++;
                 if(enemyWarningRecovery>0||count>=(SpawnElapsed<25?2:3))return false;

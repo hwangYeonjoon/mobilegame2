@@ -107,7 +107,7 @@ namespace ScrapGuard
             root.anchoredPosition=new Vector2(bullet.position.x,-bullet.position.y);
             root.localEulerAngles=new Vector3(0,0,-Mathf.Atan2(bullet.velocity.y,bullet.velocity.x)*Mathf.Rad2Deg);
             var tint=bullet.chilling?Ui.Hex("91EAFF"):bullet.mod?Ui.Hex("C996FF"):bullet.drone?Ui.Mint:outfit>0?OutfitVisuals.Accent(outfit):Ui.Gold;
-            if(robotStyle>0)tint=robotStyle==1?Ui.Gold:Ui.Mint;
+            if(robotStyle>0)tint=RobotRigView.StyleAccent(robotStyle);
             float length=robotStyle==1?42:bullet.visual>0?48:bullet.pierce>0?35:bullet.mod?30:15+level*2;
             trail.rectTransform.sizeDelta=new Vector2(length,bullet.blast?7:4);
             trail.rectTransform.anchoredPosition=new Vector2(-length,bullet.blast?3.5f:2);

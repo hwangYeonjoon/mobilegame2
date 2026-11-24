@@ -82,6 +82,7 @@ namespace ScrapGuard
             else if(combat.SurvivalPractice)message=combat.PressurePractice?"실패 시간대 연습 · 예고를 읽고 빈 곳으로 이동하세요":"60초 생존 연습 · 적의 예고 밖으로 이동하세요";
             else if(combat.BossPractice)message="보스 패턴 연습 · 경고 밖으로 이동하세요";
             else if(combat.BossArenaActive)message="";
+            else if(combat.RobotSeasonBattle&&combat.Elapsed<8)message="테마 작전 · 합체를 눌러 대여 로봇 조립";
             else if(combat.Mode==Endgame.WeeklyMode&&combat.Elapsed<8)message="합체 버튼 → "+RobotAssembly.Frames[combat.WeeklyFrame]+" 특화형 제작";
             else if(RobotPromptActive)message="↓ 모은 부품으로 로봇을 만들어 보세요";
             else if(combat.IntroBattle&&combat.Elapsed>8&&combat.Elapsed<14)message="포·동·장 표식 적을 부수고 부품을 회수하세요";
@@ -104,7 +105,7 @@ namespace ScrapGuard
             ObserveRobotExperience();
             machineActor.gameObject.SetActive(combat.MachineTime>0);
             float arrival=combat.MachineActiveDuration-combat.MachineTime;
-            battleRobot.SetDesign(combat.MachineDesign,combat.RobotRank(combat.MachineDesign),RobotStyles.Active(State,RobotAssembly.Frame(combat.MachineDesign)));battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f,combat.MachineTime>0?arrival:-1);
+            battleRobot.SetDesign(combat.MachineDesign,combat.RobotRank(combat.MachineDesign),BattleRobotStyle(RobotAssembly.Frame(combat.MachineDesign)));battleRobot.Animate(combat.Elapsed,combat.LastMovement.Length>.1f,combat.MachineTime>0?arrival:-1);
             machineActor.anchoredPosition=new Vector2(combat.MachinePosition.x,-combat.MachinePosition.y);
             float unfold=Mathf.Clamp01(arrival/.18f);
             bool clearer=PlayerPrefs.GetInt("scrapguard.robot.clear",1)==1;
@@ -113,7 +114,7 @@ namespace ScrapGuard
             battleRobot.SetBattleClarity(nearby);
             bossFence.gameObject.SetActive(combat.BossArenaActive);
             bossFence.anchoredPosition=new Vector2(combat.BossArenaCenter.x-235,-combat.BossArenaCenter.y+300);
-            var robotAccent=RobotStyles.Active(State,RobotAssembly.Frame(combat.MachineDesign))==1?Ui.Gold:Ui.Mint;robotAccent.a=combat.FinalBossActive?.1f:.3f;machineAura.GetComponent<CombatRing>().color=robotAccent;
+            var robotAccent=RobotRigView.StyleAccent(BattleRobotStyle(RobotAssembly.Frame(combat.MachineDesign)));robotAccent.a=combat.FinalBossActive?.1f:.3f;machineAura.GetComponent<CombatRing>().color=robotAccent;
             machineAura.localScale=Vector3.one*(1+.04f*Mathf.Sin(combat.Elapsed*5));
             machineRotor.localEulerAngles=new Vector3(0,0,-combat.Elapsed*260);
             escapeArrow.gameObject.SetActive(combat.WaveWarning>0);

@@ -19,7 +19,7 @@ namespace ScrapGuard
             var hero=Ui.Box(screen,24,176,492,204,Ui.Panel).transform;
             RobotRigView.Draw(hero,321,26,145,RobotWeek.Frame(week)*4+1,2);
             Ui.Label(hero,"주간 로봇 도전 / 90초",20,15,300,27,12,Ui.Mint);
-            Ui.Label(hero,"이번 주 로봇을 조립하세요",20,51,306,40,23);
+            Ui.Button(hero,"폭풍 구조대 · 새 조립 작전",20,51,300,40,RobotSeasonHub,Ui.Blue,true,18);
             Ui.Label(hero,"이번 주 최고 기록",20,99,270,29,15,Ui.Muted);
             Ui.Label(hero,(progress==null?0:progress.bestScore).ToString("N0")+"점",20,131,290,50,35,Ui.Gold);
             Ui.Label(screen,week+" 주간 · 월요일 오전 5시 갱신",24,390,492,29,14,Ui.Muted);
@@ -72,6 +72,7 @@ namespace ScrapGuard
         }
         void ChallengeResult()
         {
+            if(combat.RobotSeasonBattle){RobotSeasonResult();return;}
             var receipt=State.receipts.Find(r=>r.id==combat.RunId);bool practice=combat.Mode==Endgame.PracticeMode;bool skill=combat.Mode==SkillTrial.Mode;
             var card=Dialog(skill?"동일 조건 실력 기록":practice?"코어 도전 연습 완료":"이번 도전 기록",skill?"고정 대원·장비로 도전한 기록 · 재화 보상 없음":practice?"연습은 순위와 보상에 반영되지 않아요.":"30초 이상 진행한 최고 기록이 저장됩니다.",780);
             Ui.Label(card,combat.CoreScore.ToString("N0")+"점",24,155,444,76,46,Ui.Gold,TextAnchor.MiddleCenter);

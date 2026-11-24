@@ -59,6 +59,9 @@ namespace ScrapGuard.Core
                 case "outfit_equip": return Outfits.Equip(e.State,c.skin);
                 case "guide_seen": e.State.guideIntroSeen=true; return CommandResult.Ok("안내는 정비소에서 다시 볼 수 있어요.");
                 case "cosmetic_buy": return Social.Buy(e.State, c.value);
+                case "robot_seeker_unlock": return e.UnlockSeeker();
+                case "robot_rescue_craft": return e.CraftRescueStyle(c.frame);
+                case "robot_storm_buy": return e.BuyStormStyle();
                 case "robot_style_craft": return e.CraftRobotStyle(c.frame);
                 case "robot_style_equip": return RobotStyles.Equip(e.State,c.frame,c.skin);
                 case "growth_kit_upgrade": return e.BuyGrowthKitAndUpgrade(c.value,c.stage,c.count,c.id,c.level,c.hero);
@@ -132,7 +135,7 @@ namespace ScrapGuard.Core
             int frames = 0;
             foreach (var step in steps)
             {
-                if (step == null || step.robotPlan<0 || step.robotPlan>9 || (step.robotUpgrade&&step.robotPlan==0) || step.robot<0 || step.robot>9 || (!step.machine&&step.robot!=0) || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 11 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
+                if (step == null || step.robotPlan<0 || step.robotPlan>RobotAssembly.Count || (step.robotUpgrade&&step.robotPlan==0) || step.robot<0 || step.robot>RobotAssembly.Count || (!step.machine&&step.robot!=0) || step.assembly<0 || step.assembly>4 || step.encounter<0 || step.encounter>2 || step.skill < -1 || step.skill > 11 || step.frames < 0 || step.frames > 120 || Math.Abs((long)step.x) > 100 || Math.Abs((long)step.y) > 100)
                     throw new ArgumentException("전투 입력이 올바르지 않아요.");
                 if(step.robotPlan!=0&&(step.machine||step.robot!=0||step.revive||step.assembly!=0||step.encounter!=0||step.support||step.ultimate||step.skill!=-1||step.frames!=0||step.x!=0||step.y!=0))throw new ArgumentException("잘못된 로봇 설계 입력이에요.");
                 if(step.machine && (step.revive || step.assembly!=0 || step.encounter!=0 || step.support || step.ultimate || step.skill!=-1 || step.frames!=0 || step.x!=0 || step.y!=0))throw new ArgumentException("잘못된 합체 입력이에요.");

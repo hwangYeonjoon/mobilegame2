@@ -69,6 +69,8 @@ namespace ScrapGuard.Editor
         public static void BuildAndroidBossQA(){BuildAndroidQA(false,false,true);}
         public static void BuildAndroidPerformanceQA(){BuildAndroidQA(false,performance:true);}
         public static void BuildAndroidRegionalQA(){BuildAndroidQA(false,regional:true);}
+        public static void BuildAndroidRobotSeasonQA(){BuildAndroidQA(false,robotSeason:true);}
+        public static void BuildAndroidRobotSeasonAndPlaytest(){BuildAndroidRobotSeasonQA();BuildAndroidPlaytest();}
         public static void BuildAndroidGrowthQA(){BuildAndroidQA(false,false,false,false,true);}
         public static void BuildAndroidGrowthAndPlaytest()
         {
@@ -80,7 +82,7 @@ namespace ScrapGuard.Editor
             BuildAndroidPlaytest();
         }
         public static void BuildAndroidPlaytest(){BuildAndroidQA(false,false,false,true);}
-        static void BuildAndroidQA(bool soak,bool assault=false,bool bosses=false,bool manual=false,bool growth=false,bool regional=false,bool performance=false)
+        static void BuildAndroidQA(bool soak,bool assault=false,bool bosses=false,bool manual=false,bool growth=false,bool regional=false,bool performance=false,bool robotSeason=false)
         {
             Configure();EditorUserBuildSettings.buildAppBundle=false;
             string previous=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),previousName=PlayerSettings.productName;
@@ -90,13 +92,19 @@ namespace ScrapGuard.Editor
             {
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,ScrapGuard.Core.AppRelease.Package+".qa");
                 PlayerSettings.productName=manual?"고철 수호대 체험":"고철 수호대 QA";
-                Build(BuildTarget.Android,manual?"Builds/Android/ScrapGuard-playtest.apk":"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,manual?new[]{"SCRAP_QA_SOAK","SCRAP_QA_MANUAL"}:performance?new[]{"SCRAP_QA_SOAK","SCRAP_QA_PERFORMANCE"}:regional?new[]{"SCRAP_QA_SOAK","SCRAP_QA_REGIONAL"}:growth?new[]{"SCRAP_QA_SOAK","SCRAP_QA_GROWTH"}:bosses?new[]{"SCRAP_QA_SOAK","SCRAP_QA_BOSS"}:assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
+                Build(BuildTarget.Android,manual?"Builds/Android/ScrapGuard-playtest.apk":"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,manual?new[]{"SCRAP_QA_SOAK","SCRAP_QA_MANUAL"}:robotSeason?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ROBOT_SEASON"}:performance?new[]{"SCRAP_QA_SOAK","SCRAP_QA_PERFORMANCE"}:regional?new[]{"SCRAP_QA_SOAK","SCRAP_QA_REGIONAL"}:growth?new[]{"SCRAP_QA_SOAK","SCRAP_QA_GROWTH"}:bosses?new[]{"SCRAP_QA_SOAK","SCRAP_QA_BOSS"}:assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
             }
             finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();if(previousDependencies!=null)File.WriteAllBytes(dependencyPath,previousDependencies);}
         }
         public static bool InternalTestBuild {get;private set;}
+        public static bool ProductionBuild {get;private set;}
         [MenuItem("Scrap Guard/Build signed internal-test AAB")]
         public static void BuildAndroidBundle()
+        {BuildSignedBundle(false);}
+        [MenuItem("Scrap Guard/Build signed production AAB")]
+        public static void BuildAndroidProductionBundle()
+        {BuildSignedBundle(true);}
+        static void BuildSignedBundle(bool production)
         {
             string key=System.Environment.GetEnvironmentVariable("SCRAP_KEYSTORE_PATH");
             string alias=System.Environment.GetEnvironmentVariable("SCRAP_KEY_ALIAS");
@@ -107,20 +115,22 @@ namespace ScrapGuard.Editor
             if(!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android,BuildTarget.Android))
                 throw new BuildFailedException("Android build support is unavailable. Check the editor module and licensing initialization, then restart the build.");
             Configure();
+            if(production)PrototypeBuildGuard.ValidateProduction();
+            string output=production?"Builds/Android/ScrapGuard-production.aab":"Builds/Android/ScrapGuard-internal-test.aab";
             bool oldBundle=EditorUserBuildSettings.buildAppBundle,oldExport=EditorUserBuildSettings.exportAsGoogleAndroidProject;
             EditorUserBuildSettings.buildAppBundle=true;EditorUserBuildSettings.exportAsGoogleAndroidProject=false;
             bool oldCustom=PlayerSettings.Android.useCustomKeystore;string oldName=PlayerSettings.Android.keystoreName,oldAlias=PlayerSettings.Android.keyaliasName;
             try
             {
                 PlayerSettings.Android.useCustomKeystore=true;PlayerSettings.Android.keystoreName=Path.GetFullPath(key);PlayerSettings.Android.keyaliasName=alias;
-                PlayerSettings.Android.keystorePass=storePass;PlayerSettings.Android.keyaliasPass=aliasPass;InternalTestBuild=true;
-                Build(BuildTarget.Android,"Builds/Android/ScrapGuard-internal-test.aab",BuildOptions.None);
-                if(!File.Exists("Builds/Android/ScrapGuard-internal-test.aab"))
-                    throw new BuildFailedException("Unity did not produce the internal-test AAB. Check the Android build log even if the report says Success.");
+                PlayerSettings.Android.keystorePass=storePass;PlayerSettings.Android.keyaliasPass=aliasPass;InternalTestBuild=!production;ProductionBuild=production;
+                Build(BuildTarget.Android,output,BuildOptions.None);
+                if(!File.Exists(output))
+                    throw new BuildFailedException("Unity did not produce the signed AAB. Check the Android build log even if the report says Success.");
             }
             finally
             {
-                InternalTestBuild=false;EditorUserBuildSettings.buildAppBundle=oldBundle;EditorUserBuildSettings.exportAsGoogleAndroidProject=oldExport;
+                InternalTestBuild=false;ProductionBuild=false;EditorUserBuildSettings.buildAppBundle=oldBundle;EditorUserBuildSettings.exportAsGoogleAndroidProject=oldExport;
                 PlayerSettings.Android.keystorePass=PlayerSettings.Android.keyaliasPass="";
                 PlayerSettings.Android.useCustomKeystore=oldCustom;PlayerSettings.Android.keystoreName=oldName;PlayerSettings.Android.keyaliasName=oldAlias;
                 AssetDatabase.SaveAssets();
