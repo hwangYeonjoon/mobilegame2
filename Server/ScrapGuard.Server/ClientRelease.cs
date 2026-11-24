@@ -14,8 +14,10 @@ public sealed class ClientRelease
             playAvailable=config.GetValue("PLAY_UPDATE_AVAILABLE",false),
             notes=config["CLIENT_UPDATE_NOTES"]??"새로운 수호대 콘텐츠와 안정성 개선을 확인하세요."
         };
-        if(!ReleaseRules.Valid(Policy) || Policy.latestBuild<AppRelease.Build)
-            throw new InvalidOperationException("Invalid client release configuration: minimum <= latest, valid version and latest >= server build are required.");
+        // A compatible backend hotfix can precede Play approval of its sibling app build.
+        // Advertise only the version actually published; minimum and combat rules still gate requests.
+        if(!ReleaseRules.Valid(Policy) || Policy.latestBuild<AppRelease.MinimumBuild)
+            throw new InvalidOperationException("Invalid client release configuration: minimum <= latest, valid version and a supported published build are required.");
     }
     public bool Accepts(string buildHeader,string rulesHeader)
     {

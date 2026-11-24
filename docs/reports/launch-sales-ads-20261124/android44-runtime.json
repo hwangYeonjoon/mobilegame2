@@ -1,0 +1,26 @@
+{
+  "build": 44,
+  "version": "0.40.1",
+  "device": "Android API35 arm64 emulator (not physical device)",
+  "install": "passed; previous QA APK backed up, data retained with uninstall -k",
+  "startup": "passed",
+  "server_guest_and_shop": "passed",
+  "ad_consent": "ready=True error=none",
+  "ad_screen": "Test Ad",
+  "server_ad_mode": "production",
+  "ssv_claim_status": "granted",
+  "gold_before": 1800,
+  "gold_after": 2400,
+  "parts_before": 30,
+  "parts_after": 38,
+  "daily_reward_parts_after": 1,
+  "actual_ad_revenue": "not verified",
+  "admob_app_verification": "not approved",
+  "play_release": "review requested; automated pre-review checks running",
+  "automated_checks": {
+    "core": 137,
+    "server": 452,
+    "compose": 3
+  },
+  "runtime_error_log": "Unity:E and AndroidRuntime:E empty"
+}

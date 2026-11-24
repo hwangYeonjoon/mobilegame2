@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "checks": {
+    "api": {
+      "ok": true,
+      "details": {
+        "status": "ok",
+        "version": "0.40.1",
+        "commerce": "production",
+        "maintenance": false
+      }
+    },
+    "database": {
+      "ok": true,
+      "details": {
+        "status": "ready"
+      }
+    },
+    "services": {
+      "ok": true,
+      "details": {
+        "commerce": "production",
+        "newSales": true,
+        "ads": "production",
+        "refunds": {
+          "status": "ok",
+          "lastSuccess": "2026-11-24T05:40:06.1044635+00:00",
+          "lastFailure": null,
+          "consecutiveFailures": 0,
+          "needsAttention": false
+        },
+        "refundRecovery": {
+          "cursor": {
+            "completed": "2026-11-24T05:32:12.0087382+00:00",
+            "gap": 0
+          },
+          "pending": {
+            "count": 0,
+            "oldest": null,
+            "attempts": 0
+          },
+          "coverage": {
+            "missingTokens": 0,
+            "failures": 0,
+            "oldestVerified": null
+          },
+          "needsAttention": false
+        },
+        "rtdn": true
+      }
+    }
+  }
+}

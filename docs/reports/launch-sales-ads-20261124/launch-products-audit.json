@@ -1,0 +1,97 @@
+[
+  {
+    "id": "ad_skip_lifetime",
+    "options": [
+      {
+        "id": "standard",
+        "state": "ACTIVE",
+        "korea": [
+          {
+            "regionCode": "KR",
+            "price": {
+              "currencyCode": "KRW",
+              "units": "9900"
+            },
+            "availability": "AVAILABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gems_1200",
+    "options": [
+      {
+        "id": "standard",
+        "state": "ACTIVE",
+        "korea": [
+          {
+            "regionCode": "KR",
+            "price": {
+              "currencyCode": "KRW",
+              "units": "7500"
+            },
+            "availability": "AVAILABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gems_2600",
+    "options": [
+      {
+        "id": "standard",
+        "state": "ACTIVE",
+        "korea": [
+          {
+            "regionCode": "KR",
+            "price": {
+              "currencyCode": "KRW",
+              "units": "14900"
+            },
+            "availability": "AVAILABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gems_300",
+    "options": [
+      {
+        "id": "standard",
+        "state": "ACTIVE",
+        "korea": [
+          {
+            "regionCode": "KR",
+            "price": {
+              "currencyCode": "KRW",
+              "units": "2200"
+            },
+            "availability": "AVAILABLE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gems_600",
+    "options": [
+      {
+        "id": "standard",
+        "state": "ACTIVE",
+        "korea": [
+          {
+            "regionCode": "KR",
+            "price": {
+              "currencyCode": "KRW",
+              "units": "3900"
+            },
+            "availability": "AVAILABLE"
+          }
+        ]
+      }
+    ]
+  }
+]

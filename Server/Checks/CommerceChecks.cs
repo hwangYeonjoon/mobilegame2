@@ -37,6 +37,22 @@ static class CommerceChecks
         repo.RevokePurchase("skip");check(!repo.Bootstrap(key).state.adSkip,"refund removes permanent right");
         repo.RevokePurchase("arrived_first");Fails(()=>Buy("arrived_first"),409,"refund before grant leaves tombstone");
         repo=new GameRepository(path,()=>now);check(Buy("two").state.gems==550,"purchase provenance survives database restart");
+        // Exercise every enabled SKU on a separate test account, then reopen its persisted ledger.
+        string catalogPath=Path.Combine(folder,"commerce-all-products.db"),catalogKey=Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+','-').Replace('/','_');
+        var catalogRepo=new GameRepository(catalogPath,()=>now);catalogRepo.Register(catalogKey);
+        var catalogProvider=new Provider{Binding=catalogRepo.Commerce(catalogKey,true).accountBinding};
+        int expectedGems=0;
+        foreach(var offer in CommerceCatalog.Offers)
+        {
+            var order=new PurchaseRequest{productId=offer.Id,purchaseToken="catalog-test-"+offer.Id};
+            var grant=catalogRepo.VerifyPurchase(catalogKey,order,catalogProvider).GetAwaiter().GetResult();
+            expectedGems+=offer.Gems;
+            check(grant.state.gems==expectedGems&&grant.state.testProgress,"catalog test grant: "+offer.Id);
+            catalogRepo=new GameRepository(catalogPath,()=>now);
+            var restored=catalogRepo.VerifyPurchase(catalogKey,order,catalogProvider).GetAwaiter().GetResult();
+            check(restored.state.gems==expectedGems&&restored.state.paidGems==expectedGems,"catalog restore after restart grants no duplicate: "+offer.Id);
+        }
+        check(catalogRepo.Bootstrap(catalogKey).state.adSkip,"permanent ad skip survives catalog restore");
         // Isolated fixture for ranked test; commerce test accounts must never rank.
         var s=GameState.New();s.publicProfile=true;s.clearedStages.AddRange(new[]{0,1,2,3,4});s.heroes[0].level=30;foreach(var item in s.items)item.level=20;
         using(var db=new SqliteConnection("Data Source="+path)){db.Open();using var q=db.CreateCommand();q.CommandText="UPDATE accounts SET state=$state WHERE id=$id";q.Parameters.AddWithValue("$state",JsonSerializer.Serialize(s,GameRepository.Json));q.Parameters.AddWithValue("$id",initial.playerId);q.ExecuteNonQuery();}

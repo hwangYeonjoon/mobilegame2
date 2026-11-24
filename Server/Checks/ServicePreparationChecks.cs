@@ -24,6 +24,8 @@ static class ServicePreparationChecks
         BadConfig(()=>new CommercePolicy(Config(("COMMERCE_MODE","typo"))),"invalid commerce mode fails closed");
         var production=new CommercePolicy(Config(("COMMERCE_MODE","production"),("PLAY_PACKAGE_NAME","game"),("COMMERCE_RELEASE_READY","true"),("COMMERCE_SALES_ENABLED","true"),("COMMERCE_DISABLED_PRODUCTS","ad_skip_lifetime")));
         check(production.SaleProducts.Length==4&&!production.LicenseTest,"production can stop one product without disabling verification");
+        var allProducts=new CommercePolicy(Config(("COMMERCE_MODE","production"),("PLAY_PACKAGE_NAME","game"),("COMMERCE_RELEASE_READY","true"),("COMMERCE_SALES_ENABLED","true"),("COMMERCE_DISABLED_PRODUCTS","")));
+        check(allProducts.SaleProducts.Order().SequenceEqual(CommerceCatalog.Offers.Select(o=>o.Id).Order()),"explicit empty restriction permits all five production products");
         var now=DateTimeOffset.UtcNow;string key=Secret(),viewer=Secret();var repo=new GameRepository(Path.Combine(folder,"service-prep.db"),()=>now);var initial=repo.Register(key);repo.Register(viewer);
         var provider=new Provider{Binding=repo.Commerce(key,false).accountBinding};
         var purchase=new PurchaseRequest{productId="gems_600",purchaseToken="real-purchase"};

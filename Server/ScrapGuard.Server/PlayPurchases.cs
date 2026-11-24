@@ -77,7 +77,17 @@ public sealed class RefundService(IRefundPlay play,GameRepository repo,Func<Date
         if(!play.Enabled)return;
         foreach(var job in repo.RefundJobs())
         {
-            try {var p=await play.Lookup(repo.UnprotectPurchase(job.Cipher),ct);if((job.Kind=="cancel"||job.Kind=="voidedPurchaseNotification")&&!p.Canceled)throw new ApiFault(503,"Cancellation not visible yet.");repo.ApplyRefundVerification(p,play.LicenseTest);repo.FinishRefundJob(job,true);}
+            try
+            {
+                var p=await play.Lookup(repo.UnprotectPurchase(job.Cipher),ct);
+                if((job.Kind=="cancel"||job.Kind=="voidedPurchaseNotification")&&!p.Canceled)throw new ApiFault(503,"Cancellation not visible yet.");
+                // RTDN covers the package, including isolated license-test orders. A verified
+                // notification only reconciles refunds; it never grants purchases. Use Google's
+                // verified context here, retaining ledger product/binding/test checks. Checkout
+                // still requires the configured commerce mode and cannot grant test orders live.
+                repo.ApplyRefundVerification(p,p.Test);
+                repo.FinishRefundJob(job,true);
+            }
             catch(OperationCanceledException)when(ct.IsCancellationRequested){throw;}
             catch{repo.FinishRefundJob(job,false);}
         }

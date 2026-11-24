@@ -8,9 +8,9 @@ static class RefundChecks
 {
     sealed class Play : IRefundPlay
     {
-        public bool Enabled=>true;public bool LicenseTest=>false;public bool FailList,FailLookup;public string Binding;public HashSet<string> Canceled=new();
+        public bool Enabled=>true;public bool LicenseTest=>false;public bool FailList,FailLookup;public string Binding;public HashSet<string> Canceled=new(),TestTokens=new();
         public Task<VerifiedPurchase> Verify(PurchaseRequest p,CancellationToken ct)=>Task.FromResult(new VerifiedPurchase(p.purchaseToken,p.productId,Binding,true,false,false,1));
-        public Task<VerifiedPurchase> Lookup(string token,CancellationToken ct)=>FailLookup?throw new IOException("offline"):Task.FromResult(new VerifiedPurchase(token,"gems_600",Binding,!Canceled.Contains(token),Canceled.Contains(token),false,1));
+        public Task<VerifiedPurchase> Lookup(string token,CancellationToken ct)=>FailLookup?throw new IOException("offline"):Task.FromResult(new VerifiedPurchase(token,"gems_600",Binding,!Canceled.Contains(token),Canceled.Contains(token),TestTokens.Contains(token),1));
         public Task<List<string>> Voided(DateTimeOffset from,DateTimeOffset until,CancellationToken ct)=>FailList?throw new IOException("offline"):Task.FromResult(new List<string>());
     }
     sealed class Identity : IRtdnIdentity
@@ -48,6 +48,15 @@ static class RefundChecks
         play.Binding="wrong";now=now.AddMinutes(2);play.Canceled.Add("retry-later");Run();check(repo.Bootstrap(key).state.gems==600,"binding mismatch cannot revoke account purchase");play.Binding=repo.Commerce(key,false).accountBinding;
         play.Canceled.Add("before-grant");Push("3","before-grant");Run();Fails(()=>Purchase("before-grant"),409,"early refund tombstone prevents later grant");
         repo.Delete(key);check((long)Sql("SELECT COUNT(*) FROM purchases WHERE token_cipher IS NOT NULL")==0&&(long)Sql("SELECT COUNT(*) FROM refund_inbox WHERE status='pending'")==0,"deleting account clears queued and stored tokens");
+        // A package-wide production subscription also receives isolated QA test orders.
+        repo.Register(key);play.Binding=repo.Commerce(key,false).accountBinding;
+        play.TestTokens.Add("isolated-test-order");
+        repo.EnqueueRtdn(new RtdnEvent("test-order","test-order-digest","purchase","isolated-test-order"));Run();
+        check((string)Sql("SELECT status FROM refund_inbox WHERE id='test-order'")=="done"&&repo.Bootstrap(key).state.gems==0&&(long)Sql("SELECT COUNT(*) FROM purchases WHERE owner IS NOT NULL")==0,"production RTDN settles verified test purchase without granting currency or ownership");
+        play.Canceled.Add("isolated-test-order");Push("test-cancel","isolated-test-order");Run();
+        check((string)Sql("SELECT status FROM refund_inbox WHERE id='test-cancel'")=="done"&&repo.Bootstrap(key).state.gems==0,"production RTDN settles verified test cancellation without creating a retry backlog");
+        Purchase("live-context-check");play.TestTokens.Add("live-context-check");play.Canceled.Add("live-context-check");Push("wrong-test-context","live-context-check");Run();
+        check((string)Sql("SELECT status FROM refund_inbox WHERE id='wrong-test-context'")=="pending"&&repo.Bootstrap(key).state.gems==600,"RTDN still rejects test-context mismatch against a real purchase ledger");
         check(ClientRelease.Exempt("/v1/commerce/rtdn","POST"),"Google push bypasses game build headers");
     }
 }

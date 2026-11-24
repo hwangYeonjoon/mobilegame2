@@ -17,7 +17,8 @@ services:
       COMMERCE_MODE: ${COMMERCE_MODE:-disabled}
       COMMERCE_SALES_ENABLED: ${COMMERCE_SALES_ENABLED:-false}
       COMMERCE_RELEASE_READY: ${COMMERCE_RELEASE_READY:-false}
-      COMMERCE_DISABLED_PRODUCTS: ${COMMERCE_DISABLED_PRODUCTS:-ad_skip_lifetime}
+      # An explicitly empty list enables every configured product; unset keeps the safe default.
+      COMMERCE_DISABLED_PRODUCTS: ${COMMERCE_DISABLED_PRODUCTS-ad_skip_lifetime}
       ADS_MODE: ${ADS_MODE:-disabled}
       ADS_RELEASE_READY: ${ADS_RELEASE_READY:-false}
       ADMOB_REWARDED_UNIT_ID: ${ADMOB_REWARDED_UNIT_ID:-}
