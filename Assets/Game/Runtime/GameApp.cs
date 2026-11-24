@@ -41,6 +41,8 @@ namespace ScrapGuard
             profile=Path.Combine(Application.persistentDataPath,"qa-profile.json");
 #if SCRAP_QA_MANUAL
             args=Array.Empty<string>();
+#elif SCRAP_QA_NAVIGATION
+            args=new[]{"-smoke","-navigationSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"Navigation")};
 #elif SCRAP_QA_ASSAULT
             args=new[]{"-smoke","-assaultSmoke","-withNatural","-smokeOutput",Path.Combine(Application.persistentDataPath,"AssaultUI")};
 #elif SCRAP_QA_BOSS
@@ -59,7 +61,7 @@ namespace ScrapGuard
             args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
 #endif
 #endif
-#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL || SCRAP_QA_PERFORMANCE || SCRAP_QA_ROBOT_SEASON
+#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL || SCRAP_QA_PERFORMANCE || SCRAP_QA_ROBOT_SEASON || SCRAP_QA_NAVIGATION
             profile=Path.Combine(Application.persistentDataPath,"qa-growth-"+Guid.NewGuid().ToString("N")+".json");
 #endif
             Store = new ProfileStore(profile);
@@ -160,16 +162,16 @@ namespace ScrapGuard
             UpdateBattleMusic();
             page = target; if (!Online) Store.Economy.RefreshDay(); Ui.Clear(screen); CloseModal();
             Ui.Label(screen, "SCRAP GUARD", 24, 20, 300, 25, 14, Ui.Mint);
-            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "gear" ? "장비 정비" : target == "heroes" ? "수호대원" : target == "weekly" ? "주간 로봇 도전 · 반복 보상" : target == "showcase" ? "나의 전시실" : "보급 상점", 24, 50, 396, 40, 30);
+            Ui.Label(screen, target == "home" ? "고철 수호대" : target == "growth" ? "강화" : target == "robots" ? "로봇 도감" : target == "more" ? "활동 · 전시" : target == "gear" ? "장비 보관함" : target == "heroes" ? "수호대원" : target == "weekly" ? "주간 로봇 도전" : target == "showcase" ? "나의 전시실" : "상점", 24, 50, 396, 40, 30);
             Ui.Button(screen, "설정", 432, 34, 84, 60, Settings, Ui.Raised, true, 16);
             for(int i=0;i<3;i++)walletAmounts[i]=CurrencyArt.Balance(screen,i,24+i*166,104,160);
             RefreshWallet();
-            switch (target) { case "gear": Gear(); break; case "heroes": Heroes(); break; case "shop": Shop(); break; case "showcase": Showcase(); break; case "weekly": WeeklyHub(); break; default: Home(); break; }
-            string[] names = { "상점", "장비", "출격", "대원", "전시실" }, pages = { "shop", "gear", "home", "heroes", "showcase" };
+            switch (target) { case "growth": GrowthHome(); break; case "robots": RobotCodex(); break; case "more": ActivitiesHome(); break; case "gear": Gear(); break; case "heroes": Heroes(); break; case "shop": Shop(); break; case "showcase": Showcase(); break; case "weekly": WeeklyHub(); break; default: Home(); break; }
+            string[] names = { "상점", "강화", "출격", "로봇", "더 보기" }, pages = { "shop", "growth", "home", "robots", "more" };
             Ui.Box(screen, 16, MenuHeight-98, 508, 80, Ui.Panel);
             for (int i = 0; i < 5; i++)
             {
-                string p = pages[i]; bool active = p == page;
+                string p = pages[i]; bool active = p == page || p=="growth"&&(page=="gear"||page=="heroes") || p=="more"&&(page=="showcase"||page=="weekly");
                 Ui.Button(screen, names[i], 24 + i * 100, MenuHeight-94, 92, 72, () => Show(p), active ? Ui.Mint : Ui.Panel, true, 19);
             }
             Ui.Label(screen, Online ? "서버에 저장됨" : "로컬 체험 · 기기에 저장됨", 0, MenuHeight-20, 540, 20, 12, Ui.Muted, TextAnchor.MiddleCenter);
@@ -185,7 +187,7 @@ namespace ScrapGuard
         }
         void Home()
         {
-            float height=MenuBottom-358;
+            float height=MenuBottom-526;
             var room=Ui.Box(screen,24,178,492,height,Ui.Panel).rectTransform;
             float displayHeight=Mathf.Min(520,height-40),displayY=(height-displayHeight)/2;
             WorkshopStage.Draw(room,0,displayY,492,displayHeight,Ui.Mint);
@@ -194,10 +196,13 @@ namespace ScrapGuard
             art.gameObject.AddComponent<ShowroomMotion>();
             Ui.Label(room,"부수고 · 회수하고 · 합체하라",18,12,456,28,19,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Label(room,Catalog.HeroNames[State.selectedHero]+"  Lv."+State.heroes[State.selectedHero].level,18,height-51,456,35,25,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Label(screen,(selectedStage+1).ToString("D2")+" · "+Catalog.StageNames[selectedStage],24,MenuBottom-168,492,32,23,Ui.Ink,TextAnchor.MiddleCenter);
-            Ui.Button(screen,State.clearedStages.Count==Campaign.Count?"주간 로봇 도전 →":"출격하기  →",24,MenuBottom-124,310,78,()=>{if(State.clearedStages.Count==Campaign.Count)Show("weekly");else CampaignLaunch();},Ui.Mint,true,24);
-            Ui.Button(screen,Growth.CanUpgrade(State)?"강화 가능 ●":"성장하기",348,MenuBottom-124,168,78,GrowthPanel,Growth.CanUpgrade(State)?Ui.Gold:Ui.Raised,true,21);
-            Ui.Button(screen,"작전 지도 · 출석 · 더 보기",24,MenuBottom-36,492,35,HomeActivities,Ui.Panel,true,17);
+            int goal=SavedRobotGoal;
+            Ui.Button(screen,goal==0?"어떤 로봇을 만들까요?  도감에서 목표 선택 →":"조립 목표 · "+RobotAssembly.Name(goal)+"  →",24,MenuBottom-338,492,58,()=>{Show("robots");if(goal!=0)RobotCodexDetail(goal);},Ui.Raised,true,18);
+            HomeCampaignProgress();
+            bool finished=State.clearedStages.Count>=Campaign.Count&&selectedStage==Campaign.Count-1;
+            Ui.Button(screen,finished?"주간 로봇 도전 →":"작전 "+(selectedStage+1).ToString("D2")+" 출격 →",24,MenuBottom-124,310,78,()=>{if(finished)Show("weekly");else CampaignLaunch();},Ui.Mint,true,24);
+            Ui.Button(screen,Growth.CanUpgrade(State)?"강화 가능 ●":"강화",348,MenuBottom-124,168,78,()=>Show("growth"),Growth.CanUpgrade(State)?Ui.Gold:Ui.Raised,true,21);
+            Ui.Label(screen,"강화는 골드·공용 부품 · 로봇 부품은 전투에서 회수",24,MenuBottom-36,492,30,14,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void HomeActivities()
         {

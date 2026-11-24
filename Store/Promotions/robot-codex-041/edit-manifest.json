@@ -1,0 +1,49 @@
+{
+  "package": "io.github.hwangyeonjoon.scrapguard",
+  "version": "0.41.0",
+  "versionCode": 45,
+  "recorded_apk_sha256": "c7b143a8c7ad77159a555bd277bb13f1b984f40c4d93ef9702c5917976ffcd68",
+  "environment": "Android API 35 ARM64 QA emulator, production package/server, actual input",
+  "provenance": "Pre-final build45. Final changes only clarify carrier-only material sources and restore the completed-campaign home CTA; neither appears in this edit.",
+  "editing": "20 seconds, cuts only, no speed change; 30fps container repeats source frames, not a performance claim. Landscape uses the same footage as a blurred backdrop. SRT captions are separate.",
+  "audio": "Edited background music, not captured device audio: Overdrive by Alexander Ehlers / tricksntraps, CC0; see ArtSource/Audio/LICENSES.md.",
+  "cuts": [
+    {
+      "file": "assembly.mp4",
+      "start_seconds": 44,
+      "duration_seconds": 3,
+      "source_sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+    },
+    {
+      "file": "navigation.mp4",
+      "start_seconds": 32,
+      "duration_seconds": 5,
+      "source_sha256": "b15d9151d4cf78d31036ff286a63992834d446593244aa7d139198d6e273e178"
+    },
+    {
+      "file": "battle.mp4",
+      "start_seconds": 146,
+      "duration_seconds": 5,
+      "source_sha256": "6d26051b9f5868312b819292947e2dc7dc0a6b9e43d9b1cf608c29fd7b2961f0"
+    },
+    {
+      "file": "assembly.mp4",
+      "start_seconds": 0,
+      "duration_seconds": 7,
+      "source_sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+    }
+  ],
+  "outcome": "Real first-stage run: cannon4/4, specialized artillery crafted and ridden; voluntarily ended at1:43,443kills. Server accepted gold415/parts3. No victory fixture in video.",
+  "outputs": [
+    {
+      "file": "gameplay-portrait.mp4",
+      "bytes": 2137070,
+      "sha256": "475a9a20d6f4371e8893bde1a2229adb9466d578a971bf100d41759775705d92"
+    },
+    {
+      "file": "gameplay-landscape.mp4",
+      "bytes": 3576960,
+      "sha256": "0549f0327fc9b7e679e43cbee7c09642e07b54ea866911bcc1a282bc1e019910"
+    }
+  ]
+}

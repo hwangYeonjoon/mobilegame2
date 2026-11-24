@@ -1,0 +1,18 @@
+{
+  "status": "local_draft_not_submitted",
+  "app": "io.github.hwangyeonjoon.scrapguard",
+  "requires_app_version": "0.41.0 (45)",
+  "event_name": "로봇 도감과 조립 목표 0.41",
+  "event_type": "MAJOR_UPDATE",
+  "event_subtype": "FEATURES_&_ANNOUNCEMENTS",
+  "language": "ko-KR",
+  "countries": ["KR"],
+  "tagline": "로봇 도감에서 조립 목표를 고르고, 필요한 부품을 찾아보세요",
+  "description": "포격 전차, 돌파 보행기, 철벽 수호기의 조합을 새 로봇 도감에서 비교해 보세요. 특화형과 완성형의 모습, 필요한 포신·구동부·장갑, 부품을 회수할 수 있는 적을 확인할 수 있습니다. 홈 하단의 로봇에서 원하는 조합을 목표로 고르면 출격 후 부품 회수 안내로 이어집니다. 전투 부품은 매 판 다시 모으며 조립 기록은 남습니다. 유도 포격 전차는 공방에서 설계를 영구 제작한 뒤 목표로 선택할 수 있습니다.",
+  "start_date": null,
+  "duration_days": 28,
+  "featuring_requested": false,
+  "primary_image": "primary-1920x1080.jpg",
+  "square_image": "square-1080x1080.jpg",
+  "video_url": null
+}

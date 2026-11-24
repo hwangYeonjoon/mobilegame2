@@ -32,6 +32,13 @@ namespace ScrapGuard.Core
         }
         public static int PartFor(Enemy enemy){return enemy.salvagePart>=0?enemy.salvagePart:PartFor(enemy.role);}
         public static int PartFor(EnemyRole role){return role==EnemyRole.Artillery||role==EnemyRole.Bomber?0:role==EnemyRole.Shield||role==EnemyRole.Summoner?2:1;}
+        // The codex and live assembly must quote the same recipe. Rank is the current rank.
+        public static int[] Recipe(int design,int rank)
+        {
+            var cost=new int[3];if(!Valid(design)||rank<0||rank>=2)return cost;
+            cost[Frame(design)]+=rank==0?3:5;
+            cost[design==RobotSeason.Seeker?1:Support(design)]+=rank==0?1:3;return cost;
+        }
         public static void Normalize(GameState s)
         {
             if(s.robotRecords==null)s.robotRecords=new List<RobotRecord>();
@@ -66,8 +73,7 @@ namespace ScrapGuard.Core
         public bool RobotAvailable(int design){return RobotDesignUnlocked(design)&&(design==RobotAssembly.DefaultDesign||RobotRank(design)>0);}
         public int[] RobotRecipe(int design)
         {
-            var cost=new int[3];if(!RobotAssembly.Valid(design)||RobotRank(design)>=2)return cost;
-            cost[RobotAssembly.Frame(design)]+=RobotRank(design)==0?3:5;cost[design==RobotSeason.Seeker?1:RobotAssembly.Support(design)]+=RobotRank(design)==0?1:3;return cost;
+            return RobotAssembly.Recipe(design,RobotRank(design));
         }
         public bool CanPlanRobot(int design,bool upgrade)
         {

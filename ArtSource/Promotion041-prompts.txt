@@ -1,0 +1,18 @@
+2026-11-24 · Built-in image_gen · promotional illustration, not a gameplay screenshot.
+Reference: Assets/Resources/Art/RobotRescue-v1.png (existing in-game rescue chassis).
+Final files: Store/Promotions/robot-codex-041/primary-1920x1080.jpg and square-1080x1080.jpg.
+No runtime asset added. No change to the app icon.
+
+Primary generation prompt:
+Create a new promotional key art illustration using the supplied Scrap Guard robot sprite atlas as exact character design references. Asset type: Google Play promotional content primary image, landscape 1920x1080 16:9. Use the cream/coral rescue artillery tank (top left) and cream/coral bipedal drill walker (top middle) from the reference, faithfully matching their silhouettes and worn painted metal details. One clear focal point: the big bipedal robot at center just finishing assembly in a luminous salvage workshop, looking powerful and approachable. One detached metal armor plate and drive mechanism are mechanically docking into its shoulders with warm sparks, while the recognizable smaller tracked artillery robot waits behind left. Illustrated industrial blue-teal workshop, warm amber practical light, detailed hand-painted game illustration matching the atlas, not photorealistic, strong dark contours and readable shapes. Keep entire central robot and meaningful action inside safe zone: 10% sides, 15% top, 20% bottom reserved for environment only. This advertises robot assembly, not a new skin: use existing cream coral robots, do not invent wings, weapons or human characters. Restrained sparks, no crowds, no clutter. Absolutely no lettering, numbers, logos, UI, badges, borders or button shapes. No six-panel layout, make a single coherent scene.
+
+Framing refinement:
+Reframe this SAME illustration for Google Play promotion. Keep the exact robots, designs, pose, painterly rendering, palette and workshop. Zoom out camera about 22 percent so entire central robot lies between y=20% and y=74% of canvas, with clear workshop space above and substantial floor below. Both robots must fit between x=15% and x=85%. Single scene, no text/UI/logos/border. Output precisely 1920x1080 landscape 16:9. Do not invent or change the robot design; only widen framing and extend the workshop environment.
+
+Square variant:
+Make a SQUARE 1080x1080 promotional variant of this exact Scrap Guard illustration. Keep exact cream-coral bipedal drill robot, exact worn industrial design, same painterly rendering and teal amber workshop. Center the complete biped with assembly arm docking a shoulder part. Robot and meaningful mechanical action entirely between 15% and 85% of square both horizontally and vertically, with floor and workshop margins. One clear focal robot. Smaller tank optional behind left if it fits without crowding. This is a promotional illustration, no new weapons or new characters. No text, numbers, brand names, UI, buttons, borders, watermarks. Actual square canvas, not landscape.
+
+Provenance: ~/.codex/generated_images/01a19a0d-09de-75a1-ac02-222a71ac93fb/
+Primary final generation: exec-fb1c9e66-2c68-4cc2-b9c9-19e3357151c4.png (1672x941).
+Square generation: exec-bfa0ab9f-9bb0-4f37-befe-cc5b891e33f5.png (1254x1254).
+Mechanical export: sips; primary cropped one vertical pixel to 1672x940, resized 1920x1080; square resized 1080x1080. JPEG quality 85. No semantic edits outside image_gen.

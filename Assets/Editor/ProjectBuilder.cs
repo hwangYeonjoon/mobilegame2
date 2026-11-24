@@ -70,6 +70,7 @@ namespace ScrapGuard.Editor
         public static void BuildAndroidPerformanceQA(){BuildAndroidQA(false,performance:true);}
         public static void BuildAndroidRegionalQA(){BuildAndroidQA(false,regional:true);}
         public static void BuildAndroidRobotSeasonQA(){BuildAndroidQA(false,robotSeason:true);}
+        public static void BuildAndroidNavigationQA(){BuildAndroidQA(false,navigation:true);}
         public static void BuildAndroidRobotSeasonAndPlaytest(){BuildAndroidRobotSeasonQA();BuildAndroidPlaytest();}
         public static void BuildAndroidGrowthQA(){BuildAndroidQA(false,false,false,false,true);}
         public static void BuildAndroidGrowthAndPlaytest()
@@ -82,7 +83,7 @@ namespace ScrapGuard.Editor
             BuildAndroidPlaytest();
         }
         public static void BuildAndroidPlaytest(){BuildAndroidQA(false,false,false,true);}
-        static void BuildAndroidQA(bool soak,bool assault=false,bool bosses=false,bool manual=false,bool growth=false,bool regional=false,bool performance=false,bool robotSeason=false)
+        static void BuildAndroidQA(bool soak,bool assault=false,bool bosses=false,bool manual=false,bool growth=false,bool regional=false,bool performance=false,bool robotSeason=false,bool navigation=false)
         {
             Configure();EditorUserBuildSettings.buildAppBundle=false;
             string previous=PlayerSettings.GetApplicationIdentifier(NamedBuildTarget.Android),previousName=PlayerSettings.productName;
@@ -92,7 +93,7 @@ namespace ScrapGuard.Editor
             {
                 PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,ScrapGuard.Core.AppRelease.Package+".qa");
                 PlayerSettings.productName=manual?"고철 수호대 체험":"고철 수호대 QA";
-                Build(BuildTarget.Android,manual?"Builds/Android/ScrapGuard-playtest.apk":"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,manual?new[]{"SCRAP_QA_SOAK","SCRAP_QA_MANUAL"}:robotSeason?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ROBOT_SEASON"}:performance?new[]{"SCRAP_QA_SOAK","SCRAP_QA_PERFORMANCE"}:regional?new[]{"SCRAP_QA_SOAK","SCRAP_QA_REGIONAL"}:growth?new[]{"SCRAP_QA_SOAK","SCRAP_QA_GROWTH"}:bosses?new[]{"SCRAP_QA_SOAK","SCRAP_QA_BOSS"}:assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
+                Build(BuildTarget.Android,manual?"Builds/Android/ScrapGuard-playtest.apk":"Builds/Android/ScrapGuard-qa.apk",BuildOptions.Development,manual?new[]{"SCRAP_QA_SOAK","SCRAP_QA_MANUAL"}:navigation?new[]{"SCRAP_QA_SOAK","SCRAP_QA_NAVIGATION"}:robotSeason?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ROBOT_SEASON"}:performance?new[]{"SCRAP_QA_SOAK","SCRAP_QA_PERFORMANCE"}:regional?new[]{"SCRAP_QA_SOAK","SCRAP_QA_REGIONAL"}:growth?new[]{"SCRAP_QA_SOAK","SCRAP_QA_GROWTH"}:bosses?new[]{"SCRAP_QA_SOAK","SCRAP_QA_BOSS"}:assault?new[]{"SCRAP_QA_SOAK","SCRAP_QA_ASSAULT"}:soak?new[]{"SCRAP_QA_SOAK"}:new[]{"SCRAP_QA_SOAK","SCRAP_QA_UI"});
             }
             finally{PlayerSettings.SetApplicationIdentifier(NamedBuildTarget.Android,previous);PlayerSettings.productName=previousName;AssetDatabase.SaveAssets();if(previousDependencies!=null)File.WriteAllBytes(dependencyPath,previousDependencies);}
         }

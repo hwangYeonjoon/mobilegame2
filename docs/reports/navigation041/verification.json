@@ -1,0 +1,72 @@
+{
+  "apk": "/Users/kd-server/IdeaProjects/mobilegame2/Builds/Android/ScrapGuard-qa.apk",
+  "bytes": 119587001,
+  "sha256": "8bd078aa4031cf66a4139086801ea16337e1c5da3b4a2f69314abb5fe96567d9",
+  "package": "io.github.hwangyeonjoon.scrapguard.qa",
+  "version": "0.41.0",
+  "versionCode": 45,
+  "minSdk": 26,
+  "targetSdk": 36,
+  "abi": "arm64-v8a",
+  "v2_signature": true,
+  "zip_16kb": true,
+  "file_provider": true,
+  "backup_disabled": true,
+  "libraries": [
+    {
+      "name": "lib/arm64-v8a/libc++_shared.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libgame.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libil2cpp.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libmain.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libswappywrapper.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384
+      ]
+    },
+    {
+      "name": "lib/arm64-v8a/libunity.so",
+      "load_alignments": [
+        16384,
+        16384,
+        16384,
+        16384
+      ]
+    }
+  ],
+  "device_execution": "Android API 35 ARM64 QA emulator: NavigationSmoke, 0 errors; 24 screenshots. Not a physical-device performance test.",
+  "core_checks": "137/137 passed",
+  "result_screen_fixtures": "Win and final-win receipts are isolated UI fixtures, not gameplay evidence."
+}

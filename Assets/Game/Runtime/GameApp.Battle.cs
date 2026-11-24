@@ -455,8 +455,11 @@ namespace ScrapGuard
             if (combat.Challenge) { ChallengeResult(); return; }
             var receipt = State.receipts.Find(r => r.id == combat.RunId);
             bool won = receipt != null ? receipt.won : combat.Won;
-            var card = Dialog(won ? "구역 정리 완료!" : "다음 작전을 준비해요", Catalog.StageNames[combat.Stage] + " · 다음 작전을 준비하세요.", 745);
-            Ui.Label(card, won ? "작전 성공" : "정비하고 다시 도전해요", 24, 134, 444, 40, 20, won ? Ui.Mint : Ui.Gold, TextAnchor.MiddleCenter);
+            int stage=combat.Stage,next=ResultDestination(won,stage);
+            bool final=won&&stage==Campaign.Count-1;
+            string continuation=final?"60개 작전 완료 · 이제 주간 로봇 도전에 도전해요.":won?"다음은 작전 "+(next+1).ToString("D2")+" · "+Campaign.Regions[Campaign.Get(next).Region]:"작전 "+(stage+1).ToString("D2")+" · "+Catalog.StageNames[stage];
+            var card = Dialog(won ? "작전 "+(stage+1).ToString("D2")+" 완료!" : "정비하고 다시 도전해요", continuation, 745);
+            Ui.Label(card, won ? Campaign.Regions[Campaign.Get(stage).Region]+" · 작전 성공" : "강화와 무료 연습으로 다음 도전을 준비해요", 24, 134, 444, 40, 19, won ? Ui.Mint : Ui.Gold, TextAnchor.MiddleCenter);
             Ui.Label(card, TimeLabel(receipt != null ? receipt.seconds : combat.Elapsed) + " 생존    " + (receipt != null ? receipt.kills : combat.Kills) + "마리 처치    Lv." + combat.Level, 24, 184, 444, 40, 17, Ui.Muted, TextAnchor.MiddleCenter);
             Ui.Box(card, 24, 249, 444, 82, Ui.Raised);
             if(receipt==null)Ui.Label(card,"보상 저장 완료",39,258,414,65,19,Ui.Gold,TextAnchor.MiddleCenter);
@@ -480,13 +483,11 @@ namespace ScrapGuard
             Ui.Button(card, State.lastResultBonus ? "추가 보상 수령 완료" : "추가 골드 +50%  ·  " + (State.demoAdSkip || State.adSkip ? "광고 없이 받기" : Online?"광고 보고 받기":"체험 안내"), 24, 433, 444, 57,
                 () => RequestReward("result"), Ui.Raised, canBonus, 17);
             bool showSupport=combat.Support!=null && combat.SupportUsed && combat.Support.showIdentity && Online;
-            if(showSupport&&won)
-                Ui.Button(card,"지원해 준 동료의 전시실",24,591,444,34,()=>{Track("profile_source","support_result");StartCoroutine(LoadPublic(combat.Support.owner));},Ui.Raised,true,14);
-            int stage = combat.Stage;
-            Ui.Button(card, won&&stage==Campaign.Count-1?"주간 로봇 도전":"다시 출격", 24, 519, 214, 62, () => { combat = null;if(won&&stage==Campaign.Count-1)Show("weekly");else StartBattle(stage); });
-            Ui.Button(card, Growth.CanUpgrade(State)?"강화하고 재도전":"성장 경로 확인", 254, 519, 214, 62, () => { combat = null; GrowthPanel(); }, Ui.Raised);
-            if(won&&!showSupport && StarterGuide.Next(State)<5)Ui.Button(card,"다음 목표 · "+StarterGuide.Names[StarterGuide.Next(State)],24,591,444,34,()=>{combat=null;Show("home");GuidePanel();},Ui.Raised,true,14);
-            if(!won)Ui.Button(card,SurvivalTraining.PressureAvailable(State,stage)?"실패 구간 60초 무료 연습":Campaign.Get(stage).Mission==Mission.Survive?"이 지역 60초 무료 연습":"이 보스 무료 연습",24,591,444,34,()=>{combat=null;StartBattle(stage,false,CombatTraining.RetryMode(State,stage));},Ui.Mint,true,15);
+            Ui.Button(card,final?"주간 로봇 도전 →":won?"다음 작전 "+(next+1).ToString("D2")+" 출격 →":"작전 "+(stage+1).ToString("D2")+" 다시 도전",24,519,444,62,()=>{combat=null;selectedStage=next;if(final)Show("weekly");else StartBattle(next);},Ui.Mint,true,23);
+            Ui.Button(card,Growth.CanUpgrade(State)?"강화 가능 · 확인":"강화 화면",24,591,214,34,()=>{combat=null;selectedStage=next;Show("growth");},Ui.Raised,true,16);
+            if(!won)Ui.Button(card,"실패 원인 · 무료 연습",254,591,214,34,()=>{combat=null;StartBattle(stage,false,CombatTraining.RetryMode(State,stage));},Ui.Raised,true,15);
+            else if(showSupport)Ui.Button(card,"지원 동료의 전시실",254,591,214,34,()=>{Track("profile_source","support_result");StartCoroutine(LoadPublic(combat.Support.owner));},Ui.Raised,true,14);
+            else Ui.Button(card,"로봇 도감 · 다음 목표",254,591,214,34,()=>{combat=null;Show("robots");},Ui.Raised,true,15);
             Ui.Button(card, "정비소로 돌아가기", 24, 632, 444, 51, () => { combat = null; Show("home"); }, Ui.Panel, true, 16);
             Ui.Button(card,ratedRun==combat.RunId?"플레이 의견 저장 완료":"플레이 의견 남기기 · 선택",24,693,444,32,CombatOpinion,Ui.Panel,ratedRun!=combat.RunId,15);
             card.GetChild(2).gameObject.SetActive(false);

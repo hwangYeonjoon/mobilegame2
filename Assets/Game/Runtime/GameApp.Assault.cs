@@ -34,7 +34,8 @@ namespace ScrapGuard
         void SetupAssaultPresentation()
         {
             robotWorkshopObserved=robotPartsObserved=robotCraftObserved=robotBoardObserved=robotSpecializedObserved=robotPromptUsed=false;robotPromptRemaining=nextRobotProbe=0;readyRobotDesign=0;
-            trackedMachines=trackedWaves=trackedEvolution=trackedSkillEvolutions=0;robotTargetDesign=combat.MachineDesign;robotMenuOpen=false;
+            trackedMachines=trackedWaves=trackedEvolution=trackedSkillEvolutions=0;
+            robotTargetDesign=BattleRobotGoal();robotMenuOpen=false;
             bossFence=Ui.Rect(arena,"Boss arena fence",0,0,470,600);
             Ui.Box(bossFence,0,0,470,4,Ui.Blue,false);Ui.Box(bossFence,0,596,470,4,Ui.Blue,false);
             Ui.Box(bossFence,0,0,4,600,Ui.Blue,false);Ui.Box(bossFence,466,0,4,600,Ui.Blue,false);
