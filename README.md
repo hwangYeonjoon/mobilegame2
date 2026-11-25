@@ -1,9 +1,9 @@
 # mobilegame2 안드로이드 생존 성장 게임
 
 
-최신 로컬 소스: **0.42.0 / Android code 46 / 전투 규칙 30** — [영어 지원](docs/31-english-localization.md). 기기 언어 자동 선택과 한국어/영어 전환, 도감·조립·강화·상점·전투 문구 번역을 추가했다. 0.42.0은 아직 Play에 배포하지 않았다.
+최신 로컬 소스: **0.42.0 / Android code 46 / 전투 규칙 30** — [영어 지원](docs/31-english-localization.md). 기기 언어 자동 선택과 한국어/영어 전환, 도감·조립·강화·상점·전투 문구 번역을 추가했다. 0.42.0(46)과 영어 스토어 등록정보는 Google 검토 요청을 제출했다. 승인·공개 완료와 구분한다. [배포 기록](docs/32-release-042.md).
 
-2026-11-25 Play Console에서 공개 확인한 버전은 **0.41.0 / 45**, 대상 국가는 대한민국이다. 이번 영어 작업으로 국가 타기팅이나 운영 서버를 바꾸지 않았다. [출시·홍보 등록 이력](docs/30-release-041-and-promotion.md)과 [실제 플레이 영상](https://youtu.be/5yfN0J4dO9Q)은 별도로 관리한다.
+2026-11-25 Play Console에서 공개 확인한 버전은 **0.41.0 / 45**, 대상 국가는 대한민국이다. 국가 타기팅은 유지하고 운영 최신 버전 안내만 실제 공개된 45로 맞췄다(최소 43 유지). [출시·홍보 등록 이력](docs/30-release-041-and-promotion.md)과 [실제 플레이 영상](https://youtu.be/5yfN0J4dO9Q)은 별도로 관리한다.
 
 - [강화·출격 동선과 로봇 도감](docs/29-navigation-and-robot-codex.md): 필요한 부품·획득처·조립 목표, 하단 강화 메뉴, 지역 진행과 다음 작전 출격. Android 화면 검사 0건 오류, 실제 온라인 조립·탑승·정산 확인. [홍보 자료와 등록 현황](Store/Promotions/robot-codex-041/README.md).
 
