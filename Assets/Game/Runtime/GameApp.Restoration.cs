@@ -9,7 +9,7 @@ namespace ScrapGuard
         void RestorationPanel(GuildView guild)
         {
             int level=GuildRestoration.Level(guild.restorationPoints);
-            var card=Dialog("길드 공동 정비소",guild.name+" · "+guild.week+" 주간 복구",890);
+            var card=Dialog("길드 공동 정비소",Localization.Verbatim(guild.name)+" · "+guild.week+" 주간 복구",890);
             var stage=Ui.Box(card,24,140,444,250,Ui.Background).transform;
             var art=Ui.Box(stage,112,39,220,180,level>0?Color.white:new Color(.28f,.32f,.35f),false);art.sprite=ArenaArt.Landmark(level>=2?0:7);art.preserveAspect=true;
             for(int i=0;i<3;i++)Ui.Box(stage,69+i*111,221,84,6,level>i?Ui.Mint:Ui.Raised,false);
@@ -22,7 +22,7 @@ namespace ScrapGuard
             if(members.Length==0)Ui.Label(list,"첫 복구 기여자를 기다리고 있어요.",10,50,424,45,18,Ui.Muted,TextAnchor.MiddleCenter);
             for(int i=0;i<members.Length;i++)
             {
-                var member=members[i];Ui.Label(list,member.name+" · "+member.restorationPoints+"점",12,i*57,310,44,18);
+                var member=members[i];Ui.Label(list,Localization.Verbatim(member.name)+" · "+member.restorationPoints+"점",12,i*57,310,44,18);
                 Ui.Button(list,"대원 보기",323,i*57,109,43,()=>GuildPortrait(member,guild),Ui.Raised,member.hero>=0,14);
             }
             int next=GuildRestoration.NextGoal(guild.restorationPoints);
@@ -32,7 +32,7 @@ namespace ScrapGuard
         }
         void GuildMemorialPanel(GuildView guild)
         {
-            var card=Dialog("길드 영구 기념관",guild.name+" · 총 "+guild.memorialWeeks+"주 달성\n주간 초기화 후에도 기념장은 남습니다.",880);
+            var card=Dialog("길드 영구 기념관",Localization.Verbatim(guild.name)+" · 총 "+guild.memorialWeeks+"주 달성\n주간 초기화 후에도 기념장은 남습니다.",880);
             var list=Ui.Scroll(card,24,145,444,550,Math.Max(550,guild.memorials.Count*112));
             if(guild.memorials.Count==0)Ui.Label(list,"이번 주 30점을 모아 첫 기념장을 남겨 보세요.\n60점·120점에 도달하면 같은 주의 기념장이 승급해요.",16,100,412,100,18,Ui.Muted,TextAnchor.MiddleCenter);
             for(int i=0;i<guild.memorials.Count;i++)

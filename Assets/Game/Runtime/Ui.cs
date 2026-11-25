@@ -41,13 +41,16 @@ namespace ScrapGuard
         {
             var image = Box(parent, x, y, size, size, color); image.sprite = Circle; image.type = Image.Type.Simple; return image;
         }
-        public static Text Label(Transform parent, string value, float x, float y, float w, float h, int size = 18, Color? color = null, TextAnchor align = TextAnchor.MiddleLeft)
+        public static Text Label(Transform parent, string value, float x, float y, float w, float h, int size = 18, Color? color = null, TextAnchor align = TextAnchor.MiddleLeft, bool localize = true)
         {
-            var text = Rect(parent, "Text", x, y, w, h).gameObject.AddComponent<Text>();
+            var go = Rect(parent, "Text", x, y, w, h).gameObject;
+            Text text = localize ? go.AddComponent<LocalizedText>() : go.AddComponent<Text>();
             text.font = Font; text.text = value; text.fontSize = size; text.color = color ?? Ink; text.alignment = align;
             text.raycastTarget = false; text.horizontalOverflow = HorizontalWrapMode.Wrap; text.verticalOverflow = VerticalWrapMode.Overflow;
             text.lineSpacing = .92f;
-            text.supportRichText = false; return text;
+            text.supportRichText = false;
+            if (text is LocalizedText localized) localized.ConfigureLocalization(size);
+            return text;
         }
         public static Button Button(Transform parent, string label, float x, float y, float w, float h, Action clicked, Color? color = null, bool enabled = true, int size = 18)
         {
@@ -71,7 +74,7 @@ namespace ScrapGuard
         {
             var box = Box(parent, x, y, w, 52, Background); box.raycastTarget = true;
             var input = box.gameObject.AddComponent<InputField>(); input.targetGraphic = box;
-            input.textComponent = Label(box.transform, "", 12, 0, w - 24, 52, 17);
+            input.textComponent = Label(box.transform, "", 12, 0, w - 24, 52, 17, localize: false);
             input.placeholder = Label(box.transform, hint, 12, 0, w - 24, 52, 16, Muted);
             input.characterLimit = limit; input.text = value; input.lineType = InputField.LineType.SingleLine;
             return input;

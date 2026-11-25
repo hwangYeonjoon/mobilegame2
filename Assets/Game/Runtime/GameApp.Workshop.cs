@@ -155,7 +155,7 @@ namespace ScrapGuard
             var plate=Ui.Box(modalCard,24,139,444,550,Ui.Background).rectTransform;
             Ui.Box(plate,0,0,444,5,FrameColor(State.showcaseFrame),false);
             Ui.Label(plate,skill?"고철 수호대 / 동일 조건 실력전":"고철 수호대 / 주간 성장 도전",20,23,404,30,14,Ui.Mint,TextAnchor.MiddleCenter);
-            Ui.Label(plate,State.displayName,20,62,404,38,26,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(plate,Localization.Verbatim(State.displayName),20,62,404,38,26,Ui.Ink,TextAnchor.MiddleCenter);
             CharacterArt.Draw(plate,107,113,230,234,skill?0:State.showcaseHero,State.selectedSkin,Outfits.Active(State,skill?0:State.showcaseHero));
             Ui.Label(plate,score.ToString("N0")+"점",20,358,404,69,42,Ui.Gold,TextAnchor.MiddleCenter);
             Ui.Label(plate,Social.Titles[State.showcaseTitle]+" · "+Social.Skins[State.selectedSkin],20,440,404,48,17,Ui.Ink,TextAnchor.MiddleCenter);
@@ -168,7 +168,7 @@ namespace ScrapGuard
             var support=combat.Support;bool show=support.showIdentity;
             if(show && support.outfit>0)OutfitVisuals.Special(effectLayer,new Vector2(combat.Position.x,-combat.Position.y),90,support.outfit);
             // HUD-only entrance: never cover the arena's attack warnings or consume touches.
-            StylePresentation.Arrival(screen,18,16,show?support.name+" · 지원 도착":"길드 지원 도착",support.hero,show?support.skin:0,show?support.outfit:0,
+            StylePresentation.Arrival(screen,18,16,show?Localization.Verbatim(support.name)+" · 지원 도착":"길드 지원 도착",support.hero,show?support.skin:0,show?support.outfit:0,
                 show?Social.Titles[Mathf.Clamp(support.title,0,Social.Titles.Length-1)]+" · "+SupportNames[support.hero]:"비공개 대원 · "+SupportNames[support.hero],combat);
         }
     }

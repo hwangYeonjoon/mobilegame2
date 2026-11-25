@@ -15,7 +15,7 @@ namespace ScrapGuard
             var stage=Ui.Box(card,24,138,444,448,Ui.Background).rectTransform;stage.gameObject.AddComponent<RectMask2D>();
             var floor=Ui.Box(stage,0,0,444,448,Color.white,false);floor.sprite=ArenaArt.Floor(Mathf.Clamp(profile.skin-3,0,6));
             Ui.Box(stage,0,0,444,448,new Color(.02f,.04f,.07f,.42f),false);
-            Ui.Label(stage,profile.name,18,12,408,37,26,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(stage,Localization.Verbatim(profile.name),18,12,408,37,26,Ui.Ink,TextAnchor.MiddleCenter);
             var lookLabel=Ui.Label(stage,StylePresentation.Look(profile.outfit,profile.skin),18,54,408,30,17,Ui.Gold,TextAnchor.MiddleCenter);
             var preview=stage.gameObject.AddComponent<GuardianPosePreview>();preview.Initialize(profile.hero,profile.skin,profile.outfit);
             Ui.Label(stage,"Lv."+profile.heroLevel+" · "+Catalog.HeroNames[profile.hero],18,365,408,30,19,Ui.Ink,TextAnchor.MiddleCenter);
@@ -38,7 +38,7 @@ namespace ScrapGuard
         }
         void SupportHall(GuildView guild)
         {
-            var card=Dialog("이번 주 길드 지원 활약",guild.name+" · "+guild.week+"\n실제로 호출한 30초 이상 전투를 정산한 기록입니다.",890);
+            var card=Dialog("이번 주 길드 지원 활약",Localization.Verbatim(guild.name)+" · "+guild.week+"\n실제로 호출한 30초 이상 전투를 정산한 기록입니다.",890);
             var featured=guild.members.Find(m=>m.id==guild.featuredId);
             var panel=Ui.Box(card,24,143,444,239,Ui.Background).transform;
             if(featured==null)
@@ -51,7 +51,7 @@ namespace ScrapGuard
                 CharacterArt.Draw(panel,10,30,160,180,featured.hero,featured.skin,featured.outfit);
                 Ui.Label(panel,"이번 주 활약 길드원",182,20,245,30,16,Ui.Gold);
                 Ui.Label(panel,"현재 등록 대원",182,47,245,20,11,Ui.Muted);
-                Ui.Label(panel,featured.name,182,69,245,37,23,Ui.Ink);
+                Ui.Label(panel,Localization.Verbatim(featured.name),182,69,245,37,23,Ui.Ink);
                 Ui.Label(panel,featured.helpedMembers+"명 공략 지원\n호출 "+featured.supportUses+"회 · 승리 "+featured.supportWins+"회",182,113,245,60,16,Ui.Mint);
                 Ui.Button(panel,"대원 크게 보기",182,183,242,40,()=>GuildPortrait(featured,guild),Ui.Raised,true,15);
             }
@@ -61,7 +61,7 @@ namespace ScrapGuard
             {
                 var member=members[i];var row=Ui.Box(list,0,i*86,444,78,Ui.Raised).transform;
                 if(member.hero>=0)CharacterArt.Draw(row,6,5,58,68,member.hero,member.skin,member.outfit);
-                Ui.Label(row,member.name,76,7,255,27,17);
+                Ui.Label(row,Localization.Verbatim(member.name),76,7,255,27,17);
                 Ui.Label(row,"호출 "+member.supportUses+" · 승리 "+member.supportWins+" · 동료 "+member.helpedMembers+"명",76,39,255,26,12,Ui.Muted);
                 Ui.Button(row,"감상",348,17,83,43,()=>GuildPortrait(member,guild),Ui.Panel,member.hero>=0,14);
             }

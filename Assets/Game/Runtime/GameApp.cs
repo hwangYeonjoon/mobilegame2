@@ -33,14 +33,19 @@ namespace ScrapGuard
             Debug.developerConsoleEnabled = false;
             Application.targetFrameRate = 60; Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Ui.Font = Resources.Load<Font>("Fonts/GowunDodum-Regular");
+            Localization.Initialize();
             string profile = Path.Combine(Application.persistentDataPath, "scrap-guard-v1.json");
             string[] args = Environment.GetCommandLineArgs();
             for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-profilePath") profile = args[i + 1];
+            if (Debug.isDebugBuild || Application.isEditor)
+                for (int i = 0; i + 1 < args.Length; i++) if (args[i] == "-language") Localization.SetLanguage(args[i + 1], false);
 #if SCRAP_QA_SOAK
             if(!Application.identifier.EndsWith(".qa",StringComparison.Ordinal))throw new InvalidOperationException("QA soak requires isolated package");
             profile=Path.Combine(Application.persistentDataPath,"qa-profile.json");
 #if SCRAP_QA_MANUAL
             args=Array.Empty<string>();
+#elif SCRAP_QA_LOCALIZATION
+            args=new[]{"-smoke","-localizationSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"Localization")};
 #elif SCRAP_QA_NAVIGATION
             args=new[]{"-smoke","-navigationSmoke","-smokeOutput",Path.Combine(Application.persistentDataPath,"Navigation")};
 #elif SCRAP_QA_ASSAULT
@@ -61,7 +66,7 @@ namespace ScrapGuard
             args=new[]{"-smoke","-polishSoak","-smokeOutput",Path.Combine(Application.persistentDataPath,"PolishSoak")};
 #endif
 #endif
-#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL || SCRAP_QA_PERFORMANCE || SCRAP_QA_ROBOT_SEASON || SCRAP_QA_NAVIGATION
+#if SCRAP_QA_GROWTH || SCRAP_QA_REGIONAL || SCRAP_QA_PERFORMANCE || SCRAP_QA_ROBOT_SEASON || SCRAP_QA_NAVIGATION || SCRAP_QA_LOCALIZATION
             profile=Path.Combine(Application.persistentDataPath,"qa-growth-"+Guid.NewGuid().ToString("N")+".json");
 #endif
             Store = new ProfileStore(profile);
@@ -113,6 +118,7 @@ namespace ScrapGuard
             MeasureFrame();
             if (titleScreen != null && titleScreen.gameObject.activeSelf)
             {
+                if(modal.childCount>0){if(Keyboard.current!=null&&Keyboard.current.escapeKey.wasPressedThisFrame)CloseModal();return;}
                 if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame) StartFromTitle();
                 else if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) DismissTitleScreen();
                 return;
@@ -259,7 +265,7 @@ namespace ScrapGuard
             Ui.Button(card,"앱 "+AppRelease.Version+" · 업데이트 확인",24,596,444,48,()=>StartCoroutine(CheckAppUpdate(true)),Ui.Raised,true,17);
             Ui.Button(card,"광고 보상 · 개인정보 · 고객지원",24,660,444,48,ServicePanel,Ui.Raised,true,16);
             Ui.Button(card,"플레이 테스트 · 기록 설정",24,724,444,60,ResearchPanel,Ui.Raised,true,19);
-            Ui.Label(card,"고철 수호대 · 회수하고 개조하는 생존 게임",24,812,444,25,14,Ui.Muted);
+            Ui.Button(card,"Language / 언어",24,804,444,48,LanguagePanel,Ui.Raised,true,18);
         }
         void Info(string title, string text)
         {

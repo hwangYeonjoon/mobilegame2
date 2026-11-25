@@ -1,0 +1,42 @@
+{
+  "version": "0.42.0",
+  "build": 46,
+  "combatRules": 30,
+  "catalogEntries": 2465,
+  "editMode": {
+    "result": "Passed",
+    "total": "186",
+    "passed": "186",
+    "failed": "0",
+    "start-time": "2026-11-25 09:20:11Z",
+    "end-time": "2026-11-25 09:21:27Z"
+  },
+  "android": {
+    "device": "ScrapGuard_English_API35 / emulator-5558",
+    "api": 35,
+    "abi": "arm64-v8a",
+    "resolution": "540x960",
+    "screens": 50,
+    "errors": 0,
+    "mode": "isolated offline QA profile",
+    "apkBytes": 119703219,
+    "apkSha256": "3c05b34478bddac350a389fc3186ddd0f372d601ec7d6b100a3bd5c5be71bf7b"
+  },
+  "productionPublished": false,
+  "countryTargetingChanged": false,
+  "realPurchaseRetested": false,
+  "physicalPhoneTested": false,
+  "productionBundle": {
+    "package": "io.github.hwangyeonjoon.scrapguard",
+    "versionCode": 46,
+    "versionName": "0.42.0",
+    "targetSdk": "36",
+    "debuggable": false,
+    "bytes": 106217095,
+    "sha256": "7d11487a175951fd20cd087ac0a030e1bf13c042a80a5c9fb91edd3b0462b843",
+    "bundletoolValidated": true,
+    "jarSignatureVerified": true,
+    "path": "Builds/Android/ScrapGuard-production.aab",
+    "versionedPath": "Builds/Android/ScrapGuard-0.42.0-46.aab"
+  }
+}

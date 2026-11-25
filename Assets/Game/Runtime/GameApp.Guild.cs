@@ -48,7 +48,7 @@ namespace ScrapGuard
                 return;
             }
             if(selectedGuildSupport!=null && !guild.members.Exists(m=>m.id==selectedGuildSupport.id&&m.hero>=0))selectedGuildSupport=null;
-            var panel=Dialog(guild.name,"지원 출격 오늘 "+guild.remaining+"/3회 남음 · 정원 20명\n동료 대원의 소유권과 성장 기록은 그대로 유지돼요.",900);
+            var panel=Dialog(Localization.Verbatim(guild.name),"지원 출격 오늘 "+guild.remaining+"/3회 남음 · 정원 20명\n동료 대원의 소유권과 성장 기록은 그대로 유지돼요.",900);
             Ui.Button(panel,"초대 코드 복사",24,140,214,45,()=>{GUIUtility.systemCopyBuffer=guild.code;Toast("길드 초대 코드를 복사했어요.");},Ui.Raised,true,15);
             Ui.Button(panel,"내 지원 대원 등록",254,140,214,45,SupportRegistration,Ui.Mint,true,15);
             Ui.Button(panel,"이번 주 지원 활약",24,197,214,42,()=>SupportHall(guild),Ui.Gold,true,16);
@@ -58,14 +58,14 @@ namespace ScrapGuard
             {
                 var m=guild.members[i];float y=i*113;Ui.Box(list,0,y,444,103,Ui.Raised);
                 if(m.hero>=0)CharacterArt.Draw(list,7,y+10,78,83,m.hero,m.skin,m.outfit);
-                Ui.Label(list,m.name+(m.self?" (나)":""),96,y+8,229,29,19);
+                Ui.Label(list,Localization.Verbatim(m.name)+(m.self?" (나)":""),96,y+8,229,29,19);
                 Ui.Label(list,m.hero<0?"지원 대원 미등록":SupportNames[m.hero]+" · Lv."+m.level+"\n"+SupportDetails[m.hero],96,y+41,226,53,12,Ui.Muted);
                 Ui.Button(list,m.self?"등록 변경":selectedGuildSupport!=null&&selectedGuildSupport.id==m.id?"선택됨":"동행 선택",332,y+27,101,49,()=>
                 {
-                    if(m.self)SupportRegistration();else {selectedGuildSupport=m;Toast(m.name+"의 대원을 선택했어요.");GuildPanel(guild);}
+                    if(m.self)SupportRegistration();else {selectedGuildSupport=m;Toast(Localization.Verbatim(m.name)+"의 대원을 선택했어요.");GuildPanel(guild);}
                 },Ui.Panel,m.self || m.hero>=0 && guild.remaining>0,14);
             }
-            Ui.Label(panel,selectedGuildSupport==null?"동료의 대원을 선택하면 출격 전에 확인해요.":"선택: "+selectedGuildSupport.name+" · "+SupportNames[selectedGuildSupport.hero],24,712,444,40,15,Ui.Mint,TextAnchor.MiddleCenter);
+            Ui.Label(panel,selectedGuildSupport==null?"동료의 대원을 선택하면 출격 전에 확인해요.":"선택: "+Localization.Verbatim(selectedGuildSupport.name)+" · "+SupportNames[selectedGuildSupport.hero],24,712,444,40,15,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Button(panel,"지원 없이 출격하기",24,762,214,48,()=>{selectedGuildSupport=null;CloseModal();Toast("지원 선택을 해제했어요.");},Ui.Raised,true,14);
             Ui.Button(panel,"길드 탈퇴",254,762,214,48,()=>ConfirmGuildLeave(guild.leader),Ui.Raised,true,15);
             Ui.Label(panel,"일반 구역 전용 · 출격 시 1회 차감 · 중단 시 반환 없음\n성장 도전·실력전에서는 지원을 사용할 수 없어요.",24,829,444,47,12,Ui.Muted,TextAnchor.MiddleCenter);
@@ -97,7 +97,7 @@ namespace ScrapGuard
         void CampaignLaunch()
         {
             if(!Online || selectedGuildSupport==null){StartBattle(selectedStage);return;}
-            var member=selectedGuildSupport;var card=Dialog("길드 동료와 출격",member.name+"의 "+Catalog.HeroNames[member.hero],458);
+            var member=selectedGuildSupport;var card=Dialog("길드 동료와 출격",Localization.Verbatim(member.name)+"의 "+Catalog.HeroNames[member.hero],458);
             CharacterArt.Draw(card,24,142,106,121,member.hero,member.skin,member.outfit);
             Ui.Label(card,SupportDetails[member.hero]+"\n전투 시작 8초 후 한 번 호출할 수 있어요.",150,149,310,100,17,Ui.Mint);
             Ui.Label(card,"출격 시 하루 이용 횟수 1회가 차감돼요.\n전투를 중단해도 반환되지 않아요.",24,278,444,53,15,Ui.Muted);

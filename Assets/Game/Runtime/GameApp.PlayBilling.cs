@@ -59,7 +59,7 @@ namespace ScrapGuard
             for(int i=0;i<CommerceCatalog.Offers.Length;i++)
             {
                 var offer=CommerceCatalog.Offers[i];var product=products.FirstOrDefault(p=>p.definition.id==offer.Id);
-                string price=product==null?"상품 확인 중":product.metadata.localizedPriceString;
+                string price=product==null?"상품 확인 중":Localization.Verbatim(product.metadata.localizedPriceString);
                 Ui.Button(card,offer.Name+" · "+price,24,225+i*90,444,65,()=>{
                     if(!Online||!cloudReady||networkBusy||combat!=null||billingVerifying||cloud.Pending!=null){Toast("진행 중인 작전과 동기화를 먼저 마쳐 주세요.");return;}
                     StartCoroutine(ConfirmBillingAccount(product));

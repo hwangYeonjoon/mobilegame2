@@ -1,0 +1,1202 @@
+
+### 00-title
+Language / 언어
+SCRAP GUARD
+Scrap Guard
+Turn discarded scrap into your own squad.
+Salvage parts and build robots on the battlefield. / Restore the workshop together and show off your squad.
+Salvage
+Modify
+Display
+Enter workshop
+One-handed survival, collecting and growth
+
+### 00-title-language
+Language / 언어
+Choose Korean or English. Saved on this device only.
+Close
+Use device language
+한국어
+English
+Changing language keeps your progress and purchases.
+
+### 01-home
+SCRAP GUARD
+Scrap Guard
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Break. Salvage. Assemble.
+Luke the Mechanic  Lv.1
+What will you build? Choose a Codex goal →
+Scrap Workshop  ·  0/6 cleared
+Map
+Operation 01 · Deserted Workshop / Defeat the final boss
+01
+02
+03
+04
+05
+06
+Operation 01 Deploy →
+Upgrade ●
+Upgrade with Gold & Common Parts. Salvage robot parts in battle.
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-growth
+SCRAP GUARD
+Upgrade
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Use Gold and Common Parts to upgrade your equipped gear and guardian.
+Swap gear · Inventory
+Choose / Recruit guardian
+Rivet Gun  Lv.1 → 2
+ATK 130 → 140
+Gold 300 · Parts 2
+Upgrade +1
+Work Vest  Lv.1 → 2
+HP 1180 → 1246
+Gold 300 · Parts 2
+Upgrade +1
+Pickup Module  Lv.1 → 2
+Pickup radius +25 → Pickup radius +28
+Gold 300 · Parts 2
+Upgrade +1
+Guardian  Lv.1 → 2
+ATK 130 → 133 · HP 1180 → 1210
+Gold 500 · Parts 3
+Upgrade +1
+Free supplies · Bulk upgrades · Practice
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-gear
+SCRAP GUARD
+Gear inventory
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Equipped · Tap to upgrade
+Weapon
+I
+Rivet Gun
+Lv.1 · Upgrade
+Armor
+I
+Work Vest
+Lv.1 · Upgrade
+Module
+I
+Pickup Module
+Lv.1 · Upgrade
+Inventory  3/80
+Upgrade available · Compare
+I
+Rivet Gun  Lv.1
+Weapon · Common
+Equipped
+Manage
+I
+Work Vest  Lv.1
+Armor · Common
+Equipped
+Manage
+I
+Pickup Module  Lv.1
+Module · Common
+Equipped
+Manage
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-heroes
+SCRAP GUARD
+Guardians
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Preview
+Luke the Mechanic  Lv.1
+Drone damage +15%
+Base ATK 100 · HP 1000
+Ultimate · Scrap Storm / Field Twin Turrets
+Selected
+Level up
+Preview
+Ray the Striker  Lv.1
+Crit +5% · Fast movement
+Base ATK 110 · HP 850
+Ultimate · Photon Pierce / Field Sprint Railgun
+Unlock: 1,200 Gems
+Preview
+Bolt the Guardian  Lv.1
+Generates a shield every 20s
+Base ATK 90 · HP 1200
+Ultimate · Fortress Drop
+Unlock: 7 total check-ins
+Preview
+Spark the Electrician  Lv.1
+Start with Coil Lv.1 · Coil interval −20%
+Base ATK 95 · HP 950
+Ultimate · Overload Discharge
+Operation 12 cleared to recruit
+Preview
+Iris the Cryotech  Lv.1
+Basic shots slow enemies by 30%
+Base ATK 100 · HP 1000
+Ultimate · Absolute Zero
+Operation 24 cleared to recruit
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-robots
+SCRAP GUARD
+Robot Codex
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Choose the robot you want to build · Specialists 0/10
+Salvage Cannons, Drives and Armor each run. Build records stay.
+My builds & showcase
+Blueprints & style workshop
+Rapid Fire Artillery Tank
+Slow movement · Area bombardment at range / Cannon support: triple piercing shots
+Cannon 4
+Specialist not yet built
+Look & parts
+Mobility Artillery Tank
+Slow movement · Area bombardment at range / Drive support: more speed and range
+Cannon 3 · Drive 1
+Specialist not yet built
+Look & parts
+Protection Artillery Tank
+Slow movement · Area bombardment at range / Armor support: small shield on entry
+Cannon 3 · Armor 1
+Specialist not yet built
+Look & parts
+Rapid Fire Assault Walker
+Fast movement · Tramples nearby enemies / Cannon support: triple piercing shots
+Cannon 1 · Drive 3
+Specialist not yet built
+Look & parts
+Mobility Assault Walker
+Fast movement · Tramples nearby enemies / Drive support: more speed and range
+Drive 4
+Specialist not yet built
+Look & parts
+Protection Assault Walker
+Fast movement · Tramples nearby enemies / Armor support: small shield on entry
+Drive 3 · Armor 1
+Specialist not yet built
+Look & parts
+Rapid Fire Bulwark Guardian
+Heavy movement · Melee shockwaves and damage reduction / Cannon support: triple piercing shots
+Cannon 1 · Armor 3
+Specialist not yet built
+Look & parts
+Mobility Bulwark Guardian
+Heavy movement · Melee shockwaves and damage reduction / Drive support: more speed and range
+Drive 1 · Armor 3
+Specialist not yet built
+Look & parts
+Protection Bulwark Guardian
+Heavy movement · Melee shockwaves and damage reduction / Armor support: small shield on entry
+Armor 4
+Specialist not yet built
+Look & parts
+Homing Artillery Tank
+Tracks one target. No area damage. / Slow; best against isolated enemies.
+Craft blueprint in workshop
+Specialist not yet built
+Look & parts
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-more
+SCRAP GUARD
+Activities & Showcase
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Claim rewards, find challenges and show off your robots.
+Check-in rewards · Ready to claim
+Daily missions · Battles 0/3
+Weekly Robots · Storm Rescue
+My showcase · Build records
+Guild & support
+Growth & collection goals
+How to play
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-weekly
+SCRAP GUARD
+Weekly Robot Challenge
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Weekly Robot Challenge / 90s
+Storm Rescue · New assembly operations
+This week's best
+0 pts
+2026-11-23 week · Resets Monday 05:00 KST
+Assault Walker specialist piloted · Survive 60s / Start with 4 of each part. Salvage more from marked enemies.
+Unlock after Operation 05
+Practice · No rewards
+This week's leaderboard
+Weekly robot task & rewards
+Extreme Operations
+Shard exchange
+Local records do not enter server rankings. / You can practice before Operation 05.
+Record card
+Equal Gear Trial · Separate ranking
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 02-showcase
+SCRAP GUARD
+My showcase
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+SCRAP GUARD / MY GUARDIAN
+새내기 정비사
+〈 Rookie Mechanic 〉
+Default Paint
+Lv.1 Luke the Mechanic
+Operations cleared 0 / 60
+Local demo record
+Close-up · Movement & attacks
+Customize profile
+Share card image
+Gear & records
+Explore other squads
+Showcase backgrounds & honors
+Cheers & support activity
+My assembled robots · 9 combinations
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 03-shop-0
+SCRAP GUARD
+Shop
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Outfits & Styles
+Growth & Gear
+Gems & Ads
+Extreme Crew
+Solar Furnace Engineer
+Solar armor / Rotary turbine / Cooling fins
+Spark exclusive / No stat changes
+Try moving · 600 Gems
+Find another look you love
+Deep-Sea Explorer
+Deep Miner
+Heavy Mechanic
+All outfits · Filter by guardian / ownership
+Glacier / Guardian
+Earn through play / Kills 0/1,000
+View Frost paint
+Sun / Border
+Showcase frame / 250 Gems · Guaranteed
+View frame
+Amber paint · All guardians
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 03-shop-1
+SCRAP GUARD
+Shop
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Outfits & Styles
+Growth & Gear
+Gems & Ads
+Growth materials
+Guaranteed gear
+Prepare for your next operation
+Upgrade gear and guardians with Gold and Parts. / Purchased materials are added to your balance.
+Common Parts ×20
+Once daily · Buy materials with Gold
+2,000 Gold
+Common Parts ×100
+Once daily · Guaranteed amount
+100 Gems
+Repair Supplies · Compare upgrades
+Gold 4,500 · Parts 40 · Once daily
+100 Gems
+Operation Growth Pass
+Free & bonus tracks · Never expires
+View contents
+Nebula Knights · 3 robot styles
+Equip instantly · No growth materials
+600 Gems
+Compare before & after
+Guardian upgrades
+Free field supplies · 5 minutes of normal battles
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 03-shop-2
+SCRAP GUARD
+Shop
+Settings
+Gold
+1,800
+Gems
+0
+Parts
+30
+Outfits & Styles
+Growth & Gear
+Gems & Ads
+Repair supplies · Gold 600 / Parts 8
+Today 0 / 2 claims · Optional reward
+Reward demo details
+Free Gem sources
+Gem balance & history
+Gem packs & contents
+Google Play shows the actual price and availability.
+300 Gems
+Receive the exact amount shown
+Contents & price
+600 Gems
+Receive the exact amount shown
+Contents & price
+1,200 Gems
+Receive the exact amount shown
+Contents & price
+2,600 Gems
+Receive the exact amount shown
+Contents & price
+Lifetime Ad Skip
+Skip ads · Reward limits unchanged
+Contents & price
+Google Play & restore purchases
+Free and paid Gems have equal purchasing power. / Gems cannot be exchanged for cash.
+Shop
+Upgrade
+Deploy
+Robots
+More
+Local demo · Saved on device
+
+### 04-gems_300
+300 Gems
+Pack contents. Google Play shows actual prices.
+Close
+300 Gems
+Gems 300 guaranteed / Same purchasing power as free Gems. / Choose guardians, outfits, gear or parts.
+Connect to Google Play to see available products / and their actual checkout prices.
+Play shop · View prices
+Back to shop
+
+### 04-gems_600
+600 Gems
+Pack contents. Google Play shows actual prices.
+Close
+600 Gems
+600 Gems guaranteed / Same purchasing power as free Gems. / Choose guardians, outfits, gear or parts.
+Connect to Google Play to see available products / and their actual checkout prices.
+Play shop · View prices
+Back to shop
+
+### 04-gems_1200
+1,200 Gems
+Pack contents. Google Play shows actual prices.
+Close
+1,200 Gems
+1,200 Gems guaranteed / Same purchasing power as free Gems. / Choose guardians, outfits, gear or parts.
+Connect to Google Play to see available products / and their actual checkout prices.
+Play shop · View prices
+Back to shop
+
+### 04-gems_2600
+2,600 Gems
+Pack contents. Google Play shows actual prices.
+Close
+2,600 Gems
+Gems 2,600 guaranteed / Same purchasing power as free Gems. / Choose guardians, outfits, gear or parts.
+Connect to Google Play to see available products / and their actual checkout prices.
+Play shop · View prices
+Back to shop
+
+### 04-ad_skip_lifetime
+Lifetime Ad Skip
+Pack contents. Google Play shows actual prices.
+Close
+Lifetime Ad Skip
+Permanent Ad Skip entitlement. Supports account restore. / Extra result Gold: 3/day. Parts reward: 2/day. / One emergency repair per regular operation. / Skips ad viewing; reward limits do not increase.
+Connect to Google Play to see available products / and their actual checkout prices.
+Play shop · View prices
+Back to shop
+
+### 05-growth-kit
+Repair Supplies · Choose upgrade
+Gold 4,500 · Parts 40 · 100 Gems / One supply purchase per day across all tiers. Choose one path.
+Close
+Compare upgrades with current materials and with this purchase.
+Rivet Gun · Current Lv.1 / Owned materials: Lv.4 → With purchase: Lv.7 / Purchase adds 3 levels · Compare
+Work Vest · Current Lv.1 / Owned materials: Lv.4 → With purchase: Lv.7 / Purchase adds 3 levels · Compare
+Pickup Module · Current Lv.1 / Owned materials: Lv.4 → With purchase: Lv.7 / Purchase adds 3 levels · Compare
+Guardian · Current Lv.1 / Owned materials: Lv.3 → With purchase: Lv.5 / Purchase adds 2 levels · Compare
+Bulk upgrade with owned materials
+Free supplies & tier contents
+Back
+
+### 05-pass
+Operation Growth Pass
+No expiry. Milestones at Operations 3 / 6 / 9 / 12. / Free rewards never require a purchase.
+Close
+Operation 3 complete
+Free · Gold 1000 / Parts 10
+Claim
+Bonus · Gold 3000 / Parts 30
+Claim
+Operation 6 complete
+Free · Gold 1500 / Parts 15
+Claim
+Bonus · Gold 4000 / Parts 40
+Claim
+Operation 9 complete
+Free · Gold 2000 / Parts 20
+Claim
+Bonus · Gold 5000 / Parts 50
+Claim
+Operation 12 complete
+Free · Gold 2500 / Parts 25
+Claim
+Bonus · Gold 6000 / Parts 60
+Claim
+Bonus track total: 18,000 Gold · 180 Parts. / Operation 12: Heavy Mechanic outfit, attack and support effects. / If owned: 6,000 Gold and 60 Parts instead.
+Preview final outfit & effects
+Bonus track · 900 Gems · Details
+Upgrade with received materials
+
+### 05-attendance
+Supplies that grow day by day
+Total check-ins. Missing a day does not reset progress. / Resets daily at 05:00 KST.
+Close
+Day 1
+Gold / 1,000
+Day 2
+Parts / 20
+Day 3
+Gems / 50
+Day 4
+Gold / 2,000
+Day 5
+Parts / 40
+Day 6
+Gems / 100
+Day 7
+Bolt / joins
+Claim today's reward
+Total 0 check-ins
+
+### 05-missions
+Today's maintenance log
+Finish 3 battles and defeat 500 enemies. / Battles must last at least 30 seconds to count.
+Close
+Battles completed     0 / 3
+Robots defeated     0 / 500
+2,000 Gold · 20 Parts · 30 Gems
+Complete all & claim
+
+### 05-account
+Save & restore your squad
+Server saves do not require Google sign-in.
+Close
+Your new squad is saved on the server. / No invite or recovery code is needed. /  / Your local demo progress is kept separately. / It does not transfer to a new server account.
+Start / Continue with server save
+Restore with Google
+Recovery code & connection
+Continue local demo
+
+### 05-research
+Playtest log
+Saved on this device only. Never sent automatically.
+Close
+With consent, logs screens, battle results, Gem changes, / outfit interest, robot choices and frame times. / No names, account codes or advertising IDs. / Retains up to 2,000 events from the last 14 days.
+Logging off · Agree & enable
+Saved events 0 / Slow battle frames 0 / 0
+Export log file
+Delete logs & reset participant ID
+You choose whether to share the exported file. / Disabling logs does not affect progress or rewards. / Deletion applies to logs on this device.
+Online outfit analytics · Separate consent
+
+### 05-settings
+Settings
+Progress is saved on this device.
+Close
+Sound, music & haptics
+Play shop & restore purchases
+Account & server connection
+Test tools
+Move: drag or WASD / arrow keys. / Attacks are automatic. Choose skills on level-up. / Pause: top battle button or ESC.
+Battle visuals & effects
+App 0.42.0 · Check updates
+Ad rewards, privacy & support
+Playtest logging
+Language / 언어
+
+### 05-language
+Language / 언어
+Choose Korean or English. Saved on this device only.
+Close
+Use device language
+한국어
+English
+Changing language keeps your progress and purchases.
+
+### 06-korean
+Language / 언어
+한국어 또는 영어를 선택하세요. 이 기기에만 저장됩니다.
+닫기
+기기 언어 사용
+한국어
+English
+언어를 바꿔도 진행 상황과 구매 내역은 유지됩니다.
+
+### 07-map-0
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+1 / 10 region
+Next
+Scrap Workshop
+Move around the workbenches
+01  Deserted Workshop
+Defeat the final boss · Available
+Details
+02  Parts Recovery Route
+Defeat the final boss · Clear the previous operation
+Details
+03  Giant Robot Salvage
+Survive the time limit · Clear the previous operation
+Details
+04  Welding Yard
+Defeat the final boss · Clear the previous operation
+Details
+05  Restore Workshop Power
+Survive the time limit · Clear the previous operation
+Details
+06  Retake the Workshop
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-1
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+2 / 10 region
+Next
+Abandoned Railway
+Avoid rail bombardment warnings
+07  Enter the Old Station
+Defeat the final boss · Clear the previous operation
+Details
+08  Railway Intruders
+Defeat the final boss · Clear the previous operation
+Details
+09  Cargo Escort
+Survive the time limit · Clear the previous operation
+Details
+10  Artillery Platform
+Defeat the final boss · Clear the previous operation
+Details
+11  Broken Rail Bridge
+Survive the time limit · Clear the previous operation
+Details
+12  Railway Destroyer
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-2
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+3 / 10 region
+Next
+Waste Treatment Plant
+Avoid toxic pools
+13  Waste Disposal Yard
+Defeat the final boss · Clear the previous operation
+Details
+14  Toxic Drain
+Defeat the final boss · Clear the previous operation
+Details
+15  Contamination Blockade
+Survive the time limit · Clear the previous operation
+Details
+16  Dismantling Yard
+Defeat the final boss · Clear the previous operation
+Details
+17  Wastewater Reservoir
+Survive the time limit · Clear the previous operation
+Details
+18  Heart of Contamination
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-3
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+4 / 10 region
+Next
+Cooling Facility
+Icy floors add momentum
+19  Cooling Chamber Entrance
+Defeat the final boss · Clear the previous operation
+Details
+20  Frozen Pipes
+Defeat the final boss · Clear the previous operation
+Details
+21  Cold Alert
+Survive the time limit · Clear the previous operation
+Details
+22  Frozen Storage
+Defeat the final boss · Clear the previous operation
+Details
+23  Cold Pursuit
+Survive the time limit · Clear the previous operation
+Details
+24  Cryogenic Guardian
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-4
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+5 / 10 region
+Next
+Central Factory
+Conveyor movement & laser warnings
+25  Silent Factory
+Defeat the final boss · Clear the previous operation
+Details
+26  Assembly Conveyor
+Defeat the final boss · Clear the previous operation
+Details
+27  Production Line Blockade
+Survive the time limit · Clear the previous operation
+Details
+28  Laser Grid
+Defeat the final boss · Clear the previous operation
+Details
+29  Core Approach
+Survive the time limit · Clear the previous operation
+Details
+30  Central Control Core
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-5
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+6 / 10 region
+Next
+High-Voltage Plant
+Avoid alternating electric grids
+31  Substation Entry
+Defeat the final boss · Clear the previous operation
+Details
+32  Capacitor Corridor
+Defeat the final boss · Clear the previous operation
+Details
+33  Current Blockade
+Survive the time limit · Clear the previous operation
+Details
+34  Transmission Grid
+Defeat the final boss · Clear the previous operation
+Details
+35  Overload Alert
+Survive the time limit · Clear the previous operation
+Details
+36  Thunder Controller
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-6
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+7 / 10 region
+Next
+Deep Furnace
+Leave furnace lanes after eruption warnings
+37  Smelter Entrance
+Defeat the final boss · Clear the previous operation
+Details
+38  Heat Exchange Corridor
+Defeat the final boss · Clear the previous operation
+Details
+39  Flame Blockade
+Survive the time limit · Clear the previous operation
+Details
+40  Molten Cargo Route
+Defeat the final boss · Clear the previous operation
+Details
+41  Pressure Surge
+Survive the time limit · Clear the previous operation
+Details
+42  Deep Foundry King
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-7
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+8 / 10 region
+Next
+Magnetic Sorter
+Sideways magnetic currents & crusher warnings
+43  Sorter Entrance
+Defeat the final boss · Clear the previous operation
+Details
+44  Magnetic Cargo Route
+Defeat the final boss · Clear the previous operation
+Details
+45  Polarity Blockade
+Survive the time limit · Clear the previous operation
+Details
+46  Crusher Sorting Room
+Defeat the final boss · Clear the previous operation
+Details
+47  Center of Attraction
+Survive the time limit · Clear the previous operation
+Details
+48  Magnetic Claw King
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-8
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+9 / 10 region
+Next
+Storm Transmission Tower
+Wind lanes & sequential lightning
+49  Tower Foothills
+Defeat the final boss · Clear the previous operation
+Details
+50  Storm Corridor
+Defeat the final boss · Clear the previous operation
+Details
+51  Lightning Rod Defense
+Survive the time limit · Clear the previous operation
+Details
+52  Charge Transfer Route
+Defeat the final boss · Clear the previous operation
+Details
+53  Thunder Steps
+Survive the time limit · Clear the previous operation
+Details
+54  Storm Conductor
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 07-map-9
+Operation map
+Cleared 0 / 60 · Regional rules
+Close
+Previous
+10 / 10 region
+Next
+Orbital Assembly Port
+Find safe lanes between launch rails
+55  Orbital Dock
+Defeat the final boss · Clear the previous operation
+Details
+56  Cargo Launch Route
+Defeat the final boss · Clear the previous operation
+Details
+57  Port Blockade
+Survive the time limit · Clear the previous operation
+Details
+58  Satellite Scrapyard
+Defeat the final boss · Clear the previous operation
+Details
+59  Departure Alert
+Survive the time limit · Clear the previous operation
+Details
+60  Orbital Assembly Carrier
+Defeat the final boss · Clear the previous operation
+Details
+Region collection & paint
+
+### 08-robot-1-1
+Rapid Fire Artillery Tank
+Preview the finished robot and choose your next build.
+Close
+Specialist
+Slow movement · Area bombardment at range / Cannon support: triple piercing shots
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Homing
+Battle parts for a specialist
+Cannon  4 needed
+Sources
+Drive  0 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-1-2
+Rapid Fire Artillery Tank
+Preview the finished robot and choose your next build.
+Close
+Complete
+Slow movement · Area bombardment at range / Cannon support: triple piercing shots
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Homing
+After building a specialist, salvage these extra parts
+Cannon  8 needed
+Sources
+Drive  0 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-5-1
+Mobility Assault Walker
+Preview the finished robot and choose your next build.
+Close
+Specialist
+Fast movement · Tramples nearby enemies / Drive support: more speed and range
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Battle parts for a specialist
+Cannon  0 needed
+Sources
+Drive  4 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-5-2
+Mobility Assault Walker
+Preview the finished robot and choose your next build.
+Close
+Complete
+Fast movement · Tramples nearby enemies / Drive support: more speed and range
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+After building a specialist, salvage these extra parts
+Cannon  0 needed
+Sources
+Drive  8 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-9-1
+Protection Bulwark Guardian
+Preview the finished robot and choose your next build.
+Close
+Specialist
+Heavy movement · Melee shockwaves and damage reduction / Armor support: small shield on entry
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Battle parts for a specialist
+Cannon  0 needed
+Sources
+Drive  0 needed
+Sources
+Armor  4 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-9-2
+Protection Bulwark Guardian
+Preview the finished robot and choose your next build.
+Close
+Complete
+Heavy movement · Melee shockwaves and damage reduction / Armor support: small shield on entry
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+After building a specialist, salvage these extra parts
+Cannon  0 needed
+Sources
+Drive  0 needed
+Sources
+Armor  8 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Set robot goal · Prepare to deploy
+Back to Robot Codex
+Assemble freely · No goal
+
+### 08-robot-10-1
+Homing Artillery Tank
+Preview the finished robot and choose your next build.
+Close
+Specialist
+Tracks one target. No area damage. / Slow; best against isolated enemies.
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Homing
+Battle parts for a specialist
+Cannon  3 needed
+Sources
+Drive  1 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Homing Cannon · Permanent blueprint
+Back to Robot Codex
+Check workshop materials
+
+### 08-robot-10-2
+Homing Artillery Tank
+Preview the finished robot and choose your next build.
+Close
+Complete
+Tracks one target. No area damage. / Slow; best against isolated enemies.
+Specialist look
+Complete look
+Rapid Fire
+Mobility
+Protection
+Homing
+After building a specialist, salvage these extra parts
+Cannon  5 needed
+Sources
+Drive  3 needed
+Sources
+Armor  0 needed
+Sources
+Battle parts start at zero each run. / Common Parts in your wallet upgrade gear, not robots.
+Homing Cannon · Permanent blueprint
+Back to Robot Codex
+Check workshop materials
+
+### 08-parts
+Cannon sources
+Defeat enemies and collect dropped parts. Not every kill drops one.
+Close
+Rapid Fire Artillery Tank / Specialist · Cannon 4
+Operation 01 · Scrap Workshop
+C
+Cannon carrier
+Look for the 'C' mark on the battlefield
+Even in regions without enemies that normally drop this part, / marked carriers can supply it.
+Look for part-carrier marks in this operation. / C / D / A means Cannon / Drive / Armor. / Parts are for this run only; they do not carry over.
+Operation 01 Prepare to deploy
+Back to robot
+
+### 09-assembler
+Which robot will you build?
+Chargers ahead: Assault repositions; Artillery hits before contact
+Close
+Artillery Tank
+Area bombardment against distant enemies / Slow movement
+Not built
+Artillery Tank
+Assault Walker
+Bulwark Guardian
+Support: Extra piercing shots  Change ▾
+Build specialist / Cannon needed 4 · Owned 0
+Set as part collection goal
+Scrap needed: 40 · Owned 0 / Tap to pilot again. Hold to change design.
+
+### 09-skills
+Grow stronger
+Lv.2 · Choose a skill for this battle.
+Orbiting Saw
+New skill → Lv.1
+Orbiting saws attack nearby enemies
+Planetary Cutter Ring / Saw 5 + Magnet 3 · Wide orbit
+Choose
+Shock Coil
+New skill → Lv.1
+Periodic electric shocks clear nearby foes
+Cryogenic Storm / Coil 5 + Repair 3 · Area freeze
+Choose
+Support Drone
+New skill → Lv.1
+A drone attacks with homing shots
+Tri-Drone Formation / Drone 5 + Reload 3 · Triple formation
+Choose
+
+### 09-battle
+Parts recovery
+C
+Ⅱ
+00:14 / 03:00
+Kills 20
+1180 / 1180
+Lv.2
+1
+1
+Activate ultimate
+Approach device
+↑ dropped Cannon salvage · 4 more needed
+20 kill streak · Scrap shower!
+Assemble · Scrap 22/40
+
+### 10-result
+Upgrade and try again
+Operation 01 · Deserted Workshop
+Prepare with upgrades and free practice
+00:14 survived    20 kills    Lv.2
+Rewards saved
+Battle report
+Robots built · 0 types
+Extra Gold +50% · Demo information
+Operation 01 Retry
+Upgrades available
+Cause of defeat & free practice
+Back to workshop
+Leave feedback · Optional

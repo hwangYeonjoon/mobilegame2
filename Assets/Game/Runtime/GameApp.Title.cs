@@ -13,6 +13,7 @@ namespace ScrapGuard
             background.raycastTarget=true;
             BattleArt.Floor(titleScreen,0);
             Ui.Box(titleScreen,0,0,540,960,new Color(.025f,.06f,.09f,.83f),false);
+            Ui.Button(titleScreen,"Language / 언어",350,20,166,40,LanguagePanel,Ui.Raised,true,15);
             Ui.Label(titleScreen,"SCRAP GUARD",32,74,476,29,17,Ui.Mint,TextAnchor.MiddleCenter);
             Ui.Label(titleScreen,"고철 수호대",24,115,492,76,52,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(titleScreen,"버려진 고철로, 나만의 수호대를.",24,202,492,40,22,Ui.Mint,TextAnchor.MiddleCenter);

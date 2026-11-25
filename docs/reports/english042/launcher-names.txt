@@ -1,0 +1,4 @@
+Package 'io.github.hwangyeonjoon.scrapguard':
+0x7f0f0023 - string/app_name
+	(default) - [STR] "Scrap Guard"
+	locale: "ko" - [STR] "고철 수호대"

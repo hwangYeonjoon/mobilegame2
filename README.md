@@ -1,7 +1,9 @@
 # mobilegame2 안드로이드 생존 성장 게임
 
 
-최신 소스: **0.41.0 / Android code 45 / 전투 규칙 30**. 2026-11-25 Play 프로덕션 전체 출시와 스토어 소개 영상 변경을 함께 검토 요청했다. 실제 공개 확인 버전은 **0.40.1 / 44**이며 서버 latest=44, minimum=43이다. [출시·홍보 등록 현황](docs/30-release-041-and-promotion.md): **이선생 게임공방** 채널에 [실제 플레이 영상](https://youtu.be/5yfN0J4dO9Q) 공개 완료. Play 프로모션은 영상이 연결된 초안이며 최종 제출 전이다. YouTube 공개와 Play 앱·스토어 승인 및 이벤트 노출을 구분한다.
+최신 로컬 소스: **0.42.0 / Android code 46 / 전투 규칙 30** — [영어 지원](docs/31-english-localization.md). 기기 언어 자동 선택과 한국어/영어 전환, 도감·조립·강화·상점·전투 문구 번역을 추가했다. 0.42.0은 아직 Play에 배포하지 않았다.
+
+2026-11-25 Play Console에서 공개 확인한 버전은 **0.41.0 / 45**, 대상 국가는 대한민국이다. 이번 영어 작업으로 국가 타기팅이나 운영 서버를 바꾸지 않았다. [출시·홍보 등록 이력](docs/30-release-041-and-promotion.md)과 [실제 플레이 영상](https://youtu.be/5yfN0J4dO9Q)은 별도로 관리한다.
 
 - [강화·출격 동선과 로봇 도감](docs/29-navigation-and-robot-codex.md): 필요한 부품·획득처·조립 목표, 하단 강화 메뉴, 지역 진행과 다음 작전 출격. Android 화면 검사 0건 오류, 실제 온라인 조립·탑승·정산 확인. [홍보 자료와 등록 현황](Store/Promotions/robot-codex-041/README.md).
 

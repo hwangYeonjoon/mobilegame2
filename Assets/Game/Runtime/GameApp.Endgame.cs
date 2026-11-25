@@ -99,14 +99,14 @@ namespace ScrapGuard
                 var entry=board.entries[i];float y=i*100;
                 Ui.Box(list,0,y,444,90,Ui.Raised);Ui.Label(list,entry.rank.ToString(),10,y+20,40,45,23,Ui.Gold,TextAnchor.MiddleCenter);
                 CharacterArt.Draw(list,50,y+9,55,67,entry.hero,entry.skin,entry.outfit);
-                Ui.Label(list,entry.name,115,y+10,210,32,19);Ui.Label(list,entry.score.ToString("N0")+"점",115,y+47,210,28,17,Ui.Mint);
+                Ui.Label(list,Localization.Verbatim(entry.name),115,y+10,210,32,19);Ui.Label(list,entry.score.ToString("N0")+"점",115,y+47,210,28,17,Ui.Mint);
                 Ui.Button(list,"전시실",334,y+23,98,45,()=>StartCoroutine(LoadPublic(entry.id)),Ui.Panel,true,15);
             }
             Ui.Label(card,"상위 50명 · 동점은 먼저 달성한 기록이 우선\n차단한 계정은 서로의 기록판에 표시되지 않아요.",24,782,444,58,13,Ui.Muted,TextAnchor.MiddleCenter);
         }
         void TrophyRoom(PublicProfile p)
         {
-            var card=Dialog(p.name+"의 전시대","성장한 대원과 플레이로 획득한 트로피",870);
+            var card=Dialog(Localization.Verbatim(p.name)+"의 전시대","성장한 대원과 플레이로 획득한 트로피",870);
             Ui.Box(card,24,139,444,330,Ui.Background);
             CharacterArt.Draw(card,122,151,248,263,p.hero,p.skin,p.outfit);
             Ui.Label(card,Catalog.HeroNames[p.hero]+" Lv."+p.heroLevel,24,422,444,32,22,Ui.Mint,TextAnchor.MiddleCenter);

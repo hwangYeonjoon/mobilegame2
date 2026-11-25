@@ -35,7 +35,7 @@ namespace ScrapGuard
             var card=Ui.Box(parent,x,y,492,530,accent,true,"ShowcaseCard").rectTransform;
             Ui.Box(card,3,3,486,524,Ui.Background);
             Ui.Label(card,"SCRAP GUARD / MY GUARDIAN",24,13,444,24,14,accent,TextAnchor.MiddleCenter);
-            Ui.Label(card,p.name,24,43,444,43,30,Ui.Ink,TextAnchor.MiddleCenter);
+            Ui.Label(card,Localization.Verbatim(p.name),24,43,444,43,30,Ui.Ink,TextAnchor.MiddleCenter);
             Ui.Label(card,"〈 "+Social.Titles[p.title]+" 〉",24,90,444,30,20,accent,TextAnchor.MiddleCenter);
             var stage=ShowcaseStage.Draw(card,18,129,456,272,p.theme,accent);
             if(p.frame==4)
@@ -53,7 +53,7 @@ namespace ScrapGuard
         }
         void ProfileEquipment(PublicProfile p)
         {
-            var card=Dialog("전시 장비와 성장 기록",p.name+" · 전시 장비는 출격 장비와 다를 수 있어요.",770);
+            var card=Dialog("전시 장비와 성장 기록",Localization.Verbatim(p.name)+" · 전시 장비는 출격 장비와 다를 수 있어요.",770);
             Ui.Label(card,"공격 "+p.attack+"   체력 "+p.health,24,136,444,42,25,Ui.Mint,TextAnchor.MiddleCenter);
             for(int i=0;i<p.items.Count&&i<3;i++)
             {
@@ -158,7 +158,7 @@ namespace ScrapGuard
             {
                 var pick=Ui.Box(card,24,205,444,128,Ui.Background).transform;
                 CharacterArt.Draw(pick,6,11,95,105,featured.hero,featured.skin,featured.outfit);
-                Ui.Label(pick,"이번 주 발견 · "+featured.name,113,8,312,30,20,Ui.Gold);
+                Ui.Label(pick,"이번 주 발견 · "+Localization.Verbatim(featured.name),113,8,312,30,20,Ui.Gold);
                 Ui.Label(pick,"이 목록에서 주간 선정 · 구매 여부와 무관",113,43,312,28,12,Ui.Muted);
                 Ui.Button(pick,"전시실 방문",113,79,312,38,()=>StartCoroutine(LoadPublic(featured.id)),Ui.Mint,true,16);
             }
@@ -168,7 +168,7 @@ namespace ScrapGuard
             {
                 var p = list.profiles[i]; var row = Ui.Box(content, 0, i * 145, 444, 133, Ui.Raised).transform;
                 CharacterArt.Draw(row,4,7,104,118,p.hero,p.skin,p.outfit);
-                Ui.Label(row, p.name, 115, 8, 215, 30, 20);
+                Ui.Label(row, Localization.Verbatim(p.name), 115, 8, 215, 30, 20);
                 Ui.Label(row,StylePresentation.Look(p.outfit,p.skin),115,42,215,27,15,p.outfit>0?OutfitVisuals.Accent(p.outfit):Ui.Muted);
                 Ui.Label(row, Social.Titles[p.title] + "\n정복 " + p.stages + "/" + Campaign.Count + " · 응원 " + p.likes, 115, 77, 215, 44, 12, FrameColor(p.frame));
                 Ui.Button(row, "보기", 337, 40, 93, 52, () => StartCoroutine(LoadPublic(p.id)), null, true, 16);
