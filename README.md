@@ -1,9 +1,9 @@
 # mobilegame2 안드로이드 생존 성장 게임
 
 
-최신 소스: **0.41.0 / Android code 45 / 전투 규칙 30**. 2026-11-25 Play 프로덕션 전체 출시 검토를 요청했고, 사전 검사 후 Google 검토 중이다. 실제 공개 확인 버전은 **0.40.1 / 44**이며 서버 latest=44, minimum=43이다. [출시·홍보 등록 현황](docs/30-release-041-and-promotion.md): Play 프로모션 초안 저장 완료, 영상은 YouTube 추가 본인 확인과 제출 약관 동의 대기. 45 공개나 영상 게시 완료로 해석하지 않는다.
+최신 소스: **0.41.0 / Android code 45 / 전투 규칙 30**. 2026-11-25 Play 프로덕션 전체 출시와 스토어 소개 영상 변경을 함께 검토 요청했다. 실제 공개 확인 버전은 **0.40.1 / 44**이며 서버 latest=44, minimum=43이다. [출시·홍보 등록 현황](docs/30-release-041-and-promotion.md): **이선생 게임공방** 채널에 [실제 플레이 영상](https://youtu.be/5yfN0J4dO9Q) 공개 완료. Play 프로모션은 영상이 연결된 초안이며 최종 제출 전이다. YouTube 공개와 Play 앱·스토어 승인 및 이벤트 노출을 구분한다.
 
-- [강화·출격 동선과 로봇 도감](docs/29-navigation-and-robot-codex.md): 필요한 부품·획득처·조립 목표, 하단 강화 메뉴, 지역 진행과 다음 작전 출격. Android 화면 검사 0건 오류, 실제 온라인 조립·탑승·정산 확인. [프로모션 준비본](Store/Promotions/robot-codex-041/README.md)은 아직 공개하지 않았다.
+- [강화·출격 동선과 로봇 도감](docs/29-navigation-and-robot-codex.md): 필요한 부품·획득처·조립 목표, 하단 강화 메뉴, 지역 진행과 다음 작전 출격. Android 화면 검사 0건 오류, 실제 온라인 조립·탑승·정산 확인. [홍보 자료와 등록 현황](Store/Promotions/robot-codex-041/README.md).
 
 - [판매·광고 검증과 0.40.1 출시](docs/28-launch-sales-ads-041.md): 가격 유지, 5종 판매 허용, 운영 광고 설정 일치, Google 테스트 구매·복원·광고 스킵·보상형 광고 SSV 지급 확인. AdMob 앱 인증은 미완료이며 광고 매출 발생을 확인한 것은 아니다.
 

@@ -16,10 +16,13 @@
   "featuring_requested": false,
   "primary_image": "primary-1920x1080.jpg",
   "square_image": "square-1080x1080.jpg",
-  "video_url": null,
+  "video_url": "https://www.youtube.com/watch?v=5yfN0J4dO9Q",
   "play_draft_id": "4831549310827165691",
   "end_date": "2026-12-28T01:07:00Z",
   "preview_before_start": false,
   "ai_image_declaration": "required_on_submission",
-  "video_upload_status": "awaiting_youtube_reauthentication_and_terms_consent"
+  "video_upload_status": "public",
+  "youtube_channel_name": "이선생 게임공방",
+  "youtube_channel_id": "UCNFKX_NnUQPGwRyEz0ADE9g",
+  "store_video_status": "submitted_with_production_45_for_review"
 }
