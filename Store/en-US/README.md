@@ -1,6 +1,6 @@
 # English listing for 0.42.0
 
-On 2026-11-25, the English (en-US) listing and 0.42.0 (46) production release were submitted for Google review. Country targeting remains South Korea. Existing default-language graphics and gameplay video are inherited; English screenshots are still a follow-up.
+On 2026-11-26, Play Console confirmed that the English 0.42.0 (46) production release is available on Google Play (published November 25). The addition of the US, Canada, Australia, New Zealand, Singapore and the Philippines, with South Korea retained, has been submitted and is under review. All five products have saved availability and local prices for those six countries; Korean prices are unchanged. See [overseas rollout record](../../docs/33-overseas-release.md). Existing default-language graphics and gameplay video are inherited; English screenshots are still a follow-up.
 
 - `title.txt`: Scrap Guard
 - `short-description.txt`: under 80 characters
