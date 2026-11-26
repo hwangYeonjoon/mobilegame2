@@ -1,0 +1,8 @@
+Built-in image_gen, 2026-11-26. Skill: /Users/kd-server/.codex/skills/.system/imagegen/SKILL.md
+Output: Store/Promotions/acquisition-20261126/thumbnail-robot-v1.png
+Reference 1: Assets/Resources/Art/RobotFrame-artillery-v1.png (actual robot design).
+Reference 2: frame at 5 seconds from TestResults/Promotion041/assembly.mp4 (actual gameplay).
+
+Use case: ads-marketing, compositing. Create a polished 16:9 YouTube thumbnail for Korean indie game 고철 수호대. Input 1 is the EXACT actual in-game artillery robot design, preserve its geometry, twin cannons, pixel art materials and proportions; input 2 is supporting real gameplay reference. Do not redesign or invent a different robot. Large robot occupying right 60%, dark navy industrial background, few cyan recovered parts, strong warm yellow / mint contrast, legible on phone. Left bold clean Korean headline in two lines EXACT text: '고철 모아' and '로봇 탑승'. Smaller bottom left text EXACT: '고철 수호대'. No other text, no UI buttons, no numbers, no claim of realistic graphics. Marketing composition rather than a fake gameplay screenshot. Keep plenty of margin so text is not cropped.
+
+Result inspected: Korean text correct, artillery design recognizable, no extra performance or availability claims. AI-generated promotional composite, not a gameplay screenshot. Native SVG text overlays in Shorts are rendered by rsvg-convert, then composited onto real footage with FFmpeg; no generated gameplay frames.

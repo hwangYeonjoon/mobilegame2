@@ -1,0 +1,109 @@
+[
+  {
+    "slug": "transform",
+    "title": "이 작은 대원이 로봇에 탄다면? 🤖 | 고철 수호대 #Shorts",
+    "description": "고철 수호대 — Google Play에서 플레이하세요.\n설치: 채널 프로필의 ‘고철 수호대’ 링크\n\n작은 대원 → 부품으로 제작 → 포격 로봇 탑승. 실제 0.41 Android 플레이를 컷 편집했습니다.\n\n직접 열기·복사용 링크:\nhttps://play.google.com/store/apps/details?id=io.github.hwangyeonjoon.scrapguard&utm_source=youtube&utm_medium=organic_video&utm_campaign=yt_short_transform_20261126&referrer=utm_source%3Dyoutube%26utm_medium%3Dorganic_video%26utm_campaign%3Dyt_short_transform_20261126\n\n영상은 Android 에뮬레이터에서 녹화한 게임 화면이며 실기기 성능을 뜻하지 않습니다. 도감 비교는 정지 화면입니다.\n음악: Overdrive — Alexander Ehlers (tricksntraps), CC0 1.0. 기기 녹음 대신 음악을 편집했습니다.\n#고철수호대 #로봇게임 #인디게임 #Shorts",
+    "file": "short-transform.mp4",
+    "duration": 14,
+    "sources": [
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 5,
+        "duration": 1,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      },
+      {
+        "source": "TestResults/Promotion041/battle.mp4",
+        "start": 146,
+        "duration": 2,
+        "kind": "real Android gameplay",
+        "sha256": "6d26051b9f5868312b819292947e2dc7dc0a6b9e43d9b1cf608c29fd7b2961f0"
+      },
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 0,
+        "duration": 3,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      },
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 3,
+        "duration": 8,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      }
+    ],
+    "sha256": "fa8fbe4447c2b82a60c33969fd5df31e1bb9b74000e433561fd6d90c28557faa"
+  },
+  {
+    "slug": "design",
+    "title": "포격 전차 vs 돌파 보행기, 어떤 로봇을 만들까요? | 고철 수호대 #Shorts",
+    "description": "고철 수호대 — Google Play에서 플레이하세요.\n설치: 채널 프로필의 ‘고철 수호대’ 링크\n\n게임 내 도감 화면으로 포격 전차와 돌파 보행기의 모습·필요 부품을 비교합니다. 후반 전투 장면은 포격형의 실제 플레이입니다. 돌파형 전투 비교 영상은 아닙니다.\n\n직접 열기·복사용 링크:\nhttps://play.google.com/store/apps/details?id=io.github.hwangyeonjoon.scrapguard&utm_source=youtube&utm_medium=organic_video&utm_campaign=yt_short_design_20261126&referrer=utm_source%3Dyoutube%26utm_medium%3Dorganic_video%26utm_campaign%3Dyt_short_design_20261126\n\n영상은 Android 에뮬레이터에서 녹화한 게임 화면이며 실기기 성능을 뜻하지 않습니다. 도감 비교는 정지 화면입니다.\n음악: Overdrive — Alexander Ehlers (tricksntraps), CC0 1.0. 기기 녹음 대신 음악을 편집했습니다.\n#고철수호대 #로봇게임 #인디게임 #Shorts",
+    "file": "short-design.mp4",
+    "duration": 14,
+    "sources": [
+      {
+        "source": "TestResults/Navigation041FinalAndroid/06-robot-1-1.png",
+        "start": 0,
+        "duration": 4,
+        "kind": "static codex QA capture",
+        "sha256": "5e8c16143533feeeb7469e9366154f6f12efb1d24e5cc818984de02434dc83e0"
+      },
+      {
+        "source": "TestResults/Navigation041FinalAndroid/06-robot-5-1.png",
+        "start": 0,
+        "duration": 4,
+        "kind": "static codex QA capture",
+        "sha256": "d11fb7bcd3456bae23a5ded524e229e9ad344249d30363cf921d1c7c8b80a0cb"
+      },
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 4,
+        "duration": 6,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      }
+    ],
+    "sha256": "dd48c24921c93fb4dde09012b4937b443a8980a2d3169fa846e5c146f9dd23f4"
+  },
+  {
+    "slug": "assemble",
+    "title": "모은 부품이 전투 중 로봇이 되는 순간 | 고철 수호대 #Shorts",
+    "description": "고철 수호대 — Google Play에서 플레이하세요.\n설치: 채널 프로필의 ‘고철 수호대’ 링크\n\n도감에서 필요한 적을 확인하고, 전투에서 부품을 모아 제작·탑승하는 흐름입니다. 서로 다른 시점의 실제 플레이를 이어 붙였으며 위기 탈출이나 승리를 증명하는 영상은 아닙니다.\n\n직접 열기·복사용 링크:\nhttps://play.google.com/store/apps/details?id=io.github.hwangyeonjoon.scrapguard&utm_source=youtube&utm_medium=organic_video&utm_campaign=yt_short_assemble_20261126&referrer=utm_source%3Dyoutube%26utm_medium%3Dorganic_video%26utm_campaign%3Dyt_short_assemble_20261126\n\n영상은 Android 에뮬레이터에서 녹화한 게임 화면이며 실기기 성능을 뜻하지 않습니다. 도감 비교는 정지 화면입니다.\n음악: Overdrive — Alexander Ehlers (tricksntraps), CC0 1.0. 기기 녹음 대신 음악을 편집했습니다.\n#고철수호대 #로봇게임 #인디게임 #Shorts",
+    "file": "short-assemble.mp4",
+    "duration": 16,
+    "sources": [
+      {
+        "source": "TestResults/Promotion041/navigation.mp4",
+        "start": 32,
+        "duration": 4,
+        "kind": "real Android gameplay",
+        "sha256": "b15d9151d4cf78d31036ff286a63992834d446593244aa7d139198d6e273e178"
+      },
+      {
+        "source": "TestResults/Promotion041/battle.mp4",
+        "start": 146,
+        "duration": 3,
+        "kind": "real Android gameplay",
+        "sha256": "6d26051b9f5868312b819292947e2dc7dc0a6b9e43d9b1cf608c29fd7b2961f0"
+      },
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 0,
+        "duration": 3,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      },
+      {
+        "source": "TestResults/Promotion041/assembly.mp4",
+        "start": 5,
+        "duration": 6,
+        "kind": "real Android gameplay",
+        "sha256": "54669111eb5aeff1d428b6839832cdec7a754a60bcec35951fdcd0c3ea77f829"
+      }
+    ],
+    "sha256": "76f56fbeffab7e415defe2ec6b9aa065a5baa6faa21a73e430a6831b7bcc2f56"
+  }
+]
