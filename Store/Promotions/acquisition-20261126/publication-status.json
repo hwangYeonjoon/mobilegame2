@@ -1,7 +1,7 @@
 {
   "published_date": "2026-11-26",
   "timezone": "Asia/Seoul",
-  "verification": "YouTube Studio 게시된 동영상 confirmation for each public upload; upload copyright checks reported no issues.",
+  "verification": "YouTube Studio public publication confirmations and copyright checks passed; all three Shorts listed on public channel Shorts tab.",
   "shorts": [
     {
       "slug": "transform",
@@ -11,7 +11,9 @@
       "title": "이 작은 대원이 로봇에 탄다면? 🤖 | 고철 수호대 #Shorts",
       "file": "short-transform.mp4",
       "sha256": "fa8fbe4447c2b82a60c33969fd5df31e1bb9b74000e433561fd6d90c28557faa",
-      "campaign": "yt_short_transform_20261126"
+      "campaign": "yt_short_transform_20261126",
+      "related_video_id": "5yfN0J4dO9Q",
+      "related_video_saved_confirmation": true
     },
     {
       "slug": "design",
@@ -21,7 +23,9 @@
       "title": "포격 전차 vs 돌파 보행기, 어떤 로봇을 만들까요? | 고철 수호대 #Shorts",
       "file": "short-design.mp4",
       "sha256": "dd48c24921c93fb4dde09012b4937b443a8980a2d3169fa846e5c146f9dd23f4",
-      "campaign": "yt_short_design_20261126"
+      "campaign": "yt_short_design_20261126",
+      "related_video_id": "5yfN0J4dO9Q",
+      "related_video_saved_confirmation": true
     },
     {
       "slug": "assemble",
@@ -31,22 +35,27 @@
       "title": "모은 부품이 전투 중 로봇이 되는 순간 | 고철 수호대 #Shorts",
       "file": "short-assemble.mp4",
       "sha256": "76f56fbeffab7e415defe2ec6b9aa065a5baa6faa21a73e430a6831b7bcc2f56",
-      "campaign": "yt_short_assemble_20261126"
+      "campaign": "yt_short_assemble_20261126",
+      "related_video_id": "5yfN0J4dO9Q",
+      "related_video_saved_confirmation": true
     }
   ],
   "existing_video": {
     "id": "5yfN0J4dO9Q",
     "title_description_saved": true,
-    "custom_thumbnail_applied": false
+    "custom_thumbnail_applied": true,
+    "thumbnail_file": "thumbnail-robot-v1.png",
+    "thumbnail_verified_after_reload": true,
+    "play_campaign_link_visible_on_public_channel": true
   },
   "channel": {
     "id": "UCNFKX_NnUQPGwRyEz0ADE9g",
     "handle": "@mrGrooveSpher",
     "play_link_campaign": "yt_channel_20261126",
-    "profile_link_saved_and_reloaded": true
+    "profile_link_saved_and_reloaded": true,
+    "public_play_link_verified": true
   },
-  "pending": [
-    "YouTube channel phone verification for custom thumbnail; related video eligibility requires separate check."
-  ],
-  "paid_promotion_started": false
+  "pending": [],
+  "paid_promotion_started": false,
+  "performance_results": "Not yet measured; review at 3 and 7 days after publication."
 }
