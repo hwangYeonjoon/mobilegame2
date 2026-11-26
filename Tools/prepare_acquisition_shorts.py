@@ -96,9 +96,10 @@ def main():
              '-map','0:v','-map','1:a','-c:v','copy','-af',f'volume=0.25,afade=t=out:st={duration-1}:d=1',
              '-c:a','aac','-b:a','128k','-t',str(duration),'-movflags','+faststart',str(video)])
         campaign=f"yt_short_{spec['slug']}_20261126"
+        still_note = ' 도감 비교는 정지 화면입니다.' if spec['slug'] == 'design' else ''
         desc=(f"고철 수호대 — Google Play에서 플레이하세요.\n설치: 채널 프로필의 ‘고철 수호대’ 링크\n\n"
               f"{spec['note']}\n\n직접 열기·복사용 링크:\n{links[campaign]}\n\n"
-              '영상은 Android 에뮬레이터에서 녹화한 게임 화면이며 실기기 성능을 뜻하지 않습니다. 도감 비교는 정지 화면입니다.\n'
+              f'영상은 Android 에뮬레이터에서 녹화한 게임 화면이며 실기기 성능을 뜻하지 않습니다.{still_note}\n'
               '음악: Overdrive — Alexander Ehlers (tricksntraps), CC0 1.0. 기기 녹음 대신 음악을 편집했습니다.\n'
               '#고철수호대 #로봇게임 #인디게임 #Shorts')
         metadata.append(dict(slug=spec['slug'],title=spec['title'],description=desc,file=video.name,

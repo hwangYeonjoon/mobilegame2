@@ -1,0 +1,52 @@
+{
+  "published_date": "2026-11-26",
+  "timezone": "Asia/Seoul",
+  "verification": "YouTube Studio 게시된 동영상 confirmation for each public upload; upload copyright checks reported no issues.",
+  "shorts": [
+    {
+      "slug": "transform",
+      "video_id": "CZiDtMQzALM",
+      "url": "https://youtube.com/shorts/CZiDtMQzALM",
+      "visibility": "public",
+      "title": "이 작은 대원이 로봇에 탄다면? 🤖 | 고철 수호대 #Shorts",
+      "file": "short-transform.mp4",
+      "sha256": "fa8fbe4447c2b82a60c33969fd5df31e1bb9b74000e433561fd6d90c28557faa",
+      "campaign": "yt_short_transform_20261126"
+    },
+    {
+      "slug": "design",
+      "video_id": "yggcxg6KFto",
+      "url": "https://youtube.com/shorts/yggcxg6KFto",
+      "visibility": "public",
+      "title": "포격 전차 vs 돌파 보행기, 어떤 로봇을 만들까요? | 고철 수호대 #Shorts",
+      "file": "short-design.mp4",
+      "sha256": "dd48c24921c93fb4dde09012b4937b443a8980a2d3169fa846e5c146f9dd23f4",
+      "campaign": "yt_short_design_20261126"
+    },
+    {
+      "slug": "assemble",
+      "video_id": "E2gHuO5DZCg",
+      "url": "https://youtube.com/shorts/E2gHuO5DZCg",
+      "visibility": "public",
+      "title": "모은 부품이 전투 중 로봇이 되는 순간 | 고철 수호대 #Shorts",
+      "file": "short-assemble.mp4",
+      "sha256": "76f56fbeffab7e415defe2ec6b9aa065a5baa6faa21a73e430a6831b7bcc2f56",
+      "campaign": "yt_short_assemble_20261126"
+    }
+  ],
+  "existing_video": {
+    "id": "5yfN0J4dO9Q",
+    "title_description_saved": true,
+    "custom_thumbnail_applied": false
+  },
+  "channel": {
+    "id": "UCNFKX_NnUQPGwRyEz0ADE9g",
+    "handle": "@mrGrooveSpher",
+    "play_link_campaign": "yt_channel_20261126",
+    "profile_link_saved_and_reloaded": true
+  },
+  "pending": [
+    "YouTube channel phone verification for custom thumbnail; related video eligibility requires separate check."
+  ],
+  "paid_promotion_started": false
+}
